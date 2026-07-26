@@ -1,0 +1,76 @@
+{
+  "name": "@rtkelly/design-system",
+  "version": "1.1.0",
+  "description": "Brutalist dual-mode design system, slide deck system, and experiments foundation for Ryan Kelly websites, backed by GitHub Packages",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "style": "./dist/styles.css",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./preset": {
+      "types": "./dist/tailwind-preset.d.ts",
+      "import": "./dist/tailwind-preset.mjs",
+      "require": "./dist/tailwind-preset.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build -o storybook-static",
+    "prepublishOnly": "pnpm build"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rtkelly13/design-system.git"
+  },
+  "keywords": [
+    "design-system",
+    "brutalist",
+    "dual-mode",
+    "react",
+    "tailwind",
+    "storybook",
+    "slides",
+    "deck",
+    "experiments"
+  ],
+  "author": "Ryan Kelly",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^0.474.0"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^8.5.8",
+    "@storybook/react": "^8.5.8",
+    "@storybook/react-vite": "^8.5.8",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "lucide-react": "^0.474.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "storybook": "^8.5.8",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
+  }
+}

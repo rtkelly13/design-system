@@ -1,0 +1,20 @@
+import React from 'react';
+import type { Meta, StoryObj } from '@storybook/react';
+import { LoremIpsumPost } from '../components/blog/LoremIpsumPost';
+import { ThemeProvider } from '../components/ThemeProvider';
+
+const meta: Meta<typeof LoremIpsumPost> = {
+  title: 'Blog/LoremIpsumPost',
+  component: LoremIpsumPost,
+};
+
+export default meta;
+type Story = StoryObj<typeof LoremIpsumPost>;
+
+export const FoundationalBlogPost: Story = {
+  render: () => (
+    <ThemeProvider defaultTheme="dark">
+      <LoremIpsumPost />
+    </ThemeProvider>
+  ),
+};

@@ -1,0 +1,108 @@
+/* @rtkelly/design-system - Brutalist Dual-Mode Theme Stylesheet */
+
+:root, .dark {
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --brutalist-cyan: #22d3ee;
+  --brutalist-pink: #ec4899;
+  --brutalist-yellow: #facc15;
+  --brutalist-neonGreen: #39ff14;
+  --brutalist-cyberOrange: #ff8c00;
+  --brutalist-darkBg: #0a0a1a;
+  --brutalist-shadow-color: #ffffff;
+  --border-color: #ffffff;
+}
+
+.dim {
+  --color-black: #121316;
+  --color-white: #e4e4e7;
+  --brutalist-cyan: #38bdf8;
+  --brutalist-pink: #f43f5e;
+  --brutalist-yellow: #fbbf24;
+  --brutalist-shadow-color: #e4e4e7;
+  --border-color: #e4e4e7;
+}
+
+.sketch {
+  --color-black: #fcfbf9; /* Warm paper sheet */
+  --color-white: #18181b; /* Graphite ink */
+  --brutalist-cyan: #2563eb; /* Blue pen ink */
+  --brutalist-pink: #dc2626; /* Red pen ink */
+  --brutalist-yellow: #16a34a; /* Green highlighter */
+  --brutalist-shadow-color: #18181b;
+  --border-color: #18181b;
+}
+
+/* Global Brutalist Enforcement */
+*, *::before, *::after {
+  border-radius: 0px !important;
+}
+
+.brutalist-card {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  border: 2px solid var(--border-color);
+  box-shadow: 4px 4px 0px 0px var(--brutalist-shadow-color);
+  padding: 1.5rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.brutalist-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--brutalist-cyan);
+}
+
+.brutalist-btn {
+  font-family: var(--font-space-grotesk, "Space Grotesk"), sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  border: 2px solid var(--border-color);
+  box-shadow: 4px 4px 0px 0px var(--brutalist-shadow-color);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.brutalist-btn:hover {
+  transform: translate(-2px, -2px);
+  background-color: var(--brutalist-cyan);
+  color: #000000;
+  box-shadow: 6px 6px 0px 0px var(--brutalist-pink);
+}
+
+.brutalist-btn-pink {
+  border-color: var(--brutalist-pink);
+  box-shadow: 4px 4px 0px 0px var(--brutalist-pink);
+}
+
+.brutalist-btn-pink:hover {
+  background-color: var(--brutalist-pink);
+  color: #ffffff;
+  box-shadow: 6px 6px 0px 0px var(--brutalist-yellow);
+}
+
+.brutalist-badge {
+  font-family: var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border: 2px solid var(--border-color);
+  background-color: var(--color-black);
+  color: var(--brutalist-cyan);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ascii-divider {
+  font-family: var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace;
+  color: var(--brutalist-cyan);
+  letter-spacing: 0.2em;
+  user-select: none;
+}

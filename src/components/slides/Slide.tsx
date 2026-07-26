@@ -1,0 +1,84 @@
+import React from 'react';
+
+export interface SlideProps {
+  title?: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  speakerNotes?: string;
+}
+
+export const Slide: React.FC<SlideProps> = ({
+  title,
+  subtitle,
+  children,
+}) => {
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '3rem 4rem',
+        backgroundColor: 'var(--color-black, #000000)',
+        color: 'var(--color-white, #ffffff)',
+        boxSizing: 'border-box',
+      }}
+    >
+      {/* Slide Header */}
+      {title && (
+        <div style={{ marginBottom: '2rem', borderBottom: '2px solid var(--border-color, #ffffff)', paddingBottom: '1rem' }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+              fontSize: '2.5rem',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '-0.02em',
+              color: 'var(--color-white, #ffffff)',
+              margin: 0,
+            }}
+          >
+            [ {title} ]
+          </h2>
+          {subtitle && (
+            <p
+              style={{
+                fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+                fontSize: '1rem',
+                color: 'var(--brutalist-cyan, #22d3ee)',
+                marginTop: '0.5rem',
+              }}
+            >
+              &gt; {subtitle}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Slide Content Body */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {children}
+      </div>
+
+      {/* Slide Footer Branding */}
+      <div
+        style={{
+          marginTop: '2rem',
+          paddingTop: '1rem',
+          borderTop: '2px solid var(--border-color, #ffffff)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+          fontSize: '0.75rem',
+          color: 'var(--brutalist-cyan, #22d3ee)',
+        }}
+      >
+        <span>// BRUTALIST PRESENTATION ENGINE //</span>
+        <span>RYANKELLY.DEV</span>
+      </div>
+    </div>
+  );
+};
