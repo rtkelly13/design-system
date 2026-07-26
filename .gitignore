@@ -3,3 +3,7 @@ dist/
 storybook-static/
 .DS_Store
 *.log
+
+# Temporary files, local databases, scratch files, and git worktrees
+/temp/
+temp/
