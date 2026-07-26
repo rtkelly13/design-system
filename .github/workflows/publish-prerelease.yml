@@ -1,0 +1,105 @@
+name: Publish PR Prerelease to GitHub Packages
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  prerelease:
+    name: Build & Publish PR Prerelease
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@rtkelly'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Dynamic Prerelease Version
+        id: prerelease_version
+        run: |
+          PR_NUM="${{ github.event.number }}"
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          BASE_VERSION=$(node -p "require('./package.json').version.split('-')[0]")
+          PRERELEASE_VER="${BASE_VERSION}-pr.${PR_NUM}.${SHORT_SHA}"
+          
+          # Set version in package.json without committing
+          npm version "${PRERELEASE_VER}" --no-git-tag-version
+          
+          echo "version=${PRERELEASE_VER}" >> $GITHUB_OUTPUT
+          echo "pr_tag=pr-${PR_NUM}" >> $GITHUB_OUTPUT
+
+      - name: Build Package & Storybook
+        run: |
+          pnpm typecheck
+          pnpm build
+          pnpm build-storybook
+
+      - name: Publish Prerelease to GitHub Packages
+        run: |
+          pnpm publish --no-git-checks --tag ${{ steps.prerelease_version.outputs.pr_tag }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post PR Comment with Installation Instructions
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNum = context.issue.number;
+            const version = "${{ steps.prerelease_version.outputs.version }}";
+            const prTag = "${{ steps.prerelease_version.outputs.pr_tag }}";
+            
+            const commentBody = `### 🚀 PR Prerelease Published to GitHub Packages!
+            
+            You can test the design system changes in this PR directly in any downstream website or application:
+            
+            \`\`\`bash
+            # Install by PR Tag:
+            pnpm add @rtkelly/design-system@${prTag}
+            
+            # Or install exact prerelease version:
+            pnpm add @rtkelly/design-system@${version}
+            \`\``;
+
+            // Find existing bot comment to update or post new
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNum,
+            });
+
+            const botComment = comments.data.find(c => c.body.includes('PR Prerelease Published to GitHub Packages!'));
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNum,
+                body: commentBody,
+              });
+            }

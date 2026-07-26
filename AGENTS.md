@@ -11,7 +11,10 @@ Package manager is **pnpm** (`node >=22`).
 1. **Squash Merge Only**: All pull requests must be merged into `main` using **Squash and Merge** exclusively.
 2. **Delete Branch on Merge**: Feature branches must be automatically or manually deleted immediately upon merge into `main`.
 3. **Linear History**: Maintain a strictly linear history. Rebase feature branches onto `main` before merging; no merge commits allowed.
-4. **Required Checks**:
+4. **PR Prerelease Publishing**:
+   - Every Pull Request automatically builds and publishes a tagged prerelease to GitHub Packages (`@rtkelly/design-system@pr-<PR_NUMBER>`).
+   - Downstream apps (`blog`, `ynab-budget-companion`) can test PR changes before merging by running `pnpm add @rtkelly/design-system@pr-<PR_NUMBER>`.
+5. **Required Checks**:
    - `pnpm typecheck`
    - `pnpm build`
    - `pnpm build-storybook`
