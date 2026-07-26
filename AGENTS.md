@@ -13,11 +13,15 @@ Package manager is **pnpm** (`node >=22`).
 3. **Linear History**: Maintain a strictly linear history. Rebase feature branches onto `main` before merging; no merge commits allowed.
 4. **PR Prerelease Publishing**:
    - Every Pull Request automatically builds and publishes a tagged prerelease to GitHub Packages (`@rtkelly/design-system@pr-<PR_NUMBER>`).
-   - Downstream apps (`blog`, `ynab-budget-companion`) can test PR changes before merging by running `pnpm add @rtkelly/design-system@pr-<PR_NUMBER>`.
-5. **Required Checks**:
+5. **Visual Regression Testing**:
+   - Powered by Playwright snapshot testing (`tests/visual.spec.ts`).
+   - Runs strictly on **Linux CI** to avoid OS font rendering diffs (`maxDiffPixelRatio: 0.002`).
+   - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow.
+6. **Required Checks**:
    - `pnpm typecheck`
    - `pnpm build`
    - `pnpm build-storybook`
+   - `pnpm test:visual` (Linux CI)
 
 ---
 
@@ -35,4 +39,6 @@ Package manager is **pnpm** (`node >=22`).
 - `pnpm build`: Bundles ESM, CJS, DTS types, and CSS via `tsup`.
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
+- `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
+- `pnpm test:visual:update`: Updates Playwright visual snapshots.
 - `pnpm typecheck`: Validates TypeScript strict mode.

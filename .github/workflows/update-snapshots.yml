@@ -1,16 +1,16 @@
-name: CI & Visual Regression Checks
+name: Update Visual Regression Snapshots
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for updating visual snapshots'
+        required: true
+        default: 'Update component baseline snapshots'
 
 jobs:
-  verify:
-    name: Build, Typecheck, Storybook & Visual Regression
+  update-snapshots:
+    name: Update Snapshots on Linux
     runs-on: ubuntu-latest
 
     steps:
@@ -30,25 +30,18 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Type Check
-        run: pnpm typecheck
-
-      - name: Build Package
-        run: pnpm build
-
-      - name: Build Storybook
+      - name: Build Storybook Static
         run: pnpm build-storybook
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run Visual Regression Tests
-        run: pnpm test:visual
+      - name: Generate Visual Snapshots
+        run: pnpm test:visual:update
 
-      - name: Upload Playwright Report on Failure
-        if: failure()
+      - name: Upload Snapshot Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: playwright-snapshots
+          path: tests/__snapshots__/
           retention-days: 7
