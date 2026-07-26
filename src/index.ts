@@ -7,6 +7,7 @@ export * from './tailwind-preset';
 export * from './components/Button';
 export * from './components/Card';
 export * from './components/Badge';
+export * from './components/Avatar';
 export * from './components/PageTitle';
 export * from './components/AsciiDivider';
 export * from './components/ThemeProvider';
@@ -25,3 +26,7 @@ export * from './components/blog/LoremIpsumPost';
 // Experiments Page & Design System Sandbox
 export * from './components/experiments/ExperimentsView';
 export * from './components/experiments/DesignSandbox';
+
+// SaaS Landing Pages & Admin Sites Foundations
+export * from './components/saas/SaasLandingPage';
+export * from './components/admin/AdminDashboardLayout';

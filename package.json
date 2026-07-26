@@ -1,6 +1,6 @@
 {
   "name": "@rtkelly/design-system",
-  "version": "1.2.0",
+  "version": "0.0.1",
   "description": "Brutalist dual-mode design system, slide deck system, and experiments foundation for Ryan Kelly websites, backed by GitHub Packages",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
