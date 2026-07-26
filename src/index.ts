@@ -7,6 +7,7 @@ export * from './tailwind-preset';
 export * from './components/Button';
 export * from './components/Card';
 export * from './components/Badge';
+export * from './components/Avatar';
 export * from './components/PageTitle';
 export * from './components/AsciiDivider';
 export * from './components/ThemeProvider';
