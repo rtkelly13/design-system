@@ -40,7 +40,15 @@ export function Button({
       className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variantKey]} ${className}`.trim()}
       {...props}
     >
-      {bracketed ? `[ ${children} ]` : children}
+      {bracketed ? (
+        <span className="inline-flex items-center justify-center gap-2">
+          <span className="bracket-glyph select-none" aria-hidden="true">[</span>
+          <span className="inline-flex items-center gap-2">{children}</span>
+          <span className="bracket-glyph select-none" aria-hidden="true">]</span>
+        </span>
+      ) : (
+        <span className="inline-flex items-center justify-center gap-2">{children}</span>
+      )}
     </button>
   );
 }
