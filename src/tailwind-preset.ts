@@ -1,6 +1,7 @@
 import { brutalistTokens } from './tokens';
 
 export const brutalistTailwindPreset = {
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: brutalistTokens.fonts,
@@ -18,6 +19,9 @@ export const brutalistTailwindPreset = {
         'hard-cyan': brutalistTokens.shadows.hardCyan,
         'hard-pink': brutalistTokens.shadows.hardPink,
         'hard-yellow': brutalistTokens.shadows.hardYellow,
+        'glow-cyan': brutalistTokens.shadows.glowCyan,
+        'glow-pink': brutalistTokens.shadows.glowPink,
+        'glow-orange': brutalistTokens.shadows.glowOrange,
       },
     },
   },
