@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 22
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@rtkelly'
+          scope: '@rtkelly13'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
