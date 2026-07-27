@@ -42,14 +42,20 @@ jobs:
       - name: Generate Visual Snapshots
         run: pnpm test:visual:update
 
-      - name: Create Pull Request for Baseline Snapshots
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore(visual): update Playwright baseline visual snapshots"
-          title: "chore(visual): update Playwright baseline visual snapshots"
-          body: "Automated PR to update baseline Playwright visual snapshots generated on Linux."
-          branch: "chore/update-visual-snapshots"
-          delete-branch: true
+      # Commit straight back to the branch this run was dispatched on — the
+      # repo blocks Actions from creating pull requests, so the previous
+      # peter-evans/create-pull-request approach can never work here.
+      - name: Commit & push snapshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -z "$(git status --porcelain tests/__snapshots__)" ]; then
+            echo "Snapshots already match — nothing to commit."
+            exit 0
+          fi
+          git add tests/__snapshots__
+          git commit -m "chore(visual): update Playwright baseline visual snapshots"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Upload Snapshot Artifacts
         uses: actions/upload-artifact@v4
