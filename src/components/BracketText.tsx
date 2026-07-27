@@ -1,40 +1,38 @@
-import React from 'react';
+import type { ReactNode, HTMLAttributes } from 'react';
 
-export interface BracketTextProps extends React.HTMLAttributes<HTMLSpanElement> {
-  children: React.ReactNode;
+export interface BracketTextProps extends HTMLAttributes<HTMLSpanElement> {
+  children: ReactNode;
   accent?: 'cyan' | 'pink' | 'yellow' | 'green' | 'white';
+  className?: string;
 }
 
-export const BracketText: React.FC<BracketTextProps> = ({
+export function BracketText({
   children,
-  accent = 'cyan',
+  accent,
   className = '',
-  style,
   ...props
-}) => {
-  const getAccentColor = () => {
-    switch (accent) {
-      case 'pink': return 'var(--brutalist-pink, #ec4899)';
-      case 'yellow': return 'var(--brutalist-yellow, #facc15)';
-      case 'green': return 'var(--brutalist-neonGreen, #39ff14)';
-      case 'white': return 'var(--color-white, #ffffff)';
-      default: return 'var(--brutalist-cyan, #22d3ee)';
-    }
+}: BracketTextProps) {
+  const accentClasses: Record<string, string> = {
+    cyan: 'text-brutalist-cyan',
+    pink: 'text-brutalist-pink',
+    yellow: 'text-brutalist-yellow',
+    green: 'text-brutalist-green',
+    white: 'text-white',
   };
 
+  const accentClass = accent ? accentClasses[accent] : '';
+
   return (
-    <span
-      className={className}
-      style={{
-        fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        color: getAccentColor(),
-        ...style
-      }}
-      {...props}
-    >
-      [ {children} ]
+    <span className={`${accentClass} ${className}`.trim()} {...props}>
+      <span className="bracket-glyph" aria-hidden="true">
+        [
+      </span>{' '}
+      {children}{' '}
+      <span className="bracket-glyph" aria-hidden="true">
+        ]
+      </span>
     </span>
   );
-};
+}
+
+export default BracketText;

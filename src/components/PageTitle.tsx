@@ -1,41 +1,35 @@
-import React from 'react';
+import type { ReactNode, HTMLAttributes } from 'react';
+import { BracketText } from './BracketText';
 
-export interface PageTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  children: React.ReactNode;
+export interface PageTitleProps extends HTMLAttributes<HTMLHeadingElement> {
+  children: ReactNode;
   subtitle?: string;
   bracketed?: boolean;
+  className?: string;
 }
 
-export const PageTitle: React.FC<PageTitleProps> = ({
+export function PageTitle({
   children,
   subtitle,
   bracketed = true,
   className = '',
-  style,
   ...props
-}) => {
+}: PageTitleProps) {
+  const baseClasses =
+    'text-3xl font-display font-bold leading-tight tracking-tight text-white uppercase sm:text-4xl md:text-5xl border-4 border-double border-white inline-block px-6 py-4';
+
   return (
-    <div style={{ marginBottom: '2rem' }}>
-      <h1
-        className={className}
-        style={{
-          fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
-          fontSize: '2.25rem',
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          letterSpacing: '-0.02em',
-          color: 'var(--color-white, #ffffff)',
-          ...style
-        }}
-        {...props}
-      >
-        {bracketed ? `[ ${children} ]` : children}
+    <div className="mb-8">
+      <h1 className={`${baseClasses} ${className}`.trim()} {...props}>
+        {bracketed ? <BracketText>{children}</BracketText> : children}
       </h1>
       {subtitle && (
-        <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', color: 'var(--brutalist-cyan, #22d3ee)', marginTop: '0.5rem' }}>
+        <p className="mt-2 font-mono text-sm text-brutalist-cyan">
           {subtitle}
         </p>
       )}
     </div>
   );
-};
+}
+
+export default PageTitle;

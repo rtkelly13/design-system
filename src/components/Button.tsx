@@ -1,29 +1,48 @@
-import React from 'react';
+import type { ButtonHTMLAttributes, DetailedHTMLProps, ReactNode } from 'react';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'cyan' | 'pink' | 'yellow' | 'default';
+export interface ButtonProps
+  extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
+  children: ReactNode;
+  variant?: 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
+  size?: 'sm' | 'md' | 'lg';
   bracketed?: boolean;
-  children: React.ReactNode;
+  className?: string;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = 'default',
-  bracketed = false,
+export function Button({
   children,
+  variant = 'pink',
+  size = 'md',
+  bracketed = false,
   className = '',
-  style,
   ...props
-}) => {
-  const getVariantClass = () => {
-    switch (variant) {
-      case 'pink': return 'brutalist-btn brutalist-btn-pink';
-      default: return 'brutalist-btn';
-    }
+}: ButtonProps) {
+  const baseStyles = 'font-mono font-bold uppercase border-2 transition-all duration-200';
+
+  const sizeStyles = {
+    sm: 'px-4 py-2 text-sm',
+    md: 'px-6 py-3 text-base',
+    lg: 'px-8 py-4 text-lg',
   };
 
+  const variantStyles = {
+    cyan: 'bg-brutalist-cyan text-black border-white shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none',
+    pink: 'bg-brutalist-pink text-black border-white shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none',
+    yellow: 'bg-brutalist-yellow text-black border-white shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none',
+    white: 'bg-white text-black border-black shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none',
+    default: 'bg-brutalist-cyan text-black border-white shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none',
+  };
+
+  const variantKey = variant === 'default' ? 'cyan' : variant;
+
   return (
-    <button className={`${getVariantClass()} ${className}`} style={style} {...props}>
+    <button
+      className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variantKey]} ${className}`.trim()}
+      {...props}
+    >
       {bracketed ? `[ ${children} ]` : children}
     </button>
   );
-};
+}
+
+export default Button;
