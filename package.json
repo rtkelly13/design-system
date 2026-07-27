@@ -1,7 +1,7 @@
 {
   "name": "@rtkelly13/design-system",
   "version": "0.0.4",
-  "description": "Brutalist dual-mode design system, slide deck system, and experiments foundation for Ryan Kelly websites, backed by GitHub Packages",
+  "description": "Brutalist dual-mode design system, slide deck system, and experiments foundation for Ryan Kelly websites",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -40,7 +40,7 @@
     "prepublishOnly": "pnpm build"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "repository": {
     "type": "git",

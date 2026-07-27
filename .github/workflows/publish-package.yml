@@ -1,4 +1,9 @@
-name: Publish Design System to GitHub Packages
+name: Publish Design System to npm
+
+# Publishes via npm Trusted Publishing (OIDC) — no NPM_TOKEN secret. npm
+# trusts this exact workflow file (configured on the package's npmjs.com
+# settings page), and npm >= 11.5 exchanges the Actions OIDC token for a
+# publish credential and attaches provenance automatically.
 
 on:
   push:
@@ -13,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      id-token: write # OIDC for npm trusted publishing + provenance
 
     steps:
       - name: Checkout Repository
@@ -23,8 +28,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@rtkelly13'
+          registry-url: 'https://registry.npmjs.org'
+
+      # Trusted publishing needs npm >= 11.5; Node 22 bundles an older npm.
+      - name: Update npm
+        run: npm install -g npm@latest
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -37,16 +45,13 @@ jobs:
       - name: Run Build
         run: pnpm build
 
-      - name: Publish Package to GitHub Packages
+      - name: Publish Package to npm
         shell: bash
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          if npm view "@rtkelly13/design-system@${VERSION}" version --registry=https://npm.pkg.github.com > /dev/null 2>&1; then
-            echo "Version ${VERSION} is already published to GitHub Packages. Skipping publish step."
+          if npm view "@rtkelly13/design-system@${VERSION}" version > /dev/null 2>&1; then
+            echo "Version ${VERSION} is already published to npm. Skipping publish step."
           else
-            echo "Publishing version ${VERSION} to GitHub Packages..."
-            pnpm publish --no-git-checks
+            echo "Publishing version ${VERSION} to npm..."
+            npm publish
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
