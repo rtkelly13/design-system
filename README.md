@@ -86,10 +86,10 @@ export function App() {
 
 ### 2. Tailwind CSS v4 token contract
 
-Consumers on Tailwind v4 should import the theme contract instead of the
-legacy JS preset — it ships the brutalist `@theme` tokens, the `.dark`/`.dim`
-dark variant, the per-mode variable blocks, and an `@source` directive so
-utilities used inside the compiled components are generated in your build:
+Import the theme contract in your CSS entrypoint — it ships the brutalist
+`@theme` tokens, the `.dark`/`.dim` dark variant, the per-mode variable
+blocks, and an `@source` directive so utilities used inside the compiled
+components are generated in your build:
 
 ```css
 @import "tailwindcss";
@@ -99,10 +99,6 @@ utilities used inside the compiled components are generated in your build:
 `styles.css` = `theme.css` + web-font imports + opinionated global resets
 (zero border-radius everywhere, base typography). Import one or the other,
 not both.
-
-> **Deprecated**: the `@rtkelly13/design-system/tailwind-preset` (v3 JS
-> preset) export still works for `tailwind.config.js` consumers but is
-> superseded by `theme.css` and will be removed in a future release.
 
 ---
 

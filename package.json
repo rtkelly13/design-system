@@ -13,17 +13,7 @@
       "require": "./dist/index.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./theme.css": "./dist/theme.css",
-    "./preset": {
-      "types": "./dist/tailwind-preset.d.ts",
-      "import": "./dist/tailwind-preset.mjs",
-      "require": "./dist/tailwind-preset.js"
-    },
-    "./tailwind-preset": {
-      "types": "./dist/tailwind-preset.d.ts",
-      "import": "./dist/tailwind-preset.mjs",
-      "require": "./dist/tailwind-preset.js"
-    }
+    "./theme.css": "./dist/theme.css"
   },
   "files": [
     "dist",
