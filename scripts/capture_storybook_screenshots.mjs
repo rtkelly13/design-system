@@ -42,9 +42,10 @@ server.listen(6007, async () => {
   });
 
   const stories = [
-    { name: 'storybook_design_sandbox_components.png', url: 'http://localhost:6007/iframe.html?id=showcase-designsandbox--default-sandbox&viewMode=story' },
-    { name: 'storybook_saas_landing_page.png', url: 'http://localhost:6007/iframe.html?id=saas-landingpage--default-landing-page&viewMode=story' },
-    { name: 'storybook_admin_dashboard.png', url: 'http://localhost:6007/iframe.html?id=saas-admindashboardlayout--default-admin-dashboard&viewMode=story' },
+    { name: 'storybook_saas_landing_dark.png', url: 'http://localhost:6007/iframe.html?id=saas-landingpage--dark-mode&viewMode=story' },
+    { name: 'storybook_saas_landing_lite.png', url: 'http://localhost:6007/iframe.html?id=saas-landingpage--lite-mode&viewMode=story' },
+    { name: 'storybook_admin_dashboard_dark.png', url: 'http://localhost:6007/iframe.html?id=saas-admindashboardlayout--dark-mode&viewMode=story' },
+    { name: 'storybook_admin_dashboard_lite.png', url: 'http://localhost:6007/iframe.html?id=saas-admindashboardlayout--lite-mode&viewMode=story' },
     { name: 'storybook_editorial_blog_post.png', url: 'http://localhost:6007/iframe.html?id=blog-loremipsumpost--foundational-blog-post&viewMode=story' },
     { name: 'storybook_presentation_slidedeck.png', url: 'http://localhost:6007/iframe.html?id=presentation-slidedeck--default-deck&viewMode=story' },
   ];

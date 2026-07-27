@@ -1,4 +1,5 @@
 /* @rtkelly/design-system - Brutalist Dual-Mode Theme Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=VT323&display=swap');
 
 :root, .dark {
   --color-black: #000000;
@@ -31,6 +32,20 @@
   --brutalist-yellow: #16a34a; /* Green highlighter */
   --brutalist-shadow-color: #18181b;
   --border-color: #18181b;
+}
+
+body, html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: 'Space Grotesk', 'Inter', sans-serif !important;
+}
+
+code, pre, .font-mono {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace !important;
 }
 
 /* Global Brutalist Enforcement */
