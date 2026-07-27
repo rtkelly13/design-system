@@ -1,0 +1,78 @@
+/* @rtkelly13/design-system — Tailwind v4 token contract.
+ *
+ * Import AFTER `@import "tailwindcss"` in the consumer's CSS entrypoint:
+ *
+ *   @import "tailwindcss";
+ *   @import "@rtkelly13/design-system/theme.css";
+ *
+ * Ships the brutalist tokens as a v4 `@theme` block, the class-based dark
+ * variant (`.dark` and `.dim` both count as dark), the per-mode CSS variable
+ * blocks, and an `@source` so utilities used inside the compiled design-system
+ * components are generated in the consumer's build (v4 skips node_modules in
+ * automatic content detection).
+ *
+ * Deliberately excludes web-font @imports and global resets — those live in
+ * styles.css for consumers that want the full opinionated stylesheet.
+ */
+
+@source "./";
+
+@custom-variant dark (&:where(.dark, .dark *, .dim, .dim *));
+
+@theme {
+  --color-brutalist-cyan: var(--brutalist-cyan, #22d3ee);
+  --color-brutalist-pink: var(--brutalist-pink, #ec4899);
+  --color-brutalist-yellow: var(--brutalist-yellow, #facc15);
+  --color-brutalist-neonGreen: var(--brutalist-neonGreen, #39ff14);
+  --color-brutalist-neonCyan: var(--brutalist-neonCyan, #00ffff);
+  --color-brutalist-cyberOrange: var(--brutalist-cyberOrange, #ff8c00);
+  --color-brutalist-darkBg: var(--brutalist-darkBg, #0a0a1a);
+
+  --font-sans: var(--font-inter, "Inter"), system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk, "Space Grotesk"), system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono, "IBM Plex Mono"), Courier New, monospace;
+  --font-pixel: var(--font-vt323, "VT323"), monospace;
+
+  --shadow-hard-sm: 2px 2px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
+  --shadow-hard-md: 4px 4px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
+  --shadow-hard-lg: 6px 6px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
+  --shadow-hard-cyan: 4px 4px 0px 0px var(--brutalist-cyan, #22d3ee);
+  --shadow-hard-pink: 4px 4px 0px 0px var(--brutalist-pink, #ec4899);
+  --shadow-hard-yellow: 4px 4px 0px 0px var(--brutalist-yellow, #facc15);
+  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 30%, transparent);
+  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--brutalist-pink, #ec4899) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-pink, #ec4899) 30%, transparent);
+  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 80%, transparent), 0 0 40px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 50%, transparent);
+}
+
+:root, .dark {
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --brutalist-cyan: #22d3ee;
+  --brutalist-pink: #ec4899;
+  --brutalist-yellow: #facc15;
+  --brutalist-neonGreen: #39ff14;
+  --brutalist-cyberOrange: #ff8c00;
+  --brutalist-darkBg: #0a0a1a;
+  --brutalist-shadow-color: #ffffff;
+  --border-color: #ffffff;
+}
+
+.dim {
+  --color-black: #121316;
+  --color-white: #e4e4e7;
+  --brutalist-cyan: #38bdf8;
+  --brutalist-pink: #f43f5e;
+  --brutalist-yellow: #fbbf24;
+  --brutalist-shadow-color: #e4e4e7;
+  --border-color: #e4e4e7;
+}
+
+.sketch {
+  --color-black: #fcfbf9; /* Warm paper sheet */
+  --color-white: #18181b; /* Graphite ink */
+  --brutalist-cyan: #2563eb; /* Blue pen ink */
+  --brutalist-pink: #dc2626; /* Red pen ink */
+  --brutalist-yellow: #16a34a; /* Green highlighter */
+  --brutalist-shadow-color: #18181b;
+  --border-color: #18181b;
+}

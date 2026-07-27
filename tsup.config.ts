@@ -16,5 +16,5 @@ export default defineConfig({
   footer: {
     js: "if (typeof module !== 'undefined' && module.exports && module.exports.default) { module.exports = Object.assign(module.exports.default, module.exports); }",
   },
-  onSuccess: 'cp src/styles.css dist/styles.css',
+  onSuccess: 'cp src/styles.css src/theme.css dist/',
 });
