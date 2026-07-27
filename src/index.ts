@@ -18,6 +18,10 @@ export * from './components/ThemeProvider';
 export * from './components/BracketText';
 export * from './components/NoteBlock';
 export * from './components/TLDR';
+export * from './components/Input';
+export * from './components/StatCard';
+export * from './components/DataTable';
+export * from './components/Modal';
 
 // Slides & Presentation Deck Engine
 export * from './components/slides/Slide';

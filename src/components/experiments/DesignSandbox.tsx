@@ -5,51 +5,63 @@ import { Button } from '../Button';
 import { Badge } from '../Badge';
 import { NoteBlock } from '../NoteBlock';
 import { TLDR } from '../TLDR';
-import { AsciiDivider } from '../AsciiDivider';
+import { Input, Select } from '../Input';
+import { StatCard } from '../StatCard';
+import { DataTable } from '../DataTable';
+import { Modal } from '../Modal';
+import { Tag } from '../Tag';
+import { PageHeader } from '../PageHeader';
+import { SectionContainer } from '../SectionContainer';
 import { SlideDeck } from '../slides/SlideDeck';
 import { Slide } from '../slides/Slide';
 import { LoremIpsumPost } from '../blog/LoremIpsumPost';
 import { useTheme } from '../ThemeProvider';
-import { Sun, Moon, Sparkles, Terminal } from 'lucide-react';
+import { Activity, ShieldCheck, Cpu, DollarSign, Layers, Search, ShoppingBag } from 'lucide-react';
+
+interface UserRecord {
+  id: string;
+  name: string;
+  role: string;
+  status: 'active' | 'pending' | 'disabled';
+  usage: string;
+}
 
 export const DesignSandbox: React.FC = () => {
   const { theme, cycleTheme, setTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState<'components' | 'slides' | 'post'>('components');
+  const [activeTab, setActiveTab] = useState<'components' | 'saas' | 'ecommerce' | 'slides' | 'post'>('components');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const usersData: UserRecord[] = [
+    { id: 'usr-001', name: 'Ryan Kelly', role: 'Architect & Lead', status: 'active', usage: '98.4%' },
+    { id: 'usr-002', name: 'Alex Vance', role: 'DevOps Engineer', status: 'active', usage: '74.2%' },
+    { id: 'usr-003', name: 'Elena Rostova', role: 'Security Ops', status: 'pending', usage: '12.0%' },
+    { id: 'usr-004', name: 'Marcus Chen', role: 'Data Pipeline', status: 'disabled', usage: '0.0%' },
+  ];
+
+  const filteredUsers = usersData.filter(
+    (u) => u.name.toLowerCase().includes(searchQuery.toLowerCase()) || u.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div
-      style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '2rem 1.5rem',
-        color: 'var(--color-white, #ffffff)',
-      }}
-    >
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-white font-mono">
       {/* Sandbox Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+      <div className="flex justify-between items-start flex-wrap gap-4 mb-8">
         <div>
-          <PageTitle subtitle="Interactive Brutalist Component Playground & Theme Matrix" bracketed>
-            DESIGN SYSTEM SANDBOX
+          <PageTitle subtitle="Universal Brutalist Component Library & Dual-Mode Surface" bracketed>
+            DESIGN SYSTEM SURFACE
           </PageTitle>
         </div>
 
         {/* 3-Way Theme Switcher Controls */}
-        <div style={{ display: 'flex', gap: '0.5rem', backgroundColor: 'var(--color-black, #000000)', padding: '0.5rem', border: '2px solid var(--border-color, #ffffff)' }}>
+        <div className="flex gap-2 bg-black p-2 border-2 border-white">
           {(['dark', 'dim', 'sketch'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTheme(t)}
-              style={{
-                fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                padding: '0.4rem 0.8rem',
-                border: '2px solid var(--border-color, #ffffff)',
-                backgroundColor: theme === t ? 'var(--brutalist-cyan, #22d3ee)' : 'transparent',
-                color: theme === t ? '#000000' : 'var(--color-white, #ffffff)',
-                cursor: 'pointer',
-                textTransform: 'uppercase',
-              }}
+              className={`font-mono font-bold text-xs px-3 py-1.5 border-2 border-white uppercase transition-all ${
+                theme === t ? 'bg-brutalist-cyan text-black' : 'bg-transparent text-white hover:bg-zinc-800'
+              }`}
             >
               {t}
             </button>
@@ -58,102 +70,195 @@ export const DesignSandbox: React.FC = () => {
       </div>
 
       {/* Navigation Sub-Tabs */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid var(--border-color, #ffffff)', paddingBottom: '0.75rem' }}>
-        <Button onClick={() => setActiveTab('components')} variant={activeTab === 'components' ? 'pink' : 'default'} bracketed>
-          COMPONENTS
+      <div className="flex gap-2 mb-8 border-b-2 border-white pb-4 overflow-x-auto">
+        <Button onClick={() => setActiveTab('components')} variant={activeTab === 'components' ? 'pink' : 'default'} bracketed size="sm">
+          COMPONENTS & THEMES
         </Button>
-        <Button onClick={() => setActiveTab('slides')} variant={activeTab === 'slides' ? 'pink' : 'default'} bracketed>
+        <Button onClick={() => setActiveTab('saas')} variant={activeTab === 'saas' ? 'pink' : 'default'} bracketed size="sm">
+          SAAS DASHBOARD
+        </Button>
+        <Button onClick={() => setActiveTab('ecommerce')} variant={activeTab === 'ecommerce' ? 'pink' : 'default'} bracketed size="sm">
+          E-COMMERCE SHOWCASE
+        </Button>
+        <Button onClick={() => setActiveTab('slides')} variant={activeTab === 'slides' ? 'pink' : 'default'} bracketed size="sm">
           PRESENTATION DECK
         </Button>
-        <Button onClick={() => setActiveTab('post')} variant={activeTab === 'post' ? 'pink' : 'default'} bracketed>
-          LOREM IPSUM BLOG POST
+        <Button onClick={() => setActiveTab('post')} variant={activeTab === 'post' ? 'pink' : 'default'} bracketed size="sm">
+          EDITORIAL BLOG
         </Button>
       </div>
 
-      {/* Tab 1: Core Components Grid */}
+      {/* Tab 1: Core Components & Themes Grid */}
       {activeTab === 'components' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          
-          {/* Card Primitives */}
+        <div className="flex flex-col gap-8">
+          {/* Theme Matrix Callout */}
+          <TLDR>
+            The design system operates across 3 first-class theme modes: <strong>DARK</strong> (neon on black), <strong>DIM</strong> (softened offset shadows), and <strong>SKETCH</strong> (ink-on-paper light mode). Theme switching flips CSS token variables automatically.
+          </TLDR>
+
+          {/* Card & Button Primitives */}
           <Card>
-            <h3 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--brutalist-cyan, #22d3ee)', marginBottom: '1rem' }}>
-              [ CARD & BADGE PRIMITIVES ]
+            <h3 className="font-display text-xl font-bold text-brutalist-cyan mb-4">
+              [ BADGES & BUTTON VARIANTS ]
             </h3>
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+            <div className="flex gap-3 flex-wrap mb-6">
               <Badge accent="cyan">CYAN BADGE</Badge>
               <Badge accent="pink">PINK BADGE</Badge>
               <Badge accent="yellow">YELLOW BADGE</Badge>
               <Badge accent="green">NEON GREEN</Badge>
             </div>
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <Button variant="cyan" bracketed>PRIMARY ACTION</Button>
-              <Button variant="pink" bracketed>ACCENT ACTION</Button>
+            <div className="flex gap-3 flex-wrap">
+              <Button variant="cyan" bracketed>PRIMARY CYAN</Button>
+              <Button variant="pink" bracketed>ACCENT PINK</Button>
+              <Button variant="yellow" bracketed>WARNING YELLOW</Button>
               <Button onClick={cycleTheme} bracketed>TOGGLE THEME: {theme.toUpperCase()}</Button>
             </div>
           </Card>
 
-          {/* Callouts */}
-          <div>
-            <h3 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--brutalist-yellow, #facc15)' }}>
-              [ CALLOUT & ALERT PRIMITIVES ]
+          {/* Form Primitives */}
+          <div className="bg-zinc-900 border-2 border-white p-6">
+            <h3 className="font-display text-xl font-bold text-brutalist-yellow mb-4">
+              [ FORM & INPUT PRIMITIVES ]
             </h3>
-            <TLDR>
-              Executive summary callouts highlight high-priority takeaways with bold yellow borders and hard shadows.
-            </TLDR>
-
-            <NoteBlock type="note" title="NEON TERMINAL NOTE">
-              Standard technical notes resolve with neon cyan accents in dark mode and re-map to rich blue pen ink in sketch mode.
-            </NoteBlock>
-
-            <NoteBlock type="warning" title="SYSTEM ALERTS">
-              Warnings display pink accents to demand immediate visual attention.
-            </NoteBlock>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <Input label="System API Key" placeholder="sk-brutalist-..." helperText="Required for cloud SDK initialization" />
+              <Select
+                label="Environment Tier"
+                options={[
+                  { label: 'Production (US-East)', value: 'prod-us' },
+                  { label: 'Staging (EU-West)', value: 'stage-eu' },
+                  { label: 'Local Development Sandbox', value: 'dev-local' },
+                ]}
+              />
+            </div>
+            <Button onClick={() => setIsModalOpen(true)} variant="yellow" bracketed size="sm">
+              TRIGGER ACTION DIALOG
+            </Button>
           </div>
 
+          {/* Callouts */}
+          <NoteBlock title="SECURITY COMPLIANCE DIRECTIVE" type="warning">
+            All design system primitives strictly enforce dual-mode token remappings. Direct hardcoded hex literals are forbidden to ensure ink-on-paper sketch mode readability.
+          </NoteBlock>
         </div>
       )}
 
-      {/* Tab 2: Slide Presentation Deck */}
+      {/* Tab 2: SaaS Dashboard Sample Page */}
+      {activeTab === 'saas' && (
+        <div className="flex flex-col gap-6">
+          <div className="flex justify-between items-center flex-wrap gap-4">
+            <h2 className="font-display text-2xl font-bold text-brutalist-cyan uppercase">
+              [ CLOUD OPERATIONS COMMAND CENTER ]
+            </h2>
+            <div className="w-full sm:w-72">
+              <Input
+                placeholder="Search cluster workloads..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* KPI Stat Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard title="SYSTEM HEALTH" value="99.98%" change="+0.04%" changeType="positive" icon={Activity} accent="cyan" subtitle="42 Nodes Healthy" />
+            <StatCard title="COMPUTE LATENCY" value="14.2 ms" change="-3.1 ms" changeType="positive" icon={Cpu} accent="pink" subtitle="Sub-20ms SLA MET" />
+            <StatCard title="SECURITY AUDIT" value="100%" change="PASSED" changeType="positive" icon={ShieldCheck} accent="green" subtitle="0 Critical Alerts" />
+            <StatCard title="EST. CLOUD COST" value="$2,410" change="+$120" changeType="negative" icon={DollarSign} accent="yellow" subtitle="Monthly Budget" />
+          </div>
+
+          {/* Data Table */}
+          <div className="mt-4">
+            <h3 className="font-display text-lg font-bold text-white mb-3 uppercase">
+              [ AUTHORIZED WORKSPACE OPERATORS ]
+            </h3>
+            <DataTable<UserRecord>
+              keyExtractor={(r) => r.id}
+              columns={[
+                { header: 'USER ID', accessor: 'id' },
+                { header: 'OPERATOR NAME', accessor: 'name' },
+                { header: 'ROLE ASSIGNMENT', accessor: 'role' },
+                {
+                  header: 'STATUS',
+                  accessor: (r) => (
+                    <Badge accent={r.status === 'active' ? 'green' : r.status === 'pending' ? 'yellow' : 'pink'}>
+                      {r.status.toUpperCase()}
+                    </Badge>
+                  ),
+                },
+                { header: 'RESOURCE USAGE', accessor: 'usage' },
+              ]}
+              data={filteredUsers}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Tab 3: E-Commerce & Product Showcase */}
+      {activeTab === 'ecommerce' && (
+        <div className="flex flex-col gap-6">
+          <PageHeader title="BRUTALIST HARDWARE GEAR" subtitle="High-performance developer gear & edge modules" accent="pink" icon={ShoppingBag} />
+
+          <div className="flex gap-2 flex-wrap mb-4">
+            <Tag text="ALL GEAR" accent="pink" />
+            <Tag text="EDGE NODES" accent="cyan" />
+            <Tag text="TERMINAL HARDWARE" accent="yellow" />
+            <Tag text="SECURITY KEYS" accent="green" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card title="NEON TERMINAL DISPLAY" description="Ultra-wide 4K brutalist developer monitor with anti-glare matte coating." filename="hardware_display.spec">
+              <div className="mt-4 flex justify-between items-center">
+                <span className="font-display text-2xl font-bold text-brutalist-cyan">$899.00</span>
+                <Button variant="cyan" size="sm" bracketed>ADD TO CART</Button>
+              </div>
+            </Card>
+            <Card title="CYBERDECK MECHANICAL" description="Hotswappable mechanical keyboard with custom laser-engraved keycaps." filename="keyboard_v2.spec">
+              <div className="mt-4 flex justify-between items-center">
+                <span className="font-display text-2xl font-bold text-brutalist-pink">$349.00</span>
+                <Button variant="pink" size="sm" bracketed>ADD TO CART</Button>
+              </div>
+            </Card>
+            <Card title="HSM HARDWARE TOKEN" description="FIPS 140-3 Level 4 physical cryptographic key with hardware destruction." filename="hsm_security.spec">
+              <div className="mt-4 flex justify-between items-center">
+                <span className="font-display text-2xl font-bold text-brutalist-yellow">$199.00</span>
+                <Button variant="yellow" size="sm" bracketed>ADD TO CART</Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Tab 4: Slide Deck Engine */}
       {activeTab === 'slides' && (
-        <div>
-          <h3 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--brutalist-cyan, #22d3ee)', marginBottom: '1.5rem' }}>
-            [ BRUTALIST SLIDE DECK ENGINE ]
-          </h3>
-
+        <div className="border-4 border-white p-6 bg-black">
           <SlideDeck>
-            <Slide title="WELCOME TO THE SLIDE DECK" subtitle="Brutalist presentation system for talks and decks">
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '1.25rem', color: 'var(--brutalist-yellow, #facc15)' }}>
-                  Use [LEFT] / [RIGHT] Arrow Keys or Spacebar to Navigate
-                </p>
-                <div style={{ marginTop: '2rem' }}>
-                  <Badge accent="green">FULLSCREEN SUPPORT (Press 'F')</Badge>
-                </div>
-              </div>
+            <Slide title="BUILDING SINGULAR DESIGN SURFACES">
+              <p className="text-xl text-zinc-300 font-mono mb-4">&gt; Dual-Mode Token Remappings across Dark, Dim, and Sketch.</p>
+              <Badge accent="cyan">REUSABLE ENGINE</Badge>
             </Slide>
-
-            <Slide title="DUAL-MODE PRESENTATIONS" subtitle="Slides seamlessly follow dark and sketch theme modes">
-              <TLDR>
-                Presentations rendered with @rtkelly/design-system read perfectly on high-brightness projectors as well as OLED terminal displays.
-              </TLDR>
-            </Slide>
-
-            <Slide title="THANK YOU" subtitle="Built for ryankelly.dev and all project surfaces">
-              <div style={{ textAlign: 'center' }}>
-                <Button bracketed variant="pink">EXPLORE DESIGN SYSTEM</Button>
-              </div>
+            <Slide title="ZERO TOKEN DRIFT PRINCIPLE">
+              <p className="text-xl text-zinc-300 font-mono mb-4">&gt; Every downstream app imports @rtkelly13/design-system/tailwind-preset.</p>
+              <Badge accent="pink">SINGLE SOURCE OF TRUTH</Badge>
             </Slide>
           </SlideDeck>
         </div>
       )}
 
-      {/* Tab 3: Lorem Ipsum Blog Post */}
+      {/* Tab 5: Editorial & Blog Post */}
       {activeTab === 'post' && (
-        <div>
+        <SectionContainer>
           <LoremIpsumPost />
-        </div>
+        </SectionContainer>
       )}
 
+      {/* Modal Dialog */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="CONFIRM SYSTEM OVERRIDE">
+        <p className="mb-4">Are you sure you want to execute system configuration override on node <strong>cluster-us-east-1</strong>?</p>
+        <p className="text-xs font-mono text-zinc-400">&gt; This action will trigger a rolling reload of active workload containers.</p>
+      </Modal>
     </div>
   );
 };
+
+export default DesignSandbox;
