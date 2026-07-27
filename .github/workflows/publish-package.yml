@@ -38,7 +38,15 @@ jobs:
         run: pnpm build
 
       - name: Publish Package to GitHub Packages
-        run: pnpm publish --no-git-checks
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@rtkelly13/design-system@${VERSION}" version --registry=https://npm.pkg.github.com > /dev/null 2>&1; then
+            echo "Version ${VERSION} is already published to GitHub Packages. Skipping publish step."
+          else
+            echo "Publishing version ${VERSION} to GitHub Packages..."
+            pnpm publish --no-git-checks
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
