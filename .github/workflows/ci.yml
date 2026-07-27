@@ -43,7 +43,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Visual Regression Tests
-        run: pnpm test:visual || (pnpm test:visual:update && exit 1)
+        run: pnpm test:visual
 
       - name: Upload Playwright Report on Failure
         if: failure()
