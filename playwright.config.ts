@@ -25,7 +25,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx vite preview --port 6006 --outDir storybook-static',
+    command: 'npx serve storybook-static -p 6006',
     url: 'http://localhost:6006',
     reuseExistingServer: !process.env.CI,
   },

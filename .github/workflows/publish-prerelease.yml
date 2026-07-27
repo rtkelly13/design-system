@@ -57,6 +57,7 @@ jobs:
           pnpm publish --no-git-checks --tag ${{ steps.prerelease_version.outputs.pr_tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Post PR Comment with Installation Instructions
         uses: actions/github-script@v7
