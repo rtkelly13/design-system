@@ -48,6 +48,13 @@ export const DEFAULT_PRICING_TIERS: PricingTier[] = [
   }
 ];
 
+const ACCENT_COLORS: Record<string, string> = {
+  cyan: 'var(--brutalist-cyan, #22d3ee)',
+  pink: 'var(--brutalist-pink, #ec4899)',
+  yellow: 'var(--brutalist-yellow, #facc15)',
+  green: 'var(--brutalist-neonGreen, #39ff14)',
+};
+
 export interface SaasLandingPageProps {
   title?: string;
   subtitle?: string;
@@ -66,142 +73,265 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
         margin: '0 auto',
         padding: '3rem 1.5rem',
         color: 'var(--color-white, #ffffff)',
+        fontFamily: 'var(--font-inter, "Inter"), sans-serif',
       }}
     >
-      {/* 1. HERO SECTION */}
-      <section style={{ textAlign: 'center', margin: '2rem 0 5rem 0' }}>
-        <Badge accent="cyan" style={{ marginBottom: '1.5rem' }}>
+      {/* ═══════════ 1. HERO SECTION ═══════════ */}
+      <section style={{ textAlign: 'center', marginBottom: '4rem' }}>
+        <Badge accent="cyan" style={{ marginBottom: '1.5rem', display: 'inline-block' }}>
           ⚡ NEXT-GEN SAAS INFRASTRUCTURE
         </Badge>
-        
+
         <PageTitle subtitle={subtitle} bracketed>
           {title}
         </PageTitle>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem', marginTop: '2.5rem', flexWrap: 'wrap' }}>
-          <Button variant="pink" bracketed style={{ padding: '0.8rem 1.75rem', fontSize: '1.1rem' }}>
+          <Button variant="pink" bracketed size="lg">
             LAUNCH APPLICATION <ArrowRight size={18} />
           </Button>
-          <Button variant="default" bracketed style={{ padding: '0.8rem 1.75rem', fontSize: '1.1rem' }}>
+          <Button variant="default" bracketed size="lg">
             EXPLORE ARCHITECTURE
           </Button>
         </div>
 
-        {/* Live Terminal Hero Preview Box */}
-        <div style={{ maxWidth: '800px', margin: '3.5rem auto 0 auto', border: '3px solid var(--border-color, #ffffff)', backgroundColor: 'var(--color-black, #000000)', boxShadow: '8px 8px 0px 0px var(--brutalist-cyan, #22d3ee)' }}>
-          <div style={{ padding: '0.6rem 1rem', borderBottom: '2px solid var(--border-color, #ffffff)', backgroundColor: 'var(--border-color, #ffffff)', color: '#000000', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontWeight: 800, fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between' }}>
+        {/* Terminal Hero Preview */}
+        <div
+          style={{
+            maxWidth: '800px',
+            margin: '3.5rem auto 0 auto',
+            border: '3px solid var(--border-color, #ffffff)',
+            backgroundColor: 'var(--color-black, #000000)',
+            boxShadow: '8px 8px 0px 0px var(--brutalist-cyan, #22d3ee)',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: '0.6rem 1rem',
+              borderBottom: '2px solid var(--border-color, #ffffff)',
+              backgroundColor: 'var(--color-white, #ffffff)',
+              color: 'var(--color-black, #000000)',
+              fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
             <span>// TERMINAL_ENGINE_DEMO.sh</span>
-            <span>STATUS: ACTIVE</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ width: '8px', height: '8px', backgroundColor: '#39ff14', display: 'inline-block' }} />
+              STATUS: ACTIVE
+            </span>
           </div>
-          <pre style={{ padding: '1.5rem', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.9rem', color: 'var(--brutalist-neonGreen, #39ff14)', textAlign: 'left', overflowX: 'auto', margin: 0 }}>
+          <pre
+            style={{
+              padding: '1.5rem',
+              fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+              fontSize: '0.9rem',
+              color: 'var(--brutalist-neonGreen, #39ff14)',
+              textAlign: 'left',
+              overflowX: 'auto',
+              margin: 0,
+              lineHeight: 1.6,
+            }}
+          >
 {`$ saas-cli deploy --environment production
 [✓] Connecting to local SQLite database... OK
 [✓] Running SHA-256 deduplication on 1,420 transactions... OK
 [✓] Triggering YNAB Live Sync Engine... SYNCHRONIZED
 [✓] Atomic Google Drive Backup saved to ~/Google Drive/My Drive/Backup/
-[★] Financial Surface Ready! Server active on http://localhost:8000`}
+[*] Financial Surface Ready! Server active on http://localhost:8000`}
           </pre>
         </div>
       </section>
 
-      <AsciiDivider />
+      <AsciiDivider style={{ margin: '3rem 0', color: 'var(--brutalist-cyan, #22d3ee)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem' }} />
 
-      {/* 2. VALUE PROPOSITION & FEATURE GRID */}
-      <section style={{ margin: '4rem 0' }}>
-        <h2 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '2rem', fontWeight: 800, textAlign: 'center', textTransform: 'uppercase', marginBottom: '3rem' }}>
+      {/* ═══════════ 2. FEATURE CARDS ═══════════ */}
+      <section style={{ margin: '3rem 0' }}>
+        <h2
+          style={{
+            textAlign: 'center',
+            fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+            fontSize: '2rem',
+            fontWeight: 900,
+            textTransform: 'uppercase',
+            color: 'var(--color-white, #ffffff)',
+            marginBottom: '3rem',
+          }}
+        >
           [ BUILT FOR EXTREME PERFORMANCE & CONTROL ]
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2rem' }}>
-          <Card style={{ boxShadow: '6px 6px 0px 0px var(--brutalist-cyan, #22d3ee)' }}>
-            <Cpu size={32} color="var(--brutalist-cyan, #22d3ee)" style={{ marginBottom: '1rem' }} />
-            <h3 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase' }}>
-              REAL-TIME SYNC
-            </h3>
-            <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', opacity: 0.85 }}>
-              Automatic delta reconciliation between live banking APIs and local single-player SQLite databases.
-            </p>
-          </Card>
-
-          <Card style={{ boxShadow: '6px 6px 0px 0px var(--brutalist-pink, #ec4899)' }}>
-            <Zap size={32} color="var(--brutalist-pink, #ec4899)" style={{ marginBottom: '1rem' }} />
-            <h3 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase' }}>
-              RULE ENGINE
-            </h3>
-            <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', opacity: 0.85 }}>
-              Custom automated regex & payee matching rules to categorize statement imports effortlessly.
-            </p>
-          </Card>
-
-          <Card style={{ boxShadow: '6px 6px 0px 0px var(--brutalist-yellow, #facc15)' }}>
-            <Shield size={32} color="var(--brutalist-yellow, #facc15)" style={{ marginBottom: '1rem' }} />
-            <h3 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase' }}>
-              DRIVE BACKUPS
-            </h3>
-            <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', opacity: 0.85 }}>
-              Periodic, atomic SQLite file backups synced directly to Google Drive without external vendor lock-in.
-            </p>
-          </Card>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '2rem',
+          }}
+        >
+          {[
+            { title: 'REAL-TIME SYNC', accent: 'cyan' as const, icon: <Cpu size={28} style={{ color: ACCENT_COLORS.cyan }} />, desc: 'Automatic delta reconciliation between live banking APIs and local single-player SQLite databases.' },
+            { title: 'RULE ENGINE', accent: 'pink' as const, icon: <Zap size={28} style={{ color: ACCENT_COLORS.pink }} />, desc: 'Custom automated regex & payee matching rules to categorize statement imports effortlessly.' },
+            { title: 'DRIVE BACKUPS', accent: 'yellow' as const, icon: <Shield size={28} style={{ color: ACCENT_COLORS.yellow }} />, desc: 'Periodic, atomic SQLite file backups synced directly to Google Drive without external vendor lock-in.' },
+          ].map((feature) => (
+            <Card key={feature.title} panel accent={feature.accent} title={feature.title}>
+              <div style={{ marginTop: '0.5rem' }}>
+                {feature.icon}
+                <p
+                  style={{
+                    marginTop: '0.75rem',
+                    fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+                    fontSize: '0.85rem',
+                    color: 'var(--color-white, #ffffff)',
+                    opacity: 0.9,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {feature.desc}
+                </p>
+              </div>
+            </Card>
+          ))}
         </div>
       </section>
 
-      <AsciiDivider />
+      <AsciiDivider style={{ margin: '3rem 0', color: 'var(--brutalist-cyan, #22d3ee)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem' }} />
 
-      {/* 3. SAAS PRICING TIERS */}
-      <section style={{ margin: '4rem 0' }}>
-        <h2 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '2rem', fontWeight: 800, textAlign: 'center', textTransform: 'uppercase', marginBottom: '3rem' }}>
+      {/* ═══════════ 3. PRICING TIERS ═══════════ */}
+      <section style={{ margin: '3rem 0' }}>
+        <h2
+          style={{
+            textAlign: 'center',
+            fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+            fontSize: '2rem',
+            fontWeight: 900,
+            textTransform: 'uppercase',
+            color: 'var(--color-white, #ffffff)',
+            marginBottom: '3rem',
+          }}
+        >
           [ TRANSPARENT PRICING ]
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'stretch' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '2rem',
+            alignItems: 'stretch',
+          }}
+        >
           {pricingTiers.map((tier) => (
             <Card
               key={tier.name}
-              style={{
-                borderColor: tier.highlighted ? 'var(--brutalist-pink, #ec4899)' : 'var(--border-color, #ffffff)',
-                boxShadow: tier.highlighted ? '8px 8px 0px 0px var(--brutalist-pink, #ec4899)' : '6px 6px 0px 0px var(--brutalist-cyan, #22d3ee)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
+              panel
+              accent={tier.accent}
+              badge={tier.highlighted ? 'POPULAR' : undefined}
+              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
             >
+              {/* Tier Header */}
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h3 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.25rem', fontWeight: 800, margin: 0, textTransform: 'uppercase' }}>
-                    {tier.name}
-                  </h3>
-                  {tier.highlighted && <Badge accent="pink">POPULAR</Badge>}
-                </div>
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+                    fontSize: '1.1rem',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: 'var(--color-white, #ffffff)',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  {tier.name}
+                </h3>
 
-                <div style={{ margin: '1.5rem 0' }}>
-                  <span style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '3rem', fontWeight: 900 }}>
+                {/* Price */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+                      fontSize: '3rem',
+                      fontWeight: 900,
+                      color: ACCENT_COLORS[tier.accent],
+                    }}
+                  >
                     {tier.price}
                   </span>
-                  {tier.period && <span style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.9rem', opacity: 0.7 }}>{tier.period}</span>}
+                  {tier.period && (
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+                        fontSize: '0.85rem',
+                        color: 'var(--color-white, #ffffff)',
+                        opacity: 0.6,
+                      }}
+                    >
+                      {tier.period}
+                    </span>
+                  )}
                 </div>
 
-                <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem', opacity: 0.85, marginBottom: '1.5rem' }}>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+                    fontSize: '0.75rem',
+                    color: 'var(--color-white, #ffffff)',
+                    opacity: 0.8,
+                    lineHeight: 1.5,
+                    marginBottom: '1.5rem',
+                  }}
+                >
                   {tier.description}
                 </p>
 
-                <ul style={{ listStyle: 'none', padding: 0, margin: '1.5rem 0', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem' }}>
+                {/* Feature list */}
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.5rem 0' }}>
                   {tier.features.map((feat) => (
-                    <li key={feat} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem' }}>
-                      <Check size={16} color="var(--brutalist-neonGreen, #39ff14)" />
+                    <li
+                      key={feat}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '0.5rem',
+                        fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+                        fontSize: '0.8rem',
+                        color: 'var(--color-white, #ffffff)',
+                        opacity: 0.9,
+                        marginBottom: '0.6rem',
+                      }}
+                    >
+                      <Check size={14} style={{ color: 'var(--brutalist-neonGreen, #39ff14)', flexShrink: 0, marginTop: '2px' }} />
                       <span>{feat}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <Button bracketed variant={tier.highlighted ? 'pink' : 'default'} style={{ width: '100%', marginTop: '1.5rem' }}>
-                {tier.ctaText || 'SELECT PLAN'}
-              </Button>
+              {/* CTA Button */}
+              <div
+                style={{
+                  paddingTop: '1rem',
+                  borderTop: '1px solid var(--border-color, #ffffff)',
+                  marginTop: 'auto',
+                }}
+              >
+                <Button
+                  variant={tier.accent === 'pink' ? 'pink' : tier.accent === 'yellow' ? 'yellow' : 'cyan'}
+                  bracketed
+                  style={{ width: '100%', justifyContent: 'center', display: 'flex' }}
+                >
+                  {tier.ctaText || 'SELECT PLAN'}
+                </Button>
+              </div>
             </Card>
           ))}
         </div>
       </section>
-
     </div>
   );
 };
+
+export default SaasLandingPage;
