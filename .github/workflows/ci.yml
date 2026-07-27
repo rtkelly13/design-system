@@ -43,7 +43,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Visual Regression Tests
-        run: pnpm test:visual
+        run: pnpm test:visual || (pnpm test:visual:update && exit 1)
 
       - name: Upload Playwright Report on Failure
         if: failure()
@@ -51,4 +51,12 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
+          retention-days: 7
+
+      - name: Upload Generated Snapshots Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-snapshots
+          path: tests/__snapshots__/
           retention-days: 7
