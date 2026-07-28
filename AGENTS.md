@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Foundational brutalist design system for ryankelly.dev and personal web applications (`@rtkelly/design-system`).
+Foundational brutalist design system for ryankelly.dev and personal web applications (`@rtkelly13/design-system`, published to public npm).
 
 Package manager is **pnpm** (`node >=22`).
 
@@ -11,12 +11,14 @@ Package manager is **pnpm** (`node >=22`).
 1. **Squash Merge Only**: All pull requests must be merged into `main` using **Squash and Merge** exclusively.
 2. **Delete Branch on Merge**: Feature branches must be automatically or manually deleted immediately upon merge into `main`.
 3. **Linear History**: Maintain a strictly linear history. Rebase feature branches onto `main` before merging; no merge commits allowed.
-4. **PR Prerelease Publishing**:
-   - Every Pull Request automatically builds and publishes a tagged prerelease to GitHub Packages (`@rtkelly/design-system@pr-<PR_NUMBER>`).
+4. **Publishing (npm, trusted publishing)**:
+   - Stable releases publish automatically from pushes to `main` via `publish-package.yml`, using npm **Trusted Publishing** (OIDC) — no tokens anywhere. Bump `package.json` version in the PR; the workflow skips already-published versions.
+   - Dev prereleases: comment **`/publish-dev`** on a PR to publish `<version>-dev.<pr>.<sha>` under the `dev` dist-tag (`publish-dev-command.yml` dispatches the trusted workflow on the PR branch). Consumers test with `pnpm add @rtkelly13/design-system@dev`.
+   - The Tailwind contract consumers import is **`theme.css`** (`@theme` tokens, `.dark`/`.dim` dark variant, `@source`); `styles.css` layers fonts + global resets on top. There is no JS tailwind preset — do not reintroduce one.
 5. **Visual Regression Testing**:
    - Powered by Playwright snapshot testing (`tests/visual.spec.ts`).
    - Runs strictly on **Linux CI** to avoid OS font rendering diffs (`maxDiffPixelRatio: 0.002`).
-   - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow.
+   - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow (dispatch it on your branch; it commits regenerated baselines back to that branch — this repo blocks Actions from creating PRs).
 6. **Required Checks**:
    - `pnpm typecheck`
    - `pnpm build`
