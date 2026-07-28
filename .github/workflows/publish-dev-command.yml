@@ -1,0 +1,109 @@
+name: Publish dev version (command)
+
+# Comment `/publish-dev` on a PR to publish that branch to npm as
+# `<version>-dev.<pr>.<short-sha>` under the `dev` dist-tag, for trialling
+# design-system changes in a consumer (e.g. the blog) before merging:
+#
+#   pnpm add @rtkelly13/design-system@<exact-version>   # pin the build
+#   pnpm add @rtkelly13/design-system@dev               # latest dev build
+#
+# npm trusted publishing only trusts publish-package.yml, so this workflow
+# doesn't publish itself — it dispatches publish-package.yml on the PR's head
+# branch with dev=true and reports back on the PR.
+#
+# Human-gated: only OWNER/MEMBER/COLLABORATOR comments trigger it.
+
+on:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: publish-dev-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish-dev:
+    name: Dispatch dev publish
+    if: >-
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/publish-dev') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write # gh workflow run
+      pull-requests: write # PR comments + reaction
+
+    steps:
+      - name: Acknowledge command
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket',
+            });
+
+      - name: Resolve PR head branch
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const headRepo = pr.data.head.repo?.full_name ?? '';
+            const sameRepo = headRepo === `${context.repo.owner}/${context.repo.repo}`;
+            core.setOutput('ref', pr.data.head.ref);
+            core.setOutput('sha', pr.data.head.sha.slice(0, 7));
+            core.setOutput('same_repo', String(sameRepo));
+
+      - name: Guard against fork PRs
+        if: steps.pr.outputs.same_repo != 'true'
+        run: |
+          echo "::error::/publish-dev only supports PR branches in this repository."
+          exit 1
+
+      - name: Dispatch publish workflow on the PR branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run publish-package.yml \
+            --repo "${{ github.repository }}" \
+            --ref "${{ steps.pr.outputs.ref }}" \
+            -f dev=true \
+            -f pr-number="${{ github.event.issue.number }}"
+
+      - name: Report back on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ref = '${{ steps.pr.outputs.ref }}';
+            const sha = '${{ steps.pr.outputs.sha }}';
+            const prNum = context.issue.number;
+            const runsUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/publish-package.yml`;
+            const body = [
+              `### 🚀 Dev publish dispatched for \`${ref}\` @ \`${sha}\``,
+              '',
+              `Watch the [publish workflow](${runsUrl}) — once green, install with:`,
+              '',
+              '```bash',
+              `pnpm add @rtkelly13/design-system@dev            # latest dev build`,
+              `pnpm view @rtkelly13/design-system dist-tags     # find the exact -dev.${prNum}.${sha} version`,
+              '```',
+              '',
+              'In the blog, pin the exact version in `package.json`, test, and revert before merging.',
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNum,
+              body,
+            });

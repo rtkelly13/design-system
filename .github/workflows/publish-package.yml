@@ -4,6 +4,17 @@ name: Publish Design System to npm
 # trusts this exact workflow file (configured on the package's npmjs.com
 # settings page), and npm >= 11.5 exchanges the Actions OIDC token for a
 # publish credential and attaches provenance automatically.
+#
+# Two modes:
+#   - Stable: push to main / v* tag (or a plain workflow_dispatch) publishes
+#     package.json's version under the `latest` dist-tag, skipping if it
+#     already exists.
+#   - Dev: workflow_dispatch with dev=true (usually via the `/publish-dev` PR
+#     comment — see publish-dev-command.yml) publishes
+#     `<version>-dev.<pr>.<short-sha>` under the `dev` dist-tag so consumers
+#     can trial a branch: `pnpm add @rtkelly13/design-system@dev`.
+#     Trusted publishing is scoped to this workflow FILE, not a branch, so
+#     dispatching it on a PR branch still authenticates.
 
 on:
   push:
@@ -12,6 +23,15 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      dev:
+        description: 'Publish a dev prerelease (<version>-dev.<pr>.<sha>) under the `dev` dist-tag'
+        type: boolean
+        default: false
+      pr-number:
+        description: 'PR number to embed in the dev version (used by /publish-dev)'
+        type: string
+        default: ''
 
 jobs:
   build-and-publish:
@@ -42,6 +62,17 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Set dev prerelease version
+        if: inputs.dev == true
+        shell: bash
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          BASE_VERSION=$(node -p "require('./package.json').version.split('-')[0]")
+          PR_SEGMENT="${{ inputs.pr-number }}"
+          DEV_VERSION="${BASE_VERSION}-dev.${PR_SEGMENT:-0}.${SHORT_SHA}"
+          npm version "${DEV_VERSION}" --no-git-tag-version
+          echo "Publishing as ${DEV_VERSION}"
+
       - name: Run Build
         run: pnpm build
 
@@ -49,9 +80,19 @@ jobs:
         shell: bash
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          TAG="${{ inputs.dev == true && 'dev' || 'latest' }}"
           if npm view "@rtkelly13/design-system@${VERSION}" version > /dev/null 2>&1; then
             echo "Version ${VERSION} is already published to npm. Skipping publish step."
           else
-            echo "Publishing version ${VERSION} to npm..."
-            npm publish
+            echo "Publishing version ${VERSION} to npm (dist-tag: ${TAG})..."
+            npm publish --tag "${TAG}"
           fi
+
+      - name: Job summary
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Published (or found existing) **@rtkelly13/design-system@${VERSION}**" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "pnpm add @rtkelly13/design-system@${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
