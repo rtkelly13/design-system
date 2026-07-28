@@ -1,7 +1,6 @@
 // @rtkelly/design-system main entrypoint
 
 export * from './tokens';
-export * from './tailwind-preset';
 
 // Primitives & Callouts
 export * from './components/Button';
