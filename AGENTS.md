@@ -89,6 +89,43 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 
 ---
 
+## 📌 Dependencies Held Back on Purpose
+
+Anything here is **pinned below latest for a reason**. Check this list before
+"just bumping it", and delete the row if you clear the blocker.
+
+| Package      | Held at  | Latest | Why, and what unblocks it |
+| ------------ | -------- | ------ | ------------------------- |
+| `typescript` | `^6.0.3` | 7.0.2  | TS 7 breaks `pnpm build` — see below. Also keeps this package aligned with the blog, which consumes it. |
+
+### The TypeScript 7 blocker
+
+TS 7 does two things this repo cannot yet absorb:
+
+1. **`baseUrl` was removed** (`error TS5102`). Our own `tsconfig.json` no longer
+   sets it — the `@/*` mapping is tsconfig-relative — but `tsup`'s dts worker
+   *injects* `baseUrl` itself, which is why `ignoreDeprecations: "6.0"` is
+   currently required just to build on TS 6. Remove that escape hatch only when
+   tsup stops injecting it.
+2. **`tsup`'s DTS step crashes outright.** `tsup` vendors `rollup-plugin-dts`,
+   which reads TS internals that TS 7 removed:
+
+   ```
+   TypeError: Cannot read properties of undefined (reading 'useCaseSensitiveFileNames')
+       at rollup-plugin-dts.cjs
+   ```
+
+   This is upstream, not a config mistake: `rollup-plugin-dts@6.4.1` (latest)
+   still declares `typescript: ^4.5 || ^5.0 || ^6.0`. Note the failure is
+   **`pnpm build` only** — `pnpm typecheck` passes fine on TS 7, so a green
+   typecheck is not evidence the upgrade works. Always run `pnpm build`.
+
+**Unblocked when** `rollup-plugin-dts` supports TS 7, or this package moves off
+`tsup` for bundling (`tsdown`, the rolldown-era successor, is the likely
+candidate). Because the blog consumes this package, move both repos together.
+
+---
+
 ## 📸 Screenshot Walkthrough
 
 `pnpm walkthrough` captures every Storybook story in **every theme**
