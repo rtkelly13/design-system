@@ -26,8 +26,15 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx serve storybook-static -p 6006',
-    url: 'http://localhost:6006',
+    // NOT `serve`: it has clean-URLs on by default, which 301s
+    // `/iframe.html?id=foundations-button--default` to `/iframe` and drops the
+    // query string. Storybook then has no story to select and every test
+    // screenshots the same "No Preview" error page — silently, because the
+    // baselines get generated from that same page. `vite preview` serves the
+    // static build verbatim, and vite is already a devDependency here.
+    command:
+      'npx vite preview --outDir storybook-static --port 6006 --strictPort',
+    url: 'http://localhost:6006/iframe.html',
     reuseExistingServer: !process.env.CI,
   },
 });
