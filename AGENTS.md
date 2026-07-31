@@ -17,8 +17,10 @@ Package manager is **pnpm** (`node >=22`).
    - The Tailwind contract consumers import is **`theme.css`** (`@theme` tokens, `.dark`/`.dim` dark variant, `@source`); `styles.css` layers fonts + global resets on top. There is no JS tailwind preset — do not reintroduce one.
 5. **Visual Regression Testing**:
    - Powered by Playwright snapshot testing (`tests/visual.spec.ts`).
-   - Runs strictly on **Linux CI** to avoid OS font rendering diffs (`maxDiffPixelRatio: 0.002`).
+   - Runs strictly on **Linux CI** to avoid OS font rendering diffs. Current tolerance is `maxDiffPixelRatio: 0.05` with `threshold: 0.2` (this file previously claimed `0.002`, which has never been the configured value). That tolerance was only ever exercised against a placeholder image — see the next bullet — so it is probably looser than it needs to be now that baselines are real components; tighten deliberately rather than by accident.
+   - **The static build must be served by `vite preview`, not `serve`.** `serve` enables clean URLs by default, which 301s `/iframe.html?id=<story>` to `/iframe` and **drops the query string**. Storybook then has no story to select and renders its "No Preview" placeholder — and because `--update-snapshots` will happily bake that placeholder in as the baseline, the whole suite silently passes while testing nothing. That is exactly what happened up to `0.0.5`: all five baselines were the same error page. `tests/visual.spec.ts` now asserts the story root is non-empty and free of "No Preview" so this cannot recur quietly.
    - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow (dispatch it on your branch; it commits regenerated baselines back to that branch — this repo blocks Actions from creating PRs).
+   - Note that the snapshot workflow pushes as `github-actions[bot]`, and CI runs on bot-authored commits land in **`action_required`** — they need an "Approve and run" click before the PR shows a green check.
 6. **Required Checks**:
    - `pnpm typecheck`
    - `pnpm build`
