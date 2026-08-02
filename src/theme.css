@@ -28,6 +28,29 @@
   --color-brutalist-cyberOrange: var(--brutalist-cyberOrange, #ff8c00);
   --color-brutalist-darkBg: var(--brutalist-darkBg, #0a0a1a);
 
+  /* Semantic aliases, so utilities can be written as `text-accent-primary` or
+   * `border-border-subtle` instead of naming a hue. Prefer these in consumer
+   * code; the `brutalist-*` names above stay for the existing components. */
+  --color-accent-primary: var(--ds-accent-primary);
+  --color-accent-secondary: var(--ds-accent-secondary);
+  --color-accent-tertiary: var(--ds-accent-tertiary);
+  --color-accent-quiet: var(--ds-accent-quiet);
+  --color-intent-info: var(--ds-intent-info);
+  --color-intent-success: var(--ds-intent-success);
+  --color-intent-warning: var(--ds-intent-warning);
+  --color-intent-danger: var(--ds-intent-danger);
+  --color-surface-base: var(--ds-surface-base);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-surface-sunken: var(--ds-surface-sunken);
+  --color-surface-overlay: var(--ds-surface-overlay);
+  --color-content-primary: var(--ds-text-primary);
+  --color-content-secondary: var(--ds-text-secondary);
+  --color-content-muted: var(--ds-text-muted);
+  --color-content-inverse: var(--ds-text-inverse);
+  --color-edge-strong: var(--ds-border-strong);
+  --color-edge-default: var(--ds-border-default);
+  --color-edge-subtle: var(--ds-border-subtle);
+
   --font-sans: var(--font-inter, "Inter"), system-ui, sans-serif;
   --font-display: var(--font-space-grotesk, "Space Grotesk"), system-ui, sans-serif;
   --font-mono: var(--font-ibm-plex-mono, "IBM Plex Mono"), Courier New, monospace;
@@ -63,6 +86,8 @@
   --brutalist-cyan: #38bdf8;
   --brutalist-pink: #f43f5e;
   --brutalist-yellow: #fbbf24;
+  --brutalist-neonGreen: #4ade80;
+  --brutalist-cyberOrange: #fb923c;
   --brutalist-shadow-color: #e4e4e7;
   --border-color: #e4e4e7;
 }
@@ -73,6 +98,61 @@
   --brutalist-cyan: #2563eb; /* Blue pen ink */
   --brutalist-pink: #dc2626; /* Red pen ink */
   --brutalist-yellow: #16a34a; /* Green highlighter */
+  --brutalist-neonGreen: #15803d; /* Darker green — neon is illegible on paper */
+  --brutalist-cyberOrange: #c2410c;
   --brutalist-shadow-color: #18181b;
   --border-color: #18181b;
+}
+
+/* ==========================================================================
+   Semantic layer
+   ==========================================================================
+
+   Components address these roles, never the palette above. Each resolves
+   through a raw variable, so every mode swap (`.dark`, `.dim`, `.sketch`)
+   propagates without the semantic layer needing per-mode blocks of its own.
+
+   Roles, and when to reach for each:
+     accent-*   visual hierarchy — which element should draw the eye first
+     intent-*   communicated meaning — info / success / warning / danger
+     surface-*  background elevation — base < raised < overlay, sunken is inset
+     text-*     prominence, coarsest to faintest
+     border-*   rule weight
+
+   `--ds-accent-secondary` and `--ds-intent-warning` share a hue today. That is
+   a property of this palette, not of the roles: retheming can separate them,
+   and call sites already say which one they meant.
+   ========================================================================== */
+
+:root {
+  --ds-surface-base: var(--color-black, #000000);
+  --ds-surface-raised: color-mix(in oklab, var(--color-white, #fff) 4%, var(--color-black, #000));
+  --ds-surface-sunken: color-mix(in oklab, var(--color-black, #000) 88%, var(--color-white, #fff));
+  --ds-surface-overlay: color-mix(in oklab, var(--color-black, #000) 82%, transparent);
+
+  --ds-text-primary: var(--color-white, #ffffff);
+  --ds-text-secondary: color-mix(in oklab, var(--color-white, #fff) 75%, transparent);
+  --ds-text-muted: color-mix(in oklab, var(--color-white, #fff) 52%, transparent);
+  --ds-text-inverse: var(--color-black, #000000);
+
+  --ds-border-strong: var(--border-color, #ffffff);
+  --ds-border-default: color-mix(in oklab, var(--border-color, #fff) 62%, transparent);
+  --ds-border-subtle: color-mix(in oklab, var(--border-color, #fff) 28%, transparent);
+
+  --ds-accent-primary: var(--brutalist-cyan, #22d3ee);
+  --ds-accent-secondary: var(--brutalist-yellow, #facc15);
+  --ds-accent-tertiary: var(--brutalist-pink, #ec4899);
+  --ds-accent-quiet: var(--ds-text-muted);
+
+  --ds-intent-info: var(--brutalist-cyan, #22d3ee);
+  --ds-intent-success: var(--brutalist-neonGreen, #39ff14);
+  --ds-intent-warning: var(--brutalist-yellow, #facc15);
+  --ds-intent-danger: var(--brutalist-pink, #ec4899);
+
+  --ds-shadow-color: var(--brutalist-shadow-color, #ffffff);
+
+  --ds-font-display: var(--font-space-grotesk, "Space Grotesk"), system-ui, sans-serif;
+  --ds-font-body: var(--font-inter, "Inter"), system-ui, sans-serif;
+  --ds-font-mono: var(--font-ibm-plex-mono, "IBM Plex Mono"), Courier New, monospace;
+  --ds-font-pixel: var(--font-vt323, "VT323"), monospace;
 }

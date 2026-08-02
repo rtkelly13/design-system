@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertCircle, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
+import { semanticTokens } from '../lib/theme';
 
 export interface NoteBlockProps {
   type?: 'note' | 'tip' | 'warning' | 'important';
@@ -16,29 +17,29 @@ export const NoteBlock: React.FC<NoteBlockProps> = ({
     switch (type) {
       case 'tip':
         return {
-          borderColor: 'var(--brutalist-neonGreen, #39ff14)',
-          color: 'var(--brutalist-neonGreen, #39ff14)',
+          borderColor: semanticTokens.intent.success,
+          color: semanticTokens.intent.success,
           icon: CheckCircle2,
           defaultTitle: 'PRO TIP'
         };
       case 'warning':
         return {
-          borderColor: 'var(--brutalist-pink, #ec4899)',
-          color: 'var(--brutalist-pink, #ec4899)',
+          borderColor: semanticTokens.intent.danger,
+          color: semanticTokens.intent.danger,
           icon: AlertTriangle,
           defaultTitle: 'WARNING'
         };
       case 'important':
         return {
-          borderColor: 'var(--brutalist-yellow, #facc15)',
-          color: 'var(--brutalist-yellow, #facc15)',
+          borderColor: semanticTokens.intent.warning,
+          color: semanticTokens.intent.warning,
           icon: AlertCircle,
           defaultTitle: 'IMPORTANT'
         };
       default:
         return {
-          borderColor: 'var(--brutalist-cyan, #22d3ee)',
-          color: 'var(--brutalist-cyan, #22d3ee)',
+          borderColor: semanticTokens.intent.info,
+          color: semanticTokens.intent.info,
           icon: Info,
           defaultTitle: 'NOTE'
         };
@@ -54,7 +55,7 @@ export const NoteBlock: React.FC<NoteBlockProps> = ({
         margin: '1.5rem 0',
         padding: '1.25rem 1.5rem',
         border: `2px solid ${config.borderColor}`,
-        backgroundColor: 'var(--color-black, #000000)',
+        backgroundColor: semanticTokens.surface.base,
         boxShadow: `4px 4px 0px 0px ${config.borderColor}`,
       }}
     >
@@ -62,7 +63,7 @@ export const NoteBlock: React.FC<NoteBlockProps> = ({
         <Icon size={18} color={config.color} />
         <span
           style={{
-            fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+            fontFamily: semanticTokens.font.display,
             fontWeight: 800,
             fontSize: '0.875rem',
             textTransform: 'uppercase',
@@ -72,7 +73,7 @@ export const NoteBlock: React.FC<NoteBlockProps> = ({
           [ {title || config.defaultTitle} ]
         </span>
       </div>
-      <div style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', color: 'var(--color-white, #ffffff)', lineHeight: 1.6 }}>
+      <div style={{ fontFamily: semanticTokens.font.mono, fontSize: '0.875rem', color: semanticTokens.text.primary, lineHeight: 1.6 }}>
         {children}
       </div>
     </div>

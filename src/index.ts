@@ -1,6 +1,14 @@
-// @rtkelly/design-system main entrypoint
+// @rtkelly13/design-system main entrypoint
 
 export * from './tokens';
+
+// Semantic theming — prefer these over the raw palette in `tokens`.
+export * from './lib/theme';
+export * from './lib/slug';
+
+// Hooks
+export * from './hooks/useCopyToClipboard';
+export * from './hooks/useActiveHeading';
 
 // Primitives & Callouts
 export * from './components/Button';
@@ -37,3 +45,6 @@ export * from './components/experiments/DesignSandbox';
 // SaaS Landing Pages & Admin Sites Foundations
 export * from './components/saas/SaasLandingPage';
 export * from './components/admin/AdminDashboardLayout';
+
+// Documentation Portal Chrome & MDX Rendering
+export * from './components/docs';

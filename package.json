@@ -1,6 +1,6 @@
 {
   "name": "@rtkelly13/design-system",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Brutalist dual-mode design system, slide deck system, and experiments foundation for Ryan Kelly websites",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -13,7 +13,8 @@
       "require": "./dist/index.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./theme.css": "./dist/theme.css"
+    "./theme.css": "./dist/theme.css",
+    "./prose.css": "./dist/prose.css"
   },
   "files": [
     "dist",

@@ -24,6 +24,10 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm build`
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)
+7. **New Components Need Baselines**: adding a story without a snapshot leaves
+   `test:visual` unable to assert it. Add the story first, dispatch
+   `Update Visual Regression Snapshots` on the branch to generate baselines, then add
+   the corresponding case to `tests/visual.spec.ts`.
 
 ---
 
@@ -33,6 +37,33 @@ Package manager is **pnpm** (`node >=22`).
 - **Hard Offset Shadows**: `shadow-hard-*` utilities (2px, 4px, 6px offset, no blur).
 - **Dual-Mode Tokens**: Driven by CSS variables remapped by `.dark`, `.dim`, and `.sketch` root theme classes.
 - **Bracketed Display Typography**: Headings render in Space Grotesk enclosed in `[ BRACKETED ]` display type.
+- **Semantic Roles Over Hues**: Components address roles, never colours. See below.
+
+---
+
+## 🎯 Semantic Theming
+
+Components must **never** reference `--brutalist-cyan`, `--color-white`, `--border-color`
+or the `brutalist-*` Tailwind utilities directly. Those are one palette's mapping of the
+system's roles; `.dim` and `.sketch` are others. Address the role instead — the semantic
+variables in `theme.css` resolve through the palette, so every mode swap propagates for free.
+
+| Role group | Tokens | Use for |
+|---|---|---|
+| `--ds-accent-*` | `primary`, `secondary`, `tertiary`, `quiet` | Visual hierarchy — what draws the eye first |
+| `--ds-intent-*` | `info`, `success`, `warning`, `danger` | Communicated meaning the reader must act on |
+| `--ds-surface-*` | `base`, `raised`, `sunken`, `overlay` | Background elevation |
+| `--ds-text-*` | `primary`, `secondary`, `muted`, `inverse` | Text prominence |
+| `--ds-border-*` | `strong`, `default`, `subtle` | Rule weight |
+| `--ds-font-*` | `display`, `body`, `mono`, `pixel` | Typography roles |
+
+From TypeScript, use `accentVar()`, `surfaceVar()`, `textVar()`, `borderVar()`, or the
+`semanticTokens` object from `src/lib/theme.ts`. From Tailwind, use the semantic aliases:
+`text-accent-primary`, `bg-surface-raised`, `border-edge-subtle`, `text-intent-danger`.
+
+Accent-style props take an `Emphasis` or an `Intent`. The old palette names
+(`'cyan' | 'pink' | 'yellow' | 'green'`) still resolve to identical values so existing
+consumers keep compiling, but they are deprecated — do not use them in new code.
 
 ---
 

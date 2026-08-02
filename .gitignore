@@ -11,3 +11,7 @@ temp/
 # Local TODO file
 todo.md
 TODO.md
+
+# Playwright
+playwright-report/
+test-results/

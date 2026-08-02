@@ -1,0 +1,975 @@
+/* @rtkelly13/design-system — documentation & prose layer.
+ *
+ *   @import "@rtkelly13/design-system/theme.css";   (tokens)
+ *   @import "@rtkelly13/design-system/prose.css";   (this file)
+ *
+ * Deliberately plain CSS. The docs chrome is layout-critical, and Tailwind v4
+ * skips node_modules during automatic content detection — a consumer whose
+ * `@source` is wrong would otherwise get a half-styled sidebar rather than an
+ * obvious failure. Everything here works with the tokens alone.
+ *
+ * Two responsibilities:
+ *   1. `.docs-prose` — styles the bare tags a Markdown/MDX pipeline emits.
+ *   2. `.docs-*`     — the documentation chrome components.
+ */
+
+:root {
+  /* Republished by DocsHeader from its measured height. The fallback keeps
+   * anchor offsets sane when no header is mounted (Storybook, tests). */
+  --docs-header-height: 0px;
+  --docs-sidebar-width: 17rem;
+  --docs-toc-width: 15rem;
+  --docs-content-max: 48rem;
+}
+
+/* Anchor jumps must clear the sticky header. `scroll-padding-top` covers
+ * browser-driven scrolls (hash on load, in-page link clicks); the
+ * `scroll-margin-top` on headings covers programmatic scrollIntoView. */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--docs-header-height) + 1.5rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ==========================================================================
+   Anchored headings
+   ========================================================================== */
+
+.docs-anchor-heading {
+  position: relative;
+  scroll-margin-top: calc(var(--docs-header-height) + 1.5rem);
+}
+
+/* The heading itself is the focus target after a TOC jump; it gets tabindex
+ *="-1" at runtime, and the default focus ring on a block heading is ugly. */
+.docs-anchor-heading:focus {
+  outline: none;
+}
+
+.docs-anchor-heading:focus-visible {
+  outline: 2px solid var(--ds-accent-primary);
+  outline-offset: 4px;
+}
+
+.docs-anchor-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.6rem;
+  padding: 0.1rem 0.4rem;
+  border: 2px solid currentColor;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+/* Revealed on hover, but never hidden from keyboard users. */
+.docs-anchor-heading:hover .docs-anchor-link,
+.docs-anchor-link:focus-visible {
+  opacity: 1;
+}
+
+.docs-anchor-link:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 0 currentColor;
+}
+
+/* Touch devices have no hover state, so the affordance would be unreachable. */
+@media (hover: none) {
+  .docs-anchor-link {
+    opacity: 0.55;
+  }
+}
+
+/* ==========================================================================
+   Prose — compiled Markdown output
+   ========================================================================== */
+
+.docs-prose {
+  font-family: var(--ds-font-body);
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--ds-text-primary);
+  max-width: var(--docs-content-max);
+}
+
+.docs-prose > :first-child {
+  margin-top: 0;
+}
+
+.docs-prose h1,
+.docs-prose h2,
+.docs-prose h3,
+.docs-prose h4,
+.docs-prose h5,
+.docs-prose h6 {
+  font-family: var(--ds-font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  color: var(--ds-text-primary);
+}
+
+.docs-prose h1 {
+  font-size: 2.25rem;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 4px double var(--ds-border-strong);
+}
+
+.docs-prose h2 {
+  font-size: 1.6rem;
+  margin: 3rem 0 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--ds-border-strong);
+}
+
+.docs-prose h3 {
+  font-size: 1.25rem;
+  margin: 2.25rem 0 0.75rem;
+  color: var(--ds-accent-primary);
+}
+
+.docs-prose h4 {
+  font-size: 1.05rem;
+  margin: 1.75rem 0 0.5rem;
+  color: var(--ds-accent-secondary);
+}
+
+.docs-prose h5,
+.docs-prose h6 {
+  font-size: 0.95rem;
+  margin: 1.5rem 0 0.5rem;
+  opacity: 0.85;
+}
+
+.docs-prose p {
+  margin: 0 0 1.25rem;
+}
+
+.docs-prose a {
+  color: var(--ds-accent-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+
+.docs-prose a:hover {
+  background-color: var(--ds-accent-primary);
+  color: var(--ds-surface-base);
+  text-decoration: none;
+}
+
+/* The anchor affordance is a link inside a heading — exempt it from the
+ * prose link treatment or it inherits the underline and hover inversion. */
+.docs-prose .docs-anchor-link,
+.docs-prose .docs-anchor-link:hover {
+  text-decoration: none;
+  background-color: transparent;
+  color: inherit;
+}
+
+.docs-prose strong {
+  font-weight: 800;
+  color: var(--ds-text-primary);
+}
+
+.docs-prose em {
+  font-style: italic;
+}
+
+.docs-prose ul,
+.docs-prose ol {
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.docs-prose ul {
+  list-style: none;
+}
+
+.docs-prose ul > li {
+  position: relative;
+}
+
+/* Square marker, drawn rather than listed, so it can take an accent colour. */
+.docs-prose ul > li::before {
+  content: '';
+  position: absolute;
+  left: -1.1rem;
+  top: 0.72em;
+  width: 0.4rem;
+  height: 0.4rem;
+  background-color: var(--ds-accent-primary);
+}
+
+.docs-prose ol {
+  list-style: decimal;
+}
+
+.docs-prose ol > li::marker {
+  font-family: var(--ds-font-mono);
+  font-weight: 700;
+  color: var(--ds-accent-secondary);
+}
+
+.docs-prose li {
+  margin: 0.35rem 0;
+}
+
+.docs-prose li > ul,
+.docs-prose li > ol {
+  margin: 0.35rem 0;
+}
+
+/* Task lists from remark-gfm. */
+.docs-prose li.task-list-item::before {
+  display: none;
+}
+
+.docs-prose input[type='checkbox'] {
+  margin-right: 0.5rem;
+  accent-color: var(--ds-intent-success);
+}
+
+.docs-prose blockquote {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.25rem;
+  border-left: 4px solid var(--ds-accent-tertiary);
+  background-color: var(--ds-surface-raised);
+  font-style: italic;
+}
+
+.docs-prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.docs-prose hr {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 2px dashed var(--ds-border-strong);
+  opacity: 0.5;
+}
+
+/* Inline code only — the `pre > code` case is handled by the code block. */
+.docs-prose :not(pre) > code {
+  font-family: var(--ds-font-mono);
+  font-size: 0.875em;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--ds-border-default);
+  background-color: var(--ds-surface-raised);
+  color: var(--ds-accent-secondary);
+  white-space: nowrap;
+}
+
+.docs-prose kbd {
+  font-family: var(--ds-font-mono);
+  font-size: 0.8em;
+  padding: 0.1rem 0.4rem;
+  border: 2px solid var(--ds-border-strong);
+  box-shadow: 2px 2px 0 0 var(--ds-shadow-color);
+}
+
+.docs-prose img {
+  max-width: 100%;
+  height: auto;
+  border: 2px solid var(--ds-border-strong);
+}
+
+/* Tables scroll inside their own container rather than widening the page. */
+.docs-prose table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  border: 2px solid var(--ds-border-strong);
+  font-family: var(--ds-font-mono);
+  font-size: 0.85rem;
+}
+
+.docs-prose thead {
+  background-color: var(--ds-surface-raised);
+}
+
+.docs-prose th {
+  padding: 0.6rem 0.85rem;
+  border: 2px solid var(--ds-border-strong);
+  text-align: left;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ds-accent-primary);
+}
+
+.docs-prose td {
+  padding: 0.6rem 0.85rem;
+  border: 2px solid var(--ds-border-default);
+  vertical-align: top;
+}
+
+.docs-prose td > code {
+  white-space: pre-wrap;
+}
+
+/* Wrapper a pipeline can emit around wide tables. */
+.docs-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* GitHub alert syntax (`> [!NOTE]`) as emitted by
+ * remark-github-blockquote-alert — styled to match NoteBlock without
+ * requiring the component. */
+.docs-prose .markdown-alert {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--ds-accent-primary);
+  border-left-width: 6px;
+  background-color: var(--ds-surface-base);
+  font-style: normal;
+}
+
+.docs-prose .markdown-alert > :last-child {
+  margin-bottom: 0;
+}
+
+.docs-prose .markdown-alert-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--ds-font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ds-accent-primary);
+}
+
+.docs-prose .markdown-alert-tip {
+  border-color: var(--ds-intent-success);
+}
+.docs-prose .markdown-alert-tip .markdown-alert-title {
+  color: var(--ds-intent-success);
+}
+
+.docs-prose .markdown-alert-important {
+  border-color: var(--ds-accent-secondary);
+}
+.docs-prose .markdown-alert-important .markdown-alert-title {
+  color: var(--ds-accent-secondary);
+}
+
+.docs-prose .markdown-alert-warning,
+.docs-prose .markdown-alert-caution {
+  border-color: var(--ds-accent-tertiary);
+}
+.docs-prose .markdown-alert-warning .markdown-alert-title,
+.docs-prose .markdown-alert-caution .markdown-alert-title {
+  color: var(--ds-accent-tertiary);
+}
+
+/* Emitted by remark-code-title, immediately before its <pre>. */
+.docs-prose .remark-code-title {
+  margin-top: 1.5rem;
+  padding: 0.4rem 0.85rem;
+  border: 2px solid var(--ds-border-strong);
+  border-bottom: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ds-accent-secondary);
+}
+
+.docs-prose .remark-code-title + .docs-codeblock {
+  margin-top: 0;
+}
+
+/* ==========================================================================
+   Code block
+   ========================================================================== */
+
+.docs-codeblock {
+  margin: 1.5rem 0;
+  border: 2px solid var(--ds-border-strong);
+  background-color: var(--ds-surface-base);
+}
+
+.docs-codeblock-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0.85rem;
+  border-bottom: 2px solid var(--ds-border-strong);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.docs-codeblock-title {
+  color: var(--ds-accent-secondary);
+}
+
+.docs-codeblock-lang {
+  color: var(--ds-accent-tertiary);
+}
+
+.docs-codeblock-body {
+  position: relative;
+}
+
+.docs-codeblock-body pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--ds-font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ds-intent-success);
+}
+
+.docs-codeblock-body pre code {
+  font-family: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  white-space: pre;
+}
+
+.docs-codeblock-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 2px solid var(--ds-border-strong);
+  background-color: var(--ds-surface-base);
+  color: var(--ds-text-primary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.docs-codeblock:hover .docs-codeblock-copy,
+.docs-codeblock-copy:focus-visible {
+  opacity: 1;
+}
+
+.docs-codeblock-copy:hover {
+  background-color: var(--ds-text-primary);
+  color: var(--ds-surface-base);
+}
+
+.docs-codeblock-copy[data-copied='true'] {
+  opacity: 1;
+  border-color: var(--ds-intent-success);
+  color: var(--ds-intent-success);
+}
+
+@media (hover: none) {
+  .docs-codeblock-copy {
+    opacity: 0.6;
+  }
+}
+
+/* ==========================================================================
+   Layout shell
+   ========================================================================== */
+
+.docs-layout {
+  min-height: 100vh;
+  background-color: var(--ds-surface-base);
+  color: var(--ds-text-primary);
+}
+
+.docs-layout-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+  max-width: 100rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.docs-layout-main {
+  min-width: 0; /* lets long code blocks scroll instead of stretching the grid */
+  padding: 2rem 1.25rem 4rem;
+}
+
+.docs-layout-sidebar,
+.docs-layout-toc {
+  position: sticky;
+  top: var(--docs-header-height);
+  max-height: calc(100vh - var(--docs-header-height));
+  overflow-y: auto;
+}
+
+.docs-layout-sidebar {
+  width: var(--docs-sidebar-width);
+  padding: 1.5rem 1rem;
+  border-right: 2px solid var(--ds-border-strong);
+}
+
+.docs-layout-toc {
+  width: var(--docs-toc-width);
+  padding: 1.5rem 1rem;
+  border-left: 2px solid var(--ds-border-strong);
+}
+
+.docs-layout-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background-color: var(--ds-surface-overlay);
+}
+
+/* Mobile: the sidebar is an off-canvas drawer. */
+@media (max-width: 1023px) {
+  .docs-layout-sidebar {
+    position: fixed;
+    top: var(--docs-header-height);
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    max-height: none;
+    background-color: var(--ds-surface-base);
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+
+  .docs-layout-sidebar[data-open='true'] {
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 1024px) {
+  .docs-layout-body {
+    grid-template-columns: var(--docs-sidebar-width) minmax(0, 1fr);
+  }
+
+  .docs-layout-main {
+    padding: 2.5rem 2.5rem 5rem;
+  }
+
+  .docs-layout-scrim {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .docs-layout-body {
+    grid-template-columns: var(--docs-sidebar-width) minmax(0, 1fr) var(--docs-toc-width);
+  }
+}
+
+/* Below xl there is no third column to put the contents rail in. */
+@media (max-width: 1279px) {
+  .docs-layout-toc {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.docs-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 2px solid var(--ds-border-strong);
+  background-color: var(--ds-surface-base);
+}
+
+.docs-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.docs-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.docs-header-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--ds-font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ds-text-primary);
+  white-space: nowrap;
+}
+
+.docs-header-brand:hover {
+  color: var(--ds-accent-primary);
+}
+
+.docs-header-brand-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--ds-accent-primary);
+}
+
+.docs-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.docs-header-nav-link {
+  font-family: var(--ds-font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  color: var(--ds-text-primary);
+  opacity: 0.75;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+}
+
+.docs-header-nav-link:hover {
+  opacity: 1;
+  color: var(--ds-accent-primary);
+}
+
+.docs-header-nav-link[aria-current='page'] {
+  opacity: 1;
+  color: var(--ds-accent-primary);
+  border-bottom-color: var(--ds-accent-primary);
+}
+
+.docs-header-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--ds-border-strong);
+  background-color: var(--ds-surface-base);
+  color: var(--ds-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.docs-header-icon-btn:hover {
+  background-color: var(--ds-accent-primary);
+  color: var(--ds-surface-base);
+}
+
+.docs-header-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2rem;
+  padding: 0 0.6rem;
+  border: 2px solid var(--ds-border-strong);
+  background-color: var(--ds-surface-base);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.docs-header-search:hover {
+  background-color: var(--ds-accent-primary);
+  color: var(--ds-surface-base);
+}
+
+.docs-header-kbd {
+  padding: 0 0.3rem;
+  border: 1px solid currentColor;
+  font-size: 0.65rem;
+  opacity: 0.8;
+}
+
+/* The sidebar toggle only exists below lg, where the rail is a drawer. */
+@media (min-width: 1024px) {
+  .docs-header-sidebar-toggle {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .docs-header-nav {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .docs-header-search-label,
+  .docs-header-kbd {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Sidebar
+   ========================================================================== */
+
+.docs-sidebar-label,
+.docs-toc-label {
+  margin: 0 0 0.75rem;
+  font-family: var(--ds-font-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent-secondary);
+}
+
+.docs-sidebar-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Nested levels indent and gain a rule to make the hierarchy legible. */
+.docs-sidebar-list[data-depth='1'],
+.docs-sidebar-list[data-depth='2'],
+.docs-sidebar-list[data-depth='3'] {
+  margin-left: 0.55rem;
+  padding-left: 0.55rem;
+  border-left: 2px solid var(--ds-border-subtle);
+}
+
+.docs-sidebar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.docs-sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+  border: 0;
+  background: none;
+  color: var(--ds-accent-primary);
+  cursor: pointer;
+}
+
+.docs-sidebar-link {
+  display: block;
+  width: 100%;
+  padding: 0.3rem 0.4rem;
+  border: 0;
+  border-left: 2px solid transparent;
+  background: none;
+  font-family: var(--ds-font-mono);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-align: left;
+  text-decoration: none;
+  color: var(--ds-text-primary);
+  opacity: 0.72;
+  cursor: pointer;
+  transition: opacity 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.docs-sidebar-link:hover {
+  opacity: 1;
+  color: var(--ds-accent-primary);
+}
+
+.docs-sidebar-link[data-active='true'] {
+  opacity: 1;
+  font-weight: 700;
+  color: var(--ds-accent-primary);
+  border-left-color: var(--ds-accent-primary);
+  background-color: color-mix(in oklab, var(--ds-accent-primary) 12%, transparent);
+}
+
+.docs-sidebar-group-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
+
+.docs-sidebar-link-static {
+  cursor: default;
+  opacity: 0.55;
+}
+
+/* ==========================================================================
+   Table of contents
+   ========================================================================== */
+
+.docs-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.docs-toc-link {
+  display: block;
+  padding: 0.22rem 0.5rem;
+  border-left: 2px solid var(--ds-border-subtle);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  text-decoration: none;
+  color: var(--ds-text-primary);
+  opacity: 0.65;
+  transition: opacity 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.docs-toc-link:hover {
+  opacity: 1;
+  color: var(--ds-accent-primary);
+}
+
+.docs-toc-link[data-active='true'] {
+  opacity: 1;
+  font-weight: 700;
+  color: var(--ds-accent-primary);
+  border-left-color: var(--ds-accent-primary);
+}
+
+/* ==========================================================================
+   Breadcrumbs
+   ========================================================================== */
+
+.docs-breadcrumbs-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.docs-breadcrumbs-link {
+  color: var(--ds-text-primary);
+  opacity: 0.65;
+  text-decoration: none;
+}
+
+.docs-breadcrumbs-link:hover {
+  opacity: 1;
+  color: var(--ds-accent-primary);
+}
+
+.docs-breadcrumbs-sep {
+  color: var(--ds-accent-tertiary);
+}
+
+.docs-breadcrumbs-current {
+  color: var(--ds-accent-secondary);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Prev/next pager
+   ========================================================================== */
+
+.docs-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--ds-border-strong);
+}
+
+.docs-pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--ds-border-strong);
+  text-decoration: none;
+  color: var(--ds-text-primary);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.docs-pager-link:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--ds-accent-primary);
+  box-shadow: 4px 4px 0 0 var(--ds-accent-primary);
+}
+
+.docs-pager-next {
+  text-align: right;
+}
+
+.docs-pager-dir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--ds-font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--ds-accent-tertiary);
+}
+
+.docs-pager-next .docs-pager-dir {
+  justify-content: flex-end;
+}
+
+.docs-pager-label {
+  font-family: var(--ds-font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+
+@media (max-width: 639px) {
+  .docs-pager {
+    grid-template-columns: 1fr;
+  }
+
+  .docs-pager-next {
+    text-align: left;
+  }
+
+  .docs-pager-next .docs-pager-dir {
+    justify-content: flex-start;
+  }
+}

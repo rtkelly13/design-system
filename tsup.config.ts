@@ -9,5 +9,5 @@ export default defineConfig({
   clean: true,
   injectStyle: false,
   external: ['react', 'react-dom'],
-  onSuccess: 'cp src/styles.css src/theme.css dist/',
+  onSuccess: 'cp src/styles.css src/theme.css src/prose.css dist/',
 });
