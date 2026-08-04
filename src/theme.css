@@ -17,7 +17,14 @@
 
 @source "./";
 
-@custom-variant dark (&:where(.dark, .dark *, .dim, .dim *));
+/* `.dark`/`.dim` activate dark: variants, with nearest-theme-ancestor
+ * semantics down to one level of cross-theme nesting: a `.sketch` subtree
+ * inside a dark page opts back out (renders light base styles), and a
+ * `.dark`/`.dim` panel inside a sketch page opts back in via the
+ * `.sketch :is(.dark, .dim)` alternatives. CSS variables already resolve
+ * nearest-ancestor, so this keeps dark: variants in lockstep with them.
+ * Deeper alternation (sketch > dark > sketch) is not supported. */
+@custom-variant dark (&:where(.dark, .dim, :is(.dark, .dim) *):where(:not(:is(.sketch, .sketch *)), .sketch :is(.dark, .dim), .sketch :is(.dark, .dim) *));
 
 @theme {
   --color-brutalist-cyan: var(--brutalist-cyan, #22d3ee);
@@ -75,4 +82,31 @@
   --brutalist-yellow: #16a34a; /* Green highlighter */
   --brutalist-shadow-color: #18181b;
   --border-color: #18181b;
+}
+
+/* The @theme block above is emitted on `:root`, where each `var(--brutalist-*)`
+ * reference substitutes immediately — descendants inherit the *resolved* value,
+ * not the reference. A nested theme panel (`.sketch` inside a dark page, or
+ * vice versa) overrides `--brutalist-*` but the already-substituted `--color-*`
+ * / `--shadow-*` tokens would keep the root theme's colors. Re-declaring the
+ * indirected tokens on the mode classes makes substitution re-run at the panel,
+ * so utilities like `text-brutalist-cyan` and `shadow-hard-md` follow the
+ * nearest theme ancestor, in lockstep with the raw variables. */
+.dark, .dim, .sketch {
+  --color-brutalist-cyan: var(--brutalist-cyan, #22d3ee);
+  --color-brutalist-pink: var(--brutalist-pink, #ec4899);
+  --color-brutalist-yellow: var(--brutalist-yellow, #facc15);
+  --color-brutalist-neonGreen: var(--brutalist-neonGreen, #39ff14);
+  --color-brutalist-neonCyan: var(--brutalist-neonCyan, #00ffff);
+  --color-brutalist-cyberOrange: var(--brutalist-cyberOrange, #ff8c00);
+  --color-brutalist-darkBg: var(--brutalist-darkBg, #0a0a1a);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
+  --shadow-hard-md: 4px 4px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
+  --shadow-hard-lg: 6px 6px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
+  --shadow-hard-cyan: 4px 4px 0px 0px var(--brutalist-cyan, #22d3ee);
+  --shadow-hard-pink: 4px 4px 0px 0px var(--brutalist-pink, #ec4899);
+  --shadow-hard-yellow: 4px 4px 0px 0px var(--brutalist-yellow, #facc15);
+  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 30%, transparent);
+  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--brutalist-pink, #ec4899) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-pink, #ec4899) 30%, transparent);
+  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 80%, transparent), 0 0 40px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 50%, transparent);
 }
