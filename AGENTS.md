@@ -74,7 +74,49 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
 - `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
 - `pnpm test:visual:update`: Updates Playwright visual snapshots.
+- `pnpm walkthrough`: Screenshots every story in every theme and builds a contact sheet at `walkthrough/index.html`.
 - `pnpm typecheck`: Validates TypeScript strict mode.
+
+---
+
+## 📸 Screenshot Walkthrough
+
+`pnpm walkthrough` captures every Storybook story in **every theme**
+(`dark`, `dim`, `sketch`) and assembles `walkthrough/index.html` — a single
+browsable page for reviewing the whole system at once. CI publishes it as the
+`storybook-walkthrough-<sha>` artifact on every PR.
+
+It is **not** a gate. It asserts nothing about how things should look; it makes
+what they *do* look like reviewable. Visual regression stays in `ci.yml`.
+
+Its real value is cross-theme: a token change that reads fine in `dark` can be
+unusable in `sketch`, and a pixel diff against a single-theme baseline will
+never surface that.
+
+### Both suites verify the render first
+
+`tests/story-ready.ts` asserts Storybook actually mounted the story before any
+screenshot is taken, by checking the `sb-show-main` / `sb-show-errordisplay` /
+`sb-show-nopreview` classes Storybook puts on `<body>`.
+
+This is not optional defensiveness. Storybook always paints *something* — a
+"No Preview" panel or a red error overlay — so a screenshot taken after a fixed
+delay succeeds whether the story rendered or the entire preview bundle failed
+to load. Every baseline in this repo was once a screenshot of the "No Preview"
+panel, and the suite passed for as long as it kept being one.
+
+### `serve.json` is load-bearing
+
+`serve` rewrites `/iframe.html` to `/iframe` by default (`cleanUrls`), which
+breaks Storybook's asset preloading and yields exactly that empty preview. Both
+Playwright configs therefore start it as:
+
+```
+npx serve storybook-static -p 6006 --config ../serve.json
+```
+
+The path is relative to the **served directory**, not the repo root. Do not drop
+the `--config` flag.
 
 
 ## 🛑 Repository Conventions & Workflow Policy

@@ -398,6 +398,78 @@ html {
   margin-top: 0;
 }
 
+/* --------------------------------------------------------------------------
+   Chrome nested inside prose
+
+   Breadcrumbs sit above the page title and the pager below the body, so both
+   are routinely rendered *inside* `.docs-prose`. Prose styles target bare tags,
+   which means they also capture the chrome's own `<ol>`, `<li>` and `<a>` —
+   breadcrumbs pick up a decimal marker and every chrome link gets the prose
+   underline and hover inversion.
+
+   These rules are more specific than the prose ones on purpose; they must win.
+   -------------------------------------------------------------------------- */
+
+.docs-prose :is(.docs-breadcrumbs-list, .docs-toc-list, .docs-sidebar-list) {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+}
+
+.docs-prose :is(.docs-breadcrumbs-list, .docs-toc-list, .docs-sidebar-list) > li {
+  margin: 0;
+}
+
+.docs-prose
+  :is(.docs-breadcrumbs-list, .docs-toc-list, .docs-sidebar-list)
+  > li::marker {
+  content: '';
+}
+
+.docs-prose
+  :is(.docs-breadcrumbs-list, .docs-toc-list, .docs-sidebar-list)
+  > li::before {
+  display: none;
+}
+
+/* Breadcrumbs keep their own bottom margin; the reset above zeroed it. */
+.docs-prose .docs-breadcrumbs-list {
+  margin-bottom: 1.25rem;
+}
+
+.docs-prose
+  :is(
+    .docs-breadcrumbs-link,
+    .docs-breadcrumbs-current,
+    .docs-toc-link,
+    .docs-sidebar-link,
+    .docs-pager-link,
+    .docs-header-brand,
+    .docs-header-nav-link
+  ),
+.docs-prose
+  :is(
+    .docs-breadcrumbs-link,
+    .docs-toc-link,
+    .docs-sidebar-link,
+    .docs-pager-link,
+    .docs-header-brand,
+    .docs-header-nav-link
+  ):hover {
+  text-decoration: none;
+  background-color: transparent;
+}
+
+/* Each chrome link defines its own hover colour; the prose inversion would
+ * otherwise repaint them all to the surface colour. */
+.docs-prose :is(.docs-pager-link, .docs-header-brand):hover {
+  color: var(--ds-text-primary);
+}
+
+.docs-prose :is(.docs-breadcrumbs-link, .docs-toc-link, .docs-sidebar-link):hover {
+  color: var(--ds-accent-primary);
+}
+
 /* ==========================================================================
    Code block
    ========================================================================== */

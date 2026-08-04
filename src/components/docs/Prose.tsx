@@ -12,8 +12,11 @@ export interface ProseProps extends HTMLAttributes<HTMLDivElement> {
  * it cannot be styled by utility classes. `prose.css` styles those tags, but
  * only inside `.docs-prose`, keeping the resets off the rest of the app.
  *
- * Wrap only the rendered document body; chrome (sidebar, TOC, pager) should sit
- * outside it.
+ * Chrome components may be nested inside — a breadcrumb above the page title
+ * and a pager below the body both read naturally as part of the article — and
+ * `prose.css` carries explicit resets so they do not pick up list markers or
+ * the prose link treatment. The sidebar and TOC belong outside, in
+ * {@link DocsLayout}'s rails.
  */
 export function Prose({ children, className = '', ...rest }: ProseProps) {
   return (

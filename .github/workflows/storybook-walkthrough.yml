@@ -1,0 +1,99 @@
+name: Storybook Walkthrough
+
+# Captures every story in every theme and publishes a browsable contact sheet
+# as a build artifact.
+#
+# Deliberately a separate workflow from `ci.yml`, and deliberately not a gate:
+# it asserts nothing about how things *should* look, it just makes what they do
+# look like reviewable in one page. Visual regression stays in `ci.yml` where
+# it can block a merge.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+# A walkthrough for an outdated commit is noise — drop in-flight runs when the
+# branch moves on.
+concurrency:
+  group: walkthrough-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  walkthrough:
+    name: Capture Screenshot Walkthrough
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Storybook
+        run: pnpm build-storybook
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Capture Walkthrough
+        env:
+          # Passed in rather than read from the clock inside the builder, so a
+          # rerun of the same commit produces an identical sheet.
+          WALKTHROUGH_TIMESTAMP: ${{ github.event.repository.updated_at }}
+        run: pnpm walkthrough
+
+      - name: Upload Walkthrough Artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-walkthrough-${{ github.sha }}
+          path: walkthrough/
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Storybook Walkthrough"
+            echo
+            if [ -d walkthrough/shots ]; then
+              total=$(find walkthrough/shots -name '*.png' | wc -l)
+              themes=$(find walkthrough/shots -mindepth 1 -maxdepth 1 -type d -printf '%f ' )
+              echo "Captured **${total}** screenshots across themes: \`${themes}\`"
+            else
+              echo "No screenshots were produced."
+            fi
+            echo
+            echo "Download the **storybook-walkthrough-${GITHUB_SHA}** artifact below,"
+            echo "unzip it, and open \`index.html\` for the contact sheet."
+            if [ -n "${{ steps.upload.outputs.artifact-url }}" ]; then
+              echo
+              echo "[Artifact download](${{ steps.upload.outputs.artifact-url }})"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Playwright Traces on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: walkthrough-debug-${{ github.sha }}
+          path: walkthrough/.playwright/
+          retention-days: 7
+          if-no-files-found: ignore
