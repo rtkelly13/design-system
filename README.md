@@ -96,9 +96,86 @@ components are generated in your build:
 @import "@rtkelly13/design-system/theme.css";
 ```
 
-`styles.css` = `theme.css` + web-font imports + opinionated global resets
-(zero border-radius everywhere, base typography). Import one or the other,
-not both.
+`styles.css` = `theme.css` + `prose.css` + web-font imports + opinionated global
+resets (zero border-radius everywhere, base typography). Import that, or compose
+the pieces yourself — but not both.
+
+### 3. Semantic tokens
+
+Address **roles**, not hues. The brutalist palette is one mapping of these roles;
+`.dim` and `.sketch` are others, so a component that hard-codes `cyan` cannot be
+rethemed without editing the component.
+
+| Role group | Tokens | Use for |
+|---|---|---|
+| `--ds-accent-*` | `primary`, `secondary`, `tertiary`, `quiet` | Visual hierarchy |
+| `--ds-intent-*` | `info`, `success`, `warning`, `danger` | Communicated meaning |
+| `--ds-surface-*` | `base`, `raised`, `sunken`, `overlay` | Background elevation |
+| `--ds-text-*` | `primary`, `secondary`, `muted`, `inverse` | Text prominence |
+| `--ds-border-*` | `strong`, `default`, `subtle` | Rule weight |
+| `--ds-font-*` | `display`, `body`, `mono`, `pixel` | Typography roles |
+
+```tsx
+import { Badge, Tag, accentVar, semanticTokens } from '@rtkelly13/design-system';
+
+<Badge accent="primary">HIERARCHY</Badge>
+<Tag text="deprecated" accent="danger" />          {/* meaning, not colour */}
+<div style={{ borderColor: accentVar('secondary') }} />
+<div style={{ background: semanticTokens.surface.raised }} />
+```
+
+Tailwind aliases are generated too: `text-accent-primary`, `bg-surface-raised`,
+`border-edge-subtle`, `text-intent-danger`.
+
+The legacy palette names (`'cyan' | 'pink' | 'yellow' | 'green'`) still resolve to
+identical values, so existing call sites keep working — but they are deprecated.
+
+---
+
+## 📚 Documentation Portal
+
+A complete chrome kit for MDX documentation sites.
+
+```tsx
+import {
+  DocsLayout, DocsHeader, DocsSidebar, TableOfContents,
+  Breadcrumbs, DocPager, Prose, CodeBlock, AnchorHeading,
+  DocsLinkProvider, mdxComponents,
+} from '@rtkelly13/design-system';
+import '@rtkelly13/design-system/prose.css';
+```
+
+**Every section is addressable.** Headings render through `AnchorHeading`, which gives
+each one a `#slug` id and a hover affordance that copies the *absolute* URL including
+the hash — the thing you actually paste into a ticket.
+
+**The header is durable.** `DocsHeader` is sticky and measures its own height into
+`--docs-header-height`. That single value feeds `scroll-padding-top`, the
+`scroll-margin-top` on every heading, and the scroll-spy reading line — so anchors
+never land underneath the bar, at any viewport width.
+
+**Bring your own router.** Wrap the app in `DocsLinkProvider` and all chrome navigation
+goes through it instead of hard-navigating:
+
+```tsx
+import { Link } from 'react-router-dom';
+
+<DocsLinkProvider component={({ href, ...props }) => <Link to={href} {...props} />}>
+  <App />
+</DocsLinkProvider>
+```
+
+**One MDX mapping.** `mdxComponents` maps `h1`–`h6` → anchored headings, `pre` →
+`CodeBlock`, `a` → router-aware links, and exposes `NoteBlock` / `TLDR` / `Card` /
+`Tag` to MDX authors. Pass it to any MDX provider so every site renders Markdown
+identically.
+
+`prose.css` styles the bare tags a Markdown pipeline emits (`ul`, `ol`, `table`,
+`blockquote`, `hr`, inline `code`, task lists), plus GitHub alert syntax
+(`> [!NOTE]`) as produced by `remark-github-blockquote-alert`, and code titles from
+`remark-code-title`. It is plain CSS on purpose: the docs chrome is layout-critical,
+and Tailwind v4 skips `node_modules` in automatic content detection, so a
+misconfigured `@source` would half-break a sidebar rather than fail loudly.
 
 ---
 

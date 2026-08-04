@@ -1,12 +1,22 @@
 import type { ReactNode, ElementType } from 'react';
+import type { AccentToken } from '../lib/theme';
 
+/** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
 export type PageHeaderAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
-const ACCENT_TEXT: Record<PageHeaderAccent, string> = {
-  cyan: 'text-brutalist-cyan',
-  pink: 'text-brutalist-pink',
-  yellow: 'text-brutalist-yellow',
-  green: 'text-brutalist-green',
+const ACCENT_TEXT: Record<string, string> = {
+  primary: 'text-accent-primary',
+  secondary: 'text-accent-secondary',
+  tertiary: 'text-accent-tertiary',
+  quiet: 'text-accent-quiet',
+  info: 'text-intent-info',
+  success: 'text-intent-success',
+  warning: 'text-intent-warning',
+  danger: 'text-intent-danger',
+  cyan: 'text-accent-primary',
+  pink: 'text-accent-tertiary',
+  yellow: 'text-accent-secondary',
+  green: 'text-intent-success',
 };
 
 export interface PageHeaderProps {
@@ -17,7 +27,7 @@ export interface PageHeaderProps {
   /** Optional leading glyph — a lucide icon or SVG component. */
   icon?: ElementType<{ className?: string }>;
   /** Themes the icon + prompt glyph. Defaults to cyan. */
-  accent?: PageHeaderAccent;
+  accent?: AccentToken;
   /** Extra header content (badges, admin notes) below the subtitle. */
   children?: ReactNode;
   /** Custom container class name override. */
@@ -28,11 +38,11 @@ export function PageHeader({
   title,
   subtitle,
   icon: Icon,
-  accent = 'cyan',
+  accent = 'primary',
   children,
   className = '',
 }: PageHeaderProps) {
-  const accentText = ACCENT_TEXT[accent] || ACCENT_TEXT.cyan;
+  const accentText = ACCENT_TEXT[accent] ?? ACCENT_TEXT.primary;
 
   return (
     <header className={`bg-zinc-900 px-6 pt-8 pb-10 ${className}`}>

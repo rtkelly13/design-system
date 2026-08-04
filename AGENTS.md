@@ -24,6 +24,10 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm build`
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)
+7. **New Components Need Baselines**: adding a story without a snapshot leaves
+   `test:visual` unable to assert it. Add the story first, dispatch
+   `Update Visual Regression Snapshots` on the branch to generate baselines, then add
+   the corresponding case to `tests/visual.spec.ts`.
 
 ---
 
@@ -33,6 +37,33 @@ Package manager is **pnpm** (`node >=22`).
 - **Hard Offset Shadows**: `shadow-hard-*` utilities (2px, 4px, 6px offset, no blur).
 - **Dual-Mode Tokens**: Driven by CSS variables remapped by `.dark`, `.dim`, and `.sketch` root theme classes.
 - **Bracketed Display Typography**: Headings render in Space Grotesk enclosed in `[ BRACKETED ]` display type.
+- **Semantic Roles Over Hues**: Components address roles, never colours. See below.
+
+---
+
+## 🎯 Semantic Theming
+
+Components must **never** reference `--brutalist-cyan`, `--color-white`, `--border-color`
+or the `brutalist-*` Tailwind utilities directly. Those are one palette's mapping of the
+system's roles; `.dim` and `.sketch` are others. Address the role instead — the semantic
+variables in `theme.css` resolve through the palette, so every mode swap propagates for free.
+
+| Role group | Tokens | Use for |
+|---|---|---|
+| `--ds-accent-*` | `primary`, `secondary`, `tertiary`, `quiet` | Visual hierarchy — what draws the eye first |
+| `--ds-intent-*` | `info`, `success`, `warning`, `danger` | Communicated meaning the reader must act on |
+| `--ds-surface-*` | `base`, `raised`, `sunken`, `overlay` | Background elevation |
+| `--ds-text-*` | `primary`, `secondary`, `muted`, `inverse` | Text prominence |
+| `--ds-border-*` | `strong`, `default`, `subtle` | Rule weight |
+| `--ds-font-*` | `display`, `body`, `mono`, `pixel` | Typography roles |
+
+From TypeScript, use `accentVar()`, `surfaceVar()`, `textVar()`, `borderVar()`, or the
+`semanticTokens` object from `src/lib/theme.ts`. From Tailwind, use the semantic aliases:
+`text-accent-primary`, `bg-surface-raised`, `border-edge-subtle`, `text-intent-danger`.
+
+Accent-style props take an `Emphasis` or an `Intent`. The old palette names
+(`'cyan' | 'pink' | 'yellow' | 'green'`) still resolve to identical values so existing
+consumers keep compiling, but they are deprecated — do not use them in new code.
 
 ---
 
@@ -43,7 +74,66 @@ Package manager is **pnpm** (`node >=22`).
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
 - `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
 - `pnpm test:visual:update`: Updates Playwright visual snapshots.
+- `pnpm walkthrough`: Screenshots every story in every theme into `walkthrough-report/`.
+- `pnpm walkthrough:show`: Opens that report locally.
 - `pnpm typecheck`: Validates TypeScript strict mode.
+
+---
+
+## 📸 Screenshot Walkthrough
+
+`pnpm walkthrough` captures every Storybook story in **every theme**
+(`dark`, `dim`, `sketch`) and publishes Playwright's own HTML report to
+`walkthrough-report/`. CI attaches it as `storybook-walkthrough-<sha>` on every PR.
+
+Download it, unzip, open `index.html` — it works straight from `file://`, no
+server needed. `pnpm walkthrough:show` serves it locally.
+
+It is **not** a gate. It asserts nothing about how things should look; it makes
+what they *do* look like reviewable. Visual regression stays in `ci.yml`.
+
+Its real value is cross-theme: a token change that reads fine in `dark` can be
+unusable in `sketch`, and a pixel diff against a single-theme baseline will
+never surface that.
+
+Two structural choices worth keeping:
+
+- **One test per story, not per story-and-theme.** The report lists tests, so a
+  row is a component and opening it shows all three themes together — which is
+  the comparison worth making. Splitting by theme triples the rows and scatters
+  the images that need comparing.
+- **Each theme's capture is wrapped in a `test.step`.** Ungrouped, the
+  navigation plumbing contributes ~21 rows to the step list and pushes the
+  screenshots below the fold.
+
+Note that `expect()`'s message argument becomes the *step title* in the report,
+shown next to a green tick on success. `story-ready.ts` therefore raises its
+guidance on catch instead — otherwise every passing run reads as a failure.
+
+### Both suites verify the render first
+
+`tests/story-ready.ts` asserts Storybook actually mounted the story before any
+screenshot is taken, by checking the `sb-show-main` / `sb-show-errordisplay` /
+`sb-show-nopreview` classes Storybook puts on `<body>`.
+
+This is not optional defensiveness. Storybook always paints *something* — a
+"No Preview" panel or a red error overlay — so a screenshot taken after a fixed
+delay succeeds whether the story rendered or the entire preview bundle failed
+to load. Every baseline in this repo was once a screenshot of the "No Preview"
+panel, and the suite passed for as long as it kept being one.
+
+### `serve.json` is load-bearing
+
+`serve` rewrites `/iframe.html` to `/iframe` by default (`cleanUrls`), which
+breaks Storybook's asset preloading and yields exactly that empty preview. Both
+Playwright configs therefore start it as:
+
+```
+npx serve storybook-static -p 6006 --config ../serve.json
+```
+
+The path is relative to the **served directory**, not the repo root. Do not drop
+the `--config` flag.
 
 
 ## 🛑 Repository Conventions & Workflow Policy

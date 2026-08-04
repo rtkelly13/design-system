@@ -1,22 +1,30 @@
 import React from 'react';
+import { accentVar } from '../lib/theme';
+import type { AccentToken } from '../lib/theme';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: React.ReactNode;
-  accent?: 'cyan' | 'pink' | 'yellow' | 'green';
+  /**
+   * Semantic role. Accepts an `Emphasis` (`primary`…`quiet`) or an `Intent`
+   * (`info`/`success`/`warning`/`danger`); the legacy palette names still
+   * resolve to the same values.
+   */
+  accent?: AccentToken;
 }
 
-export const Badge: React.FC<BadgeProps> = ({ children, accent = 'cyan', className = '', style, ...props }) => {
-  const getAccentColor = () => {
-    switch (accent) {
-      case 'pink': return 'var(--brutalist-pink, #ec4899)';
-      case 'yellow': return 'var(--brutalist-yellow, #facc15)';
-      case 'green': return 'var(--brutalist-neonGreen, #39ff14)';
-      default: return 'var(--brutalist-cyan, #22d3ee)';
-    }
-  };
-
+export const Badge: React.FC<BadgeProps> = ({
+  children,
+  accent = 'primary',
+  className = '',
+  style,
+  ...props
+}) => {
   return (
-    <span className={`brutalist-badge ${className}`} style={{ color: getAccentColor(), ...style }} {...props}>
+    <span
+      className={`brutalist-badge ${className}`}
+      style={{ color: accentVar(accent), ...style }}
+      {...props}
+    >
       {children}
     </span>
   );

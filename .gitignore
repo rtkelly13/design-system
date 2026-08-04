@@ -11,3 +11,11 @@ temp/
 # Local TODO file
 todo.md
 TODO.md
+
+# Playwright
+playwright-report/
+test-results/
+
+# Screenshot walkthrough artifacts
+walkthrough-report/
+walkthrough-results/

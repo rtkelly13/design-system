@@ -1,5 +1,8 @@
 import type { ReactNode, HTMLAttributes, CSSProperties } from 'react';
+import { accentVar, semanticTokens } from '../lib/theme';
+import type { AccentToken } from '../lib/theme';
 
+/** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
 export type CardAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -11,20 +14,13 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   filename?: string;
   children?: ReactNode;
   className?: string;
-  /** Accent color for left border highlight */
-  accent?: CardAccent;
+  /** Semantic accent for the left border highlight. */
+  accent?: AccentToken;
   /** Badge text shown in the card header */
   badge?: string;
   /** If true, renders as a simple panel without the filename header bar */
   panel?: boolean;
 }
-
-const ACCENT_COLORS: Record<CardAccent, string> = {
-  cyan: 'var(--brutalist-cyan, #22d3ee)',
-  pink: 'var(--brutalist-pink, #ec4899)',
-  yellow: 'var(--brutalist-yellow, #facc15)',
-  green: 'var(--brutalist-neonGreen, #39ff14)',
-};
 
 export function Card({
   title,
@@ -41,12 +37,12 @@ export function Card({
   style,
   ...props
 }: CardProps) {
-  const accentColor = accent ? ACCENT_COLORS[accent] : undefined;
+  const accentColor = accent ? accentVar(accent) : undefined;
 
   const baseCardStyle: CSSProperties = {
-    backgroundColor: 'var(--color-black, #000000)',
-    color: 'var(--color-white, #ffffff)',
-    border: '2px solid var(--border-color, #ffffff)',
+    backgroundColor: semanticTokens.surface.base,
+    color: semanticTokens.text.primary,
+    border: `2px solid ${semanticTokens.border.strong}`,
     transition: 'transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease',
     ...(accentColor ? { borderLeftWidth: '4px', borderLeftColor: accentColor } : {}),
     ...style,
@@ -66,11 +62,11 @@ export function Card({
               display: 'inline-block',
               padding: '0.15rem 0.5rem',
               fontSize: '0.65rem',
-              fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+              fontFamily: semanticTokens.font.mono,
               fontWeight: 700,
               textTransform: 'uppercase',
               color: '#000',
-              backgroundColor: accentColor || 'var(--brutalist-pink, #ec4899)',
+              backgroundColor: accentColor ?? semanticTokens.accent.tertiary,
               marginBottom: '0.75rem',
             }}
           >
@@ -80,11 +76,11 @@ export function Card({
         {title && (
           <h3
             style={{
-              fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+              fontFamily: semanticTokens.font.display,
               fontSize: '1.1rem',
               fontWeight: 800,
               textTransform: 'uppercase',
-              color: accentColor || 'var(--color-white, #ffffff)',
+              color: accentColor || semanticTokens.text.primary,
               marginBottom: '0.75rem',
               letterSpacing: '0.025em',
             }}
@@ -93,7 +89,7 @@ export function Card({
           </h3>
         )}
         {description && (
-          <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem', color: 'var(--color-white, #ffffff)', opacity: 0.9, lineHeight: 1.6 }}>
+          <p style={{ fontFamily: semanticTokens.font.mono, fontSize: '0.85rem', color: semanticTokens.text.primary, opacity: 0.9, lineHeight: 1.6 }}>
             {description}
           </p>
         )}
@@ -115,19 +111,19 @@ export function Card({
       >
         <div
           style={{
-            borderBottom: '2px solid var(--border-color, #ffffff)',
+            borderBottom: `2px solid ${semanticTokens.border.strong}`,
             padding: '0.5rem 1rem',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            backgroundColor: 'var(--color-black, #000000)',
+            backgroundColor: semanticTokens.surface.base,
           }}
         >
           <span
             style={{
-              fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+              fontFamily: semanticTokens.font.mono,
               fontSize: '0.85rem',
-              color: 'var(--brutalist-yellow, #facc15)',
+              color: semanticTokens.accent.secondary,
               fontWeight: 700,
               textTransform: 'uppercase',
             }}
@@ -135,14 +131,14 @@ export function Card({
             {computedFilename}
           </span>
           {asciiArt && (
-            <pre style={{ fontSize: '0.7rem', color: 'var(--brutalist-cyan, #22d3ee)', lineHeight: 1 }}>
+            <pre style={{ fontSize: '0.7rem', color: semanticTokens.accent.primary, lineHeight: 1 }}>
               {asciiArt}
             </pre>
           )}
         </div>
 
         {imgSrc && (
-          <div style={{ borderBottom: '2px solid var(--border-color, #ffffff)' }}>
+          <div style={{ borderBottom: `2px solid ${semanticTokens.border.strong}` }}>
             {href ? (
               <a href={href} aria-label={`Link to ${title || 'card'}`}>
                 <img
@@ -167,12 +163,12 @@ export function Card({
               style={{
                 marginBottom: '0.75rem',
                 fontSize: '1.5rem',
-                fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+                fontFamily: semanticTokens.font.display,
                 fontWeight: 700,
                 lineHeight: 1.3,
                 letterSpacing: '-0.01em',
                 textTransform: 'uppercase',
-                color: 'var(--color-white, #ffffff)',
+                color: semanticTokens.text.primary,
               }}
             >
               {href ? (
@@ -185,7 +181,7 @@ export function Card({
             </h2>
           )}
           {description && (
-            <p style={{ marginBottom: '0.75rem', fontFamily: 'var(--font-inter, "Inter"), sans-serif', fontSize: '0.9rem', color: 'var(--color-white, #ffffff)', opacity: 0.7, lineHeight: 1.6 }}>
+            <p style={{ marginBottom: '0.75rem', fontFamily: semanticTokens.font.body, fontSize: '0.9rem', color: semanticTokens.text.primary, opacity: 0.7, lineHeight: 1.6 }}>
               {description}
             </p>
           )}
@@ -194,9 +190,9 @@ export function Card({
             <a
               href={href}
               style={{
-                fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+                fontFamily: semanticTokens.font.mono,
                 fontWeight: 700,
-                color: 'var(--brutalist-cyan, #22d3ee)',
+                color: semanticTokens.accent.primary,
                 textDecoration: 'none',
                 textTransform: 'uppercase',
                 display: 'inline-block',

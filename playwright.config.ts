@@ -26,7 +26,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx serve storybook-static -p 6006',
+    command: 'npx serve storybook-static -p 6006 --config ../serve.json',
     url: 'http://localhost:6006',
     reuseExistingServer: !process.env.CI,
   },

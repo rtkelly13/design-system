@@ -1,0 +1,91 @@
+name: Storybook Walkthrough
+
+# Captures every story in every theme and publishes Playwright's HTML report as
+# a build artifact, with each story's three themes attached side by side.
+#
+# Deliberately a separate workflow from `ci.yml`, and deliberately not a gate:
+# it asserts nothing about how things *should* look, it just makes what they do
+# look like reviewable. Visual regression stays in `ci.yml` where it can block
+# a merge.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+# A walkthrough for an outdated commit is noise — drop in-flight runs when the
+# branch moves on.
+concurrency:
+  group: walkthrough-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  walkthrough:
+    name: Capture Screenshot Walkthrough
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Storybook
+        run: pnpm build-storybook
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Capture Walkthrough
+        run: pnpm walkthrough
+
+      - name: Upload Walkthrough Report
+        id: upload
+        # `always()` so a partial report still ships when a story fails to
+        # render — the failure is exactly what you would want to look at.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-walkthrough-${{ github.event.pull_request.head.sha || github.sha }}
+          path: walkthrough-report/
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Summary
+        if: always()
+        env:
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          {
+            echo "## Storybook Walkthrough"
+            echo
+            if [ -d walkthrough-report/data ]; then
+              total=$(find walkthrough-report/data -type f -name '*.png' | wc -l)
+              echo "Attached **${total}** screenshots (identical captures are deduplicated)."
+            else
+              echo "No screenshots were produced."
+            fi
+            echo
+            echo "Download **storybook-walkthrough-${SHA}** below, unzip, and open"
+            echo "\`index.html\` directly — it works from \`file://\`, no server needed."
+            echo "Each test is one story; open it to see dark / dim / sketch together."
+            if [ -n "${{ steps.upload.outputs.artifact-url }}" ]; then
+              echo
+              echo "[Artifact download](${{ steps.upload.outputs.artifact-url }})"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
