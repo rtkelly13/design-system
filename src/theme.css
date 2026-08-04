@@ -112,6 +112,13 @@
    through a raw variable, so every mode swap (`.dark`, `.dim`, `.sketch`)
    propagates without the semantic layer needing per-mode blocks of its own.
 
+   The block is declared on the mode classes as well as `:root` because var()
+   references substitute where a custom property is DECLARED, not where it is
+   used — declared on `:root` alone, every `--ds-*` token would inherit as the
+   root theme's resolved literal, and a nested theme panel (`.sketch` inside a
+   dark page, or vice versa) would keep the root's colors. Re-declaring on the
+   mode classes re-runs substitution at the panel element.
+
    Roles, and when to reach for each:
      accent-*   visual hierarchy — which element should draw the eye first
      intent-*   communicated meaning — info / success / warning / danger
@@ -124,7 +131,7 @@
    and call sites already say which one they meant.
    ========================================================================== */
 
-:root {
+:root, .dark, .dim, .sketch {
   --ds-surface-base: var(--color-black, #000000);
   --ds-surface-raised: color-mix(in oklab, var(--color-white, #fff) 4%, var(--color-black, #000));
   --ds-surface-sunken: color-mix(in oklab, var(--color-black, #000) 88%, var(--color-white, #fff));
