@@ -74,7 +74,8 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
 - `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
 - `pnpm test:visual:update`: Updates Playwright visual snapshots.
-- `pnpm walkthrough`: Screenshots every story in every theme and builds a contact sheet at `walkthrough/index.html`.
+- `pnpm walkthrough`: Screenshots every story in every theme into `walkthrough-report/`.
+- `pnpm walkthrough:show`: Opens that report locally.
 - `pnpm typecheck`: Validates TypeScript strict mode.
 
 ---
@@ -82,9 +83,11 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 ## 📸 Screenshot Walkthrough
 
 `pnpm walkthrough` captures every Storybook story in **every theme**
-(`dark`, `dim`, `sketch`) and assembles `walkthrough/index.html` — a single
-browsable page for reviewing the whole system at once. CI publishes it as the
-`storybook-walkthrough-<sha>` artifact on every PR.
+(`dark`, `dim`, `sketch`) and publishes Playwright's own HTML report to
+`walkthrough-report/`. CI attaches it as `storybook-walkthrough-<sha>` on every PR.
+
+Download it, unzip, open `index.html` — it works straight from `file://`, no
+server needed. `pnpm walkthrough:show` serves it locally.
 
 It is **not** a gate. It asserts nothing about how things should look; it makes
 what they *do* look like reviewable. Visual regression stays in `ci.yml`.
@@ -92,6 +95,20 @@ what they *do* look like reviewable. Visual regression stays in `ci.yml`.
 Its real value is cross-theme: a token change that reads fine in `dark` can be
 unusable in `sketch`, and a pixel diff against a single-theme baseline will
 never surface that.
+
+Two structural choices worth keeping:
+
+- **One test per story, not per story-and-theme.** The report lists tests, so a
+  row is a component and opening it shows all three themes together — which is
+  the comparison worth making. Splitting by theme triples the rows and scatters
+  the images that need comparing.
+- **Each theme's capture is wrapped in a `test.step`.** Ungrouped, the
+  navigation plumbing contributes ~21 rows to the step list and pushes the
+  screenshots below the fold.
+
+Note that `expect()`'s message argument becomes the *step title* in the report,
+shown next to a green tick on success. `story-ready.ts` therefore raises its
+guidance on catch instead — otherwise every passing run reads as a failure.
 
 ### Both suites verify the render first
 

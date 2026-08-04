@@ -1,6 +1,7 @@
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-/** Shared between the walkthrough spec and the contact-sheet builder. */
+/** Shared between the walkthrough spec and anything else reading the story list. */
 
 export interface StoryEntry {
   id: string;
@@ -11,29 +12,38 @@ export interface StoryEntry {
 }
 
 export const REPO_ROOT = path.resolve(__dirname, '..');
-
-export const STORYBOOK_DIR = path.join(REPO_ROOT, 'storybook-static');
-export const STORYBOOK_INDEX = path.join(STORYBOOK_DIR, 'index.json');
-
-export const WALKTHROUGH_DIR = path.join(REPO_ROOT, 'walkthrough');
-export const SHOTS_DIR = path.join(WALKTHROUGH_DIR, 'shots');
+export const STORYBOOK_INDEX = path.join(REPO_ROOT, 'storybook-static', 'index.json');
 
 /**
  * Every theme the system ships. Capturing all three is the point of the
- * artifact: a token change that reads fine in `dark` can be unusable in
- * `sketch`, and that is exactly the class of regression a pixel diff against a
- * single-theme baseline will not surface.
+ * walkthrough: a token change that reads fine in `dark` can be unusable in
+ * `sketch`, and a pixel diff against a single-theme baseline will not surface
+ * that.
  */
 export const THEMES = ['dark', 'dim', 'sketch'] as const;
 
 export type Theme = (typeof THEMES)[number];
 
-/** Story ids are already filename-safe (Storybook slugifies them). */
-export function shotPath(theme: string, storyId: string): string {
-  return path.join(SHOTS_DIR, theme, `${storyId}.png`);
-}
+/**
+ * Read the story list out of Storybook's own build index, so new stories are
+ * picked up without touching this file.
+ */
+export function loadStories(): StoryEntry[] {
+  let raw: string;
+  try {
+    raw = readFileSync(STORYBOOK_INDEX, 'utf8');
+  } catch {
+    throw new Error(
+      `Storybook index not found at ${STORYBOOK_INDEX}. Run \`pnpm build-storybook\` first.`,
+    );
+  }
 
-/** Path relative to `walkthrough/`, for use in the generated HTML. */
-export function shotHref(theme: string, storyId: string): string {
-  return `shots/${theme}/${storyId}.png`;
+  const parsed = JSON.parse(raw) as {
+    entries: Record<string, { id: string; title: string; name: string; type?: string }>;
+  };
+
+  return Object.values(parsed.entries)
+    .filter((entry) => entry.type === 'story')
+    .map(({ id, title, name }) => ({ id, title, name }))
+    .sort((a, b) => a.title.localeCompare(b.title) || a.name.localeCompare(b.name));
 }

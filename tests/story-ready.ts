@@ -7,10 +7,9 @@ import { expect, type Page } from '@playwright/test';
  * Storybook always paints *something* — a "No Preview" panel, or a red error
  * overlay — so a screenshot taken after a fixed delay succeeds whether the
  * story rendered or the whole preview bundle failed to load. Both the visual
- * regression baselines and the walkthrough artifact are therefore only
- * meaningful if the render is verified first; without this check a broken
- * Storybook produces a full set of confident-looking screenshots of an error
- * message.
+ * regression baselines and the walkthrough report are therefore only meaningful
+ * if the render is verified first; without this check a broken Storybook
+ * produces a full set of confident-looking screenshots of an error message.
  *
  * Storybook signals its state through classes on `<body>`:
  *   sb-show-main            story rendered
@@ -20,12 +19,19 @@ import { expect, type Page } from '@playwright/test';
 export async function waitForStoryRendered(page: Page, storyId: string): Promise<void> {
   const body = page.locator('body');
 
-  await expect(
-    body,
-    `Story "${storyId}" never reached a rendered state. ` +
-      'Check that the Storybook build is current and that the static server is ' +
-      'not rewriting /iframe.html.',
-  ).toHaveClass(/sb-show-main/, { timeout: 30_000 });
+  // The failure guidance is raised on catch rather than passed as expect()'s
+  // message argument: Playwright uses that message as the *step title*, so it
+  // would appear in the HTML report next to a green tick on every successful
+  // run, which reads as a failure at a glance.
+  try {
+    await expect(body).toHaveClass(/sb-show-main/, { timeout: 30_000 });
+  } catch {
+    throw new Error(
+      `Story "${storyId}" never reached a rendered state. ` +
+        'Check that the Storybook build is current and that the static server ' +
+        'is not rewriting /iframe.html (see serve.json).',
+    );
+  }
 
   const classes = (await body.getAttribute('class')) ?? '';
 
@@ -41,7 +47,11 @@ export async function waitForStoryRendered(page: Page, storyId: string): Promise
   }
 
   // The root can be present but empty while the story is still mounting.
-  await expect(page.locator('#storybook-root')).not.toBeEmpty({ timeout: 15_000 });
+  try {
+    await expect(page.locator('#storybook-root')).not.toBeEmpty({ timeout: 15_000 });
+  } catch {
+    throw new Error(`Story "${storyId}" mounted an empty root element.`);
+  }
 
   // Web fonts change text metrics enough to reflow a page after paint.
   await page.evaluate(() => document.fonts.ready);

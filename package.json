@@ -30,8 +30,8 @@
     "test:visual": "playwright test tests/visual.spec.ts",
     "test:visual:update": "playwright test tests/visual.spec.ts --update-snapshots",
     "prepublishOnly": "pnpm build",
-    "walkthrough": "playwright test --config=playwright.walkthrough.config.ts && node scripts/build-walkthrough-index.mjs",
-    "walkthrough:build": "node scripts/build-walkthrough-index.mjs"
+    "walkthrough": "playwright test --config=playwright.walkthrough.config.ts",
+    "walkthrough:show": "playwright show-report walkthrough-report"
   },
   "publishConfig": {
     "access": "public"

@@ -16,5 +16,6 @@ TODO.md
 playwright-report/
 test-results/
 
-# Screenshot walkthrough artifact
-walkthrough/
+# Screenshot walkthrough artifacts
+walkthrough-report/
+walkthrough-results/
