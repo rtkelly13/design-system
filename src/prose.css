@@ -13,6 +13,24 @@
  *   2. `.docs-*`     — the documentation chrome components.
  */
 
+/* This file promises to work with the tokens alone, so it cannot assume a
+ * reset. Without `border-box`, every fixed-width chrome element blows out by
+ * its own padding — the contents rail is `width: 15rem` plus 2rem of padding
+ * and a 2px rule, so it renders 34px wider than its grid column and pushes the
+ * page sideways. `styles.css` consumers get this from Tailwind's preflight;
+ * `theme.css` + `prose.css` consumers previously got nothing.
+ *
+ * Scoped to the docs subtree rather than `*` so importing this file does not
+ * silently restyle the rest of a host application. */
+.docs-layout,
+.docs-prose,
+.docs-layout *,
+.docs-prose *,
+.docs-layout *::before,
+.docs-layout *::after {
+  box-sizing: border-box;
+}
+
 :root {
   /* Republished by DocsHeader from its measured height. The fallback keeps
    * anchor offsets sane when no header is mounted (Storybook, tests). */
@@ -273,6 +291,21 @@ html {
   background-color: var(--ds-surface-raised);
   color: var(--ds-accent-secondary);
   white-space: nowrap;
+}
+
+/* A heading that is entirely inline code — `### \`tvs metadata --format json\``
+ * is the dominant shape in CLI documentation — must not render as a chip. The
+ * chip's `nowrap` in particular cannot break a long command and pushes the page
+ * sideways on narrow viewports. Keep the mono face and accent so it still reads
+ * as a command; drop the box. */
+.docs-prose :is(h1, h2, h3, h4, h5, h6) code {
+  font-size: inherit;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .docs-prose kbd {
@@ -923,6 +956,9 @@ html {
   color: var(--ds-text-primary);
   opacity: 0.65;
   transition: opacity 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  /* Heading text is arbitrary and often long — `tvs metadata --readonly-only`
+   * has no break opportunity the rail can use on its own. */
+  overflow-wrap: anywhere;
 }
 
 .docs-toc-link:hover {
