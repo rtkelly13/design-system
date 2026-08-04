@@ -52,23 +52,26 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Capture Walkthrough
-        env:
-          # Passed in rather than read from the clock inside the builder, so a
-          # rerun of the same commit produces an identical sheet.
-          WALKTHROUGH_TIMESTAMP: ${{ github.event.repository.updated_at }}
-        run: pnpm walkthrough
+        run: |
+          # Supplied by the workflow rather than read inside the builder, which
+          # keeps the builder free of wall-clock reads (and lets a local run
+          # omit the label entirely).
+          export WALKTHROUGH_TIMESTAMP="$(date -u +'%Y-%m-%d %H:%M UTC')"
+          pnpm walkthrough
 
       - name: Upload Walkthrough Artifact
         id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: storybook-walkthrough-${{ github.sha }}
+          name: storybook-walkthrough-${{ github.event.pull_request.head.sha || github.sha }}
           path: walkthrough/
           retention-days: 14
           if-no-files-found: error
 
       - name: Summary
         if: always()
+        env:
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           {
             echo "## Storybook Walkthrough"
@@ -81,7 +84,7 @@ jobs:
               echo "No screenshots were produced."
             fi
             echo
-            echo "Download the **storybook-walkthrough-${GITHUB_SHA}** artifact below,"
+            echo "Download the **storybook-walkthrough-${SHA}** artifact below,"
             echo "unzip it, and open \`index.html\` for the contact sheet."
             if [ -n "${{ steps.upload.outputs.artifact-url }}" ]; then
               echo
@@ -93,7 +96,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: walkthrough-debug-${{ github.sha }}
+          name: walkthrough-debug-${{ github.event.pull_request.head.sha || github.sha }}
           path: walkthrough/.playwright/
           retention-days: 7
           if-no-files-found: ignore
