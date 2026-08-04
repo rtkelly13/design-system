@@ -25,9 +25,18 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)
 7. **New Components Need Baselines**: adding a story without a snapshot leaves
-   `test:visual` unable to assert it. Add the story first, dispatch
-   `Update Visual Regression Snapshots` on the branch to generate baselines, then add
-   the corresponding case to `tests/visual.spec.ts`.
+   `test:visual` unable to assert it. Add the story first, comment
+   **`/update-snapshots`** on the PR to generate baselines, then add the
+   corresponding case to `tests/visual.spec.ts`.
+8. **Re-baselining Happens In The PR**: any change that legitimately alters
+   rendering turns the visual check red. Comment **`/update-snapshots`** on the
+   PR — it regenerates on Linux, verifies the suite passes against the new
+   baselines, commits them back to the branch, and reports what changed. No
+   merge required. `workflow_dispatch` still works for baselining `main`.
+   Caveat: the baseline commit is pushed with `GITHUB_TOKEN`, and GitHub does
+   not start workflow runs from those pushes, so the PR's own visual check keeps
+   its previous result until you re-run it or push again. The verification step
+   inside the update run is what tells you the new baselines are good.
 
 ---
 

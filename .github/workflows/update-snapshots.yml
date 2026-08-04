@@ -1,5 +1,13 @@
 name: Update Visual Regression Snapshots
 
+# Regenerates the Playwright visual baselines on Linux and commits them back to
+# the branch this run was dispatched on.
+#
+# Usually reached by commenting `/update-snapshots` on a PR
+# (`update-snapshots-command.yml`), which is the point: a change that
+# legitimately alters rendering can be re-baselined from inside the PR rather
+# than only after merging. Direct dispatch still works for baselining `main`.
+
 on:
   workflow_dispatch:
     inputs:
@@ -7,6 +15,10 @@ on:
         description: 'Reason for updating visual snapshots'
         required: true
         default: 'Update component baseline snapshots'
+      pr-number:
+        description: 'PR to report results back to (set by /update-snapshots)'
+        required: false
+        default: ''
 
 jobs:
   update-snapshots:
@@ -42,24 +54,138 @@ jobs:
       - name: Generate Visual Snapshots
         run: pnpm test:visual:update
 
+      - name: Summarise what changed
+        id: changes
+        run: |
+          set -euo pipefail
+          added=$(git ls-files --others --exclude-standard tests/__snapshots__ | wc -l)
+          modified=$(git diff --name-only tests/__snapshots__ | wc -l)
+          {
+            echo "added=${added}"
+            echo "modified=${modified}"
+            echo 'files<<SNAPSHOT_EOF'
+            git ls-files --others --exclude-standard tests/__snapshots__ | sed 's/^/A  /'
+            git diff --name-only tests/__snapshots__ | sed 's/^/M  /'
+            echo 'SNAPSHOT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      # Proves the regenerated baselines are self-consistent before they are
+      # committed. Worth the extra minute: the branch's own visual check will
+      # NOT re-run off the commit below, because GitHub does not start workflow
+      # runs from GITHUB_TOKEN pushes. Without this the only signal a reviewer
+      # gets is "some files changed".
+      - name: Verify suite passes against the new baselines
+        run: pnpm test:visual
+
       # Commit straight back to the branch this run was dispatched on — the
       # repo blocks Actions from creating pull requests, so the previous
       # peter-evans/create-pull-request approach can never work here.
       - name: Commit & push snapshots
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [ -z "$(git status --porcelain tests/__snapshots__)" ]; then
             echo "Snapshots already match — nothing to commit."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git add tests/__snapshots__
           git commit -m "chore(visual): update Playwright baseline visual snapshots"
           git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Report success on the PR
+        if: success() && inputs.pr-number != ''
+        uses: actions/github-script@v7
+        env:
+          COMMITTED: ${{ steps.commit.outputs.committed }}
+          ADDED: ${{ steps.changes.outputs.added }}
+          MODIFIED: ${{ steps.changes.outputs.modified }}
+          FILES: ${{ steps.changes.outputs.files }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+        with:
+          script: |
+            const { COMMITTED, ADDED, MODIFIED, FILES, PR_NUMBER } = process.env;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const body = COMMITTED === 'true'
+              ? [
+                  '### 📸 Baselines updated',
+                  '',
+                  `**${ADDED}** added, **${MODIFIED}** modified. The suite was re-run against`,
+                  'the new baselines and passed, so they are self-consistent.',
+                  '',
+                  '<details><summary>Changed snapshots</summary>',
+                  '',
+                  '```',
+                  (FILES || '').trim() || '(none)',
+                  '```',
+                  '',
+                  '</details>',
+                  '',
+                  '> [!IMPORTANT]',
+                  '> Review the images in the commit before merging — a regenerated',
+                  '> baseline records whatever rendered, including a regression.',
+                  '',
+                  "This PR's visual check still shows its previous result: GitHub does not",
+                  'start workflow runs from `GITHUB_TOKEN` pushes. Re-run it, or push any',
+                  'commit, to see it go green.',
+                  '',
+                  `[Run log](${runUrl})`,
+                ].join('\n')
+              : [
+                  '### 📸 Baselines already current',
+                  '',
+                  'Nothing to commit — the existing baselines already match what this',
+                  'branch renders.',
+                  '',
+                  `[Run log](${runUrl})`,
+                ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(PR_NUMBER),
+              body,
+            });
+
+      - name: Report failure on the PR
+        if: failure() && inputs.pr-number != ''
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ inputs.pr-number }}
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(process.env.PR_NUMBER),
+              body: [
+                '### ❌ Snapshot update failed',
+                '',
+                'No baselines were committed. A likely cause is a story that fails to',
+                'render, which `tests/story-ready.ts` now catches rather than silently',
+                'screenshotting Storybook\'s error overlay.',
+                '',
+                `[Run log](${runUrl})`,
+              ].join('\n'),
+            });
 
       - name: Upload Snapshot Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-snapshots
           path: tests/__snapshots__/
           retention-days: 7
+
+      - name: Upload Playwright Report on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-snapshot-update
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
