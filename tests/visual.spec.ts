@@ -17,6 +17,16 @@ test.skip(process.platform !== 'linux', 'Visual tests run on Linux CI');
 async function waitForStoryReady(page: import('@playwright/test').Page) {
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(1000);
+
+  // Fail loudly if the story did not actually mount. Without this the suite can
+  // pass while testing nothing: if Storybook cannot resolve the story id it
+  // renders a "No Preview" placeholder, and since `--update-snapshots` happily
+  // bakes that placeholder into the baseline, every test then compares one error
+  // page against another and goes green forever. That is exactly what a
+  // clean-URLs static server did to this suite (see playwright.config.ts).
+  const root = page.locator('#storybook-root');
+  await expect(root).not.toContainText('No Preview');
+  await expect(root).not.toBeEmpty();
 }
 
 test.describe('Design System Visual Regression - Components', () => {

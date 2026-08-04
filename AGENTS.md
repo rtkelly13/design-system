@@ -17,8 +17,10 @@ Package manager is **pnpm** (`node >=22`).
    - The Tailwind contract consumers import is **`theme.css`** (`@theme` tokens, `.dark`/`.dim` dark variant, `@source`); `styles.css` layers fonts + global resets on top. There is no JS tailwind preset — do not reintroduce one.
 5. **Visual Regression Testing**:
    - Powered by Playwright snapshot testing (`tests/visual.spec.ts`).
-   - Runs strictly on **Linux CI** to avoid OS font rendering diffs (`maxDiffPixelRatio: 0.002`).
+   - Runs strictly on **Linux CI** to avoid OS font rendering diffs. Current tolerance is `maxDiffPixelRatio: 0.05` with `threshold: 0.2` (this file previously claimed `0.002`, which has never been the configured value). That tolerance was only ever exercised against a placeholder image — see the next bullet — so it is probably looser than it needs to be now that baselines are real components; tighten deliberately rather than by accident.
+   - **The static build must be served by `vite preview`, not `serve`.** `serve` enables clean URLs by default, which 301s `/iframe.html?id=<story>` to `/iframe` and **drops the query string**. Storybook then has no story to select and renders its "No Preview" placeholder — and because `--update-snapshots` will happily bake that placeholder in as the baseline, the whole suite silently passes while testing nothing. That is exactly what happened up to `0.0.5`: all five baselines were the same error page. `tests/visual.spec.ts` now asserts the story root is non-empty and free of "No Preview" so this cannot recur quietly.
    - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow (dispatch it on your branch; it commits regenerated baselines back to that branch — this repo blocks Actions from creating PRs).
+   - Note that the snapshot workflow pushes as `github-actions[bot]`, and CI runs on bot-authored commits land in **`action_required`** — they need an "Approve and run" click before the PR shows a green check.
 6. **Required Checks**:
    - `pnpm typecheck`
    - `pnpm build`
@@ -45,6 +47,44 @@ Package manager is **pnpm** (`node >=22`).
 - `pnpm test:visual:update`: Updates Playwright visual snapshots.
 - `pnpm typecheck`: Validates TypeScript strict mode.
 
+---
+
+## 📌 Dependencies Held Back on Purpose
+
+Anything here is **pinned below latest for a reason**. Check this list before
+"just bumping it", and delete the row if you clear the blocker.
+
+| Package      | Held at  | Latest | Why, and what unblocks it |
+| ------------ | -------- | ------ | ------------------------- |
+| `typescript` | `^6.0.3` | 7.0.2  | TS 7 breaks `pnpm build` — see below. Also keeps this package aligned with the blog, which consumes it. |
+
+### The TypeScript 7 blocker
+
+TS 7 does two things this repo cannot yet absorb:
+
+1. **`baseUrl` was removed** (`error TS5102`). Our own `tsconfig.json` no longer
+   sets it — the `@/*` mapping is tsconfig-relative — but `tsup`'s dts worker
+   *injects* `baseUrl` itself, which is why `ignoreDeprecations: "6.0"` is
+   currently required just to build on TS 6. Remove that escape hatch only when
+   tsup stops injecting it.
+2. **`tsup`'s DTS step crashes outright.** `tsup` vendors `rollup-plugin-dts`,
+   which reads TS internals that TS 7 removed:
+
+   ```
+   TypeError: Cannot read properties of undefined (reading 'useCaseSensitiveFileNames')
+       at rollup-plugin-dts.cjs
+   ```
+
+   This is upstream, not a config mistake: `rollup-plugin-dts@6.4.1` (latest)
+   still declares `typescript: ^4.5 || ^5.0 || ^6.0`. Note the failure is
+   **`pnpm build` only** — `pnpm typecheck` passes fine on TS 7, so a green
+   typecheck is not evidence the upgrade works. Always run `pnpm build`.
+
+**Unblocked when** `rollup-plugin-dts` supports TS 7, or this package moves off
+`tsup` for bundling (`tsdown`, the rolldown-era successor, is the likely
+candidate). Because the blog consumes this package, move both repos together.
+
+---
 
 ## 🛑 Repository Conventions & Workflow Policy
 
