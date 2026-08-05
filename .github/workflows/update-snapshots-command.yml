@@ -1,0 +1,113 @@
+name: Update snapshots (command)
+
+# Comment `/update-snapshots` on a PR to regenerate the Playwright visual
+# baselines for that branch and commit them back to it — without merging first.
+#
+# Before this existed, `update-snapshots.yml` was `workflow_dispatch` only, so
+# baselining a PR meant leaving the PR, finding the workflow, and picking the
+# right branch by hand. A contributor whose change legitimately alters rendering
+# had no in-PR way to say "yes, that diff is intended", which made a red visual
+# check the default state of any styling PR.
+#
+# Mirrors `publish-dev-command.yml`: this workflow does not do the work itself,
+# it dispatches `update-snapshots.yml` on the PR's head branch and reports back.
+#
+# Human-gated: only OWNER/MEMBER/COLLABORATOR comments trigger it.
+
+on:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: update-snapshots-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  update-snapshots:
+    name: Dispatch snapshot update
+    if: >-
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/update-snapshots') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write # gh workflow run
+      pull-requests: write # PR comments + reaction
+
+    steps:
+      - name: Acknowledge command
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket',
+            });
+
+      - name: Resolve PR head branch
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const headRepo = pr.data.head.repo?.full_name ?? '';
+            const sameRepo = headRepo === `${context.repo.owner}/${context.repo.repo}`;
+            core.setOutput('ref', pr.data.head.ref);
+            core.setOutput('sha', pr.data.head.sha.slice(0, 7));
+            core.setOutput('same_repo', String(sameRepo));
+
+      - name: Guard against fork PRs
+        # The dispatched workflow pushes a commit back to the head branch, which
+        # this repo's token cannot do across a fork boundary.
+        if: steps.pr.outputs.same_repo != 'true'
+        run: |
+          echo "::error::/update-snapshots only supports PR branches in this repository."
+          exit 1
+
+      - name: Dispatch snapshot update on the PR branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run update-snapshots.yml \
+            --repo "${{ github.repository }}" \
+            --ref "${{ steps.pr.outputs.ref }}" \
+            -f reason="/update-snapshots on PR #${{ github.event.issue.number }}" \
+            -f pr-number="${{ github.event.issue.number }}"
+
+      - name: Report back on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ref = '${{ steps.pr.outputs.ref }}';
+            const sha = '${{ steps.pr.outputs.sha }}';
+            const runsUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/update-snapshots.yml`;
+            const body = [
+              `### 📸 Snapshot update dispatched for \`${ref}\` @ \`${sha}\``,
+              '',
+              `Watch the [update workflow](${runsUrl}). It regenerates the baselines on`,
+              'Linux, verifies the suite passes against them, and commits them back to',
+              'this branch.',
+              '',
+              '> [!NOTE]',
+              '> The baseline commit is pushed with `GITHUB_TOKEN`, and GitHub does not',
+              '> start new workflow runs from those pushes. This PR\'s visual check will',
+              '> therefore still show its previous result until you re-run it or push',
+              '> again — the update workflow verifies the new baselines itself so you',
+              '> are not flying blind in the meantime.',
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
