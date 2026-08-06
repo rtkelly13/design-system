@@ -4,6 +4,12 @@ The foundational visual design system for **ryankelly.dev** and all personal web
 
 Published to the public **npm registry** as `@rtkelly13/design-system` (via npm trusted publishing — see `.github/workflows/publish-package.yml`).
 
+**📖 Browse it: [design-system.ryankelly.dev](https://design-system.ryankelly.dev)** — the
+full Storybook, with the blog's own Storybook composed into the sidebar. Unreleased work
+lands at [preview.design-system.ryankelly.dev](https://preview.design-system.ryankelly.dev)
+(the `preview` branch). Hosting is declared in [`infra/`](./infra/README.md); see
+[AGENTS.md](./AGENTS.md#-hosted-storybook).
+
 ---
 
 ## 📸 Visual Regression Layer
