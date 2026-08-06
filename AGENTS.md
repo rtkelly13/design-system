@@ -80,6 +80,54 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 
 ---
 
+## 🌐 Hosted Storybook
+
+| URL | Serves | Vercel mechanism |
+| --- | --- | --- |
+| [design-system.ryankelly.dev](https://design-system.ryankelly.dev) | `main` | Production domain |
+| [preview.design-system.ryankelly.dev](https://preview.design-system.ryankelly.dev) | the `preview` branch | Branch domain (`gitBranch`) |
+
+Both are declared in [`infra/`](./infra/README.md) (Pulumi, `@pulumiverse/vercel`).
+Build settings live in `vercel.json` — Vercel reads it from the repo at build time and
+it **overrides** project settings, so they are deliberately not declared in both places.
+
+`vercel.json` sets **`"cleanUrls": false`**. This is load-bearing for the same reason
+`serve.json` is (see below): clean URLs rewrite `/iframe.html` to `/iframe`, breaking
+Storybook's asset preloading and yielding an empty preview pane. Storybook is one of
+the few static sites where clean URLs are actively wrong.
+
+`preview` is a long-lived branch, not a per-PR URL. A Vercel branch domain maps to
+exactly one branch; individual PRs still get their own generated `*.vercel.app` URLs.
+To promote work to the preview site, merge it into `preview`.
+
+### Composition
+
+The blog's Storybook is composed into this one's sidebar as **`ryankelly.dev (site)`**,
+so one URL answers both "what does the system provide" and "what does the site do with
+it". It is driven by `STORYBOOK_REF_BLOG_URL` in `.storybook/main.ts`, not hardcoded:
+the URL differs per environment, and an unreachable ref renders as a permanently
+erroring sidebar entry. Unset — the default for `pnpm storybook` locally — composes
+nothing.
+
+Composition is resolved **in the browser**, which has two consequences worth knowing
+before debugging it:
+
+- The composed Storybook must send `Access-Control-Allow-Origin` on `/index.json`;
+  the manager fetches it cross-origin. It also probes `stories.json` and
+  `metadata.json` — 404s there are expected and harmless.
+- The ref URL is baked into the manager bundle at **build** time, so changing
+  `STORYBOOK_REF_BLOG_URL` requires a redeploy, not just a reload.
+
+The blog's Storybook is deployed by a second Vercel project reading
+`storybook-site/vercel.json` in the blog repo, declared in this repo's `infra/` as
+`blog-storybook`. That project needs **"Include source files outside of the Root
+Directory in the Build Step"** ticked by hand — the Vercel provider does not expose it.
+
+This repo is on Storybook 8.5 and the blog is on 10.4. Composition across the two
+majors works (both emit `index.json` v5); see [`docs/evaluation.md`](./docs/evaluation.md).
+
+---
+
 ## 📸 Screenshot Walkthrough
 
 `pnpm walkthrough` captures every Storybook story in **every theme**
