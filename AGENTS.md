@@ -135,9 +135,14 @@ candidate). Because the blog consumes this package, move both repos together.
 | [design-system.ryankelly.dev](https://design-system.ryankelly.dev) | `main` | Production domain |
 | [preview.design-system.ryankelly.dev](https://preview.design-system.ryankelly.dev) | the `preview` branch | Branch domain (`gitBranch`) |
 
-Both are declared in [`infra/`](./infra/README.md) (Pulumi, `@pulumiverse/vercel`).
-Build settings live in `vercel.json` — Vercel reads it from the repo at build time and
-it **overrides** project settings, so they are deliberately not declared in both places.
+Both domains are declared **outside this repo**, in `rtkelly13/shared-utilities` at
+[`infra/vercel/`](https://github.com/rtkelly13/shared-utilities/tree/main/infra/vercel) —
+one Pulumi stack covering every ryankelly.dev site rather than a per-repo copy. Add or
+change a domain in that repo's `sites.ts` (site key `design-system-storybook`).
+
+Build settings stay here in `vercel.json`, and that split is deliberate: Vercel reads
+`vercel.json` from the repo at build time and it **overrides** project settings, so the
+shared stack declares only identity, domains and env vars. Repos own how they build.
 
 `vercel.json` sets **`"cleanUrls": false`**. This is load-bearing for the same reason
 `serve.json` is (see below): clean URLs rewrite `/iframe.html` to `/iframe`, breaking
@@ -167,7 +172,7 @@ before debugging it:
   `STORYBOOK_REF_BLOG_URL` requires a redeploy, not just a reload.
 
 The blog's Storybook is deployed by a second Vercel project reading
-`storybook-site/vercel.json` in the blog repo, declared in this repo's `infra/` as
+`storybook-site/vercel.json` in the blog repo, declared in the shared stack as
 `blog-storybook`. That project needs **"Include source files outside of the Root
 Directory in the Build Step"** ticked by hand — the Vercel provider does not expose it.
 

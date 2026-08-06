@@ -7,8 +7,9 @@ Published to the public **npm registry** as `@rtkelly13/design-system` (via npm 
 **📖 Browse it: [design-system.ryankelly.dev](https://design-system.ryankelly.dev)** — the
 full Storybook, with the blog's own Storybook composed into the sidebar. Unreleased work
 lands at [preview.design-system.ryankelly.dev](https://preview.design-system.ryankelly.dev)
-(the `preview` branch). Hosting is declared in [`infra/`](./infra/README.md); see
-[AGENTS.md](./AGENTS.md#-hosted-storybook).
+(the `preview` branch). Domains are declared in `rtkelly13/shared-utilities` at
+[`infra/vercel/`](https://github.com/rtkelly13/shared-utilities/tree/main/infra/vercel);
+see [AGENTS.md](./AGENTS.md#-hosted-storybook).
 
 ---
 
