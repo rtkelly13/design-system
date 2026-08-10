@@ -102,7 +102,7 @@ have theme-specific overlay problems.
 
 ### 4. No accessibility checking in the package's own Storybook
 
-`.storybook/main.ts` loads only `@storybook/addon-essentials`. The **blog's**
+`.storybook/main.ts` loads only `@storybook/addon-docs`. The **blog's**
 Storybook runs `@storybook/addon-a11y`. That is backwards: contrast and focus
 failures introduced here propagate to every consumer, and a brutalist palette
 on black — cyan `#22d3ee`, yellow `#facc15`, pink `#ec4899` — is precisely the
@@ -128,13 +128,13 @@ would align the package with its own primary consumer.
 
 - **The blog cannot receive updates.** It depends on `"@rtkelly13/design-system": "^0.0.5"`.
   Under semver, a caret range on `0.0.x` matches *only* `0.0.5` — so the blog is
-  pinned two minor versions behind the published `0.1.1` and will never resolve
-  forward. This is almost certainly unintentional.
-- **Storybook is two majors behind.** This repo is on Storybook `8.5`; the blog
-  is on `10.4`. `@storybook/addon-essentials` no longer exists in 9+, so the
-  upgrade is not purely mechanical. Composition across the two majors *does*
-  work — both emit `index.json` v5, verified in this branch — so this is a
-  maintenance concern rather than a blocker for the hosting work.
+  pinned behind the published `0.1.2` and will never resolve forward. This is
+  almost certainly unintentional, and remains the cheapest high-value fix. It
+  needs a change in the blog repo, not here.
+- ~~**Storybook is two majors behind.**~~ **Resolved by #23**, which took this
+  repo from `8.6` to `10.5` and dropped `@storybook/addon-essentials` — it has no
+  v10 release, its features having moved into core. Host and ref are now on the
+  same major, so composition no longer depends on cross-major tolerance.
 
 ## What this branch changes
 

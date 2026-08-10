@@ -176,8 +176,11 @@ The blog's Storybook is deployed by a second Vercel project reading
 `blog-storybook`. That project needs **"Include source files outside of the Root
 Directory in the Build Step"** ticked by hand — the Vercel provider does not expose it.
 
-This repo is on Storybook 8.5 and the blog is on 10.4. Composition across the two
-majors works (both emit `index.json` v5); see [`docs/evaluation.md`](./docs/evaluation.md).
+Both repos are on Storybook 10 — this one on 10.5, the blog on 10.4 — so host and
+ref agree on the `index.json` v5 format the manager reads. That was not true when
+this was written: #23 aligned them precisely so composition would not depend on
+cross-major tolerance. Keep them on the same major; see
+[`docs/evaluation.md`](./docs/evaluation.md).
 
 ---
 
