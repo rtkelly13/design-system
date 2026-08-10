@@ -11,9 +11,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
+    // tsup's dts worker injects its own `baseUrl`, which TS 6 deprecates. Remove
+    // once tsup ships a rollup-plugin-dts that no longer sets it (also what
+    // currently blocks TS 7 here).
+    "ignoreDeprecations": "6.0",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"]

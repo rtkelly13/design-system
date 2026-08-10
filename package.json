@@ -1,6 +1,6 @@
 {
   "name": "@rtkelly13/design-system",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Brutalist dual-mode design system, slide deck system, and experiments foundation for Ryan Kelly websites",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -13,8 +13,7 @@
       "require": "./dist/index.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./theme.css": "./dist/theme.css",
-    "./prose.css": "./dist/prose.css"
+    "./theme.css": "./dist/theme.css"
   },
   "files": [
     "dist",
@@ -60,22 +59,22 @@
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "dependencies": {
-    "lucide-react": "^0.474.0"
+    "lucide-react": "^1.28.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.50.0",
-    "@storybook/addon-docs": "^10.4.6",
-    "@storybook/react-vite": "^10.4.6",
+    "@playwright/test": "^1.62.1",
+    "@storybook/addon-docs": "^10.5.5",
+    "@storybook/react": "^10.5.5",
+    "@storybook/react-vite": "^10.5.5",
     "@tailwindcss/vite": "^4.3.3",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "lucide-react": "^0.474.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "storybook": "^10.4.6",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "storybook": "^10.5.5",
     "tailwindcss": "^4.3.3",
-    "tsup": "^8.3.6",
-    "typescript": "^5.7.3",
-    "vite": "^6.1.0"
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.0"
   }
 }
