@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { DesignSandbox } from '../components/experiments/DesignSandbox';
 
 const meta: Meta<typeof DesignSandbox> = {
