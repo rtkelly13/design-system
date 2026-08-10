@@ -28,7 +28,9 @@
     "build-storybook": "storybook build -o storybook-static",
     "test:visual": "playwright test tests/visual.spec.ts",
     "test:visual:update": "playwright test tests/visual.spec.ts --update-snapshots",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "walkthrough": "playwright test --config=playwright.walkthrough.config.ts",
+    "walkthrough:show": "playwright show-report walkthrough-report"
   },
   "publishConfig": {
     "access": "public"
