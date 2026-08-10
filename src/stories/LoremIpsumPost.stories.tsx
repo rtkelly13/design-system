@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { LoremIpsumPost } from '../components/blog/LoremIpsumPost';
 import { ThemeProvider } from '../components/ThemeProvider';
 

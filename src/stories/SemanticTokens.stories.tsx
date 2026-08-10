@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { semanticTokens } from '../lib/theme';
 import { Badge } from '../components/Badge';
 import { Tag } from '../components/Tag';
