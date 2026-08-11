@@ -35,15 +35,23 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)
 7. **New Components Need Baselines**: adding a story without a snapshot leaves
-   `test:visual` unable to assert it. Add the story first, comment
-   **`/update-snapshots`** on the PR to generate baselines, then add the
-   corresponding case to `tests/visual.spec.ts`.
-   This is no longer a convention you have to remember: `pnpm check:visual-coverage`
-   reads Storybook's own build index and fails when a story is neither asserted
-   nor listed in `EXCLUDED` with a reason. It is a ratchet — the 20 stories that
-   were already ungated are budgeted and burn down, but a *new* one cannot land
-   unasserted. It also catches the reverse: an `id` in the spec that Storybook
-   no longer builds, i.e. a test asserting nothing.
+   `test:visual` unable to assert it. Add the story and its `CASES` row, comment
+   **`/update-snapshots`** on the PR to generate the baseline, then push.
+   `missing` mode writes only what does not exist, so this cannot re-record an
+   existing baseline that has drifted.
+   This is not a convention you have to remember: `pnpm check:visual-coverage`
+   reads Storybook's own build index and fails when a **component** has no
+   asserted story and no `EXCLUDED` entry giving a reason. The budget is **0** and
+   should stay there.
+   It counts components, not stories, and that distinction is the rule: the suite
+   asserts **one representative story per component**, because every row is a
+   committed PNG a human reviews whenever it changes, so breadth across
+   components is worth more than depth within one. A second story on a covered
+   component is therefore free — the old story-counting budget got angrier at it
+   while coverage improved not at all. It also catches the reverse: an `id` in the
+   spec that Storybook no longer builds, i.e. a test asserting nothing.
+   `tests/visual.spec.ts` is a table for this reason — adding a component means
+   adding a row, and the id appears exactly once.
 8. **Re-baselining Happens In The PR**: any change that legitimately alters
    rendering turns the visual check red. Comment **`/update-snapshots`** on the
    PR — it regenerates on Linux, verifies the suite passes against the new
@@ -282,8 +290,8 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
 - `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
-- `pnpm check:visual-coverage`: Fails if a story is neither asserted nor excluded. Runs in CI.
-- `pnpm check:visual-coverage:list`: Same, naming every unasserted story.
+- `pnpm check:visual-coverage`: Fails if a component has no asserted story and no exclusion. Runs in CI.
+- `pnpm check:visual-coverage:list`: Same, naming every uncovered component and every exclusion.
 - `pnpm test:visual:missing`: Writes only baselines that do not yet exist.
 - `pnpm test:visual:update`: Re-records **all** baselines. Deliberate act — prefer `:missing`.
 - `pnpm walkthrough`: Screenshots every story on every level into `walkthrough-report/`.
@@ -488,13 +496,14 @@ server needed. `pnpm walkthrough:show` serves it locally.
 It is **not** a gate. It asserts nothing about how things should look; it makes
 what they *do* look like reviewable. Visual regression stays in `ci.yml`.
 
-Its real value is cross-level: a token change that reads fine on `midnight` can
-be unusable on `white`, and a pixel diff against a single-level baseline will
-never surface that. The gated suite still only asserts one level — promoting
-`Foundations/Theme Ladder → AllLevels` into `tests/visual.spec.ts` is the next
-step there, and per rule 7 it needs `/update-snapshots` run first. It is one of
-the 20 stories `pnpm check:visual-coverage` currently reports, so the gap is
-visible rather than remembered.
+Its real value is breadth per level: it captures *every* story on every rung,
+where the gated suite captures one representative per component.
+
+The cross-level gap the gated suite used to have is closed —
+`Foundations/Theme Ladder → AllLevels` renders all four rungs in one screenshot
+and is now a `CASES` row, so a token change that reads fine on `midnight` and is
+unusable on `white` fails a required check rather than merely showing up in a
+report nobody opened.
 
 Two structural choices worth keeping:
 

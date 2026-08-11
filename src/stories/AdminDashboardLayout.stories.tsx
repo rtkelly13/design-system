@@ -24,6 +24,27 @@ export const DarkMode: Story = {
   ),
 };
 
+/**
+ * The middle of the dark half of the ladder. `midnight` is the maximal end and
+ * `bright` the paper end; this rung is the one meant to be read in for a long
+ * time, which is what an admin surface actually is.
+ */
+export const DimMode: Story = {
+  render: () => (
+    <ThemeProvider
+      defaultLevel="dim"
+      scoped
+      persist={false}
+      followSystem={false}
+      className="min-h-screen bg-surface-base text-content-primary"
+    >
+      <div>
+        <AdminDashboardLayout />
+      </div>
+    </ThemeProvider>
+  ),
+};
+
 export const LiteMode: Story = {
   render: () => (
     <ThemeProvider defaultLevel="bright" scoped persist={false} followSystem={false} className="min-h-screen bg-surface-base text-content-primary">
