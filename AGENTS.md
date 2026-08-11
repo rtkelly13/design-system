@@ -167,7 +167,12 @@ before debugging it:
 
 - The composed Storybook must send `Access-Control-Allow-Origin` on `/index.json`;
   the manager fetches it cross-origin. It also probes `stories.json` and
-  `metadata.json` — 404s there are expected and harmless.
+  `metadata.json`, which no longer exist in Storybook 10. Those failures are
+  harmless — composition works from `index.json` alone — but they surface as
+  **CORS errors, not 404s**, if the composed origin scopes its
+  `Access-Control-Allow-Origin` to `/index.json`: the browser blocks the response
+  before the status is readable. The blog's `storybook-site/vercel.json`
+  therefore sets the header on all paths, which keeps the console clean.
 - The ref URL is baked into the manager bundle at **build** time, so changing
   `STORYBOOK_REF_BLOG_URL` requires a redeploy, not just a reload.
 
