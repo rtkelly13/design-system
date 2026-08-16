@@ -1,11 +1,24 @@
 /* @rtkelly13/design-system — the full opinionated stylesheet.
  *
  * theme.css alone ships the tokens and nothing else, for consumers who want to
- * bring their own resets and fonts. This file layers on the web fonts, the
- * global resets, and the handful of `.brutalist-*` utility classes.
+ * bring their own resets and fonts. This file layers on the web fonts and the
+ * global resets — and nothing more.
  *
- * Everything below addresses semantic roles (`--ds-*`). Nothing here names a
- * hue or a level, so all four rungs of the ladder are styled by the same rules.
+ * ============================================================================
+ * Why there are no component classes here
+ * ============================================================================
+ *
+ * Styling lives in the TSX, as Tailwind utilities on the element. What remains
+ * in this file is only what has no element in a component to hang a `className`
+ * on: the document itself, and bare tags arriving from a consumer's own markup.
+ *
+ * `pnpm check:css` enforces that. It counts every declaration whose selector
+ * names a class this repo authors, and fails when the number rises.
+ *
+ * The classes that used to live here — `.brutalist-card`, `.brutalist-btn`,
+ * `.brutalist-badge`, `.ascii-divider` — are now utilities inside `Card`,
+ * `Badge` and `AsciiDivider`. `.brutalist-btn` and `.brutalist-btn-pink` had no
+ * caller anywhere in this package and are gone; use `<Button />`.
  */
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=VT323&display=swap');
 @import "tailwindcss";
@@ -18,11 +31,19 @@ body, html {
   color: var(--ds-text-primary);
 }
 
-h1, h2, h3, h4, h5, h6, .font-display {
+/* Typography defaults for bare tags. A consumer's own markup and a Markdown
+ * pipeline both emit these with no class to target, so this is the one place
+ * the type roles can reach them. Components state their own font.
+ *
+ * `!important` is inherited from the rule these replace, and is load-bearing
+ * while prose.css still sets fonts on `.docs-prose h1` and friends: a component
+ * carrying `font-mono` inside an article would otherwise lose to the more
+ * specific descendant selector. It comes out with those prose rules. */
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--ds-font-display) !important;
 }
 
-code, pre, .font-mono {
+code, pre {
   font-family: var(--ds-font-mono) !important;
 }
 
@@ -36,84 +57,4 @@ code, pre, .font-mono {
 :focus-visible {
   outline: 2px solid var(--ds-accent-primary);
   outline-offset: 2px;
-}
-
-.brutalist-card {
-  background-color: var(--ds-surface-raised);
-  color: var(--ds-text-primary);
-  border: 2px solid var(--ds-border-strong);
-  box-shadow: 4px 4px 0px 0px var(--ds-shadow-color);
-  padding: 1.5rem;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.brutalist-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px 0px var(--ds-accent-primary);
-}
-
-.brutalist-btn {
-  font-family: var(--ds-font-display);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.6rem 1.2rem;
-  background-color: var(--ds-surface-base);
-  color: var(--ds-text-primary);
-  border: 2px solid var(--ds-border-strong);
-  box-shadow: 4px 4px 0px 0px var(--ds-shadow-color);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.15s ease;
-}
-
-.brutalist-btn:hover {
-  transform: translate(-2px, -2px);
-  background-color: var(--ds-accent-primary);
-  color: var(--ds-text-inverse);
-  box-shadow: 6px 6px 0px 0px var(--ds-accent-tertiary);
-}
-
-.brutalist-btn-pink {
-  border-color: var(--ds-accent-tertiary);
-  box-shadow: 4px 4px 0px 0px var(--ds-accent-tertiary);
-}
-
-.brutalist-btn-pink:hover {
-  background-color: var(--ds-accent-tertiary);
-  color: var(--ds-text-inverse);
-  box-shadow: 6px 6px 0px 0px var(--ds-accent-secondary);
-}
-
-.brutalist-badge {
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.2rem 0.6rem;
-  border: 2px solid var(--ds-border-strong);
-  background-color: var(--ds-surface-base);
-  color: var(--ds-accent-primary);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.ascii-divider {
-  font-family: var(--ds-font-mono);
-  color: var(--ds-accent-primary);
-  letter-spacing: 0.2em;
-  user-select: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .brutalist-card,
-  .brutalist-btn {
-    transition: none;
-  }
-  .brutalist-card:hover,
-  .brutalist-btn:hover {
-    transform: none;
-  }
 }

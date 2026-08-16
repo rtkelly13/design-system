@@ -25,6 +25,7 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
    - `pnpm check:contrast` (every role pair, every level)
    - `pnpm check:tokens` (colour-instead-of-role ratchet)
+   - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm typecheck`
    - `pnpm build`
    - `pnpm build-storybook`
@@ -52,6 +53,64 @@ Package manager is **pnpm** (`node >=22`).
 - **A Four-Rung Theme Ladder**: `midnight` → `dim` → `bright` → `white`, selected by a `data-theme` attribute. Not a light/dark flip — see Theme Ladder below.
 - **Bracketed Display Typography**: Headings render in Space Grotesk enclosed in `[ BRACKETED ]` display type.
 - **Semantic Roles Over Hues**: Components address roles, never colours. See below.
+- **Styling Lives in TSX**: Tailwind utilities on the element. CSS files declare variables and nothing else. See below.
+
+---
+
+## 🧱 Styling Lives in TSX
+
+**A component's appearance is written on its elements, as Tailwind utilities.
+CSS files declare variables.** There is no third place for styling to live, and
+no `.component-name { … }` class to go looking in.
+
+`pnpm check:css` enforces it, and it is a ratchet like `check:tokens`: it counts
+every declaration whose selector names a class this repo authors and fails when
+the number rises. `pnpm check:css:list` shows what is left.
+
+### The three things CSS may still do
+
+Each is exempt because there is no element in a component to put a `className`
+on — not because it was inconvenient to move.
+
+| Exempt | Why | Where |
+|---|---|---|
+| Custom properties (`--x: …`) anywhere | Variables are the sanctioned CSS payload | `theme.css`, generated |
+| Selectors of only element names, `:root`, `html`, `body`, `*`, pseudo-classes | No JSX element for the document; a consumer's own `<h1>` has no class we can add | `styles.css` |
+| Class names emitted by third-party tooling | We never render `.markdown-alert` — a remark plugin does | `prose.css`, listed in `THIRD_PARTY` |
+
+A pseudo-element (`::before`, `::after`) is the one genuine gap in the rule.
+`AsciiDivider` keeps its bare `.ascii-divider` class as a **styling-free hook**
+for exactly that reason: the blog draws a pencil rule off it. A hook class
+carries no declarations here, so it costs nothing against the ratchet.
+
+### Consequences worth knowing before you rely on them
+
+- **Consumers must import `theme.css` and let Tailwind scan the package.** The
+  generated `theme.css` carries `@source "./"`, which points at `dist/` once
+  published — verified: a consumer importing only `theme.css` gets every
+  utility, variants and arbitrary values included, generated from the compiled
+  bundle. This is what makes the rule safe, and it is why that `@source` line
+  must never be removed.
+- **The system no longer promises to style raw HTML.** `prose.css` styles bare
+  tags inside `.docs-prose`; as those move into `mdxComponents`, Markdown must
+  be rendered *through* the component map. A consumer pushing a markdown-to-HTML
+  string through `dangerouslySetInnerHTML` will get unstyled output.
+- **Translate faithfully, then check.** Named Tailwind sizes ship a paired
+  line-height that a bare `font-size` declaration did not — `text-xs` is
+  `0.75rem` *and* a leading. `Badge` uses `text-[0.75rem]` precisely so it keeps
+  inheriting the article's unitless `1.5`. This cost one round of visual-suite
+  failures to find; when a migration shifts layout by a few pixels, this is why.
+
+### What is migrated
+
+`styles.css` is done — its four component classes are utilities in `Badge`,
+`AsciiDivider` and `ExperimentsView`, and `.brutalist-btn` / `.brutalist-btn-pink`
+were deleted outright as they had no caller. What is left in that file is
+document-level and stays.
+
+`prose.css` is the remaining 455 declarations: roughly twelve docs-chrome
+components each with a 1:1 class, plus the `.docs-prose` bare-tag rules.
+Migrate one component per PR and lower its budget line.
 
 ---
 
@@ -127,6 +186,8 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm contrast:report`: Prints the full matrix with margins, worst first.
 - `pnpm check:tokens`: Ratchet on colour-instead-of-role call sites. Runs in CI.
 - `pnpm check:tokens:list`: Same, broken down by file.
+- `pnpm check:css`: Ratchet on styling that lives in a stylesheet. Runs in CI.
+- `pnpm check:css:list`: Same, showing the offending selectors.
 - `pnpm build`: Regenerates tokens, then bundles ESM, CJS, DTS types, and CSS via `tsup`.
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.

@@ -44,6 +44,10 @@ jobs:
       - name: Token Hygiene
         run: pnpm check:tokens
 
+      # Ratchet: fails if styling moves back into a stylesheet.
+      - name: CSS Surface
+        run: pnpm check:css
+
       - name: Type Check
         run: pnpm typecheck
 
