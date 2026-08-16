@@ -16,9 +16,9 @@ import { waitForStoryRendered } from './story-ready';
  * merges on cosmetic churn, or that one stops gating.
  *
  * One test per *story* rather than per story-and-theme: the report lists tests,
- * so this way a row is a component and opening it shows dark/dim/sketch
- * together — which is the comparison worth making. Splitting by theme would
- * give three times the rows and scatter the themes that need comparing.
+ * so this way a row is a component and opening it shows every level together —
+ * which is the comparison worth making. Splitting by level would give four
+ * times the rows and scatter the images that need comparing.
  */
 
 const stories = loadStories();
@@ -40,14 +40,13 @@ const FREEZE_CSS = `
 `;
 
 /**
- * Storybook's backgrounds addon pins the preview background to a fixed hex
- * (dark, per `.storybook/preview.ts`). That is wrong for every theme but the
- * default — `sketch` would render light-on-paper inside a black frame. Defer
- * to the theme's own surface token instead.
+ * Storybook paints the preview frame itself, which is wrong for every level but
+ * whichever one it was configured with. Defer to the level's own surface token
+ * so the frame always matches the story inside it.
  */
 const THEME_SURFACE_CSS = `
   html, body, .sb-show-main {
-    background-color: var(--color-black) !important;
+    background-color: var(--ds-surface-base) !important;
   }
 `;
 
@@ -62,13 +61,13 @@ async function captureTheme(
   // plumbing push the screenshots — the only thing anyone opens this report to
   // see — below the fold.
   await test.step(`capture ${theme}`, async () => {
-    // ThemeProvider seeds its state from localStorage on first render, so the
-    // value has to be in place before the bundle re-evaluates — hence set, then
-    // reload, rather than set and hope.
-    await page.evaluate((value) => {
-      window.localStorage.setItem('brutalist_theme', value);
-    }, theme);
-    await page.reload({ waitUntil: 'load' });
+    // The level is a Storybook global, so it travels in the URL and the story
+    // renders in it directly. The previous approach wrote localStorage and
+    // reloaded, which depended on the provider seeding itself from storage on
+    // first render — the same thing that made it unsafe to server-render.
+    await page.goto(`/iframe.html?id=${story.id}&viewMode=story&globals=level:${theme}`, {
+      waitUntil: 'load',
+    });
 
     // Verified before anything is captured: a walkthrough that silently
     // screenshots Storybook's error overlay is worse than no walkthrough.
@@ -95,9 +94,6 @@ test.describe('Storybook walkthrough', () => {
       testInfo.annotations.push({ type: 'story', description: story.id });
 
       await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.goto(`/iframe.html?id=${story.id}&viewMode=story`, {
-        waitUntil: 'load',
-      });
 
       for (const theme of THEMES) {
         await captureTheme(page, testInfo, story, theme);

@@ -3,6 +3,7 @@ import type { ElementType, ReactNode } from 'react';
 import { Menu, Palette, Search, X } from 'lucide-react';
 import { DocsLink } from './DocsLinkProvider';
 import { useTheme } from '../ThemeProvider';
+import { LEVELS } from '../../theme/levels';
 
 export interface DocsNavItem {
   label: string;
@@ -57,7 +58,7 @@ export function DocsHeader({
   className = '',
 }: DocsHeaderProps) {
   const ref = useRef<HTMLElement | null>(null);
-  const { theme, cycleTheme } = useTheme();
+  const { level, cycleLevel } = useTheme();
 
   useEffect(() => {
     const el = ref.current;
@@ -140,10 +141,10 @@ export function DocsHeader({
 
         <button
           type="button"
-          onClick={cycleTheme}
+          onClick={cycleLevel}
           className="docs-header-icon-btn"
-          aria-label={`Switch theme (current: ${theme})`}
-          title={`Theme: ${theme}`}
+          aria-label={`Switch theme level (current: ${LEVELS[level].label})`}
+          title={`Level: ${LEVELS[level].label}`}
         >
           <Palette size={18} />
         </button>

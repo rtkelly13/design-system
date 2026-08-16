@@ -14,7 +14,7 @@ Package manager is **pnpm** (`node >=22`).
 4. **Publishing (npm, trusted publishing)**:
    - Stable releases publish automatically from pushes to `main` via `publish-package.yml`, using npm **Trusted Publishing** (OIDC) — no tokens anywhere. Bump `package.json` version in the PR; the workflow skips already-published versions.
    - Dev prereleases: comment **`/publish-dev`** on a PR to publish `<version>-dev.<pr>.<sha>` under the `dev` dist-tag (`publish-dev-command.yml` dispatches the trusted workflow on the PR branch). Consumers test with `pnpm add @rtkelly13/design-system@dev`.
-   - The Tailwind contract consumers import is **`theme.css`** (`@theme` tokens, `.dark`/`.dim` dark variant, `@source`); `styles.css` layers fonts + global resets on top. There is no JS tailwind preset — do not reintroduce one.
+   - The Tailwind contract consumers import is **`theme.css`** (`@theme` tokens, per-level and polarity variants, `@source`) — now **generated** from `src/theme/levels.ts`; `styles.css` layers fonts + global resets on top. There is no JS tailwind preset — do not reintroduce one.
 5. **Visual Regression Testing**:
    - Powered by Playwright snapshot testing (`tests/visual.spec.ts`).
    - Runs strictly on **Linux CI** to avoid OS font rendering diffs. Current tolerance is `maxDiffPixelRatio: 0.05` with `threshold: 0.2` (this file previously claimed `0.002`, which has never been the configured value). That tolerance was only ever exercised against a placeholder image — see the next bullet — so it is probably looser than it needs to be now that baselines are real components; tighten deliberately rather than by accident.
@@ -22,6 +22,9 @@ Package manager is **pnpm** (`node >=22`).
    - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow (dispatch it on your branch; it commits regenerated baselines back to that branch — this repo blocks Actions from creating PRs).
    - Note that the snapshot workflow pushes as `github-actions[bot]`, and CI runs on bot-authored commits land in **`action_required`** — they need an "Approve and run" click before the PR shows a green check.
 6. **Required Checks**:
+   - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
+   - `pnpm check:contrast` (every role pair, every level)
+   - `pnpm check:tokens` (colour-instead-of-role ratchet)
    - `pnpm typecheck`
    - `pnpm build`
    - `pnpm build-storybook`
@@ -46,18 +49,56 @@ Package manager is **pnpm** (`node >=22`).
 
 - **Zero Border-Radius**: `0px` globally enforced.
 - **Hard Offset Shadows**: `shadow-hard-*` utilities (2px, 4px, 6px offset, no blur).
-- **Dual-Mode Tokens**: Driven by CSS variables remapped by `.dark`, `.dim`, and `.sketch` root theme classes.
+- **A Four-Rung Theme Ladder**: `midnight` → `dim` → `bright` → `white`, selected by a `data-theme` attribute. Not a light/dark flip — see Theme Ladder below.
 - **Bracketed Display Typography**: Headings render in Space Grotesk enclosed in `[ BRACKETED ]` display type.
 - **Semantic Roles Over Hues**: Components address roles, never colours. See below.
+
+---
+
+## 🪜 The Theme Ladder
+
+**`src/theme/levels.ts` is the only place a level name or a level colour is written.**
+Everything else derives from it: `src/theme.css` (generated), the runtime provider, the
+Storybook toolbar, the walkthrough matrix, and the contrast gate.
+
+| Level | Polarity | Ground | For |
+|---|---|---|---|
+| `midnight` | dark | `#0a0a1a` | Neon on blue-black — the maximal end |
+| `dim` | dark | `#121316` | Desaturated, softer inks, long reading |
+| `bright` | light | `#fcfbf9` | Warm sketch paper and pen ink |
+| `white` | light | `#ffffff` | Neutral, print-safe, dense UI |
+
+Four rules follow from that, and they are what keep four levels maintainable:
+
+1. **`theme.css` is generated — never edit it.** Change `levels.ts`, run `pnpm tokens:build`,
+   commit both. `pnpm tokens:check` fails CI on drift. TypeScript covers the TS half of the
+   ladder; this covers the CSS half, which is where the drift used to live.
+2. **Never branch on a level with an if-chain.** Use a `Record<ThemeLevel, T>` — adding a rung
+   is then a compile error until every branch answers it — or end a `switch` with
+   `assertNever(level)`. Map over `THEME_LEVELS`; never re-list the names.
+3. **Polarity is a declared field, not the axis.** `LEVELS[x].polarity` drives `color-scheme`,
+   the `dark:`/`light:` variants, and the `prefers-color-scheme` mapping in `SYSTEM_LEVEL`.
+   `dark:` now means "midnight or dim" and is only for non-colour utilities.
+4. **Every level colour is a literal.** No `color-mix` derivation, because percentages tuned
+   against near-black do not hold at the light end — and because literals make
+   `pnpm check:contrast` able to audit all 200 role pairs without a browser.
+
+Selection is `data-theme="<level>"` on the root (the level class is mirrored for consumers
+whose own CSS selects on it). `<ThemeProvider scoped>` themes a subtree instead — a `bright`
+panel inside a `midnight` page resolves correctly at any depth. For SSR, render
+`getThemeInitScript()` in an inline `<script>` in `<head>`: it sets the attribute before
+first paint, which React cannot do without either a flash or a hydration mismatch.
 
 ---
 
 ## 🎯 Semantic Theming
 
 Components must **never** reference `--brutalist-cyan`, `--color-white`, `--border-color`
-or the `brutalist-*` Tailwind utilities directly. Those are one palette's mapping of the
-system's roles; `.dim` and `.sketch` are others. Address the role instead — the semantic
-variables in `theme.css` resolve through the palette, so every mode swap propagates for free.
+or the `brutalist-*` Tailwind utilities directly. Those names now resolve through a
+**deprecated compatibility block** in the generated `theme.css`, which exists only so the
+~30 not-yet-migrated components keep rendering while they are ported. `pnpm check:tokens`
+counts the remaining call sites; the block is deleted when that reaches zero.
+`src/components/Input.tsx` is the worked example of a migrated component.
 
 | Role group | Tokens | Use for |
 |---|---|---|
@@ -80,12 +121,18 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 
 ## 📜 Commands
 
-- `pnpm build`: Bundles ESM, CJS, DTS types, and CSS via `tsup`.
+- `pnpm tokens:build`: Regenerates `src/theme.css` from `src/theme/levels.ts`.
+- `pnpm tokens:check`: Fails if the generated CSS is stale. Runs in CI.
+- `pnpm check:contrast`: Audits every role pair on every level. Runs in CI.
+- `pnpm contrast:report`: Prints the full matrix with margins, worst first.
+- `pnpm check:tokens`: Ratchet on colour-instead-of-role call sites. Runs in CI.
+- `pnpm check:tokens:list`: Same, broken down by file.
+- `pnpm build`: Regenerates tokens, then bundles ESM, CJS, DTS types, and CSS via `tsup`.
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
 - `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
 - `pnpm test:visual:update`: Updates Playwright visual snapshots.
-- `pnpm walkthrough`: Screenshots every story in every theme into `walkthrough-report/`.
+- `pnpm walkthrough`: Screenshots every story on every level into `walkthrough-report/`.
 - `pnpm walkthrough:show`: Opens that report locally.
 - `pnpm typecheck`: Validates TypeScript strict mode.
 
@@ -191,8 +238,9 @@ cross-major tolerance. Keep them on the same major; see
 
 ## 📸 Screenshot Walkthrough
 
-`pnpm walkthrough` captures every Storybook story in **every theme**
-(`dark`, `dim`, `sketch`) and publishes Playwright's own HTML report to
+`pnpm walkthrough` captures every Storybook story on **every level**
+(derived from `THEME_LEVELS`, so a new rung widens the matrix automatically)
+and publishes Playwright's own HTML report to
 `walkthrough-report/`. CI attaches it as `storybook-walkthrough-<sha>` on every PR.
 
 Download it, unzip, open `index.html` — it works straight from `file://`, no
@@ -201,16 +249,18 @@ server needed. `pnpm walkthrough:show` serves it locally.
 It is **not** a gate. It asserts nothing about how things should look; it makes
 what they *do* look like reviewable. Visual regression stays in `ci.yml`.
 
-Its real value is cross-theme: a token change that reads fine in `dark` can be
-unusable in `sketch`, and a pixel diff against a single-theme baseline will
-never surface that.
+Its real value is cross-level: a token change that reads fine on `midnight` can
+be unusable on `white`, and a pixel diff against a single-level baseline will
+never surface that. The gated suite still only asserts one level — promoting
+`Foundations/Theme Ladder → AllLevels` into `tests/visual.spec.ts` is the next
+step there, and per rule 7 it needs `/update-snapshots` run first.
 
 Two structural choices worth keeping:
 
-- **One test per story, not per story-and-theme.** The report lists tests, so a
-  row is a component and opening it shows all three themes together — which is
-  the comparison worth making. Splitting by theme triples the rows and scatters
-  the images that need comparing.
+- **One test per story, not per story-and-level.** The report lists tests, so a
+  row is a component and opening it shows all four levels together — which is
+  the comparison worth making. Splitting by level quadruples the rows and
+  scatters the images that need comparing.
 - **Each theme's capture is wrapped in a `test.step`.** Ungrouped, the
   navigation plumbing contributes ~21 rows to the step list and pushes the
   screenshots below the fold.

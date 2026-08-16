@@ -16,7 +16,7 @@ type Story = StoryObj<typeof SaasLandingPage>;
 
 export const DarkMode: Story = {
   render: () => (
-    <ThemeProvider defaultTheme="dark">
+    <ThemeProvider defaultLevel="midnight" persist={false} followSystem={false}>
       <div className="bg-black min-h-screen text-white">
         <SaasLandingPage />
       </div>
@@ -26,8 +26,8 @@ export const DarkMode: Story = {
 
 export const LiteMode: Story = {
   render: () => (
-    <ThemeProvider defaultTheme="sketch">
-      <div className="bg-[#fcfbf9] min-h-screen text-[#18181b] sketch">
+    <ThemeProvider defaultLevel="bright" scoped persist={false} followSystem={false} className="min-h-screen bg-surface-base text-content-primary">
+      <div>
         <SaasLandingPage />
       </div>
     </ThemeProvider>

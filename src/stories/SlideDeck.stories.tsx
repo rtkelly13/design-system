@@ -27,7 +27,7 @@ export const DefaultDeck: Story = {
         </div>
       </Slide>
 
-      <Slide title="DUAL-MODE PRESENTATIONS" subtitle="Slides seamlessly follow dark and sketch theme modes">
+      <Slide title="DUAL-MODE PRESENTATIONS" subtitle="Slides follow every level of the theme ladder">
         <TLDR>
           Presentations rendered with @rtkelly/design-system read perfectly on high-brightness projectors as well as OLED terminal displays.
         </TLDR>

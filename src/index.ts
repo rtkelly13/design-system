@@ -2,6 +2,11 @@
 
 export * from './tokens';
 
+// The theme ladder — the single source for level names, level colours, and the
+// contrast arithmetic that gates them.
+export * from './theme/levels';
+export * from './theme/contrast';
+
 // Semantic theming — prefer these over the raw palette in `tokens`.
 export * from './lib/theme';
 export * from './lib/slug';

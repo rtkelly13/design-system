@@ -17,7 +17,7 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
   {
     id: 'component-library',
     name: 'Component Library',
-    description: 'Every core primitive component rendered in both themes (dark + sketch) side by side',
+    description: 'Every core primitive component rendered across the full theme ladder, side by side',
     icon: <Boxes size={36} color="var(--brutalist-cyan, #22d3ee)" />,
     status: 'active',
     componentCount: 8,

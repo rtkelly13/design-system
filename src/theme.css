@@ -1,51 +1,66 @@
-/* @rtkelly13/design-system — Tailwind v4 token contract.
+/* GENERATED FILE — DO NOT EDIT.
  *
- * Import AFTER `@import "tailwindcss"` in the consumer's CSS entrypoint:
+ * Source: src/theme/levels.ts   (edit that, not this)
+ * Regenerate: pnpm tokens:build   ·   Verify: pnpm tokens:check
+ *
+ * Import order in a consumer's entrypoint:
  *
  *   @import "tailwindcss";
  *   @import "@rtkelly13/design-system/theme.css";
  *
- * Ships the brutalist tokens as a v4 `@theme` block, the class-based dark
- * variant (`.dark` and `.dim` both count as dark), the per-mode CSS variable
- * blocks, and an `@source` so utilities used inside the compiled design-system
- * components are generated in the consumer's build (v4 skips node_modules in
- * automatic content detection).
+ * ============================================================================
+ * How the cascade works here, because it is not obvious
+ * ============================================================================
  *
- * Deliberately excludes web-font @imports and global resets — those live in
- * styles.css for consumers that want the full opinionated stylesheet.
+ * Every level block below declares LITERAL colours. That matters: a custom
+ * property containing a var() reference is substituted where it is DECLARED,
+ * not where it is used, so a token defined once on :root as var(--something)
+ * inherits into descendants already resolved to the root theme's value — and a
+ * nested theme panel keeps the outer theme's colours. The previous hand-written
+ * token layer worked around that by re-declaring the indirected tokens on every
+ * mode class. With literals the problem does not arise at all, and nesting to
+ * any depth resolves by ordinary CSS inheritance.
+ *
+ * The Tailwind --color-* aliases DO indirect through --ds-*, so that a consumer
+ * can override a role and have the utilities follow. Those are therefore
+ * re-declared inside each level block, which is free in a generated file.
  */
 
+/* Tailwind v4 skips node_modules during automatic content detection, so the
+ * utilities used inside the compiled components would never be generated in a
+ * consumer's build without this. */
 @source "./";
 
-/* `.dark`/`.dim` activate dark: variants, with nearest-theme-ancestor
- * semantics down to one level of cross-theme nesting: a `.sketch` subtree
- * inside a dark page opts back out (renders light base styles), and a
- * `.dark`/`.dim` panel inside a sketch page opts back in via the
- * `.sketch :is(.dark, .dim)` alternatives. CSS variables already resolve
- * nearest-ancestor, so this keeps dark: variants in lockstep with them.
- * Deeper alternation (sketch > dark > sketch) is not supported. */
-@custom-variant dark (&:where(.dark, .dim, :is(.dark, .dim) *):where(:not(:is(.sketch, .sketch *)), .sketch :is(.dark, .dim), .sketch :is(.dark, .dim) *));
+/* ==========================================================================
+   Variants — one per level, plus the two polarity groups
+   ==========================================================================
+
+   Prefer a role token over a variant: a component written against
+   --ds-surface-raised needs no variant at all and picks up a fifth level for
+   free. Reach for these only for what tokens genuinely cannot express, such as
+   a different border weight on one level. */
+
+@custom-variant midnight (&:where([data-theme="midnight"], [data-theme="midnight"] *):not(:where([data-theme]:not([data-theme="midnight"]), [data-theme]:not([data-theme="midnight"]) *)));
+@custom-variant dim (&:where([data-theme="dim"], [data-theme="dim"] *):not(:where([data-theme]:not([data-theme="dim"]), [data-theme]:not([data-theme="dim"]) *)));
+@custom-variant bright (&:where([data-theme="bright"], [data-theme="bright"] *):not(:where([data-theme]:not([data-theme="bright"]), [data-theme]:not([data-theme="bright"]) *)));
+@custom-variant white (&:where([data-theme="white"], [data-theme="white"] *):not(:where([data-theme]:not([data-theme="white"]), [data-theme]:not([data-theme="white"]) *)));
+
+/* Polarity is a declared property of a level, so these are derived rather than
+ * being the axis the system hangs off. Use them for non-colour utilities that
+ * genuinely depend on light-vs-dark — a shadow spread, an image filter — never
+ * for colour, which the tokens already handle. */
+@custom-variant dark (&:where([data-theme="midnight"], [data-theme="midnight"] *, [data-theme="dim"], [data-theme="dim"] *):not(:where([data-theme]:not([data-theme="midnight"]):not([data-theme="dim"]), [data-theme]:not([data-theme="midnight"]):not([data-theme="dim"]) *)));
+@custom-variant light (&:where([data-theme="bright"], [data-theme="bright"] *, [data-theme="white"], [data-theme="white"] *):not(:where([data-theme]:not([data-theme="bright"]):not([data-theme="white"]), [data-theme]:not([data-theme="bright"]):not([data-theme="white"]) *)));
+
+/* ==========================================================================
+   Utility surface
+   ==========================================================================
+
+   Declaring the token here is what makes Tailwind emit `bg-surface-raised`,
+   `text-accent-primary`, `border-edge-subtle` and friends. The values are
+   references; the literals live in the level blocks below. */
 
 @theme {
-  --color-brutalist-cyan: var(--brutalist-cyan, #22d3ee);
-  --color-brutalist-pink: var(--brutalist-pink, #ec4899);
-  --color-brutalist-yellow: var(--brutalist-yellow, #facc15);
-  --color-brutalist-neonGreen: var(--brutalist-neonGreen, #39ff14);
-  --color-brutalist-neonCyan: var(--brutalist-neonCyan, #00ffff);
-  --color-brutalist-cyberOrange: var(--brutalist-cyberOrange, #ff8c00);
-  --color-brutalist-darkBg: var(--brutalist-darkBg, #0a0a1a);
-
-  /* Semantic aliases, so utilities can be written as `text-accent-primary` or
-   * `border-border-subtle` instead of naming a hue. Prefer these in consumer
-   * code; the `brutalist-*` names above stay for the existing components. */
-  --color-accent-primary: var(--ds-accent-primary);
-  --color-accent-secondary: var(--ds-accent-secondary);
-  --color-accent-tertiary: var(--ds-accent-tertiary);
-  --color-accent-quiet: var(--ds-accent-quiet);
-  --color-intent-info: var(--ds-intent-info);
-  --color-intent-success: var(--ds-intent-success);
-  --color-intent-warning: var(--ds-intent-warning);
-  --color-intent-danger: var(--ds-intent-danger);
   --color-surface-base: var(--ds-surface-base);
   --color-surface-raised: var(--ds-surface-raised);
   --color-surface-sunken: var(--ds-surface-sunken);
@@ -57,143 +72,365 @@
   --color-edge-strong: var(--ds-border-strong);
   --color-edge-default: var(--ds-border-default);
   --color-edge-subtle: var(--ds-border-subtle);
+  --color-accent-primary: var(--ds-accent-primary);
+  --color-accent-secondary: var(--ds-accent-secondary);
+  --color-accent-tertiary: var(--ds-accent-tertiary);
+  --color-accent-quiet: var(--ds-accent-quiet);
+  --color-intent-info: var(--ds-intent-info);
+  --color-intent-success: var(--ds-intent-success);
+  --color-intent-warning: var(--ds-intent-warning);
+  --color-intent-danger: var(--ds-intent-danger);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  --font-sans: var(--font-inter, "Inter"), system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk, "Space Grotesk"), system-ui, sans-serif;
-  --font-mono: var(--font-ibm-plex-mono, "IBM Plex Mono"), Courier New, monospace;
-  --font-pixel: var(--font-vt323, "VT323"), monospace;
+  --color-brutalist-cyan: var(--ds-accent-primary);
+  --color-brutalist-neonCyan: var(--ds-accent-primary);
+  --color-brutalist-pink: var(--ds-accent-tertiary);
+  --color-brutalist-yellow: var(--ds-accent-secondary);
+  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
+  --color-brutalist-neonGreen: var(--ds-intent-success);
+  --color-brutalist-darkBg: var(--ds-surface-base);
+  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
 
-  --shadow-hard-sm: 2px 2px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
-  --shadow-hard-md: 4px 4px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
-  --shadow-hard-lg: 6px 6px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--brutalist-cyan, #22d3ee);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--brutalist-pink, #ec4899);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--brutalist-yellow, #facc15);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--brutalist-pink, #ec4899) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-pink, #ec4899) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 80%, transparent), 0 0 40px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 50%, transparent);
-}
-
-:root, .dark {
-  --color-black: #000000;
-  --color-white: #ffffff;
-  --brutalist-cyan: #22d3ee;
-  --brutalist-pink: #ec4899;
-  --brutalist-yellow: #facc15;
-  --brutalist-neonGreen: #39ff14;
-  --brutalist-cyberOrange: #ff8c00;
-  --brutalist-darkBg: #0a0a1a;
-  --brutalist-shadow-color: #ffffff;
-  --border-color: #ffffff;
-}
-
-.dim {
-  --color-black: #121316;
-  --color-white: #e4e4e7;
-  --brutalist-cyan: #38bdf8;
-  --brutalist-pink: #f43f5e;
-  --brutalist-yellow: #fbbf24;
-  --brutalist-neonGreen: #4ade80;
-  --brutalist-cyberOrange: #fb923c;
-  --brutalist-shadow-color: #e4e4e7;
-  --border-color: #e4e4e7;
-}
-
-.sketch {
-  --color-black: #fcfbf9; /* Warm paper sheet */
-  --color-white: #18181b; /* Graphite ink */
-  --brutalist-cyan: #2563eb; /* Blue pen ink */
-  --brutalist-pink: #dc2626; /* Red pen ink */
-  --brutalist-yellow: #16a34a; /* Green highlighter */
-  --brutalist-neonGreen: #15803d; /* Darker green — neon is illegible on paper */
-  --brutalist-cyberOrange: #c2410c;
-  --brutalist-shadow-color: #18181b;
-  --border-color: #18181b;
-}
-
-/* The @theme block above is emitted on `:root`, where each `var(--brutalist-*)`
- * reference substitutes immediately — descendants inherit the *resolved* value,
- * not the reference. A nested theme panel (`.sketch` inside a dark page, or
- * vice versa) overrides `--brutalist-*` but the already-substituted `--color-*`
- * / `--shadow-*` tokens would keep the root theme's colors. Re-declaring the
- * indirected tokens on the mode classes makes substitution re-run at the panel,
- * so utilities like `text-brutalist-cyan` and `shadow-hard-md` follow the
- * nearest theme ancestor, in lockstep with the raw variables. */
-.dark, .dim, .sketch {
-  --color-brutalist-cyan: var(--brutalist-cyan, #22d3ee);
-  --color-brutalist-pink: var(--brutalist-pink, #ec4899);
-  --color-brutalist-yellow: var(--brutalist-yellow, #facc15);
-  --color-brutalist-neonGreen: var(--brutalist-neonGreen, #39ff14);
-  --color-brutalist-neonCyan: var(--brutalist-neonCyan, #00ffff);
-  --color-brutalist-cyberOrange: var(--brutalist-cyberOrange, #ff8c00);
-  --color-brutalist-darkBg: var(--brutalist-darkBg, #0a0a1a);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
-  --shadow-hard-md: 4px 4px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
-  --shadow-hard-lg: 6px 6px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1));
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--brutalist-cyan, #22d3ee);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--brutalist-pink, #ec4899);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--brutalist-yellow, #facc15);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--brutalist-pink, #ec4899) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-pink, #ec4899) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 80%, transparent), 0 0 40px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 50%, transparent);
+  --font-sans: var(--ds-font-body);
+  --font-display: var(--ds-font-display);
+  --font-mono: var(--ds-font-mono);
+  --font-pixel: var(--ds-font-pixel);
 }
 
 /* ==========================================================================
-   Semantic layer
-   ==========================================================================
-
-   Components address these roles, never the palette above. Each resolves
-   through a raw variable, so every mode swap (`.dark`, `.dim`, `.sketch`)
-   propagates without the semantic layer needing per-mode blocks of its own.
-
-   The block is declared on the mode classes as well as `:root` because var()
-   references substitute where a custom property is DECLARED, not where it is
-   used — declared on `:root` alone, every `--ds-*` token would inherit as the
-   root theme's resolved literal, and a nested theme panel (`.sketch` inside a
-   dark page, or vice versa) would keep the root's colors. Re-declaring on the
-   mode classes re-runs substitution at the panel element.
-
-   Roles, and when to reach for each:
-     accent-*   visual hierarchy — which element should draw the eye first
-     intent-*   communicated meaning — info / success / warning / danger
-     surface-*  background elevation — base < raised < overlay, sunken is inset
-     text-*     prominence, coarsest to faintest
-     border-*   rule weight
-
-   `--ds-accent-secondary` and `--ds-intent-warning` share a hue today. That is
-   a property of this palette, not of the roles: retheming can separate them,
-   and call sites already say which one they meant.
+   Typography roles — level-independent
    ========================================================================== */
 
-:root, .dark, .dim, .sketch {
-  --ds-surface-base: var(--color-black, #000000);
-  --ds-surface-raised: color-mix(in oklab, var(--color-white, #fff) 4%, var(--color-black, #000));
-  --ds-surface-sunken: color-mix(in oklab, var(--color-black, #000) 88%, var(--color-white, #fff));
-  --ds-surface-overlay: color-mix(in oklab, var(--color-black, #000) 82%, transparent);
-
-  --ds-text-primary: var(--color-white, #ffffff);
-  --ds-text-secondary: color-mix(in oklab, var(--color-white, #fff) 75%, transparent);
-  --ds-text-muted: color-mix(in oklab, var(--color-white, #fff) 52%, transparent);
-  --ds-text-inverse: var(--color-black, #000000);
-
-  --ds-border-strong: var(--border-color, #ffffff);
-  --ds-border-default: color-mix(in oklab, var(--border-color, #fff) 62%, transparent);
-  --ds-border-subtle: color-mix(in oklab, var(--border-color, #fff) 28%, transparent);
-
-  --ds-accent-primary: var(--brutalist-cyan, #22d3ee);
-  --ds-accent-secondary: var(--brutalist-yellow, #facc15);
-  --ds-accent-tertiary: var(--brutalist-pink, #ec4899);
-  --ds-accent-quiet: var(--ds-text-muted);
-
-  --ds-intent-info: var(--brutalist-cyan, #22d3ee);
-  --ds-intent-success: var(--brutalist-neonGreen, #39ff14);
-  --ds-intent-warning: var(--brutalist-yellow, #facc15);
-  --ds-intent-danger: var(--brutalist-pink, #ec4899);
-
-  --ds-shadow-color: var(--brutalist-shadow-color, #ffffff);
-
-  --ds-font-display: var(--font-space-grotesk, "Space Grotesk"), system-ui, sans-serif;
-  --ds-font-body: var(--font-inter, "Inter"), system-ui, sans-serif;
-  --ds-font-mono: var(--font-ibm-plex-mono, "IBM Plex Mono"), Courier New, monospace;
+:root {
+  /* Fallback chains matter as much as the first choice: when the web font has
+   * not loaded — a blocked CDN, a slow connection, the first paint — the next
+   * entry decides the metrics, and a different fallback reflows the page. These
+   * chains are the ones the global rules in styles.css have always used, so the
+   * tokens and the globals now agree instead of quietly disagreeing. */
+  --ds-font-display: var(--font-space-grotesk, "Space Grotesk"), var(--font-inter, "Inter"), sans-serif;
+  --ds-font-body: var(--font-inter, "Inter"), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --ds-font-mono: var(--font-ibm-plex-mono, "IBM Plex Mono"), "Courier New", monospace;
   --ds-font-pixel: var(--font-vt323, "VT323"), monospace;
 }
+
+/* ==========================================================================
+   The ladder
+   ========================================================================== */
+
+/* Midnight — Neon on blue-black. The maximal end of the ladder. */
+:root, [data-theme="midnight"] {
+  color-scheme: dark;
+
+  --ds-surface-base: #0a0a1a;
+  --ds-surface-raised: #14142a;
+  --ds-surface-sunken: #050510;
+  --ds-surface-overlay: rgba(5, 5, 16, 0.82);
+  --ds-text-primary: #ffffff;
+  --ds-text-secondary: #c3c3d4;
+  --ds-text-muted: #8b8ba3;
+  --ds-text-inverse: #0a0a1a;
+  --ds-border-strong: #ffffff;
+  --ds-border-default: #9d9db4;
+  --ds-border-subtle: #33334d;
+  --ds-accent-primary: #22d3ee;
+  --ds-accent-secondary: #facc15;
+  --ds-accent-tertiary: #ec4899;
+  --ds-accent-quiet: #8b8ba3;
+  --ds-intent-info: #22d3ee;
+  --ds-intent-success: #39ff14;
+  --ds-intent-warning: #facc15;
+  --ds-intent-danger: #ec4899;
+  --ds-shadow-color: #ffffff;
+  --ds-polarity: dark;
+
+  --color-surface-base: var(--ds-surface-base);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-surface-sunken: var(--ds-surface-sunken);
+  --color-surface-overlay: var(--ds-surface-overlay);
+  --color-content-primary: var(--ds-text-primary);
+  --color-content-secondary: var(--ds-text-secondary);
+  --color-content-muted: var(--ds-text-muted);
+  --color-content-inverse: var(--ds-text-inverse);
+  --color-edge-strong: var(--ds-border-strong);
+  --color-edge-default: var(--ds-border-default);
+  --color-edge-subtle: var(--ds-border-subtle);
+  --color-accent-primary: var(--ds-accent-primary);
+  --color-accent-secondary: var(--ds-accent-secondary);
+  --color-accent-tertiary: var(--ds-accent-tertiary);
+  --color-accent-quiet: var(--ds-accent-quiet);
+  --color-intent-info: var(--ds-intent-info);
+  --color-intent-success: var(--ds-intent-success);
+  --color-intent-warning: var(--ds-intent-warning);
+  --color-intent-danger: var(--ds-intent-danger);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+
+  /* deprecated — see `pnpm check:tokens` */
+  --color-black: #0a0a1a;
+  --color-white: #ffffff;
+  --border-color: #ffffff;
+  --brutalist-cyan: #22d3ee;
+  --brutalist-neonCyan: #22d3ee;
+  --brutalist-pink: #ec4899;
+  --brutalist-yellow: #facc15;
+  --brutalist-cyberOrange: #facc15;
+  --brutalist-neonGreen: #39ff14;
+  --brutalist-darkBg: #0a0a1a;
+  --brutalist-shadow-color: #ffffff;
+  --color-brutalist-cyan: var(--ds-accent-primary);
+  --color-brutalist-neonCyan: var(--ds-accent-primary);
+  --color-brutalist-pink: var(--ds-accent-tertiary);
+  --color-brutalist-yellow: var(--ds-accent-secondary);
+  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
+  --color-brutalist-neonGreen: var(--ds-intent-success);
+  --color-brutalist-darkBg: var(--ds-surface-base);
+  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
+}
+
+/* Dim — Desaturated neutrals and softer inks, for long reading. */
+[data-theme="dim"] {
+  color-scheme: dark;
+
+  --ds-surface-base: #121316;
+  --ds-surface-raised: #1c1d21;
+  --ds-surface-sunken: #0c0d0f;
+  --ds-surface-overlay: rgba(12, 13, 15, 0.82);
+  --ds-text-primary: #e4e4e7;
+  --ds-text-secondary: #b0b1b8;
+  --ds-text-muted: #8a8b93;
+  --ds-text-inverse: #121316;
+  --ds-border-strong: #e4e4e7;
+  --ds-border-default: #8f9099;
+  --ds-border-subtle: #3c3d44;
+  --ds-accent-primary: #38bdf8;
+  --ds-accent-secondary: #fbbf24;
+  --ds-accent-tertiary: #f43f5e;
+  --ds-accent-quiet: #8a8b93;
+  --ds-intent-info: #38bdf8;
+  --ds-intent-success: #4ade80;
+  --ds-intent-warning: #fbbf24;
+  --ds-intent-danger: #f43f5e;
+  --ds-shadow-color: #e4e4e7;
+  --ds-polarity: dark;
+
+  --color-surface-base: var(--ds-surface-base);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-surface-sunken: var(--ds-surface-sunken);
+  --color-surface-overlay: var(--ds-surface-overlay);
+  --color-content-primary: var(--ds-text-primary);
+  --color-content-secondary: var(--ds-text-secondary);
+  --color-content-muted: var(--ds-text-muted);
+  --color-content-inverse: var(--ds-text-inverse);
+  --color-edge-strong: var(--ds-border-strong);
+  --color-edge-default: var(--ds-border-default);
+  --color-edge-subtle: var(--ds-border-subtle);
+  --color-accent-primary: var(--ds-accent-primary);
+  --color-accent-secondary: var(--ds-accent-secondary);
+  --color-accent-tertiary: var(--ds-accent-tertiary);
+  --color-accent-quiet: var(--ds-accent-quiet);
+  --color-intent-info: var(--ds-intent-info);
+  --color-intent-success: var(--ds-intent-success);
+  --color-intent-warning: var(--ds-intent-warning);
+  --color-intent-danger: var(--ds-intent-danger);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+
+  /* deprecated — see `pnpm check:tokens` */
+  --color-black: #121316;
+  --color-white: #e4e4e7;
+  --border-color: #e4e4e7;
+  --brutalist-cyan: #38bdf8;
+  --brutalist-neonCyan: #38bdf8;
+  --brutalist-pink: #f43f5e;
+  --brutalist-yellow: #fbbf24;
+  --brutalist-cyberOrange: #fbbf24;
+  --brutalist-neonGreen: #4ade80;
+  --brutalist-darkBg: #121316;
+  --brutalist-shadow-color: #e4e4e7;
+  --color-brutalist-cyan: var(--ds-accent-primary);
+  --color-brutalist-neonCyan: var(--ds-accent-primary);
+  --color-brutalist-pink: var(--ds-accent-tertiary);
+  --color-brutalist-yellow: var(--ds-accent-secondary);
+  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
+  --color-brutalist-neonGreen: var(--ds-intent-success);
+  --color-brutalist-darkBg: var(--ds-surface-base);
+  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
+}
+
+/* Bright — Warm sketch paper and pen ink. The characterful light level. */
+[data-theme="bright"] {
+  color-scheme: light;
+
+  --ds-surface-base: #fcfbf9;
+  --ds-surface-raised: #ffffff;
+  --ds-surface-sunken: #f4f1e9;
+  --ds-surface-overlay: rgba(24, 24, 27, 0.72);
+  --ds-text-primary: #18181b;
+  --ds-text-secondary: #4b4a45;
+  --ds-text-muted: #66655e;
+  --ds-text-inverse: #fcfbf9;
+  --ds-border-strong: #18181b;
+  --ds-border-default: #7c7a72;
+  --ds-border-subtle: #cbc5b7;
+  --ds-accent-primary: #2563eb;
+  --ds-accent-secondary: #c2410c;
+  --ds-accent-tertiary: #c81e1e;
+  --ds-accent-quiet: #66655e;
+  --ds-intent-info: #2563eb;
+  --ds-intent-success: #146c34;
+  --ds-intent-warning: #9a4708;
+  --ds-intent-danger: #c81e1e;
+  --ds-shadow-color: #18181b;
+  --ds-polarity: light;
+
+  --color-surface-base: var(--ds-surface-base);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-surface-sunken: var(--ds-surface-sunken);
+  --color-surface-overlay: var(--ds-surface-overlay);
+  --color-content-primary: var(--ds-text-primary);
+  --color-content-secondary: var(--ds-text-secondary);
+  --color-content-muted: var(--ds-text-muted);
+  --color-content-inverse: var(--ds-text-inverse);
+  --color-edge-strong: var(--ds-border-strong);
+  --color-edge-default: var(--ds-border-default);
+  --color-edge-subtle: var(--ds-border-subtle);
+  --color-accent-primary: var(--ds-accent-primary);
+  --color-accent-secondary: var(--ds-accent-secondary);
+  --color-accent-tertiary: var(--ds-accent-tertiary);
+  --color-accent-quiet: var(--ds-accent-quiet);
+  --color-intent-info: var(--ds-intent-info);
+  --color-intent-success: var(--ds-intent-success);
+  --color-intent-warning: var(--ds-intent-warning);
+  --color-intent-danger: var(--ds-intent-danger);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+
+  /* deprecated — see `pnpm check:tokens` */
+  --color-black: #fcfbf9;
+  --color-white: #18181b;
+  --border-color: #18181b;
+  --brutalist-cyan: #2563eb;
+  --brutalist-neonCyan: #2563eb;
+  --brutalist-pink: #c81e1e;
+  --brutalist-yellow: #c2410c;
+  --brutalist-cyberOrange: #c2410c;
+  --brutalist-neonGreen: #146c34;
+  --brutalist-darkBg: #fcfbf9;
+  --brutalist-shadow-color: #18181b;
+  --color-brutalist-cyan: var(--ds-accent-primary);
+  --color-brutalist-neonCyan: var(--ds-accent-primary);
+  --color-brutalist-pink: var(--ds-accent-tertiary);
+  --color-brutalist-yellow: var(--ds-accent-secondary);
+  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
+  --color-brutalist-neonGreen: var(--ds-intent-success);
+  --color-brutalist-darkBg: var(--ds-surface-base);
+  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
+}
+
+/* White — Neutral and print-safe, for dense UI and documents. */
+[data-theme="white"] {
+  color-scheme: light;
+
+  --ds-surface-base: #ffffff;
+  --ds-surface-raised: #f7f8fa;
+  --ds-surface-sunken: #eef1f5;
+  --ds-surface-overlay: rgba(11, 11, 13, 0.7);
+  --ds-text-primary: #0b0b0d;
+  --ds-text-secondary: #42454d;
+  --ds-text-muted: #5f636d;
+  --ds-text-inverse: #ffffff;
+  --ds-border-strong: #0b0b0d;
+  --ds-border-default: #73777f;
+  --ds-border-subtle: #c6cad2;
+  --ds-accent-primary: #1d4ed8;
+  --ds-accent-secondary: #9a4708;
+  --ds-accent-tertiary: #be123c;
+  --ds-accent-quiet: #5f636d;
+  --ds-intent-info: #1d4ed8;
+  --ds-intent-success: #146c34;
+  --ds-intent-warning: #9a4708;
+  --ds-intent-danger: #b91c1c;
+  --ds-shadow-color: #0b0b0d;
+  --ds-polarity: light;
+
+  --color-surface-base: var(--ds-surface-base);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-surface-sunken: var(--ds-surface-sunken);
+  --color-surface-overlay: var(--ds-surface-overlay);
+  --color-content-primary: var(--ds-text-primary);
+  --color-content-secondary: var(--ds-text-secondary);
+  --color-content-muted: var(--ds-text-muted);
+  --color-content-inverse: var(--ds-text-inverse);
+  --color-edge-strong: var(--ds-border-strong);
+  --color-edge-default: var(--ds-border-default);
+  --color-edge-subtle: var(--ds-border-subtle);
+  --color-accent-primary: var(--ds-accent-primary);
+  --color-accent-secondary: var(--ds-accent-secondary);
+  --color-accent-tertiary: var(--ds-accent-tertiary);
+  --color-accent-quiet: var(--ds-accent-quiet);
+  --color-intent-info: var(--ds-intent-info);
+  --color-intent-success: var(--ds-intent-success);
+  --color-intent-warning: var(--ds-intent-warning);
+  --color-intent-danger: var(--ds-intent-danger);
+  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+
+  /* deprecated — see `pnpm check:tokens` */
+  --color-black: #ffffff;
+  --color-white: #0b0b0d;
+  --border-color: #0b0b0d;
+  --brutalist-cyan: #1d4ed8;
+  --brutalist-neonCyan: #1d4ed8;
+  --brutalist-pink: #be123c;
+  --brutalist-yellow: #9a4708;
+  --brutalist-cyberOrange: #9a4708;
+  --brutalist-neonGreen: #146c34;
+  --brutalist-darkBg: #ffffff;
+  --brutalist-shadow-color: #0b0b0d;
+  --color-brutalist-cyan: var(--ds-accent-primary);
+  --color-brutalist-neonCyan: var(--ds-accent-primary);
+  --color-brutalist-pink: var(--ds-accent-tertiary);
+  --color-brutalist-yellow: var(--ds-accent-secondary);
+  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
+  --color-brutalist-neonGreen: var(--ds-intent-success);
+  --color-brutalist-darkBg: var(--ds-surface-base);
+  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
+}
+
+/* Native form controls, scrollbars and the caret follow `color-scheme`, which
+ * each level declares above. Without it a light level renders dark scrollbars
+ * and an unreadable date picker while every styled element looks correct. */
+
