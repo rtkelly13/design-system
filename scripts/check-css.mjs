@@ -61,9 +61,11 @@ const BUDGET = {
   // Migrated: its four component classes are utilities in Badge, AsciiDivider
   // and ExperimentsView. What is left is document-level and stays.
   'src/styles.css': 0,
-  // The docs chrome (~12 components, each with a 1:1 class) plus the bare-tag
-  // prose rules. Migrate a component at a time and lower this line.
-  'src/prose.css': 455,
+  // Down from 455: the bare-tag prose rules and the ~70 declarations of
+  // chrome-inside-prose reset are gone, replaced by @tailwindcss/typography
+  // plus a variables-only token mapping. What remains is the docs chrome —
+  // ~12 components, each with a 1:1 class. Migrate one at a time.
+  'src/prose.css': 328,
 };
 
 /** Strip comments and string literals so braces inside them do not confuse the scan. */

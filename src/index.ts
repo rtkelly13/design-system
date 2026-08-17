@@ -9,6 +9,7 @@ export * from './theme/contrast';
 
 // Semantic theming — prefer these over the raw palette in `tokens`.
 export * from './lib/theme';
+export * from './lib/tv';
 export * from './lib/slug';
 
 // Hooks

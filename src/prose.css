@@ -9,8 +9,9 @@
  * obvious failure. Everything here works with the tokens alone.
  *
  * Two responsibilities:
- *   1. `.docs-prose` — styles the bare tags a Markdown/MDX pipeline emits.
- *   2. `.docs-*`     — the documentation chrome components.
+ *   1. `prose-ladder` — maps @tailwindcss/typography's variables onto the
+ *      ladder's role tokens. Variables only; the deltas live in `Prose.tsx`.
+ *   2. `.docs-*`      — the documentation chrome components, not yet migrated.
  */
 
 /* This file promises to work with the tokens alone, so it cannot assume a
@@ -23,9 +24,7 @@
  * Scoped to the docs subtree rather than `*` so importing this file does not
  * silently restyle the rest of a host application. */
 .docs-layout,
-.docs-prose,
 .docs-layout *,
-.docs-prose *,
 .docs-layout *::before,
 .docs-layout *::after {
   box-sizing: border-box;
@@ -113,394 +112,47 @@ html {
 
 /* ==========================================================================
    Prose — compiled Markdown output
+   ==========================================================================
+
+   `@tailwindcss/typography` does this job, and it is built for exactly this
+   case: "typographic defaults for HTML you don't control". A Markdown pipeline
+   emits bare tags with no class names, so there is nothing for a utility to
+   attach to — and hand-writing ~150 descendant declarations here, or the same
+   number as `[&_h2]:…` arbitrary variants on the container, is reimplementing a
+   plugin badly either way.
+
+   What stays in CSS is the part the styling-lives-in-TSX rule already sanctions:
+   variables. `prose-ladder` maps the plugin's `--tw-prose-*` knobs onto this
+   system's role tokens. The brutalist deltas — the double rule under an h1, the
+   uppercase display headings, the mono tables — are `prose-h1:` / `prose-table:`
+   modifiers on the element, in `Prose.tsx`.
+
+   Note there is no `--tw-prose-invert-*` block. The plugin needs one because it
+   models theming as a light/dark flip; the ladder does not — `--ds-*` already
+   resolves per level, so one mapping is correct on all four rungs and would be
+   correct on a fifth.
    ========================================================================== */
 
-.docs-prose {
-  font-family: var(--ds-font-body);
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--ds-text-primary);
-  max-width: var(--docs-content-max);
-}
+@plugin "@tailwindcss/typography";
 
-.docs-prose > :first-child {
-  margin-top: 0;
-}
-
-.docs-prose h1,
-.docs-prose h2,
-.docs-prose h3,
-.docs-prose h4,
-.docs-prose h5,
-.docs-prose h6 {
-  font-family: var(--ds-font-display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
-  color: var(--ds-text-primary);
-}
-
-.docs-prose h1 {
-  font-size: 2.25rem;
-  margin: 0 0 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 4px double var(--ds-border-strong);
-}
-
-.docs-prose h2 {
-  font-size: 1.6rem;
-  margin: 3rem 0 1rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 2px solid var(--ds-border-strong);
-}
-
-.docs-prose h3 {
-  font-size: 1.25rem;
-  margin: 2.25rem 0 0.75rem;
-  color: var(--ds-accent-primary);
-}
-
-.docs-prose h4 {
-  font-size: 1.05rem;
-  margin: 1.75rem 0 0.5rem;
-  color: var(--ds-accent-secondary);
-}
-
-.docs-prose h5,
-.docs-prose h6 {
-  font-size: 0.95rem;
-  margin: 1.5rem 0 0.5rem;
-  opacity: 0.85;
-}
-
-.docs-prose p {
-  margin: 0 0 1.25rem;
-}
-
-.docs-prose a {
-  color: var(--ds-accent-primary);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 2px;
-}
-
-.docs-prose a:hover {
-  background-color: var(--ds-accent-primary);
-  color: var(--ds-surface-base);
-  text-decoration: none;
-}
-
-/* The anchor affordance is a link inside a heading — exempt it from the
- * prose link treatment or it inherits the underline and hover inversion. */
-.docs-prose .docs-anchor-link,
-.docs-prose .docs-anchor-link:hover {
-  text-decoration: none;
-  background-color: transparent;
-  color: inherit;
-}
-
-.docs-prose strong {
-  font-weight: 800;
-  color: var(--ds-text-primary);
-}
-
-.docs-prose em {
-  font-style: italic;
-}
-
-.docs-prose ul,
-.docs-prose ol {
-  margin: 0 0 1.25rem;
-  padding-left: 1.5rem;
-}
-
-.docs-prose ul {
-  list-style: none;
-}
-
-.docs-prose ul > li {
-  position: relative;
-}
-
-/* Square marker, drawn rather than listed, so it can take an accent colour. */
-.docs-prose ul > li::before {
-  content: '';
-  position: absolute;
-  left: -1.1rem;
-  top: 0.72em;
-  width: 0.4rem;
-  height: 0.4rem;
-  background-color: var(--ds-accent-primary);
-}
-
-.docs-prose ol {
-  list-style: decimal;
-}
-
-.docs-prose ol > li::marker {
-  font-family: var(--ds-font-mono);
-  font-weight: 700;
-  color: var(--ds-accent-secondary);
-}
-
-.docs-prose li {
-  margin: 0.35rem 0;
-}
-
-.docs-prose li > ul,
-.docs-prose li > ol {
-  margin: 0.35rem 0;
-}
-
-/* Task lists from remark-gfm. */
-.docs-prose li.task-list-item::before {
-  display: none;
-}
-
-.docs-prose input[type='checkbox'] {
-  margin-right: 0.5rem;
-  accent-color: var(--ds-intent-success);
-}
-
-.docs-prose blockquote {
-  margin: 1.5rem 0;
-  padding: 0.75rem 1.25rem;
-  border-left: 4px solid var(--ds-accent-tertiary);
-  background-color: var(--ds-surface-raised);
-  font-style: italic;
-}
-
-.docs-prose blockquote > :last-child {
-  margin-bottom: 0;
-}
-
-.docs-prose hr {
-  margin: 2.5rem 0;
-  border: 0;
-  border-top: 2px dashed var(--ds-border-strong);
-  opacity: 0.5;
-}
-
-/* Inline code only — the `pre > code` case is handled by the code block. */
-.docs-prose :not(pre) > code {
-  font-family: var(--ds-font-mono);
-  font-size: 0.875em;
-  padding: 0.1rem 0.35rem;
-  border: 1px solid var(--ds-border-default);
-  background-color: var(--ds-surface-raised);
-  color: var(--ds-accent-secondary);
-  white-space: nowrap;
-}
-
-/* A heading that is entirely inline code — `### \`tvs metadata --format json\``
- * is the dominant shape in CLI documentation — must not render as a chip. The
- * chip's `nowrap` in particular cannot break a long command and pushes the page
- * sideways on narrow viewports. Keep the mono face and accent so it still reads
- * as a command; drop the box. */
-.docs-prose :is(h1, h2, h3, h4, h5, h6) code {
-  font-size: inherit;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-.docs-prose kbd {
-  font-family: var(--ds-font-mono);
-  font-size: 0.8em;
-  padding: 0.1rem 0.4rem;
-  border: 2px solid var(--ds-border-strong);
-  box-shadow: 2px 2px 0 0 var(--ds-shadow-color);
-}
-
-.docs-prose img {
-  max-width: 100%;
-  height: auto;
-  border: 2px solid var(--ds-border-strong);
-}
-
-/* Tables scroll inside their own container rather than widening the page. */
-.docs-prose table {
-  width: 100%;
-  margin: 1.5rem 0;
-  border-collapse: collapse;
-  border: 2px solid var(--ds-border-strong);
-  font-family: var(--ds-font-mono);
-  font-size: 0.85rem;
-}
-
-.docs-prose thead {
-  background-color: var(--ds-surface-raised);
-}
-
-.docs-prose th {
-  padding: 0.6rem 0.85rem;
-  border: 2px solid var(--ds-border-strong);
-  text-align: left;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ds-accent-primary);
-}
-
-.docs-prose td {
-  padding: 0.6rem 0.85rem;
-  border: 2px solid var(--ds-border-default);
-  vertical-align: top;
-}
-
-.docs-prose td > code {
-  white-space: pre-wrap;
-}
-
-/* Wrapper a pipeline can emit around wide tables. */
-.docs-table-scroll {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-/* GitHub alert syntax (`> [!NOTE]`) as emitted by
- * remark-github-blockquote-alert — styled to match NoteBlock without
- * requiring the component. */
-.docs-prose .markdown-alert {
-  margin: 1.5rem 0;
-  padding: 1rem 1.25rem;
-  border: 2px solid var(--ds-accent-primary);
-  border-left-width: 6px;
-  background-color: var(--ds-surface-base);
-  font-style: normal;
-}
-
-.docs-prose .markdown-alert > :last-child {
-  margin-bottom: 0;
-}
-
-.docs-prose .markdown-alert-title {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.5rem;
-  font-family: var(--ds-font-display);
-  font-size: 0.8rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ds-accent-primary);
-}
-
-.docs-prose .markdown-alert-tip {
-  border-color: var(--ds-intent-success);
-}
-.docs-prose .markdown-alert-tip .markdown-alert-title {
-  color: var(--ds-intent-success);
-}
-
-.docs-prose .markdown-alert-important {
-  border-color: var(--ds-accent-secondary);
-}
-.docs-prose .markdown-alert-important .markdown-alert-title {
-  color: var(--ds-accent-secondary);
-}
-
-.docs-prose .markdown-alert-warning,
-.docs-prose .markdown-alert-caution {
-  border-color: var(--ds-accent-tertiary);
-}
-.docs-prose .markdown-alert-warning .markdown-alert-title,
-.docs-prose .markdown-alert-caution .markdown-alert-title {
-  color: var(--ds-accent-tertiary);
-}
-
-/* Emitted by remark-code-title, immediately before its <pre>. */
-.docs-prose .remark-code-title {
-  margin-top: 1.5rem;
-  padding: 0.4rem 0.85rem;
-  border: 2px solid var(--ds-border-strong);
-  border-bottom: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--ds-accent-secondary);
-}
-
-.docs-prose .remark-code-title + .docs-codeblock {
-  margin-top: 0;
-}
-
-/* --------------------------------------------------------------------------
-   Chrome nested inside prose
-
-   Breadcrumbs sit above the page title and the pager below the body, so both
-   are routinely rendered *inside* `.docs-prose`. Prose styles target bare tags,
-   which means they also capture the chrome's own `<ol>`, `<li>` and `<a>` —
-   breadcrumbs pick up a decimal marker and every chrome link gets the prose
-   underline and hover inversion.
-
-   These rules are more specific than the prose ones on purpose; they must win.
-   -------------------------------------------------------------------------- */
-
-.docs-prose :is(.docs-breadcrumbs-list, .docs-toc-list, .docs-sidebar-list) {
-  list-style: none;
-  margin: 0;
-  padding-left: 0;
-}
-
-.docs-prose :is(.docs-breadcrumbs-list, .docs-toc-list, .docs-sidebar-list) > li {
-  margin: 0;
-}
-
-.docs-prose
-  :is(.docs-breadcrumbs-list, .docs-toc-list, .docs-sidebar-list)
-  > li::marker {
-  content: '';
-}
-
-.docs-prose
-  :is(.docs-breadcrumbs-list, .docs-toc-list, .docs-sidebar-list)
-  > li::before {
-  display: none;
-}
-
-/* Breadcrumbs keep their own bottom margin; the reset above zeroed it. */
-.docs-prose .docs-breadcrumbs-list {
-  margin-bottom: 1.25rem;
-}
-
-.docs-prose
-  :is(
-    .docs-breadcrumbs-link,
-    .docs-breadcrumbs-current,
-    .docs-toc-link,
-    .docs-sidebar-link,
-    .docs-pager-link,
-    .docs-header-brand,
-    .docs-header-nav-link
-  ),
-.docs-prose
-  :is(
-    .docs-breadcrumbs-link,
-    .docs-toc-link,
-    .docs-sidebar-link,
-    .docs-pager-link,
-    .docs-header-brand,
-    .docs-header-nav-link
-  ):hover {
-  text-decoration: none;
-  background-color: transparent;
-}
-
-/* Each chrome link defines its own hover colour; the prose inversion would
- * otherwise repaint them all to the surface colour. */
-.docs-prose :is(.docs-pager-link, .docs-header-brand):hover {
-  color: var(--ds-text-primary);
-}
-
-.docs-prose :is(.docs-breadcrumbs-link, .docs-toc-link, .docs-sidebar-link):hover {
-  color: var(--ds-accent-primary);
+@utility prose-ladder {
+  --tw-prose-body: var(--ds-text-primary);
+  --tw-prose-headings: var(--ds-text-primary);
+  --tw-prose-lead: var(--ds-text-secondary);
+  --tw-prose-links: var(--ds-accent-primary);
+  --tw-prose-bold: var(--ds-text-primary);
+  --tw-prose-counters: var(--ds-accent-secondary);
+  --tw-prose-bullets: var(--ds-accent-primary);
+  --tw-prose-hr: var(--ds-border-strong);
+  --tw-prose-quotes: var(--ds-text-primary);
+  --tw-prose-quote-borders: var(--ds-accent-tertiary);
+  --tw-prose-captions: var(--ds-text-muted);
+  --tw-prose-kbd: var(--ds-text-primary);
+  --tw-prose-code: var(--ds-accent-secondary);
+  --tw-prose-pre-code: var(--ds-text-primary);
+  --tw-prose-pre-bg: var(--ds-surface-sunken);
+  --tw-prose-th-borders: var(--ds-border-strong);
+  --tw-prose-td-borders: var(--ds-border-default);
 }
 
 /* ==========================================================================

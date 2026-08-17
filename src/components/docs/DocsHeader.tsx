@@ -86,7 +86,7 @@ export function DocsHeader({
   }, []);
 
   return (
-    <header ref={ref} className={`docs-header ${className}`.trim()}>
+    <header ref={ref} className={`not-prose docs-header ${className}`.trim()}>
       <div className="docs-header-left">
         {onToggleSidebar && (
           <button

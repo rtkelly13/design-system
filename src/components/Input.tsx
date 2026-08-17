@@ -5,25 +5,59 @@ import type {
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
+import { tv } from '../lib/tv';
 import { accentVar } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
 
 /**
- * Form controls, written against semantic roles.
+ * Form controls — the reference for how a component in this system is built.
  *
- * This is the reference for migrating the remaining components. Every colour
- * addresses a role — `bg-surface-base`, `text-content-primary`,
- * `border-edge-strong`, `text-intent-danger` — so all four levels are styled by
- * the same classes, and a fifth would be too.
+ * Three things to copy from here:
  *
- * What was here before is worth knowing, because the same pattern is still in
- * ~30 other components: `bg-black text-white border-white` only appeared to
- * work, because the old token layer redefined black and white per theme; and
- * `text-zinc-300` on the label was a genuine literal, rendering as
- * near-invisible pale grey on anything light. The accent prop also emitted
- * `focus:border-brutalist-green`, a class that has never existed — the token is
- * `neonGreen` — so that option silently did nothing.
+ *   1. **Every colour addresses a role.** `bg-surface-base`,
+ *      `text-content-primary`, `border-edge-strong`, `text-intent-danger`. All
+ *      four levels are styled by the same classes and a fifth would be too.
+ *   2. **Styling is a `tv` recipe, not a template string.** The recipe has one
+ *      slot per element, so a consumer can reach any of them, and conflicts
+ *      resolve — a caller's `bg-surface-raised` genuinely replaces the base's
+ *      `bg-surface-base` rather than racing it in CSS source order.
+ *   3. **Runtime values stay out of the class string.** The focus accent comes
+ *      from a prop, so it travels as a custom property; a utility cannot be
+ *      assembled at build time from a value known only at runtime.
  */
+
+const field = tv({
+  slots: {
+    root: 'flex w-full flex-col gap-1.5 font-mono',
+    label: 'text-xs font-bold uppercase tracking-wider text-content-secondary',
+    control:
+      'w-full border-2 border-edge-strong bg-surface-base font-mono text-sm text-content-primary transition-colors placeholder:text-content-muted focus:border-[var(--field-accent)] focus:outline-none',
+    message: 'font-mono text-xs',
+  },
+  variants: {
+    /** Padding differs by control: a textarea is a box, the others are lines. */
+    shape: {
+      line: { control: 'px-4 py-2.5' },
+      box: { control: 'p-4' },
+    },
+    invalid: {
+      true: {
+        control: 'border-intent-danger',
+        message: 'font-bold text-intent-danger',
+      },
+      false: {
+        message: 'text-content-muted',
+      },
+    },
+    interactive: {
+      true: { control: 'cursor-pointer' },
+    },
+  },
+  defaultVariants: {
+    shape: 'line',
+    invalid: false,
+  },
+});
 
 /** Shared by every control here. */
 interface FieldProps {
@@ -38,11 +72,6 @@ interface FieldProps {
   accent?: AccentToken;
   className?: string;
 }
-
-const FIELD_BASE =
-  'w-full bg-surface-base text-content-primary border-2 border-edge-strong text-sm font-mono placeholder:text-content-muted focus:outline-none transition-colors focus:border-[var(--field-accent)]';
-
-const LABEL = 'text-xs font-bold uppercase tracking-wider text-content-secondary';
 
 /**
  * Wires label, control, error and helper text together.
@@ -67,28 +96,29 @@ function useField(id: string | undefined, error?: string, helperText?: string) {
   };
 }
 
-/** The accent is a runtime value, so it travels as a custom property — a
- * Tailwind class cannot be assembled from a prop at build time. */
+/** The accent is known at runtime, so it travels as a custom property. */
 function accentStyle(accent: AccentToken): CSSProperties {
   return { '--field-accent': accentVar(accent) } as CSSProperties;
 }
 
-function Message({ id, error, helperText }: { id?: string; error?: string; helperText?: string }) {
-  if (error) {
-    return (
-      <span id={id} role="alert" className="text-xs font-mono font-bold text-intent-danger">
-        &gt; {error}
-      </span>
-    );
-  }
-  if (helperText) {
-    return (
-      <span id={id} className="text-xs font-mono text-content-muted">
-        &gt; {helperText}
-      </span>
-    );
-  }
-  return null;
+function Message({
+  id,
+  error,
+  helperText,
+  className,
+}: {
+  id?: string;
+  error?: string;
+  helperText?: string;
+  className: string;
+}) {
+  const body = error ?? helperText;
+  if (!body) return null;
+  return (
+    <span id={id} role={error ? 'alert' : undefined} className={className}>
+      &gt; {body}
+    </span>
+  );
 }
 
 export interface InputProps
@@ -105,21 +135,24 @@ export function Input({
   ...props
 }: InputProps) {
   const { fieldId, messageId, controlProps } = useField(id, error, helperText);
+  const styles = field({ invalid: Boolean(error) });
 
   return (
-    <div className="flex flex-col gap-1.5 w-full font-mono">
+    <div className={styles.root()}>
       {label && (
-        <label htmlFor={fieldId} className={LABEL}>
+        <label htmlFor={fieldId} className={styles.label()}>
           {label}
         </label>
       )}
       <input
         {...controlProps}
         style={accentStyle(accent)}
-        className={`${FIELD_BASE} px-4 py-2.5 ${error ? 'border-intent-danger' : ''} ${className}`.trim()}
+        // `class` is tv's override slot: it merges into the recipe rather than
+        // being appended after it, so a caller's utility actually wins.
+        className={styles.control({ class: className })}
         {...props}
       />
-      <Message id={messageId} error={error} helperText={helperText} />
+      <Message id={messageId} error={error} helperText={helperText} className={styles.message()} />
     </div>
   );
 }
@@ -138,21 +171,22 @@ export function TextArea({
   ...props
 }: TextAreaProps) {
   const { fieldId, messageId, controlProps } = useField(id, error, helperText);
+  const styles = field({ shape: 'box', invalid: Boolean(error) });
 
   return (
-    <div className="flex flex-col gap-1.5 w-full font-mono">
+    <div className={styles.root()}>
       {label && (
-        <label htmlFor={fieldId} className={LABEL}>
+        <label htmlFor={fieldId} className={styles.label()}>
           {label}
         </label>
       )}
       <textarea
         {...controlProps}
         style={accentStyle(accent)}
-        className={`${FIELD_BASE} p-4 ${error ? 'border-intent-danger' : ''} ${className}`.trim()}
+        className={styles.control({ class: className })}
         {...props}
       />
-      <Message id={messageId} error={error} helperText={helperText} />
+      <Message id={messageId} error={error} helperText={helperText} className={styles.message()} />
     </div>
   );
 }
@@ -179,20 +213,19 @@ export function Select({
   ...props
 }: SelectProps) {
   const { fieldId, messageId, controlProps } = useField(id, error, helperText);
+  const styles = field({ invalid: Boolean(error), interactive: true });
 
   return (
-    <div className="flex flex-col gap-1.5 w-full font-mono">
+    <div className={styles.root()}>
       {label && (
-        <label htmlFor={fieldId} className={LABEL}>
+        <label htmlFor={fieldId} className={styles.label()}>
           {label}
         </label>
       )}
       <select
         {...controlProps}
         style={accentStyle(accent)}
-        className={`${FIELD_BASE} px-4 py-2.5 cursor-pointer ${
-          error ? 'border-intent-danger' : ''
-        } ${className}`.trim()}
+        className={styles.control({ class: className })}
         {...props}
       >
         {options.map((opt) => (
@@ -208,7 +241,7 @@ export function Select({
           </option>
         ))}
       </select>
-      <Message id={messageId} error={error} helperText={helperText} />
+      <Message id={messageId} error={error} helperText={helperText} className={styles.message()} />
     </div>
   );
 }

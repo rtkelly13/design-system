@@ -63,6 +63,23 @@ Package manager is **pnpm** (`node >=22`).
 CSS files declare variables.** There is no third place for styling to live, and
 no `.component-name { … }` class to go looking in.
 
+Composition goes through **`tv` from `src/lib/tv.ts`** — never a template
+string. `src/components/Input.tsx` is the worked example: one slot per element,
+variants as data, and the consumer's `className` passed as tv's `class` override.
+
+That last part is a correctness fix, not a convenience. Appending a caller's
+`className` to the end of a string does nothing: Tailwind decides between two
+conflicting utilities by **CSS source order**, not class-attribute order, so a
+caller's `bg-surface-raised` was racing the component's `bg-surface-base` and
+whichever the stylesheet emitted later won. Every `className` prop in this
+package was unreliable in exactly that way. `tv` resolves the conflict before
+the string reaches the DOM.
+
+Use `tv` from `src/lib/tv.ts`, not the bare export from the package: the local
+one declares the hard-shadow scale. Everything else needs no configuration —
+`tailwind-merge` classifies the semantic tokens correctly out of the box,
+including telling a colour from a size in the same `text-*` position.
+
 `pnpm check:css` enforces it, and it is a ratchet like `check:tokens`: it counts
 every declaration whose selector names a class this repo authors and fails when
 the number rises. `pnpm check:css:list` shows what is left.
@@ -77,6 +94,30 @@ on — not because it was inconvenient to move.
 | Custom properties (`--x: …`) anywhere | Variables are the sanctioned CSS payload | `theme.css`, generated |
 | Selectors of only element names, `:root`, `html`, `body`, `*`, pseudo-classes | No JSX element for the document; a consumer's own `<h1>` has no class we can add | `styles.css` |
 | Class names emitted by third-party tooling | We never render `.markdown-alert` — a remark plugin does | `prose.css`, listed in `THIRD_PARTY` |
+
+### Prose is the plugin's job, not ours
+
+A Markdown pipeline emits bare tags with no class names, so there is nothing for
+a utility to attach to. **`@tailwindcss/typography`** is built for that case, so
+the prose layer is the plugin plus two things:
+
+- `@utility prose-ladder` in `prose.css` maps its `--tw-prose-*` knobs onto the
+  `--ds-*` role tokens. Variables only, so it is the sanctioned CSS payload —
+  and there is deliberately no `--tw-prose-invert-*` block: the plugin needs one
+  because it models theming as a light/dark flip, while `--ds-*` already resolves
+  per level, so one mapping is correct on all four rungs.
+- The brutalist deltas are `prose-h1:` / `prose-table:` / `prose-code:` element
+  modifiers in `Prose.tsx` — the plugin's own mechanism for exactly this.
+
+The plugin is an **optional peer dependency**: `@plugin` resolves from the
+*consumer's* `node_modules` at their build time, so it cannot be bundled. Only
+`prose.css` consumers need it; `theme.css`-only consumers do not.
+
+Chrome nested inside an article (a breadcrumb above the title, a pager below the
+body) carries `not-prose`, which every selector the plugin generates excludes.
+That replaced ~70 declarations of hand-written reset — and it is the reason to
+prefer the plugin over `[&_h2]:…` arbitrary variants on the container, which
+would keep all of CSS's specificity gymnastics with worse ergonomics.
 
 There is deliberately **no hook-class exemption**. `AsciiDivider` used to keep a
 bare `.ascii-divider` class so the blog could attach `::after` to it — the last
@@ -111,9 +152,10 @@ belongs in a component.
 were deleted outright as they had no caller. What is left in that file is
 document-level and stays.
 
-`prose.css` is the remaining 455 declarations: roughly twelve docs-chrome
-components each with a 1:1 class, plus the `.docs-prose` bare-tag rules.
-Migrate one component per PR and lower its budget line.
+`prose.css` is down from 455 declarations to 328. The bare-tag prose rules and
+the chrome-inside-prose resets are gone. What remains is the docs chrome —
+roughly twelve components, each with a 1:1 class. Migrate one per PR with `tv`,
+and lower its budget line.
 
 ---
 
