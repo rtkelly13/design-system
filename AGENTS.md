@@ -63,9 +63,10 @@ Package manager is **pnpm** (`node >=22`).
 CSS files declare variables.** There is no third place for styling to live, and
 no `.component-name { … }` class to go looking in.
 
-Composition goes through **`tv` from `src/lib/tv.ts`** — never a template
-string. `src/components/Input.tsx` is the worked example: one slot per element,
-variants as data, and the consumer's `className` passed as tv's `class` override.
+Composition goes through **`recipe` from `src/lib/recipe.ts`** — never a
+template string. `src/components/Input.tsx` is the worked example: one slot per
+element, variants as data, and the consumer's `className` passed as the recipe's
+`class` override.
 
 That last part is a correctness fix, not a convenience. Appending a caller's
 `className` to the end of a string does nothing: Tailwind decides between two
@@ -75,10 +76,19 @@ whichever the stylesheet emitted later won. Every `className` prop in this
 package was unreliable in exactly that way. `tv` resolves the conflict before
 the string reaches the DOM.
 
-Use `tv` from `src/lib/tv.ts`, not the bare export from the package: the local
-one declares the hard-shadow scale. Everything else needs no configuration —
-`tailwind-merge` classifies the semantic tokens correctly out of the box,
-including telling a colour from a size in the same `text-*` position.
+**Which library builds the recipes is an implementation detail of that one
+file.** `tailwind-variants` currently does, chosen because most components here
+style more than one element and the alternatives model one element per recipe.
+Nothing else in the package names it, and `recipe` is deliberately **not**
+exported from the entrypoint: its type comes from that library, so exporting it
+would put the library back into the published `.d.ts` and make swapping it a
+breaking change. `cn` is public, with a signature written out locally for the
+same reason.
+
+Only the hard-shadow scale needs declaring to the class merger — `shadow-none`
+could not otherwise clear `shadow-hard-md`. Everything else works untouched: the
+merger classifies the semantic tokens correctly out of the box, including telling
+a colour from a size in the same `text-*` position.
 
 `pnpm check:css` enforces it, and it is a ratchet like `check:tokens`: it counts
 every declaration whose selector names a class this repo authors and fails when

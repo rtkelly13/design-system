@@ -9,7 +9,11 @@ export * from './theme/contrast';
 
 // Semantic theming — prefer these over the raw palette in `tokens`.
 export * from './lib/theme';
-export * from './lib/tv';
+// Only `cn` is public. `recipe`'s type comes from the library that implements
+// it, so exporting it would put that library back into the published .d.ts and
+// make replacing it a breaking change. Components import it directly.
+export { cn } from './lib/recipe';
+export type { ClassInput } from './lib/recipe';
 export * from './lib/slug';
 
 // Hooks

@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import { tv } from '../../lib/tv';
+import { recipe } from '../../lib/recipe';
 
 /**
  * Typography scope for compiled Markdown/MDX output.
@@ -27,7 +27,7 @@ import { tv } from '../../lib/tv';
  * that class and the whole reset block goes away.
  */
 
-const prose = tv({
+const prose = recipe({
   base: [
     'prose prose-ladder max-w-[var(--docs-content-max)]',
     // `prose.css` promises to work without Tailwind's preflight, so the

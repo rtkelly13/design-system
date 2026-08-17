@@ -5,7 +5,7 @@ import type {
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
-import { tv } from '../lib/tv';
+import { recipe } from '../lib/recipe';
 import { accentVar } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
 
@@ -17,7 +17,7 @@ import type { AccentToken } from '../lib/theme';
  *   1. **Every colour addresses a role.** `bg-surface-base`,
  *      `text-content-primary`, `border-edge-strong`, `text-intent-danger`. All
  *      four levels are styled by the same classes and a fifth would be too.
- *   2. **Styling is a `tv` recipe, not a template string.** The recipe has one
+ *   2. **Styling is a `recipe`, not a template string.** The recipe has one
  *      slot per element, so a consumer can reach any of them, and conflicts
  *      resolve — a caller's `bg-surface-raised` genuinely replaces the base's
  *      `bg-surface-base` rather than racing it in CSS source order.
@@ -26,7 +26,7 @@ import type { AccentToken } from '../lib/theme';
  *      assembled at build time from a value known only at runtime.
  */
 
-const field = tv({
+const field = recipe({
   slots: {
     root: 'flex w-full flex-col gap-1.5 font-mono',
     label: 'text-xs font-bold uppercase tracking-wider text-content-secondary',
@@ -147,8 +147,8 @@ export function Input({
       <input
         {...controlProps}
         style={accentStyle(accent)}
-        // `class` is tv's override slot: it merges into the recipe rather than
-        // being appended after it, so a caller's utility actually wins.
+        // `class` is the recipe's override slot: it merges in rather than being
+        // appended after, so a caller's utility actually wins.
         className={styles.control({ class: className })}
         {...props}
       />
