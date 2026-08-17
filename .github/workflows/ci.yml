@@ -63,6 +63,11 @@ jobs:
       - name: Build Storybook
         run: pnpm build-storybook
 
+      # Reads storybook-static/index.json, so it has to follow the build. Fails
+      # if a story lands without being asserted or explicitly excluded.
+      - name: Visual Coverage
+        run: pnpm check:visual-coverage
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 

@@ -20,6 +20,7 @@ Package manager is **pnpm** (`node >=22`).
    - Runs strictly on **Linux CI** to avoid OS font rendering diffs. Current tolerance is `maxDiffPixelRatio: 0.05` with `threshold: 0.2` (this file previously claimed `0.002`, which has never been the configured value). That tolerance was only ever exercised against a placeholder image — see the next bullet — so it is probably looser than it needs to be now that baselines are real components; tighten deliberately rather than by accident.
    - **Clean URLs must stay off in the static server.** `serve` enables them by default, which 301s `/iframe.html?id=<story>` to `/iframe` and **drops the query string**. Storybook then has no story to select and renders its "No Preview" placeholder — and because `--update-snapshots` will happily bake that placeholder in as the baseline, the whole suite silently passes while testing nothing. That is exactly what happened up to `0.0.5`: all five baselines were the same error page. Both Playwright configs therefore pass `--config ../serve.json`, which sets `cleanUrls: false`; see "`serve.json` is load-bearing" below. `tests/story-ready.ts` is the second line of defence, asserting on Storybook's `sb-show-main` / `sb-show-nopreview` / `sb-show-errordisplay` body classes so a non-render fails loudly rather than being screenshotted.
    - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow (dispatch it on your branch; it commits regenerated baselines back to that branch — this repo blocks Actions from creating PRs).
+   - **The update runs in `missing` mode by default**, writing only baselines that do not exist. That matters: a bare `--update-snapshots` presets to `changed`, so a run intended to add one new story would also re-record every baseline whose render had drifted — which is exactly how a regression becomes the expectation. Say **`/update-snapshots all`** (or `changed`) when a change is *meant* to alter rendering; the mode is echoed back in the PR comment so a reviewer can tell "two added" from "everything re-recorded".
    - Note that the snapshot workflow pushes as `github-actions[bot]`, and CI runs on bot-authored commits land in **`action_required`** — they need an "Approve and run" click before the PR shows a green check.
 6. **Required Checks**:
    - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
@@ -27,6 +28,7 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm check:tokens` (colour-instead-of-role ratchet)
    - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm check:deps` (dependency reasons, sections and usage)
+   - `pnpm check:visual-coverage` (every story asserted or excluded with a reason)
    - `pnpm typecheck`
    - `pnpm build`
    - `pnpm build-storybook`
@@ -35,6 +37,12 @@ Package manager is **pnpm** (`node >=22`).
    `test:visual` unable to assert it. Add the story first, comment
    **`/update-snapshots`** on the PR to generate baselines, then add the
    corresponding case to `tests/visual.spec.ts`.
+   This is no longer a convention you have to remember: `pnpm check:visual-coverage`
+   reads Storybook's own build index and fails when a story is neither asserted
+   nor listed in `EXCLUDED` with a reason. It is a ratchet — the 20 stories that
+   were already ungated are budgeted and burn down, but a *new* one cannot land
+   unasserted. It also catches the reverse: an `id` in the spec that Storybook
+   no longer builds, i.e. a test asserting nothing.
 8. **Re-baselining Happens In The PR**: any change that legitimately alters
    rendering turns the visual check red. Comment **`/update-snapshots`** on the
    PR — it regenerates on Linux, verifies the suite passes against the new
@@ -74,8 +82,8 @@ That last part is a correctness fix, not a convenience. Appending a caller's
 conflicting utilities by **CSS source order**, not class-attribute order, so a
 caller's `bg-surface-raised` was racing the component's `bg-surface-base` and
 whichever the stylesheet emitted later won. Every `className` prop in this
-package was unreliable in exactly that way. `tv` resolves the conflict before
-the string reaches the DOM.
+package was unreliable in exactly that way. `recipe` resolves the conflict
+before the string reaches the DOM.
 
 **Which library builds the recipes is an implementation detail of that one
 file.** `tailwind-variants` currently does, chosen because most components here
@@ -159,14 +167,14 @@ belongs in a component.
 ### What is migrated
 
 `styles.css` is done — its four component classes are utilities in `Badge`,
-`AsciiDivider` and `ExperimentsView`, and `.brutalist-btn` / `.brutalist-btn-pink`
+`Divider` and `ExperimentsView`, and `.brutalist-btn` / `.brutalist-btn-pink`
 were deleted outright as they had no caller. What is left in that file is
 document-level and stays.
 
 `prose.css` is down from 455 declarations to 328. The bare-tag prose rules and
 the chrome-inside-prose resets are gone. What remains is the docs chrome —
-roughly twelve components, each with a 1:1 class. Migrate one per PR with `tv`,
-and lower its budget line.
+roughly twelve components, each with a 1:1 class. Migrate one per PR with
+`recipe`, and lower its budget line.
 
 ---
 
@@ -251,7 +259,10 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
 - `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
-- `pnpm test:visual:update`: Updates Playwright visual snapshots.
+- `pnpm check:visual-coverage`: Fails if a story is neither asserted nor excluded. Runs in CI.
+- `pnpm check:visual-coverage:list`: Same, naming every unasserted story.
+- `pnpm test:visual:missing`: Writes only baselines that do not yet exist.
+- `pnpm test:visual:update`: Re-records **all** baselines. Deliberate act — prefer `:missing`.
 - `pnpm walkthrough`: Screenshots every story on every level into `walkthrough-report/`.
 - `pnpm walkthrough:show`: Opens that report locally.
 - `pnpm typecheck`: Validates TypeScript strict mode.
@@ -417,7 +428,9 @@ Its real value is cross-level: a token change that reads fine on `midnight` can
 be unusable on `white`, and a pixel diff against a single-level baseline will
 never surface that. The gated suite still only asserts one level — promoting
 `Foundations/Theme Ladder → AllLevels` into `tests/visual.spec.ts` is the next
-step there, and per rule 7 it needs `/update-snapshots` run first.
+step there, and per rule 7 it needs `/update-snapshots` run first. It is one of
+the 20 stories `pnpm check:visual-coverage` currently reports, so the gap is
+visible rather than remembered.
 
 Two structural choices worth keeping:
 

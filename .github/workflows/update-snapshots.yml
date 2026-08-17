@@ -19,6 +19,20 @@ on:
         description: 'PR to report results back to (set by /update-snapshots)'
         required: false
         default: ''
+      mode:
+        description: >-
+          Which baselines to write. "missing" (the default) only creates ones
+          that do not exist, so a run that adds a story cannot silently
+          re-record an existing baseline that has drifted — which is how a
+          regression gets baked in. Choose "changed" or "all" deliberately, when
+          a change is *meant* to alter rendering.
+        required: false
+        default: 'missing'
+        type: choice
+        options:
+          - missing
+          - changed
+          - all
 
 jobs:
   update-snapshots:
@@ -52,7 +66,9 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Generate Visual Snapshots
-        run: pnpm test:visual:update
+        env:
+          MODE: ${{ inputs.mode }}
+        run: npx playwright test tests/visual.spec.ts --update-snapshots="${MODE:-missing}"
 
       - name: Summarise what changed
         id: changes
@@ -104,6 +120,7 @@ jobs:
           MODIFIED: ${{ steps.changes.outputs.modified }}
           FILES: ${{ steps.changes.outputs.files }}
           PR_NUMBER: ${{ inputs.pr-number }}
+          MODE: ${{ inputs.mode }}
         with:
           script: |
             const { COMMITTED, ADDED, MODIFIED, FILES, PR_NUMBER } = process.env;
@@ -112,6 +129,8 @@ jobs:
             const body = COMMITTED === 'true'
               ? [
                   '### 📸 Baselines updated',
+                  '',
+                  `Mode: \`${process.env.MODE}\`.`,
                   '',
                   `**${ADDED}** added, **${MODIFIED}** modified. The suite was re-run against`,
                   'the new baselines and passed, so they are self-consistent.',

@@ -31,6 +31,8 @@
     "check:tokens:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs --list",
     "check:css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs",
     "check:css:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs --list",
+    "check:visual-coverage": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-visual-coverage.mjs",
+    "check:visual-coverage:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-visual-coverage.mjs --list",
     "check:deps": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deps.mjs && knip --no-progress --include dependencies,unlisted,unresolved",
     "deps:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deps.mjs --list",
     "knip": "knip --no-progress",
@@ -39,7 +41,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
     "test:visual": "playwright test tests/visual.spec.ts",
-    "test:visual:update": "playwright test tests/visual.spec.ts --update-snapshots",
+    "test:visual:missing": "playwright test tests/visual.spec.ts --update-snapshots=missing",
+    "test:visual:update": "playwright test tests/visual.spec.ts --update-snapshots=all",
     "prepublishOnly": "pnpm tokens:build && pnpm build",
     "walkthrough": "playwright test --config=playwright.walkthrough.config.ts",
     "walkthrough:show": "playwright show-report walkthrough-report"
