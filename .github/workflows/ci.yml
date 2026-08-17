@@ -48,6 +48,12 @@ jobs:
       - name: CSS Surface
         run: pnpm check:css
 
+      # knip finds unused/unlisted packages; check-deps.mjs requires each one to
+      # have a stated reason, sit in the matching section, and — for CSS — be
+      # reachable through the exports map.
+      - name: Dependencies
+        run: pnpm check:deps
+
       - name: Type Check
         run: pnpm typecheck
 

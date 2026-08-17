@@ -26,6 +26,7 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm check:contrast` (every role pair, every level)
    - `pnpm check:tokens` (colour-instead-of-role ratchet)
    - `pnpm check:css` (styling-in-CSS ratchet)
+   - `pnpm check:deps` (dependency reasons, sections and usage)
    - `pnpm typecheck`
    - `pnpm build`
    - `pnpm build-storybook`
@@ -243,6 +244,9 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm check:tokens:list`: Same, broken down by file.
 - `pnpm check:css`: Ratchet on styling that lives in a stylesheet. Runs in CI.
 - `pnpm check:css:list`: Same, showing the offending selectors.
+- `pnpm check:deps`: Dependency reasons, sections and usage. Runs in CI.
+- `pnpm deps:list`: Prints the dependency table with each package's reason.
+- `pnpm knip`: Full hygiene sweep — also unused files and exports. Not gated.
 - `pnpm build`: Regenerates tokens, then bundles ESM, CJS, DTS types, and CSS via `tsup`.
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
@@ -251,6 +255,50 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm walkthrough`: Screenshots every story on every level into `walkthrough-report/`.
 - `pnpm walkthrough:show`: Opens that report locally.
 - `pnpm typecheck`: Validates TypeScript strict mode.
+
+---
+
+## 📦 Dependencies
+
+Dependencies are fine. **Undocumented ones are not.** Every entry in
+`package.json` must have a reason recorded in `MANIFEST` in
+`scripts/check-deps.mjs`, and `pnpm deps:list` prints the table.
+
+`pnpm check:deps` runs two things, because no single tool covers this:
+
+- **`knip`** answers *is it used* — unused packages, unlisted imports,
+  unresolved specifiers. It is the standard tool for that and worth more than
+  anything hand-rolled.
+- **`scripts/check-deps.mjs`** answers *is it justified, and in the right
+  place*: a package with no `MANIFEST` entry fails, a `MANIFEST` entry with no
+  package fails, and the declared section must match the reason's `kind`.
+
+Three things it catches that knip structurally cannot:
+
+1. **Shipped source importing a devDependency.** That publishes a package which
+   breaks on install. `src/stories/**` is excluded from "shipped", since those
+   files sit under `src/` but are unreachable from `src/index.ts` — which is why
+   Storybook is legitimately a devDependency.
+2. **The CSS contract.** `styles.css` does `@import "tailwindcss"` and
+   `prose.css` does `@plugin "@tailwindcss/typography"`. Both resolve from the
+   *consumer's* `node_modules` at their build time, so both are real
+   dependencies — but knip does not parse at-rules and reported the typography
+   plugin as unused. It is in `ignoreDependencies` for that reason, and this
+   check covers it instead. Adding a package to `ignoreDependencies` without a
+   corresponding CSS reference is how that exemption gets abused.
+3. **Shipped CSS missing from the `exports` map.** `prose.css` was built into
+   `dist/`, its own header told consumers to import it, and the map never
+   declared it — so following the documentation produced a resolution error. The
+   check found that on its first run.
+
+### Known and not yet gated
+
+`pnpm knip` (the full sweep) reports **28 duplicate exports**: every component
+has both a named and a `default` export. `src/index.ts` uses `export *`, which
+does not forward defaults, and the `exports` map has no deep paths — so all 28
+defaults are unreachable from any consumer. Dead API surface, safe to delete,
+not yet done. The gated run is scoped to dependency issues so this does not
+block CI while it stands.
 
 ---
 
