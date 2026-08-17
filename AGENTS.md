@@ -78,10 +78,13 @@ on — not because it was inconvenient to move.
 | Selectors of only element names, `:root`, `html`, `body`, `*`, pseudo-classes | No JSX element for the document; a consumer's own `<h1>` has no class we can add | `styles.css` |
 | Class names emitted by third-party tooling | We never render `.markdown-alert` — a remark plugin does | `prose.css`, listed in `THIRD_PARTY` |
 
-A pseudo-element (`::before`, `::after`) is the one genuine gap in the rule.
-`AsciiDivider` keeps its bare `.ascii-divider` class as a **styling-free hook**
-for exactly that reason: the blog draws a pencil rule off it. A hook class
-carries no declarations here, so it costs nothing against the ratchet.
+There is deliberately **no hook-class exemption**. `AsciiDivider` used to keep a
+bare `.ascii-divider` class so the blog could attach `::after` to it — the last
+hole in the rule. `Divider` closes it: the mark differs by *polarity*, so that
+is now a `Record<Polarity, string>` in the component and the glyph is real text
+rather than generated content. When a pseudo-element seems necessary, the
+question to ask first is what design decision it is encoding, and whether that
+belongs in a component.
 
 ### Consequences worth knowing before you rely on them
 

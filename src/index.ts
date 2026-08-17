@@ -25,6 +25,7 @@ export * from './components/PageHeader';
 export * from './components/Tag';
 export * from './components/Pagination';
 export * from './components/SectionContainer';
+export * from './components/Divider';
 export * from './components/AsciiDivider';
 export * from './components/ThemeProvider';
 export * from './components/BracketText';

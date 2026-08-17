@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Input } from '../components/Input';
+import { Divider } from '../components/Divider';
 import { LEVELS, THEME_LEVELS } from '../theme/levels';
 import type { ThemeLevel } from '../theme/levels';
 import { auditContrast } from '../theme/contrast';
@@ -57,6 +58,10 @@ function LevelPanel({ level }: { level: ThemeLevel }) {
       </div>
 
       <Card title="Raised surface" description="Elevation, border and shadow all follow the level." />
+
+      {/* The mark itself changes with polarity — terminal rule on the dark
+          levels, hand-ruled pencil dash on the light ones. */}
+      <Divider />
 
       <Input label="Field" placeholder="Type here" helperText="Helper text uses the muted tone" />
 

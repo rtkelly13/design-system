@@ -183,4 +183,15 @@ export const useTheme = (): ThemeContextValue => {
   return context;
 };
 
+/**
+ * The level, if there is a provider, without throwing when there is not.
+ *
+ * For components that *adapt* to the level rather than requiring it — a divider
+ * whose glyph differs by polarity, say. Those must still render standalone: in
+ * a Storybook story with no decorator, an MDX preview, or a consumer that
+ * themes with the attribute alone and never mounts a provider.
+ */
+export const useOptionalTheme = (): ThemeContextValue | undefined =>
+  useContext(ThemeContext);
+
 export default ThemeProvider;
