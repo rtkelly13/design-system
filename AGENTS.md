@@ -52,6 +52,10 @@ Package manager is **pnpm** (`node >=22`).
    not start workflow runs from those pushes, so the PR's own visual check keeps
    its previous result until you re-run it or push again. The verification step
    inside the update run is what tells you the new baselines are good.
+   Closing that last gap needs a push identity that is not `GITHUB_TOKEN` —
+   designed, with the exact token to create, in
+   [`docs/ci-dispatch-token.md`](./docs/ci-dispatch-token.md). Not implemented;
+   nothing reads `CI_DISPATCH_TOKEN` yet.
 
 ---
 
