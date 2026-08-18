@@ -45,15 +45,15 @@ export function PageHeader({
   const accentText = ACCENT_TEXT[accent] ?? ACCENT_TEXT.primary;
 
   return (
-    <header className={`bg-zinc-900 px-6 pt-8 pb-10 ${className}`}>
+    <header className={`bg-surface-raised px-6 pt-8 pb-10 ${className}`}>
       <div className="mb-4 flex items-center gap-4">
         {Icon && <Icon className={`h-10 w-10 ${accentText}`} />}
-        <h1 className="font-display text-4xl font-bold uppercase text-white md:text-6xl">
+        <h1 className="font-display text-4xl font-bold uppercase text-content-primary md:text-6xl">
           [ {title} ]
         </h1>
       </div>
       {subtitle && (
-        <p className="mt-4 font-mono text-lg text-zinc-400">
+        <p className="mt-4 font-mono text-lg text-content-muted">
           <span className={accentText}>&gt;</span> {subtitle}
         </p>
       )}
