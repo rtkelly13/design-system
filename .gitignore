@@ -21,3 +21,6 @@ test-results/
 # Screenshot walkthrough artifacts
 walkthrough-report/
 walkthrough-results/
+
+# Vitest coverage output
+coverage/

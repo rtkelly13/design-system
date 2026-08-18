@@ -30,6 +30,7 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm check:deps` (dependency reasons, sections and usage)
    - `pnpm check:visual-coverage` (every story asserted or excluded with a reason)
    - `pnpm typecheck`
+   - `pnpm test` (unit — see "Unit Tests" below)
    - `pnpm build`
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)
@@ -270,6 +271,39 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm walkthrough`: Screenshots every story on every level into `walkthrough-report/`.
 - `pnpm walkthrough:show`: Opens that report locally.
 - `pnpm typecheck`: Validates TypeScript strict mode.
+- `pnpm test`: Runs the Vitest unit suite (jsdom).
+- `pnpm test:watch`: Same suite in watch mode.
+- `pnpm test:coverage`: Unit suite with a V8 coverage report over `src/lib` and `src/hooks`.
+
+---
+
+## 🧪 Unit Tests
+
+Vitest, jsdom environment, tests co-located with the code as `src/**/*.test.ts(x)`.
+
+**The extension is load-bearing.** Playwright's `testDir: './tests'` matches
+`*.spec.ts`, so the two runners are kept apart by naming alone:
+
+| Path | Extension | Runner |
+| --- | --- | --- |
+| `src/**` | `.test.ts` / `.test.tsx` | Vitest |
+| `tests/**` | `.spec.ts` | Playwright |
+
+A unit test named `.spec.ts` under `tests/` gets collected by Playwright and fails
+without a browser. Keep new unit tests in `src/`, beside what they cover.
+
+Tests are invisible to the published package — `tsup` bundles from `src/index.ts`
+only, and `files` ships `dist/` — so co-locating them costs consumers nothing.
+
+**What belongs here vs. in visual regression.** Unit tests cover logic that has a
+right answer independent of pixels: token resolution, slug generation, hook state
+machines. Anything whose correctness *is* its appearance stays in `test:visual` —
+asserting on class strings is a worse version of a screenshot and breaks on every
+harmless refactor.
+
+The current suite covers `src/lib/` and `src/hooks/`. `src/components/` is not yet
+unit-tested; when it is, prefer asserting behaviour (does the disabled button fire
+its handler?) over markup.
 
 ---
 

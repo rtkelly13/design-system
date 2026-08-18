@@ -10,7 +10,7 @@ on:
 
 jobs:
   verify:
-    name: Build, Typecheck, Storybook & Visual Regression
+    name: Build, Typecheck, Unit Tests, Storybook & Visual Regression
     runs-on: ubuntu-latest
 
     steps:
@@ -56,6 +56,9 @@ jobs:
 
       - name: Type Check
         run: pnpm typecheck
+
+      - name: Unit Tests
+        run: pnpm test
 
       - name: Build Package
         run: pnpm build
