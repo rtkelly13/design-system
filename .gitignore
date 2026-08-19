@@ -24,3 +24,9 @@ walkthrough-results/
 
 # Vitest coverage output
 coverage/
+
+# Dev-only bundle written by `pnpm report` (scripts/report.mjs).
+src/report/.dev-cli.mjs
+
+# Written by a `renderReport` default-path test; removed again on success.
+src/report/__fixtures__/*.html

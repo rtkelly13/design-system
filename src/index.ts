@@ -59,3 +59,8 @@ export * from './components/admin/AdminDashboardLayout';
 
 // Documentation Portal Chrome & MDX Rendering
 export * from './components/docs';
+
+// Report Frame — the page layout the TSX-to-HTML generator renders into.
+// The generator itself is `@rtkelly13/design-system/report`, a separate entry:
+// it imports esbuild and tailwindcss, which no browser consumer should carry.
+export * from './report/ReportDocument';

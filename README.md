@@ -198,6 +198,62 @@ misconfigured `@source` would half-break a sidebar rather than fail loudly.
 
 ---
 
+## 📄 HTML Reports From TSX
+
+An agent — or anyone — that needs to emit an HTML report writes a component, not
+markup. `ds-report` renders it to **one self-contained `.html` file**: markup and
+every byte of CSS it needs, inlined, no build step and nothing to serve.
+
+```bash
+pnpm add -D @rtkelly13/design-system esbuild tailwindcss
+npx ds-report audit.tsx --theme white     # → audit.html
+```
+
+```tsx
+// audit.tsx — the whole contract is a default export
+import { ReportDocument, ReportSection, StatCard, NoteBlock } from '@rtkelly13/design-system';
+
+export default function Report() {
+  return (
+    <ReportDocument
+      title="Dependency Audit"
+      subtitle="Three packages are held back; one is now unblocked."
+      meta={[{ label: 'Generated', value: '2026-08-19' }]}
+    >
+      <ReportSection title="Summary">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StatCard title="Packages" value={42} />
+          <StatCard title="Outdated" value={3} accent="warning" />
+          <StatCard title="Vulnerable" value={0} accent="success" />
+        </div>
+        <NoteBlock>Bump `tsup` once its dts worker stops injecting `baseUrl`.</NoteBlock>
+      </ReportSection>
+    </ReportDocument>
+  );
+}
+```
+
+**The CSS is minimal because the markup comes first.** Tailwind normally scans
+source text and has to over-approximate. This pipeline renders, reads the class
+attributes out of the finished HTML, and compiles exactly those — so the stylesheet
+is both minimal and complete, with no safelist and no scanner. A typical report is
+~50kB all-in.
+
+| Flag | |
+|---|---|
+| `-o, --output <file>` | Default: the input with an `.html` extension. |
+| `-t, --theme <rung>` | `midnight` · `dim` · `bright` · `white`. Default `white` — print-safe. |
+| `--title <text>` | Document `<title>`. Default: the input's filename. |
+| `--offline` | Drop the webfont import. Type falls back to the system stacks. |
+
+`dist/report/template.tsx` is a fuller worked example, and
+`@rtkelly13/design-system/report` exports `renderReport()` for calling the same
+pipeline from code. The output is **static** — no client JS, so `useState` and
+`Modal` render inert. `esbuild` and `tailwindcss` are optional peers, needed only
+by the generator.
+
+---
+
 ## 🛠 Repository & Publishing
 
 - **Repository**: `https://github.com/rtkelly13/design-system`

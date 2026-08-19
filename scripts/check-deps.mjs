@@ -61,7 +61,7 @@ const MANIFEST = {
   'react-dom': {
     kind: 'peer',
     alsoDev: true,
-    why: 'Not imported by this package anywhere — declared because a consumer rendering these components needs it, and the Storybook react renderer does. Conventional rather than required by our own code, which is the honest reason to keep it.',
+    why: 'A consumer rendering these components needs it, the Storybook react renderer does, and `react-dom/server` is what src/report/markup.ts renders a report to markup with. That last one is a real use rather than a conventional declaration, which it was until the report generator landed.',
   },
   '@tailwindcss/typography': {
     kind: 'peer',
@@ -71,7 +71,12 @@ const MANIFEST = {
   tailwindcss: {
     kind: 'peer',
     alsoDev: true,
-    why: 'styles.css does `@import "tailwindcss"`, and theme.css is a v4 `@theme` contract, so a consumer must be building with Tailwind v4. Declared so that requirement is stated rather than assumed. Also dev, for Storybook.',
+    why: 'styles.css does `@import "tailwindcss"`, and theme.css is a v4 `@theme` contract, so a consumer must be building with Tailwind v4. Declared so that requirement is stated rather than assumed. Also dev, for Storybook — and imported directly by src/report/css.ts, which drives its compiler over a known candidate set.',
+  },
+  esbuild: {
+    kind: 'peer',
+    alsoDev: true,
+    why: 'Transpiles and bundles the report TSX in src/report/markup.ts. Peer and optional rather than runtime: it is a ~10MB toolchain that only `ds-report` needs, and making it a dependency would put it in every browser app that installs this package for the components. The CLI turns its absence into an install instruction.',
   },
 
   '@playwright/test': { kind: 'dev', why: 'Visual regression suite and the screenshot walkthrough.' },
@@ -152,11 +157,22 @@ function walk(dir, test) {
  * so a stray `export` from a `.test.ts` could not pull the runner into `dist`
  * without also appearing in the published types — which rule 5 below would
  * catch.
+ *
+ * Test fixtures under `__fixtures__/` are excluded on the same grounds: reached
+ * only from a test, never from the entrypoint.
+ *
+ * This package's *own* name is ignored wherever it appears. A report imports
+ * `@rtkelly13/design-system` by name — that is what an agent writes, and both
+ * `src/report/template.tsx` and the render fixture are deliberately identical to
+ * a real report rather than versions with the import rewritten. A self-import is
+ * never a dependency; `tsconfig` maps it to `src/index.ts` and the renderer
+ * aliases it to whichever copy of this package owns the renderer.
  */
 function shippedImports() {
   const files = walk(path.join(ROOT, 'src'), (f) => /\.tsx?$/.test(f)).filter(
     (f) =>
       !f.includes(`${path.sep}stories${path.sep}`) &&
+      !f.includes(`${path.sep}__fixtures__${path.sep}`) &&
       !/\.test\.tsx?$/.test(f) &&
       !/test-setup\.tsx?$/.test(f),
   );
@@ -165,7 +181,7 @@ function shippedImports() {
     const source = readFileSync(file, 'utf8');
     for (const match of source.matchAll(/from\s+'([^']+)'|require\(\s*'([^']+)'/g)) {
       const name = packageOf(match[1] ?? match[2]);
-      if (name) found.add(name);
+      if (name && name !== pkg.name) found.add(name);
     }
   }
   return found;

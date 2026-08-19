@@ -96,6 +96,12 @@ const CASES: readonly VisualCase[] = [
   // gap its own § *Screenshot Walkthrough* calls out.
   { id: 'foundations-theme-ladder--all-levels', snapshot: 'theme-ladder-all-levels.png', fullPage: true },
 
+  // The report frame. Asserting it is how the TSX-to-HTML generator's output
+  // gets reviewed at all: the shipped path writes a static file nobody watches,
+  // so this story is the only place a change to the report layout becomes visible
+  // before it lands in every generated report. Full page, because a report is one.
+  { id: 'foundations-reportdocument--quality-gate', snapshot: 'reportdocument-quality-gate.png', fullPage: true },
+
   // The two page-level shells. Their baselines will churn when the remaining
   // token migration reaches them, which is the intended behaviour and not a
   // reason to leave them unasserted — `dim` because it is the rung these

@@ -12,9 +12,17 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
+    "./report": {
+      "types": "./dist/report/index.d.ts",
+      "import": "./dist/report/index.mjs",
+      "require": "./dist/report/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./theme.css": "./dist/theme.css",
     "./prose.css": "./dist/prose.css"
+  },
+  "bin": {
+    "ds-report": "./dist/report/cli.js"
   },
   "files": [
     "dist",
@@ -37,6 +45,7 @@
     "deps:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deps.mjs --list",
     "knip": "knip --no-progress",
     "dev": "tsup --watch",
+    "report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/report.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -69,12 +78,14 @@
     "deck",
     "experiments",
     "theme-ladder",
-    "design-tokens"
+    "design-tokens",
+    "html-report"
   ],
   "author": "Ryan Kelly",
   "license": "MIT",
   "peerDependencies": {
     "@tailwindcss/typography": "^0.5.16",
+    "esbuild": "^0.25.0 || ^0.26.0 || ^0.27.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
     "tailwindcss": "^4.0.0"
@@ -95,6 +106,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitest/coverage-v8": "^4.1.10",
+    "esbuild": "^0.27.7",
     "jsdom": "^30.0.1",
     "knip": "^6.32.2",
     "react": "^19.2.8",
@@ -108,6 +120,9 @@
   },
   "peerDependenciesMeta": {
     "@tailwindcss/typography": {
+      "optional": true
+    },
+    "esbuild": {
       "optional": true
     },
     "tailwindcss": {

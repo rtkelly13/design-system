@@ -15,8 +15,19 @@
     // once tsup ships a rollup-plugin-dts that no longer sets it (also what
     // currently blocks TS 7 here).
     "ignoreDeprecations": "6.0",
+    // Named explicitly, with an explicit root, because tsup's dts worker injects
+    // its own `baseUrl` and then cannot resolve `@types/node` — every `node:`
+    // import in `src/report/` fails there while `tsc --noEmit` is happy. Remove
+    // both lines if that tsup issue is ever fixed.
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      // Reports import this package by name — that is what an agent writes, and
+      // what `src/report/markup.ts` aliases at bundle time. Mapping it here lets
+      // the in-repo template and test fixture be byte-identical to a real report
+      // rather than a version with the imports rewritten.
+      "@rtkelly13/design-system": ["./src/index.ts"]
     }
   },
   "include": ["src/**/*"]

@@ -82,6 +82,7 @@ Package manager is **pnpm** (`node >=22`).
 - **Bracketed Display Typography**: Headings render in Space Grotesk enclosed in `[ BRACKETED ]` display type.
 - **Semantic Roles Over Hues**: Components address roles, never colours. See below.
 - **Styling Lives in TSX**: Tailwind utilities on the element. CSS files declare variables and nothing else. See below.
+- **Reports Are Rendered, Not Written**: an HTML report is a `.tsx` file put through `ds-report`, never hand-written markup. See below.
 
 ---
 
@@ -292,6 +293,7 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm check:deps`: Dependency reasons, sections and usage. Runs in CI.
 - `pnpm deps:list`: Prints the dependency table with each package's reason.
 - `pnpm knip`: Full hygiene sweep — also unused files and exports. Not gated.
+- `pnpm report <file.tsx>`: Renders a TSX report to one self-contained HTML file. See below.
 - `pnpm build`: Regenerates tokens, then bundles ESM, CJS, DTS types, and CSS via `tsup`.
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
@@ -306,6 +308,80 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm test`: Runs the Vitest unit suite (jsdom).
 - `pnpm test:watch`: Same suite in watch mode.
 - `pnpm test:coverage`: Unit suite with a V8 coverage report over `src/lib` and `src/hooks`.
+
+---
+
+## 📄 Reports Are TSX, Not Hand-Written HTML
+
+**An agent that needs to emit an HTML report renders a `.tsx` file through
+`ds-report`. It does not write HTML.**
+
+```bash
+ds-report audit.tsx --theme white          # → audit.html, self-contained
+pnpm report src/report/template.tsx        # the same thing from a checkout
+```
+
+`src/report/template.tsx` is the starting point — copy it, replace the data. It
+ships to `dist/report/template.tsx` so it is readable from an install.
+`ReportDocument` and `ReportSection` are the frame; everything inside is ordinary
+composition with `Card`, `StatCard`, `DataTable`, `NoteBlock` and `Prose`.
+
+The reason this exists is not convenience. A hand-written `<div style="…">` report
+is a fresh design decision every time, and it inherits nothing: not the four rungs
+of the ladder, not roles whose contrast `pnpm check:contrast` has audited, not a
+layout the visual suite has pinned. A report built from these components inherits
+all of it and costs the agent less code than the HTML would.
+
+### One pass, and why that is possible
+
+```
+TSX ──esbuild──▶ markup ──class attributes──▶ candidates ──tailwind──▶ CSS ──▶ one .html
+```
+
+Tailwind normally has to *guess* which utilities a build needs, by scanning source
+text before anything renders. That is why the generated `theme.css` carries
+`@source "./"`, and why `text-${role}` assembled at runtime generates no CSS at
+all — the constraint that `src/lib/accentClasses.ts` exists to work around.
+
+**Rendering first removes the guess.** By the time the generator asks, the document
+is finished markup, so the class attributes in it are exactly and only the
+utilities it uses. `src/report/candidates.ts` reads them out; `src/report/css.ts`
+hands that list to Tailwind's own compiler and ignores the `sources` it offers
+back. The emitted CSS is therefore minimal *and* complete by construction — no
+safelist, no scanner, and no arbitrary-value edge case. A `text-[0.8125rem]` a
+scanner might miss is plainly there in the output.
+
+`src/report/render.test.ts` asserts the negative half of that, which is the half
+that matters: CSS for a utility the document does not use must be **absent**. A
+test that only checked the used utilities were present would pass just as happily
+against a generator that emitted all of Tailwind.
+
+### What the pipeline will and will not do
+
+| | |
+|---|---|
+| Theme | `--theme <rung>`, default `white` — reports get read in bright rooms and printed. Every rung's tokens ship regardless, so a nested `<ThemeProvider scoped>` panel still resolves. |
+| Fonts | The webfont `@import` survives, hoisted to the top of the inlined CSS. `--offline` strips it; the `--ds-font-*` tokens all declare fallback stacks, so the type degrades to system sans and mono rather than vanishing. |
+| Interactivity | **None.** The output is static HTML with no client JS, so an `onClick`, a `useState` or a `Modal` renders inert. Say it in a report's prose rather than hiding it behind a control. |
+| Async | `renderToStaticMarkup` is synchronous. Do the fetching before the render and pass the data in as props. |
+| Resolution | Imports resolve from the report file's own directory, so a report can import the author's modules — but it has to sit inside a project where `react` resolves. |
+| Version skew | `@rtkelly13/design-system` is aliased to the copy of the package that owns the renderer, so the markup and the CSS can never come from two versions. |
+
+### Where it lives, and the two optional peers
+
+`src/report/` is a **separate entry point** (`@rtkelly13/design-system/report`)
+plus a `bin`. That split is deliberate: it imports `esbuild` and `tailwindcss`,
+which are Node-only, so folding it into the main entry would put a ~10MB build
+toolchain into every browser app that installs this package for the components.
+
+Both are **optional peer dependencies**, the same shape `@tailwindcss/typography`
+already has. The trade is only defensible because the CLI turns a missing one into
+an install instruction rather than a stack trace — see `explain()` in
+`src/report/cli.ts`, and keep that true.
+
+`ReportDocument` is the exception and ships from the **main** entry: it is an
+ordinary component with no Node imports, so a report imports it by name like
+anything else.
 
 ---
 
@@ -326,6 +402,12 @@ without a browser. Keep new unit tests in `src/`, beside what they cover.
 
 Tests are invisible to the published package — `tsup` bundles from `src/index.ts`
 only, and `files` ships `dist/` — so co-locating them costs consumers nothing.
+
+`src/report/render.test.ts` is the one file that overrides the environment, with
+`// @vitest-environment node`: it drives esbuild and `react-dom/server`, neither
+of which wants jsdom. Its fixtures live in `src/report/__fixtures__/` and are
+excluded from `check:deps`' notion of shipped source, on the same grounds as
+stories — reached only from a test, never from the entrypoint.
 
 **What belongs here vs. in visual regression.** Unit tests cover logic that has a
 right answer independent of pixels: token resolution, slug generation, hook state
