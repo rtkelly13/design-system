@@ -81,6 +81,10 @@ const MANIFEST = {
   '@tailwindcss/vite': { kind: 'dev', why: 'Compiles Tailwind inside the Storybook build.' },
   '@types/react': { kind: 'dev', why: 'Types for the react peer.' },
   '@types/react-dom': { kind: 'dev', why: 'Types for the react-dom peer.' },
+  '@types/node': {
+    kind: 'dev',
+    why: 'Types for `node:fs`/`node:path` in the unit suite, which reads the generated theme.css from disk to assert its shape.',
+  },
   knip: {
     kind: 'dev',
     why: 'Detects unused and unlisted dependencies, files and exports. The usage half of this check; the reason half is this script.',

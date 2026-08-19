@@ -201,6 +201,15 @@ Four rules follow from that, and they are what keep four levels maintainable:
 1. **`theme.css` is generated — never edit it.** Change `levels.ts`, run `pnpm tokens:build`,
    commit both. `pnpm tokens:check` fails CI on drift. TypeScript covers the TS half of the
    ladder; this covers the CSS half, which is where the drift used to live.
+   `src/theme.css.test.ts` covers a third thing neither reaches: the *shape* the
+   generator has to emit. Every `@theme` token that indirects through a
+   per-level variable is repeated inside all four level blocks, because a custom
+   property substitutes where it is **declared**, not where it is used — so an
+   alias left only in `@theme` resolves against the root level and a nested
+   `<ThemeProvider scoped>` panel keeps the wrong colour. `tokens:check` would
+   not notice: it proves the CSS matches `levels.ts`, and would be equally happy
+   with a generator that reproducibly emitted the wrong shape. Neither would a
+   screenshot, since single-level pages render correctly either way.
 2. **Never branch on a level with an if-chain.** Use a `Record<ThemeLevel, T>` — adding a rung
    is then a compile error until every branch answers it — or end a `switch` with
    `assertNever(level)`. Map over `THEME_LEVELS`; never re-list the names.
