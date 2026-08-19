@@ -89,6 +89,16 @@ const MANIFEST = {
   tsup: { kind: 'dev', why: 'Bundles ESM, CJS and types. Read the TypeScript 7 note in AGENTS.md before changing it.' },
   typescript: { kind: 'dev', why: 'Type checking and declaration output. Pinned — see AGENTS.md.' },
   vite: { kind: 'dev', why: 'Underlies the Storybook builder.' },
+  vitest: {
+    kind: 'dev',
+    why: 'Unit suite over lib, hooks and the generated theme. Complements the Playwright suites, which assert rendering rather than logic.',
+  },
+  '@vitest/coverage-v8': { kind: 'dev', why: 'Coverage reporting for `pnpm test:coverage`.' },
+  '@testing-library/react': {
+    kind: 'dev',
+    why: 'Renders hooks and components in the unit suite, asserting behaviour through the DOM rather than internals.',
+  },
+  jsdom: { kind: 'dev', why: 'DOM environment for the unit suite; the hooks under test read `document` and `navigator`.' },
 };
 
 const SECTION = {
@@ -126,10 +136,25 @@ function walk(dir, test) {
  * `src/stories/**` is excluded: those files sit under `src/` but are not
  * reachable from `src/index.ts`, so nothing they import reaches the bundle.
  * That is why Storybook can be a devDependency while living inside `src/`.
+ *
+ * Unit tests are excluded for exactly the same reason. Co-locating
+ * `slug.test.ts` next to `slug.ts` is what makes the pairing obvious, but it
+ * puts a `vitest` import under `src/` — and without this the check would read
+ * that as the bundle depending on the test runner and demand it be promoted to
+ * a runtime dependency, which is the opposite of correct.
+ *
+ * The exclusion is safe only because it is *also* true that nothing reachable
+ * from the entrypoint imports a test file. `tsup` bundles from `src/index.ts`,
+ * so a stray `export` from a `.test.ts` could not pull the runner into `dist`
+ * without also appearing in the published types — which rule 5 below would
+ * catch.
  */
 function shippedImports() {
   const files = walk(path.join(ROOT, 'src'), (f) => /\.tsx?$/.test(f)).filter(
-    (f) => !f.includes(`${path.sep}stories${path.sep}`),
+    (f) =>
+      !f.includes(`${path.sep}stories${path.sep}`) &&
+      !/\.test\.tsx?$/.test(f) &&
+      !/test-setup\.tsx?$/.test(f),
   );
   const found = new Set();
   for (const file of files) {
