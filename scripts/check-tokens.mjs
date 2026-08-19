@@ -67,16 +67,16 @@ const RULES = [
 ];
 
 /**
- * Counts at the commit that introduced the ladder, less what the Input
- * migration cleared. Every remaining one is pre-existing debt in components
+ * Counts at the commit that introduced the ladder, less what the Input and
+ * Modal migrations cleared. Every remaining one is pre-existing debt in components
  * written before the semantic layer existed; `src/prose.css` and the docs
  * chrome are already at zero, and `Input.tsx` is the worked example of what
  * clearing a file looks like.
  */
 const BUDGET = {
   hex: 105,
-  rawPalette: 68,
-  legacyAlias: 80,
+  rawPalette: 55,
+  legacyAlias: 79,
   darkVariant: 0,
 };
 
