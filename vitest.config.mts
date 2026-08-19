@@ -12,6 +12,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
+    // Testing Library only registers its own `afterEach(cleanup)` under
+    // `globals: true`, which this project does not use. See src/test-setup.ts.
+    setupFiles: ['src/test-setup.ts'],
     coverage: {
       provider: 'v8',
       include: ['src/lib/**', 'src/hooks/**'],

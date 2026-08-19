@@ -250,6 +250,15 @@ From TypeScript, use `accentVar()`, `surfaceVar()`, `textVar()`, `borderVar()`, 
 `semanticTokens` object from `src/lib/theme.ts`. From Tailwind, use the semantic aliases:
 `text-accent-primary`, `bg-surface-raised`, `border-edge-subtle`, `text-intent-danger`.
 
+**When the role comes from a prop, the two are not interchangeable.**
+`src/lib/accentClasses.ts` is the Tailwind counterpart to `accentVar()`, and it exists
+because Tailwind's scanner reads source text: `text-${role}` generates no CSS at all,
+so every class has to be spelled out somewhere the scanner can see it. Use
+`accentTextClass()` / `accentHoverEdgeClass()` when the accent decides a *class*, and
+`accentVar()` when it decides an inline value. A test asserts the two encodings agree,
+because a drift would have one component's class and another's style resolve the same
+prop to different colours.
+
 Accent-style props take an `Emphasis` or an `Intent`. The old palette names
 (`'cyan' | 'pink' | 'yellow' | 'green'`) still resolve to identical values so existing
 consumers keep compiling, but they are deprecated — do not use them in new code.
@@ -310,9 +319,16 @@ machines. Anything whose correctness *is* its appearance stays in `test:visual` 
 asserting on class strings is a worse version of a screenshot and breaks on every
 harmless refactor.
 
-The current suite covers `src/lib/` and `src/hooks/`. `src/components/` is not yet
-unit-tested; when it is, prefer asserting behaviour (does the disabled button fire
-its handler?) over markup.
+The suite covers `src/lib/`, `src/hooks/`, the generated `theme.css`, and — so far —
+`Input` and `StatCard` under `src/components/`. Prefer asserting behaviour (is the
+label wired to the control? does the error replace the helper text?) over markup.
+
+**Where a runtime value is involved, assert the value and not the class.** `Input`
+takes its accent as a prop, so it cannot be a utility — Tailwind's scanner reads
+source text and would generate nothing for `border-${role}`. The accent travels as
+`--field-accent` instead. Every accent therefore produces the *same* class string,
+which means a class assertion there cannot tell a working accent from a broken one:
+it passes either way. Read the custom property.
 
 ---
 

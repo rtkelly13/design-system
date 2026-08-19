@@ -1,6 +1,14 @@
-import type { ReactNode, ElementType } from 'react';
+import type { ElementType } from 'react';
+import { accentHoverEdgeClass, accentTextClass } from '../lib/accentClasses';
+import { cn } from '../lib/recipe';
+import type { AccentToken } from '../lib/theme';
 
-export type StatCardAccent = 'cyan' | 'pink' | 'yellow' | 'green';
+/**
+ * Accepted accents. Widened from the four palette names to the full role set;
+ * the old names still resolve to the same roles, so existing call sites keep
+ * rendering identically.
+ */
+export type StatCardAccent = AccentToken;
 
 export interface StatCardProps {
   title: string;
@@ -13,18 +21,15 @@ export interface StatCardProps {
   className?: string;
 }
 
-const ACCENT_BORDER_HOVER: Record<StatCardAccent, string> = {
-  cyan: 'hover:border-brutalist-cyan hover:shadow-hard-cyan',
-  pink: 'hover:border-brutalist-pink hover:shadow-hard-pink',
-  yellow: 'hover:border-brutalist-yellow hover:shadow-hard-yellow',
-  green: 'hover:border-brutalist-neonGreen hover:shadow-hard-sm',
-};
-
-const ACCENT_TEXT: Record<StatCardAccent, string> = {
-  cyan: 'text-brutalist-cyan',
-  pink: 'text-brutalist-pink',
-  yellow: 'text-brutalist-yellow',
-  green: 'text-brutalist-neonGreen',
+/**
+ * A change is meaning, not decoration, so it reads from the intent roles rather
+ * than the card's accent — a card accented `danger` still shows a rise in the
+ * success colour.
+ */
+const CHANGE_CLASS: Record<NonNullable<StatCardProps['changeType']>, string> = {
+  positive: 'text-intent-success',
+  negative: 'text-intent-danger',
+  neutral: 'text-content-muted',
 };
 
 export function StatCard({
@@ -34,41 +39,35 @@ export function StatCard({
   changeType = 'positive',
   subtitle,
   icon: Icon,
-  accent = 'cyan',
-  className = '',
+  accent = 'primary',
+  className,
 }: StatCardProps) {
-  const hoverClass = ACCENT_BORDER_HOVER[accent];
-  const accentText = ACCENT_TEXT[accent];
-
-  const changeColorClass =
-    changeType === 'positive'
-      ? 'text-brutalist-neonGreen'
-      : changeType === 'negative'
-        ? 'text-red-400'
-        : 'text-zinc-400';
-
   return (
     <div
-      className={`bg-zinc-900 border-2 border-white p-6 transition-all duration-200 ${hoverClass} ${className}`.trim()}
+      className={cn(
+        'bg-surface-raised border-2 border-edge-strong p-6 transition-all duration-200',
+        accentHoverEdgeClass(accent),
+        className,
+      )}
     >
       <div className="flex justify-between items-start mb-2">
-        <span className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-400">
+        <span className="font-mono text-xs font-bold uppercase tracking-wider text-content-muted">
           [ {title} ]
         </span>
-        {Icon && <Icon className={`h-6 w-6 ${accentText}`} />}
+        {Icon && <Icon className={`h-6 w-6 ${accentTextClass(accent)}`} />}
       </div>
       <div className="flex items-baseline gap-3 my-1">
-        <span className="font-display text-4xl font-extrabold text-white tracking-tight">
+        <span className="font-display text-4xl font-extrabold text-content-primary tracking-tight">
           {value}
         </span>
         {change && (
-          <span className={`font-mono text-xs font-bold ${changeColorClass}`}>
+          <span className={`font-mono text-xs font-bold ${CHANGE_CLASS[changeType]}`}>
             {change}
           </span>
         )}
       </div>
       {subtitle && (
-        <p className="font-mono text-xs text-zinc-400 mt-2">
+        <p className="font-mono text-xs text-content-muted mt-2">
           &gt; {subtitle}
         </p>
       )}
