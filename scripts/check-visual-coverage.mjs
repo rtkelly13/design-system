@@ -1,18 +1,31 @@
 #!/usr/bin/env node
 /**
- * Which stories does the gated visual suite actually assert?
+ * Which components does the gated visual suite actually assert?
  *
- * `tests/visual.spec.ts` hand-lists the stories it screenshots, so a story can
- * be added, reviewed and merged without ever being asserted — and nothing says
- * so. The walkthrough captures everything, but by design asserts nothing, which
+ * `tests/visual.spec.ts` hand-lists what it screenshots, so a component can be
+ * added, reviewed and merged without ever being asserted — and nothing says so.
+ * The walkthrough captures everything, but by design asserts nothing, which
  * makes it easy to believe a component is covered when it is only *photographed*.
  *
- * This closes the loop the same way the other checks do: a ratchet. Existing
- * gaps are budgeted and burn down; a NEW story cannot land ungated.
+ * ## Why this counts components, not stories
+ *
+ * It used to count unasserted *stories* against a budget of 20, and that number
+ * measured the wrong thing in both directions. Adding a second story to an
+ * already-covered component made the gate angrier while improving nothing about
+ * coverage; a brand-new component with one story cost the same single point as a
+ * variant nobody needed to screenshot.
+ *
+ * The suite's own policy is one representative story per component — each row is
+ * a committed PNG a human reviews whenever it changes, so breadth across
+ * components is worth more than depth within one. This measures that policy
+ * directly: every component in Storybook's index needs *at least one* asserted
+ * story, or an entry in `EXCLUDED` with a reason. Further stories of a covered
+ * component are reported but never fail, because that is the policy working
+ * rather than a gap.
  *
  * Reads Storybook's own build index, so it cannot drift from the real story
- * list, and reads the spec for `?id=…` rather than guessing baseline filenames
- * from story ids — the baselines are hand-named and do not match.
+ * list, and reads the spec for the ids it names rather than guessing baseline
+ * filenames from story ids — the baselines are hand-named and do not match.
  *
  *   node scripts/check-visual-coverage.mjs           fail if coverage regressed
  *   node scripts/check-visual-coverage.mjs --list    show what is not asserted
@@ -31,6 +44,8 @@ const SPEC = path.join(ROOT, 'tests', 'visual.spec.ts');
  *
  * A reason beats a number: it forces the question "should this be asserted?" to
  * be answered once, rather than left as an unexplained gap in a budget.
+ *
+ * A component is exempt only when *every* one of its stories is listed here.
  */
 const EXCLUDED = {
   'foundations-theme-ladder--contrast-matrix':
@@ -39,8 +54,14 @@ const EXCLUDED = {
     'The kitchen sink — every component, several screens tall. Too broad to localise a failure, and it changes whenever anything does.',
 };
 
-/** The count of un-triaged, un-asserted stories at the time this check landed. */
-const BUDGET = 20;
+/**
+ * Components with no asserted story and no exclusion.
+ *
+ * Zero, and it should stay there: a new component arrives with a story, and a
+ * story worth writing is worth one screenshot. Raising this needs a reason, and
+ * a reason belongs in `EXCLUDED`.
+ */
+const BUDGET = 0;
 
 let index;
 try {
@@ -76,42 +97,82 @@ const stories = Object.values(index.entries)
   .filter((entry) => entry.type === 'story')
   .map(({ id, title, name }) => ({ id, title, name }));
 
+/**
+ * Ids the spec asserts.
+ *
+ * Two forms, because the suite is a table now: `id: 'foundations-button--default'`
+ * in a `CASES` row, and `?id=…` for anything still written as a hand-rolled
+ * `page.goto`. Reading only the URL form is how this check reported "0 asserted"
+ * against a spec that asserted twenty-nine.
+ */
 const spec = readFileSync(SPEC, 'utf8');
-const asserted = new Set(
-  [...spec.matchAll(/[?&]id=([a-z0-9-]+)/gi)].map((match) => match[1]),
-);
+const asserted = new Set([
+  ...[...spec.matchAll(/[?&]id=([a-z0-9-]+)/gi)].map((match) => match[1]),
+  ...[...spec.matchAll(/\bid:\s*'([a-z0-9-]+)'/g)].map((match) => match[1]),
+]);
 
-const uncovered = stories.filter((s) => !asserted.has(s.id) && !EXCLUDED[s.id]);
-const excludedPresent = stories.filter((s) => EXCLUDED[s.id]);
+/** Storybook's `title` is the component; its stories are that component's cases. */
+const components = new Map();
+for (const story of stories) {
+  if (!components.has(story.title)) components.set(story.title, []);
+  components.get(story.title).push(story);
+}
+
+const uncovered = [];
+const excludedComponents = [];
+/** Unasserted stories of components that *are* covered — the policy, not a gap. */
+let representedElsewhere = 0;
+
+for (const [title, cases] of components) {
+  if (cases.some((s) => asserted.has(s.id))) {
+    representedElsewhere += cases.filter((s) => !asserted.has(s.id) && !EXCLUDED[s.id]).length;
+    continue;
+  }
+  if (cases.every((s) => EXCLUDED[s.id])) {
+    excludedComponents.push(title);
+    continue;
+  }
+  uncovered.push({ title, cases });
+}
 
 // A reason for a story that no longer exists is stale documentation.
-const staleExclusions = Object.keys(EXCLUDED).filter(
-  (id) => !stories.some((s) => s.id === id),
-);
+const staleExclusions = Object.keys(EXCLUDED).filter((id) => !stories.some((s) => s.id === id));
 
 // An id in the spec that Storybook does not build is a test asserting nothing.
 const phantom = [...asserted].filter((id) => !stories.some((s) => s.id === id));
 
-console.log('Visual coverage — stories the gated suite asserts\n');
-console.log(`  ${stories.length} stories, ${asserted.size} asserted, ${excludedPresent.length} excluded with a reason.`);
-console.log(`  ${uncovered.length} not asserted / budget ${BUDGET}.`);
+const covered = components.size - uncovered.length - excludedComponents.length;
+
+console.log('Visual coverage — components the gated suite asserts\n');
+console.log(`  ${components.size} components, ${stories.length} stories, ${asserted.size} asserted.`);
+console.log(`  ${covered} covered by a representative, ${excludedComponents.length} excluded with a reason.`);
+console.log(`  ${uncovered.length} components with no asserted story / budget ${BUDGET}.`);
+console.log(`  ${representedElsewhere} further stories unasserted, each belonging to a covered component.`);
 
 if (process.argv.includes('--list')) {
   if (uncovered.length > 0) {
-    console.log('\n  Not asserted:');
-    for (const s of uncovered) console.log(`    ${s.title} / ${s.name}  (${s.id})`);
+    console.log('\n  No asserted story:');
+    for (const { title, cases } of uncovered) {
+      console.log(`    ${title}`);
+      for (const s of cases) console.log(`      ${s.name}  (${s.id})`);
+    }
   }
-  if (excludedPresent.length > 0) {
+  if (excludedComponents.length > 0) {
     console.log('\n  Excluded:');
-    for (const s of excludedPresent) console.log(`    ${s.id}\n      ${EXCLUDED[s.id]}`);
+    for (const title of excludedComponents) {
+      for (const s of components.get(title)) {
+        console.log(`    ${s.id}\n      ${EXCLUDED[s.id]}`);
+      }
+    }
   }
 }
 
 const problems = [];
 if (uncovered.length > BUDGET) {
   problems.push(
-    `${uncovered.length} stories are not asserted, budget is ${BUDGET}. A new story must either be added to tests/visual.spec.ts — comment \`/update-snapshots\` on the PR first, per AGENTS.md rule 7 — or listed in EXCLUDED with a reason.`,
+    `${uncovered.length} components have no asserted story, budget is ${BUDGET}. Add one representative to the CASES table in tests/visual.spec.ts — comment \`/update-snapshots\` on the PR first, per AGENTS.md rule 7 — or list every one of its stories in EXCLUDED with a reason.`,
   );
+  for (const { title } of uncovered) problems.push(`  ${title}: no asserted story.`);
 }
 for (const id of staleExclusions) {
   problems.push(`${id}: excluded but no longer exists. Remove it from EXCLUDED.`);
@@ -124,8 +185,4 @@ if (problems.length > 0) {
   console.error('\nVisual coverage check failed:\n');
   for (const problem of problems) console.error(`  - ${problem}`);
   process.exit(1);
-}
-
-if (uncovered.length < BUDGET) {
-  console.log(`  ${BUDGET - uncovered.length} below budget — lower BUDGET in scripts/check-visual-coverage.mjs.`);
 }

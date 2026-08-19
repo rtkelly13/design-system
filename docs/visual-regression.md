@@ -1,0 +1,366 @@
+# Visual regression
+
+How this repo screenshots itself, what those screenshots are allowed to mean,
+and how to operate the thing without quietly turning it off.
+
+`AGENTS.md` rules 5–8 are the short version and remain the rules. This is the
+reference behind them: the reasoning, the failure modes, and the parts that are
+not yet good enough.
+
+---
+
+## What we run, and what each thing is for
+
+Three mechanisms, and confusing them is the most common way to draw a wrong
+conclusion from a green run.
+
+| | `pnpm test:visual` | `pnpm walkthrough` | `pnpm check:visual-coverage` |
+|---|---|---|---|
+| **Question** | did rendering change? | what does it look like? | is anything unwatched? |
+| **Asserts** | yes — pixel diff vs committed baseline | **nothing** | yes — component coverage |
+| **Scope** | one representative story per component, one level | every story × every level | every component in the index |
+| **Gate** | required check | artifact on every PR | required check |
+| **Output** | pass/fail + diff triad | HTML report you browse | count + names |
+
+The walkthrough is the one people misread. It captures far more than the gated
+suite — all four rungs of the ladder, every story — and asserts **none** of it.
+It exists so a human can *look*; it will never fail because something broke. A
+component that appears in the walkthrough and nowhere else is photographed, not
+tested.
+
+Unit tests (`pnpm test`) are the other half of the split, and the line between
+them matters: **anything whose correctness *is* its appearance belongs in
+`test:visual`.** Asserting on class strings in a unit test is a worse screenshot
+that also breaks on every harmless refactor. Conversely, logic with a right
+answer independent of pixels — token resolution, slug generation, hook state —
+belongs in Vitest, where a failure names the cause instead of showing you a
+picture of the symptom.
+
+---
+
+## The determinism contract
+
+A pixel diff only means something if everything except your change is held
+still. Each item below is load-bearing; if one drifts, the suite reports noise,
+and a suite that reports noise gets ignored within a month. That is the normal
+way visual testing dies — not by being switched off, but by being disbelieved.
+
+**Pinned by the toolchain**
+
+- **Playwright version pins the browser build.** `playwright@1.62.1` resolves to
+  one Chromium revision. Baselines are only comparable across runs that share
+  it, which is why the version is exact in `package.json` and why bumping
+  Playwright is a re-baselining event, not a routine dependency bump.
+- **Linux only.** `tests/visual.spec.ts` opens with
+  `test.skip(process.platform !== 'linux')`. macOS and Windows render text
+  differently enough to fail every baseline, so local runs are skipped rather
+  than misleading.
+- **Fixed viewport and pixel density.** The `chromium` project uses
+  `devices['Desktop Chrome']`: 1280×720 at `deviceScaleFactor: 1`. Nothing
+  should set a viewport per test without a reason, because that reason then has
+  to be re-established every time the baseline is questioned.
+
+**Pinned by Playwright's defaults — verified, not assumed**
+
+These come from the installed `playwright/types/test.d.ts`, so they are facts
+about the version in the lockfile rather than blog-post folklore:
+
+| Option | Default | Why it matters |
+|---|---|---|
+| `animations` | `"disabled"` | CSS animations and transitions are stopped and finished, so a transition mid-flight cannot be captured |
+| `caret` | `"hide"` | a blinking text cursor would differ between otherwise identical runs |
+| `scale` | `"css"` | one CSS pixel to one image pixel, independent of the display |
+
+There is deliberately **no configuration for these** — writing a default back
+into the config file makes it look like a decision and invites someone to
+"tune" it. `threshold: 0.2` in `playwright.config.ts` is exactly that mistake
+and is noted below.
+
+**Pinned by this repo**
+
+- **`document.fonts.ready` is awaited** in `tests/story-ready.ts` before any
+  screenshot. Web fonts load asynchronously and change text metrics enough to
+  reflow a page *after* first paint, so a screenshot taken before they settle is
+  a different rendering of the same markup.
+- **The render is verified before it is photographed.** Storybook always paints
+  *something* — a "No Preview" panel or a red error overlay — so a screenshot
+  taken after a fixed delay succeeds whether the story rendered or the entire
+  preview bundle failed to load. Every baseline in this repo was once a
+  screenshot of the "No Preview" panel, and the suite passed for as long as it
+  kept being one. `story-ready.ts` asserts on Storybook's own
+  `sb-show-main` / `sb-show-nopreview` / `sb-show-errordisplay` body classes.
+- **Portals count as rendering.** The same guard accepts a portal mounted to
+  `document.body` as well as content in `#storybook-root`. `Modal` portals so
+  that `position: fixed` resolves against the viewport rather than the nearest
+  transformed ancestor, which leaves its root legitimately empty; `Drawer`,
+  `Toast` and `Tooltip` will all do the same.
+- **Clean URLs must stay off.** `serve` rewrites `/iframe.html` to `/iframe` by
+  default and **drops the query string**, so Storybook gets no story to select
+  and renders its placeholder. Both Playwright configs therefore pass
+  `--config ../serve.json` (path relative to the *served* directory), and
+  `vercel.json` sets the same flag for the hosted build.
+
+**Not yet pinned — known gaps**
+
+- **Web fonts come from a third party.** `src/styles.css` `@import`s
+  `fonts.googleapis.com`. Whether a baseline contains webfont metrics or
+  *fallback* metrics therefore depends on whether the runner could reach Google,
+  which is not a property of this repository. Today's evidence says they do not
+  load in CI, but that is an inference from pixel-height agreement, not a
+  guarantee, and the day it changes every baseline breaks at once for a reason
+  nobody will connect to a network. Self-hosting via `@fontsource` — which the
+  blog already does — fixes this and the render-blocking LCP problem together.
+- **CI and local render in different environments.** CI is `ubuntu-latest` plus
+  `npx playwright install --with-deps chromium`. The industry-standard fix is to
+  run both CI and local baselining inside the same official image
+  (`mcr.microsoft.com/playwright:v1.62.1-noble`), which is what makes "just
+  re-record it locally" possible at all. Until then, **CI is the only place a
+  baseline can legitimately be produced**, which is why `/update-snapshots`
+  exists.
+
+---
+
+## Tolerance
+
+Two knobs, and they do different things. Confusing them is how a suite ends up
+unable to see a real regression.
+
+- **`threshold`** — how different one pixel may be before it counts as changed.
+  Perceived colour distance in YIQ space, `0` strict to `1` lax. **Playwright's
+  default is `0.2`.**
+- **`maxDiffPixelRatio`** — how many changed pixels are tolerated, as a fraction
+  of the image. **Playwright leaves this unset**, i.e. zero tolerance.
+
+Current configuration:
+
+```ts
+expect: {
+  toHaveScreenshot: {
+    maxDiffPixelRatio: 0.05,
+    threshold: 0.2,
+  },
+}
+```
+
+Both lines are wrong in different ways.
+
+`threshold: 0.2` **is the default**, written out. It reads as a tuned value, so
+the next person to see a flaky diff will reach for it. Delete it, and the
+default keeps applying.
+
+`maxDiffPixelRatio: 0.05` is the real problem, and it is much looser than it
+looks: 5% of 1280×720 is **~46,000 pixels** — a region roughly 215×215 — free to
+differ completely on every screenshot. An entire button could change colour, or
+a badge could vanish, and the required check would pass. On the `fullPage`
+rows it is proportionally larger still.
+
+That number was never chosen for real components. It was set when all five
+baselines were the same placeholder error page, so it was only ever exercised
+against an image that could not change. `AGENTS.md` has said it is "probably
+looser than it needs to be" since, and it is tracked as
+[#32](https://github.com/rtkelly13/design-system/issues/32).
+
+**The policy going forward**
+
+1. **Tighten toward zero, and let CI measure it.** Rendering here is pinned to
+   one browser build on one OS, so the honest expectation is a byte-identical
+   screenshot. Start from no ratio at all and add the smallest allowance that
+   real runs demand.
+2. **Prefer `maxDiffPixels` over `maxDiffPixelRatio` for an allowance.** An
+   absolute count means the same thing on a 1280×720 shot and a five-screen
+   `fullPage` one; a ratio silently grants the tall images a much larger budget,
+   which is exactly backwards — the big compositions are where a small regression
+   hides.
+3. **Never widen the global tolerance to silence one story.** That trades every
+   other assertion for the convenience of one. Reach instead for `mask` on the
+   offending region, or fix the non-determinism.
+4. **Tolerance is not where flake gets fixed.** If a screenshot is unstable, the
+   render is unstable. Find it — an unpinned date, a random ordering, an
+   animation the defaults did not catch, a font that sometimes loads.
+
+---
+
+## Operating it
+
+### Adding a component
+
+Coverage is enforced per **component**, not per story: every component in
+Storybook's index needs at least one asserted story, or an `EXCLUDED` entry with
+a reason. The budget is `0`.
+
+1. Write the story.
+2. Add one row to `CASES` in `tests/visual.spec.ts` — one *representative*
+   story, not all of them. Every row is a committed PNG that a human has to
+   review whenever it changes, so breadth across components buys more than depth
+   within one.
+3. Comment **`/update-snapshots`** on the PR.
+4. **Look at the images** in the resulting commit before merging.
+
+Adding a second or third story to a component already covered is free and does
+not need a row.
+
+### Re-baselining
+
+Comment on the PR. The mode is the whole decision:
+
+| Mode | Writes | Use when |
+|---|---|---|
+| `/update-snapshots` | only baselines that do not exist | adding a story. Cannot overwrite evidence, which is why it is the default |
+| `/update-snapshots changed` | any baseline that no longer matches | a change is *meant* to alter rendering |
+| `/update-snapshots all` | every baseline, unconditionally | a global change — a token, a font stack, the render environment |
+
+Say `changed` or `all` **deliberately**. A bare `--update-snapshots` on the CLI
+presets to `changed`, which is how a run intended to add one story also
+re-records every baseline that had drifted — and a drifted baseline that gets
+re-recorded is a regression promoted to the expectation.
+
+The mode is echoed back in the PR comment so a reviewer can tell "two added"
+from "everything re-recorded".
+
+### Two behaviours that look like bugs
+
+**A test that creates a baseline is reported as failed.** Deliberately:
+Playwright's `missing` mode writes the file and attaches a soft error, so a new
+baseline is never silent. Only `all` and `changed` return a clean pass. The
+update workflow's *generate* step therefore tolerates a non-zero exit — that is
+what success looks like there — and its *verify* step, which re-runs the suite
+with no update flag, is the gate that decides whether anything is committed.
+Generate produces candidates; verify decides.
+
+**The PR's visual check does not go green by itself.** Baselines are pushed with
+`GITHUB_TOKEN`, and GitHub does not start workflow runs from those pushes. The
+check keeps its previous result until you re-run it or push again. The verify
+step inside the update run is what tells you the new baselines are good in the
+meantime. Closing that last gap needs a push identity that is not
+`GITHUB_TOKEN` — designed in [`ci-dispatch-token.md`](./ci-dispatch-token.md),
+not implemented.
+
+Also note that snapshot commits are authored by `github-actions[bot]`, and CI
+runs on bot-authored commits land in `action_required` — they need an "Approve
+and run" click before the PR shows a green check.
+
+### Reading a failure
+
+`test:visual` failing means one of three things, and they are easy to tell apart.
+
+1. **A story did not render.** The error names the story and says which
+   Storybook state it reached. Not a visual problem — the Storybook build is
+   stale, the id is wrong, or the story throws. Nothing to re-baseline.
+2. **Pixels moved and you meant it.** Download the `playwright-report` artifact
+   and look at the expected / actual / diff triad. If it is the change you
+   intended, re-baseline with `changed`.
+3. **Pixels moved and you did not.** This is the suite paying for itself. Do not
+   re-baseline. If the diff is a few pixels of text position, suspect a font
+   metric change before anything else — see below.
+
+### Baselining locally
+
+You cannot, today, and the suite tells you so by skipping on non-Linux. Even on
+Linux, a local machine is not `ubuntu-latest`. Until the render environment is
+containerised, CI is the only legitimate source of a baseline.
+
+What you *can* do locally is everything except the pixel comparison:
+`pnpm build-storybook && pnpm check:visual-coverage` catches an unasserted
+component or a row pointing at a story that no longer exists, which is most of
+what goes wrong.
+
+---
+
+## Traps that have already cost time
+
+- **Named Tailwind sizes ship a paired line-height.** `text-xs` is `0.75rem`
+  *and* a leading; the CSS class it replaced set font-size alone. `Badge` uses
+  `text-[0.75rem]` precisely so it keeps inheriting the article's unitless
+  `1.5`. When a migration shifts layout by a few pixels, look here first.
+- **Fallback font chains change metrics.** Unifying the font stacks silently
+  changed the *fallback*, reflowing a blog post by 60px in an environment where
+  webfonts do not load. It was diagnosed by fingerprinting every element's
+  computed metrics before and after; guessing twice got it wrong. That technique
+  is the right tool for unexplained pixel drift.
+- **`check:visual-coverage` reads a build artefact.** It only sees the last
+  `pnpm build-storybook`. It warns when a story file is newer, but rebuild before
+  trusting it.
+- **An `issue_comment` workflow always runs the default branch's copy of
+  itself.** So a change to `update-snapshots-command.yml` does nothing on the PR
+  that makes it. The workflow it *dispatches* runs from the PR branch, so a fix
+  to `update-snapshots.yml` does take effect immediately.
+
+---
+
+## Anti-patterns
+
+Worth naming, because each one is a locally reasonable decision that ends with
+the suite being ignored.
+
+- **Raising the global tolerance to quiet one story.** Mask the region or fix
+  the render.
+- **`fullPage` everywhere.** A tall screenshot fails for any reason anywhere in
+  it, and localises nothing. Use it where the composition *is* the subject — a
+  blog post, a landing page — and not otherwise.
+- **A row per story instead of per component.** Multiplies review load without
+  adding coverage, and review fatigue is what actually kills these suites.
+- **Approving baselines without opening the images.** This converts a regression
+  detector into a screenshot recorder that always passes, which is worse than
+  having nothing, because it reports confidence.
+- **Re-running until green.** If a story is genuinely non-deterministic, the
+  retry is hiding a defect in the story.
+
+---
+
+## Tooling: where this sits, and what would justify moving
+
+Playwright's built-in `toHaveScreenshot` with baselines committed to the repo.
+The trade-offs are worth stating plainly, because the alternatives are mature and
+the reason for staying is not "we already have this".
+
+**What committing baselines buys.** The expectation lives in the repo, versioned
+with the code that produces it, reviewable in the diff, and free. There is no
+account, no external dependency in the critical path of a merge, and a
+five-year-old commit can still be checked out and understood.
+
+**What it costs.** Binary files in git history. Review happens in a commit diff
+rather than a purpose-built UI. Only CI can produce a baseline. And no
+cross-browser or cross-viewport coverage — one Chromium, one size.
+
+**The alternatives**, all of which solve review UX and storage, and none of which
+solve determinism for you:
+
+| | Model | Notes |
+|---|---|---|
+| **Chromatic** | Storybook-native, cloud capture | Built by the Storybook team; per-story review, and TurboSnap only re-shoots stories affected by a change. The closest fit to a Storybook-first repo, and the most expensive way in |
+| **Argos** | diffs screenshots your own tests capture | Open source, cheapest of the hosted three, and works with the Playwright suite that already exists rather than replacing it. The lowest-friction upgrade from here |
+| **Percy** | uploads DOM, re-renders in their cloud | Strong cross-browser and cross-viewport story; re-rendering elsewhere means their environment, not yours, decides some pixels |
+| **reg-suit** | self-hosted CLI + your own S3 | Keeps everything in your infrastructure, adds a bucket and a GitHub app to operate. The right answer if hosted review is wanted but a third party holding the images is not |
+
+**Recommendation: stay on the built-in comparator for now, and spend the effort
+on determinism instead.** None of the above would have caught any of the four
+real problems this suite has actually had — placeholder baselines, clean URLs
+eating the story id, a portalled component failing the render guard, and a
+tolerance wide enough to hide a component. Those are all local to the harness,
+and a hosted service would have reported the same wrong pixels more prettily.
+
+Revisit when one of these becomes true:
+
+- **Reviewing diffs in commits is what stops people re-baselining carefully.**
+  That is a review-UX problem and hosted tools are genuinely better at it —
+  Argos first, being open source and driven by the existing suite.
+- **More than one browser or viewport starts to matter.** Responsive behaviour is
+  currently asserted nowhere, and the built-in approach makes each new axis
+  another full set of committed PNGs.
+- **The repository gets heavy with baseline churn.** Roughly 38 PNGs today, which
+  is nothing; a per-story, per-level, per-viewport matrix would not be.
+
+---
+
+## Current state
+
+- 37 components, 38 asserted rows, budget `0`. One exclusion
+  (`Showcase/DesignSandbox`, with a reason).
+- `Foundations/Theme Ladder → AllLevels` is asserted, so all four rungs are
+  compared in one screenshot. That closes the gap where a token change could
+  read well on `midnight` and be unusable on `white` while passing everything.
+- Open, in rough priority order:
+  1. Tolerance — [#32](https://github.com/rtkelly13/design-system/issues/32).
+  2. Self-host the fonts, so a baseline does not depend on runner egress.
+  3. Containerise the render environment, so a baseline can be reproduced off CI.
+  4. A second viewport, once the shells are decomposed enough to be worth it.

@@ -7,6 +7,13 @@ on:
   pull_request:
     branches:
       - main
+  # Manual re-run, for the one case the two triggers above cannot cover: the
+  # snapshot workflow commits baselines with `GITHUB_TOKEN`, and GitHub does not
+  # start workflow runs from those pushes. The PR then holds its previous visual
+  # result with no way to refresh it short of an empty commit. See AGENTS.md
+  # rule 8. Dispatch requires this file on the default branch, so it helps the
+  # next branch rather than the one that adds it.
+  workflow_dispatch:
 
 jobs:
   verify:

@@ -22,17 +22,37 @@ export const DEFAULT_ADMIN_NAV: AdminNavItem[] = [
   { id: 'backups', label: 'DRIVE BACKUPS', icon: <Database size={18} /> },
 ];
 
+export interface AdminStatusBadge {
+  id: string;
+  label: string;
+  accent?: 'green' | 'cyan' | 'pink' | 'yellow';
+  icon?: React.ReactNode;
+}
+
+/**
+ * Neutral placeholders. This is a layout shell in a shared package, so the
+ * defaults have to read as "example content" rather than as any one product —
+ * a consumer rendering `<AdminDashboardLayout />` inherits whatever is here.
+ */
+export const DEFAULT_ADMIN_STATUS: AdminStatusBadge[] = [
+  { id: 'health', label: 'SYSTEM HEALTH: 100%', accent: 'green', icon: <ShieldCheck size={14} /> },
+  { id: 'api', label: 'API: CONNECTED', accent: 'cyan' },
+];
+
 export interface AdminDashboardLayoutProps {
   appTitle?: string;
   navItems?: AdminNavItem[];
+  /** Header status pills. Pass `[]` to render none. */
+  statusBadges?: AdminStatusBadge[];
   activeNavId?: string;
   onNavSelect?: (id: string) => void;
   children?: React.ReactNode;
 }
 
 export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
-  appTitle = "YNAB COMPANION ADMIN",
+  appTitle = 'ADMIN CONSOLE',
   navItems = DEFAULT_ADMIN_NAV,
+  statusBadges = DEFAULT_ADMIN_STATUS,
   activeNavId = 'dashboard',
   onNavSelect,
   children,
@@ -158,11 +178,16 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Badge accent="green">
-              <ShieldCheck size={14} style={{ display: 'inline', marginRight: '4px' }} />
-              SYSTEM HEALTH: 100%
-            </Badge>
-            <Badge accent="cyan">YNAB API: CONNECTED</Badge>
+            {statusBadges.map((badge) => (
+              <Badge key={badge.id} accent={badge.accent ?? 'cyan'}>
+                {badge.icon ? (
+                  <span style={{ display: 'inline-flex', marginRight: '4px', verticalAlign: 'middle' }}>
+                    {badge.icon}
+                  </span>
+                ) : null}
+                {badge.label}
+              </Badge>
+            ))}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

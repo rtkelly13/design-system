@@ -17,22 +17,31 @@ export interface PricingTier {
   ctaText?: string;
 }
 
+/**
+ * Placeholder pricing, deliberately generic.
+ *
+ * This is a layout in a shared package, so the sample copy has to demonstrate
+ * the *shape* — three tiers, one highlighted, escalating feature lists — without
+ * describing a particular product. The previous defaults were lifted from a
+ * personal-finance app (bank reconciliation, sync engines) and read as that
+ * product's marketing site rather than as a design-system example.
+ */
 export const DEFAULT_PRICING_TIERS: PricingTier[] = [
   {
-    name: 'COMMUNITY',
+    name: 'STARTER',
     price: '$0',
     period: '/month',
-    description: 'Single-player local SQLite storage and basic CSV bank reconciliation',
-    features: ['Local SQLite Database', 'SHA-256 CSV Deduplication', 'Manual Bank Reconciliation', 'Community Support'],
+    description: 'Local-first storage and the core workflow, for a single user',
+    features: ['Single Workspace', 'Local-First Storage', 'Core Workflow', 'Community Support'],
     accent: 'cyan',
     ctaText: 'START FREE'
   },
   {
-    name: 'PRO SaaS ENGINE',
+    name: 'PRO ENGINE',
     price: '$29',
     period: '/month',
-    description: 'Automated YNAB sync, AI rule engine, and Google Drive atomic backups',
-    features: ['Everything in Community', 'Real-Time YNAB API Sync', 'Automated Rule Engine', 'Google Drive Backups', 'Cashflow & Runway Forecaster'],
+    description: 'Automation, scheduled jobs, and versioned backups',
+    features: ['Everything in Starter', 'Automation Rules', 'Scheduled Jobs', 'Versioned Backups', 'Usage Analytics'],
     accent: 'pink',
     highlighted: true,
     ctaText: 'DEPLOY PRO ENGINE'
@@ -41,12 +50,24 @@ export const DEFAULT_PRICING_TIERS: PricingTier[] = [
     name: 'ENTERPRISE DECK',
     price: '$99',
     period: '/month',
-    description: 'Multi-workspace deployment, open bank API integrations, and custom SLA',
-    features: ['Unlimited Workspaces', 'Open Bank API Connectors', 'Custom Design System Themes', 'Dedicated Support & SLAs', 'Self-Hosted Options'],
+    description: 'Multi-workspace deployment, SSO, and a custom SLA',
+    features: ['Unlimited Workspaces', 'SSO & Audit Log', 'Custom Design System Themes', 'Dedicated Support & SLAs', 'Self-Hosted Options'],
     accent: 'yellow',
     ctaText: 'CONTACT SALES'
   }
 ];
+
+/**
+ * Sample terminal output for the deploy section. A prop rather than inline JSX
+ * so a consumer can show their own build, and generic for the same reason as the
+ * pricing above.
+ */
+export const DEFAULT_DEPLOY_LOG = `$ platform deploy --environment production
+[✓] Connecting to local datastore... OK
+[✓] Verifying 1,420 records against checksum... OK
+[✓] Running automation rules... APPLIED
+[✓] Versioned backup written to ./backups/2026-01-01/
+[*] Surface ready! Server active on http://localhost:8000`;
 
 const ACCENT_COLORS: Record<string, string> = {
   cyan: 'var(--brutalist-cyan, #22d3ee)',
@@ -59,12 +80,15 @@ export interface SaasLandingPageProps {
   title?: string;
   subtitle?: string;
   pricingTiers?: PricingTier[];
+  /** Terminal output for the deploy section. Pass `''` to hide it. */
+  deployLog?: string;
 }
 
 export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
-  title = "HIGH-PERFORMANCE BRUTALIST SAAS PLATFORM",
-  subtitle = "Subsume your financial mechanisms with real-time sync, automated audit rules, and zero-compromise design",
+  title = 'HIGH-PERFORMANCE BRUTALIST SAAS PLATFORM',
+  subtitle = 'Ship faster with real-time sync, automated rules, and zero-compromise design',
   pricingTiers = DEFAULT_PRICING_TIERS,
+  deployLog = DEFAULT_DEPLOY_LOG,
 }) => {
   return (
     <div
@@ -138,12 +162,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
               lineHeight: 1.6,
             }}
           >
-{`$ saas-cli deploy --environment production
-[✓] Connecting to local SQLite database... OK
-[✓] Running SHA-256 deduplication on 1,420 transactions... OK
-[✓] Triggering YNAB Live Sync Engine... SYNCHRONIZED
-[✓] Atomic Google Drive Backup saved to ~/Google Drive/My Drive/Backup/
-[*] Financial Surface Ready! Server active on http://localhost:8000`}
+{deployLog}
           </pre>
         </div>
       </section>
