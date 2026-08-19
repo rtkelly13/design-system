@@ -34,11 +34,11 @@ export function BracketText({
 
   return (
     <span className={`${accentClass} ${className}`.trim()} {...props}>
-      <span className="bracket-glyph" aria-hidden="true">
+      <span aria-hidden="true">
         [
       </span>{' '}
       {children}{' '}
-      <span className="bracket-glyph" aria-hidden="true">
+      <span aria-hidden="true">
         ]
       </span>
     </span>

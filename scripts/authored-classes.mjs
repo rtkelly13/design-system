@@ -1,0 +1,57 @@
+/**
+ * Every class this repo's own stylesheets define.
+ *
+ * `no-custom-classname` can only tell you a class is not a *Tailwind* class. On
+ * its own that makes it unusable here: it flags `docs-toc-link` — a real rule in
+ * `prose.css` — as loudly as `bracket-glyph`, which matched nothing anywhere and
+ * had never done a thing.
+ *
+ * Deriving the whitelist from the stylesheets closes that gap. The rule then
+ * answers the question actually worth asking — *does this class exist at all?* —
+ * and it answers it without a hand-maintained list to rot. Migrate a docs-chrome
+ * class into a `recipe` and it leaves `prose.css`, leaves this list, and the rule
+ * starts rejecting it. Nothing to remember.
+ *
+ * Regex over a real parser on purpose: `postcss` is only here as a transitive
+ * dependency of the lint plugin, and `check:deps` would rightly fail an undeclared
+ * import. The shapes involved are selector lists and `@utility` names, which do not
+ * need a parser — and a wrong answer here fails loudly as a lint error on a class
+ * that plainly exists, not silently.
+ */
+
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+/** The stylesheets that may define a class. `theme.css` is variables. */
+const SHEETS = ['src/styles.css', 'src/prose.css', 'src/theme.css'];
+
+export function authoredClasses() {
+  const found = new Set();
+
+  for (const sheet of SHEETS) {
+    let css;
+    try {
+      css = readFileSync(path.join(ROOT, sheet), 'utf8');
+    } catch {
+      continue;
+    }
+    // Comments first: `.foo` inside a doc comment is prose, not a rule.
+    css = css.replace(/\/\*[\s\S]*?\*\//g, '');
+
+    // `@utility prose-ladder { … }` declares a utility, so the name is a class.
+    for (const m of css.matchAll(/@utility\s+([a-zA-Z_][\w-]*)/g)) found.add(m[1]);
+
+    // Otherwise take the selector text ahead of each block and read its classes.
+    for (const m of css.matchAll(/([^{}]+)\{/g)) {
+      const selector = m[1];
+      // Skip at-rule preludes — `@media (min-width: …)` has no selectors.
+      if (/^\s*@(?!utility)/.test(selector)) continue;
+      for (const c of selector.matchAll(/\.(-?[a-zA-Z_][\w-]*)/g)) found.add(c[1]);
+    }
+  }
+
+  return [...found].sort();
+}

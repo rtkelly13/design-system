@@ -101,12 +101,12 @@ export function AnchorHeading({
           {copied ? (
             <>
               <Check size={14} aria-hidden="true" />
-              <span className="docs-anchor-link-label">COPIED</span>
+              <span>COPIED</span>
             </>
           ) : (
             <>
               <Link2 size={14} aria-hidden="true" />
-              <span className="docs-anchor-link-label">COPY LINK</span>
+              <span>COPY LINK</span>
             </>
           )}
         </a>

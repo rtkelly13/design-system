@@ -70,10 +70,10 @@ export const DEFAULT_DEPLOY_LOG = `$ platform deploy --environment production
 [*] Surface ready! Server active on http://localhost:8000`;
 
 const ACCENT_COLORS: Record<string, string> = {
-  cyan: 'var(--brutalist-cyan, #22d3ee)',
-  pink: 'var(--brutalist-pink, #ec4899)',
-  yellow: 'var(--brutalist-yellow, #facc15)',
-  green: 'var(--brutalist-neonGreen, #39ff14)',
+  cyan: 'var(--ds-accent-primary)',
+  pink: 'var(--ds-accent-tertiary)',
+  yellow: 'var(--ds-accent-secondary)',
+  green: 'var(--ds-intent-success)',
 };
 
 export interface SaasLandingPageProps {
@@ -96,7 +96,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
         maxWidth: '1200px',
         margin: '0 auto',
         padding: '3rem 1.5rem',
-        color: 'var(--color-white, #ffffff)',
+        color: 'var(--ds-text-primary)',
         fontFamily: 'var(--font-inter, "Inter"), sans-serif',
       }}
     >
@@ -124,18 +124,18 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
           style={{
             maxWidth: '800px',
             margin: '3.5rem auto 0 auto',
-            border: '3px solid var(--border-color, #ffffff)',
-            backgroundColor: 'var(--color-black, #000000)',
-            boxShadow: '8px 8px 0px 0px var(--brutalist-cyan, #22d3ee)',
+            border: '3px solid var(--ds-border-strong)',
+            backgroundColor: 'var(--ds-surface-base)',
+            boxShadow: '8px 8px 0px 0px var(--ds-accent-primary)',
             overflow: 'hidden',
           }}
         >
           <div
             style={{
               padding: '0.6rem 1rem',
-              borderBottom: '2px solid var(--border-color, #ffffff)',
-              backgroundColor: 'var(--color-white, #ffffff)',
-              color: 'var(--color-black, #000000)',
+              borderBottom: '2px solid var(--ds-border-strong)',
+              backgroundColor: 'var(--ds-text-primary)',
+              color: 'var(--ds-surface-base)',
               fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
               fontWeight: 800,
               fontSize: '0.85rem',
@@ -146,7 +146,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
           >
             <span>// TERMINAL_ENGINE_DEMO.sh</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ width: '8px', height: '8px', backgroundColor: '#39ff14', display: 'inline-block' }} />
+              <span style={{ width: '8px', height: '8px', backgroundColor: 'var(--ds-intent-success)', display: 'inline-block' }} />
               STATUS: ACTIVE
             </span>
           </div>
@@ -155,7 +155,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
               padding: '1.5rem',
               fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
               fontSize: '0.9rem',
-              color: 'var(--brutalist-neonGreen, #39ff14)',
+              color: 'var(--ds-intent-success)',
               textAlign: 'left',
               overflowX: 'auto',
               margin: 0,
@@ -167,7 +167,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
         </div>
       </section>
 
-      <AsciiDivider style={{ margin: '3rem 0', color: 'var(--brutalist-cyan, #22d3ee)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem' }} />
+      <AsciiDivider style={{ margin: '3rem 0', color: 'var(--ds-accent-primary)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem' }} />
 
       {/* ═══════════ 2. FEATURE CARDS ═══════════ */}
       <section style={{ margin: '3rem 0' }}>
@@ -178,7 +178,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
             fontSize: '2rem',
             fontWeight: 900,
             textTransform: 'uppercase',
-            color: 'var(--color-white, #ffffff)',
+            color: 'var(--ds-text-primary)',
             marginBottom: '3rem',
           }}
         >
@@ -205,7 +205,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
                     marginTop: '0.75rem',
                     fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
                     fontSize: '0.85rem',
-                    color: 'var(--color-white, #ffffff)',
+                    color: 'var(--ds-text-primary)',
                     opacity: 0.9,
                     lineHeight: 1.6,
                   }}
@@ -218,7 +218,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
         </div>
       </section>
 
-      <AsciiDivider style={{ margin: '3rem 0', color: 'var(--brutalist-cyan, #22d3ee)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem' }} />
+      <AsciiDivider style={{ margin: '3rem 0', color: 'var(--ds-accent-primary)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.85rem' }} />
 
       {/* ═══════════ 3. PRICING TIERS ═══════════ */}
       <section style={{ margin: '3rem 0' }}>
@@ -229,7 +229,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
             fontSize: '2rem',
             fontWeight: 900,
             textTransform: 'uppercase',
-            color: 'var(--color-white, #ffffff)',
+            color: 'var(--ds-text-primary)',
             marginBottom: '3rem',
           }}
         >
@@ -260,7 +260,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
                     fontSize: '1.1rem',
                     fontWeight: 800,
                     textTransform: 'uppercase',
-                    color: 'var(--color-white, #ffffff)',
+                    color: 'var(--ds-text-primary)',
                     marginBottom: '0.5rem',
                   }}
                 >
@@ -284,7 +284,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
                       style={{
                         fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
                         fontSize: '0.85rem',
-                        color: 'var(--color-white, #ffffff)',
+                        color: 'var(--ds-text-primary)',
                         opacity: 0.6,
                       }}
                     >
@@ -297,7 +297,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
                   style={{
                     fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
                     fontSize: '0.75rem',
-                    color: 'var(--color-white, #ffffff)',
+                    color: 'var(--ds-text-primary)',
                     opacity: 0.8,
                     lineHeight: 1.5,
                     marginBottom: '1.5rem',
@@ -317,12 +317,12 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
                         gap: '0.5rem',
                         fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
                         fontSize: '0.8rem',
-                        color: 'var(--color-white, #ffffff)',
+                        color: 'var(--ds-text-primary)',
                         opacity: 0.9,
                         marginBottom: '0.6rem',
                       }}
                     >
-                      <Check size={14} style={{ color: 'var(--brutalist-neonGreen, #39ff14)', flexShrink: 0, marginTop: '2px' }} />
+                      <Check size={14} style={{ color: 'var(--ds-intent-success)', flexShrink: 0, marginTop: '2px' }} />
                       <span>{feat}</span>
                     </li>
                   ))}
@@ -333,7 +333,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
               <div
                 style={{
                   paddingTop: '1rem',
-                  borderTop: '1px solid var(--border-color, #ffffff)',
+                  borderTop: '1px solid var(--ds-border-strong)',
                   marginTop: 'auto',
                 }}
               >

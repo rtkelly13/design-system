@@ -17,7 +17,7 @@ type Story = StoryObj<typeof AdminDashboardLayout>;
 export const DarkMode: Story = {
   render: () => (
     <ThemeProvider defaultLevel="midnight" persist={false} followSystem={false}>
-      <div className="bg-black min-h-screen text-white">
+      <div className="bg-surface-base min-h-screen text-content-primary">
         <AdminDashboardLayout />
       </div>
     </ThemeProvider>

@@ -18,7 +18,7 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
     id: 'component-library',
     name: 'Component Library',
     description: 'Every core primitive component rendered across the full theme ladder, side by side',
-    icon: <Boxes size={36} color="var(--brutalist-cyan, #22d3ee)" />,
+    icon: <Boxes size={36} color="var(--ds-accent-primary)" />,
     status: 'active',
     componentCount: 8,
   },
@@ -26,7 +26,7 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
     id: 'design-sandbox',
     name: 'Design System Sandbox',
     description: 'Interactive component variations, theme toggles, and live presentation playground',
-    icon: <Palette size={36} color="var(--brutalist-pink, #ec4899)" />,
+    icon: <Palette size={36} color="var(--ds-accent-tertiary)" />,
     status: 'active',
     componentCount: 12,
   },
@@ -34,7 +34,7 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
     id: 'typography-proposals',
     name: 'Editorial Typography Proposals',
     description: 'Three-role font pairings (Space Grotesk + Inter + IBM Plex Mono + VT323)',
-    icon: <Type size={36} color="var(--brutalist-yellow, #facc15)" />,
+    icon: <Type size={36} color="var(--ds-accent-secondary)" />,
     status: 'active',
     componentCount: 4,
   },
@@ -42,7 +42,7 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
     id: 'presentation-decks',
     name: 'Brutalist Slide Decks',
     description: 'Keyboard-navigated presentation deck engine with fullscreen support',
-    icon: <Projector size={36} color="var(--brutalist-neonGreen, #39ff14)" />,
+    icon: <Projector size={36} color="var(--ds-intent-success)" />,
     status: 'active',
     componentCount: 6,
   },
@@ -50,7 +50,7 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
     id: 'graphics-generators',
     name: 'Graphics Generators',
     description: 'Seed-driven SVG background and hero graphics generators for talks',
-    icon: <Sparkles size={36} color="var(--brutalist-cyan, #22d3ee)" />,
+    icon: <Sparkles size={36} color="var(--ds-accent-primary)" />,
     status: 'active',
     componentCount: 5,
   },
@@ -67,11 +67,11 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperi
         maxWidth: '1000px',
         margin: '0 auto',
         padding: '2rem 1.5rem',
-        color: 'var(--color-white, #ffffff)',
+        color: 'var(--ds-text-primary)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-        <Beaker size={40} color="var(--brutalist-cyan, #22d3ee)" />
+        <Beaker size={40} color="var(--ds-accent-primary)" />
         <PageTitle subtitle="Interactive prototypes, design systems, and creative explorations" bracketed>
           EXPERIMENTS & LABS
         </PageTitle>
@@ -100,7 +100,7 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperi
                     fontWeight: 800,
                     textTransform: 'uppercase',
                     margin: 0,
-                    color: 'var(--color-white, #ffffff)',
+                    color: 'var(--ds-text-primary)',
                   }}
                 >
                   {exp.name}
@@ -111,14 +111,14 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperi
                 style={{
                   fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
                   fontSize: '0.875rem',
-                  color: 'var(--color-white, #ffffff)',
+                  color: 'var(--ds-text-primary)',
                   opacity: 0.8,
                   margin: 0,
                 }}
               >
                 {exp.description}
               </p>
-              <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', color: 'var(--brutalist-yellow, #facc15)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', color: 'var(--ds-accent-secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Terminal size={14} />
                 <span>{exp.componentCount} primitives contained</span>
               </div>
