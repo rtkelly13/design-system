@@ -1,39 +1,57 @@
+/**
+ * The pre-ladder token surface.
+ *
+ * @deprecated Use the semantic API instead — `semanticTokens`, `accentVar()`,
+ * `surfaceVar()`, `textVar()`, `borderVar()` from `lib/theme`, or the
+ * `--ds-*` custom properties directly. Everything here resolves through the
+ * compatibility aliases emitted by `theme.css`, so it still renders correctly on
+ * all four levels, but the names describe hues rather than roles and the
+ * aliases are removed once the components stop using them.
+ */
+
+import type { ThemeLevel } from './theme/levels';
+
 export const brutalistTokens = {
   colors: {
-    cyan: 'var(--brutalist-cyan, #22d3ee)',
-    pink: 'var(--brutalist-pink, #ec4899)',
-    yellow: 'var(--brutalist-yellow, #facc15)',
-    neonGreen: 'var(--brutalist-neonGreen, #39ff14)',
-    neonCyan: 'var(--brutalist-neonCyan, #00ffff)',
-    cyberOrange: 'var(--brutalist-cyberOrange, #ff8c00)',
-    darkBg: 'var(--brutalist-darkBg, #0a0a1a)',
-    black: 'var(--color-black, #000000)',
-    white: 'var(--color-white, #ffffff)',
+    cyan: 'var(--ds-accent-primary)',
+    pink: 'var(--ds-accent-tertiary)',
+    yellow: 'var(--ds-accent-secondary)',
+    neonGreen: 'var(--ds-intent-success)',
+    neonCyan: 'var(--ds-accent-primary)',
+    cyberOrange: 'var(--ds-accent-secondary)',
+    darkBg: 'var(--ds-surface-base)',
+    black: 'var(--ds-surface-base)',
+    white: 'var(--ds-text-primary)',
   },
   fonts: {
-    display: ['var(--font-space-grotesk, "Space Grotesk")', 'system-ui', 'sans-serif'],
-    sans: ['var(--font-inter, "Inter")', 'system-ui', 'sans-serif'],
-    mono: ['var(--font-ibm-plex-mono, "IBM Plex Mono")', 'Courier New', 'monospace'],
-    pixel: ['var(--font-vt323, "VT323")', 'monospace'],
+    display: ['var(--ds-font-display)'],
+    sans: ['var(--ds-font-body)'],
+    mono: ['var(--ds-font-mono)'],
+    pixel: ['var(--ds-font-pixel)'],
   },
   shadows: {
-    hardSm: '2px 2px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1))',
-    hardMd: '4px 4px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1))',
-    hardLg: '6px 6px 0px 0px var(--brutalist-shadow-color, rgba(255, 255, 255, 1))',
-    hardCyan: '4px 4px 0px 0px var(--brutalist-cyan, #22d3ee)',
-    hardPink: '4px 4px 0px 0px var(--brutalist-pink, #ec4899)',
-    hardYellow: '4px 4px 0px 0px var(--brutalist-yellow, #facc15)',
+    hardSm: '2px 2px 0px 0px var(--ds-shadow-color)',
+    hardMd: '4px 4px 0px 0px var(--ds-shadow-color)',
+    hardLg: '6px 6px 0px 0px var(--ds-shadow-color)',
+    hardCyan: '4px 4px 0px 0px var(--ds-accent-primary)',
+    hardPink: '4px 4px 0px 0px var(--ds-accent-tertiary)',
+    hardYellow: '4px 4px 0px 0px var(--ds-accent-secondary)',
     glowCyan:
-      '0 0 10px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-cyan, #22d3ee) 30%, transparent)',
+      '0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent)',
     glowPink:
-      '0 0 10px color-mix(in oklab, var(--brutalist-pink, #ec4899) 50%, transparent), 0 0 20px color-mix(in oklab, var(--brutalist-pink, #ec4899) 30%, transparent)',
+      '0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent)',
     glowOrange:
-      '0 0 20px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 80%, transparent), 0 0 40px color-mix(in oklab, var(--brutalist-cyberOrange, #ff8c00) 50%, transparent)',
+      '0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent)',
   },
   borders: {
-    standard: '2px solid var(--color-white, #ffffff)',
+    standard: '2px solid var(--ds-border-strong)',
     radius: '0px',
   },
 } as const;
 
-export type BrutalistTheme = 'dark' | 'dim' | 'sketch';
+/**
+ * @deprecated Renamed to {@link ThemeLevel}. The ladder replaced the old
+ * `dark | dim | sketch` set: `dark` is now `midnight`, `sketch` is now
+ * `bright`, and `white` is new.
+ */
+export type BrutalistTheme = ThemeLevel;

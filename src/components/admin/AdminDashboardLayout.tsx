@@ -5,6 +5,7 @@ import { Badge } from '../Badge';
 import { Card } from '../Card';
 import { Avatar } from '../Avatar';
 import { useTheme } from '../ThemeProvider';
+import { LEVELS } from '../../theme/levels';
 
 export interface AdminNavItem {
   id: string;
@@ -37,7 +38,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
   children,
 }) => {
   const [currentNav, setCurrentNav] = useState(activeNavId);
-  const { theme, cycleTheme } = useTheme();
+  const { level, cycleLevel } = useTheme();
 
   const handleSelect = (id: string) => {
     setCurrentNav(id);
@@ -126,8 +127,8 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
 
         {/* Sidebar Footer Controls */}
         <div style={{ paddingTop: '1rem', borderTop: '2px solid var(--border-color, #ffffff)' }}>
-          <Button onClick={cycleTheme} bracketed style={{ width: '100%', marginBottom: '0.75rem', fontSize: '0.8rem' }}>
-            MODE: {theme.toUpperCase()}
+          <Button onClick={cycleLevel} bracketed style={{ width: '100%', marginBottom: '0.75rem', fontSize: '0.8rem' }}>
+            LEVEL: {LEVELS[level].label.toUpperCase()}
           </Button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <Avatar fallback="RK" size="sm" accent="cyan" />

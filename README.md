@@ -1,6 +1,6 @@
 # 🎨 @rtkelly13/design-system
 
-The foundational visual design system for **ryankelly.dev** and all personal web applications. Built around a **brutalist / neon-terminal** aesthetic: hard edges, zero border-radius, offset shadows, and dual-mode (`dark`, `dim`, `sketch`) paper-and-ink themes.
+The foundational visual design system for **ryankelly.dev** and all personal web applications. Built around a **brutalist / neon-terminal** aesthetic: hard edges, zero border-radius, offset shadows, and a four-rung theme ladder — `midnight` → `dim` → `bright` → `white` — from neon-on-blue-black to print-safe white.
 
 Published to the public **npm registry** as `@rtkelly13/design-system` (via npm trusted publishing — see `.github/workflows/publish-package.yml`).
 
@@ -62,7 +62,7 @@ In your app entrypoint (`_app.tsx`, `main.tsx`, or `layout.tsx`):
 
 ```tsx
 import '@rtkelly13/design-system/styles.css';
-import { ThemeProvider, Button, Card, PageTitle, Badge, AsciiDivider } from '@rtkelly13/design-system';
+import { ThemeProvider, Button, Card, PageTitle, Badge, Divider } from '@rtkelly13/design-system';
 
 export function App() {
   return (
@@ -73,16 +73,18 @@ export function App() {
         </PageTitle>
 
         <Card>
-          <Badge accent="cyan">v1.2.0 ACTIVE</Badge>
+          <Badge accent="primary">v1.2.0 ACTIVE</Badge>
           <p style={{ margin: '1rem 0' }}>
-            Brutalist dual-mode UI surface shared across all projects.
+            Brutalist UI surface shared across all projects.
           </p>
           <Button bracketed variant="pink">
             EXECUTE ACTION
           </Button>
         </Card>
 
-        <AsciiDivider />
+        {/* The mark follows the level's polarity: a terminal rule on the dark
+            rungs, a hand-ruled pencil dash on the light ones. */}
+        <Divider />
       </main>
     </ThemeProvider>
   );
@@ -93,25 +95,35 @@ export function App() {
 
 ### 2. Tailwind CSS v4 token contract
 
-Import the theme contract in your CSS entrypoint — it ships the brutalist
-`@theme` tokens, the `.dark`/`.dim` dark variant, the per-mode variable
-blocks, and an `@source` directive so utilities used inside the compiled
-components are generated in your build:
+Import the theme contract in your CSS entrypoint. It ships the `@theme` tokens,
+one `[data-theme]` block per level, the per-level and polarity variants, and an
+`@source` directive — that last one is load-bearing, because Tailwind v4 skips
+`node_modules` during content detection and would otherwise generate none of the
+utilities the compiled components use:
 
 ```css
 @import "tailwindcss";
 @import "@rtkelly13/design-system/theme.css";
 ```
 
+`theme.css` is **generated** from `src/theme/levels.ts`, which is the single place
+any level name or colour is written.
+
 `styles.css` = `theme.css` + `prose.css` + web-font imports + opinionated global
 resets (zero border-radius everywhere, base typography). Import that, or compose
 the pieces yourself — but not both.
 
+**Peer requirements.** `tailwindcss` v4 for either stylesheet, and
+`@tailwindcss/typography` if you import `prose.css`, which loads it as a
+`@plugin`. Both are optional peers: a Tailwind plugin resolves from *your*
+`node_modules` at your build time, so neither can be bundled.
+
 ### 3. Semantic tokens
 
-Address **roles**, not hues. The brutalist palette is one mapping of these roles;
-`.dim` and `.sketch` are others, so a component that hard-codes `cyan` cannot be
-rethemed without editing the component.
+Address **roles**, not hues. Each rung of the ladder declares its own mapping of
+these roles, so a component that hard-codes `cyan` cannot be rethemed without
+editing the component. Every pair is contrast-audited on every level by
+`pnpm check:contrast`, which gates CI.
 
 | Role group | Tokens | Use for |
 |---|---|---|

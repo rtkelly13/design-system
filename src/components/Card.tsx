@@ -52,7 +52,7 @@ export function Card({
   if (panel || (!title && children)) {
     return (
       <div
-        className={`brutalist-card-panel ${className}`.trim()}
+        className={className.trim()}
         style={{ ...baseCardStyle, padding: '1.5rem' }}
         {...props}
       >

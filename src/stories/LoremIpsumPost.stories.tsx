@@ -13,7 +13,7 @@ type Story = StoryObj<typeof LoremIpsumPost>;
 
 export const FoundationalBlogPost: Story = {
   render: () => (
-    <ThemeProvider defaultTheme="dark">
+    <ThemeProvider defaultLevel="midnight" persist={false} followSystem={false}>
       <LoremIpsumPost />
     </ThemeProvider>
   ),

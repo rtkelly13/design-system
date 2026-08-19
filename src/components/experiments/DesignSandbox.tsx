@@ -16,6 +16,7 @@ import { SlideDeck } from '../slides/SlideDeck';
 import { Slide } from '../slides/Slide';
 import { LoremIpsumPost } from '../blog/LoremIpsumPost';
 import { useTheme } from '../ThemeProvider';
+import { LEVELS } from '../../theme/levels';
 import { Activity, ShieldCheck, Cpu, DollarSign, Layers, Search, ShoppingBag } from 'lucide-react';
 
 interface UserRecord {
@@ -27,7 +28,7 @@ interface UserRecord {
 }
 
 export const DesignSandbox: React.FC = () => {
-  const { theme, cycleTheme, setTheme } = useTheme();
+  const { level, cycleLevel, setLevel, levels } = useTheme();
   const [activeTab, setActiveTab] = useState<'components' | 'saas' | 'ecommerce' | 'slides' | 'post'>('components');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,15 +56,20 @@ export const DesignSandbox: React.FC = () => {
 
         {/* 3-Way Theme Switcher Controls */}
         <div className="flex gap-2 bg-black p-2 border-2 border-white">
-          {(['dark', 'dim', 'sketch'] as const).map((t) => (
+          {levels.map((t) => (
             <button
               key={t}
-              onClick={() => setTheme(t)}
-              className={`font-mono font-bold text-xs px-3 py-1.5 border-2 border-white uppercase transition-all ${
-                theme === t ? 'bg-brutalist-cyan text-black' : 'bg-transparent text-white hover:bg-zinc-800'
+              type="button"
+              onClick={() => setLevel(t)}
+              aria-pressed={level === t}
+              title={LEVELS[t].description}
+              className={`font-mono font-bold text-xs px-3 py-1.5 border-2 border-edge-strong uppercase transition-all ${
+                level === t
+                  ? 'bg-accent-primary text-content-inverse'
+                  : 'bg-transparent text-content-primary hover:bg-surface-raised'
               }`}
             >
-              {t}
+              {LEVELS[t].label}
             </button>
           ))}
         </div>
@@ -93,7 +99,14 @@ export const DesignSandbox: React.FC = () => {
         <div className="flex flex-col gap-8">
           {/* Theme Matrix Callout */}
           <TLDR>
-            The design system operates across 3 first-class theme modes: <strong>DARK</strong> (neon on black), <strong>DIM</strong> (softened offset shadows), and <strong>SKETCH</strong> (ink-on-paper light mode). Theme switching flips CSS token variables automatically.
+            The design system operates across a ladder of {levels.length} first-class levels, darkest to lightest:{' '}
+            {levels.map((t, i) => (
+              <React.Fragment key={t}>
+                {i > 0 && (i === levels.length - 1 ? ', and ' : ', ')}
+                <strong>{LEVELS[t].label.toUpperCase()}</strong> ({LEVELS[t].description.replace(/\.$/, '')})
+              </React.Fragment>
+            ))}
+            . Every level declares its own surfaces, inks and accents; components address roles, never levels.
           </TLDR>
 
           {/* Card & Button Primitives */}
@@ -111,7 +124,7 @@ export const DesignSandbox: React.FC = () => {
               <Button variant="cyan" bracketed>PRIMARY CYAN</Button>
               <Button variant="pink" bracketed>ACCENT PINK</Button>
               <Button variant="yellow" bracketed>WARNING YELLOW</Button>
-              <Button onClick={cycleTheme} bracketed>TOGGLE THEME: {theme.toUpperCase()}</Button>
+              <Button onClick={cycleLevel} bracketed>CYCLE LEVEL: {LEVELS[level].label.toUpperCase()}</Button>
             </div>
           </Card>
 

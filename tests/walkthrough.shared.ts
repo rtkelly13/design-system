@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { THEME_LEVELS } from '../src/theme/levels';
+
 /** Shared between the walkthrough spec and anything else reading the story list. */
 
 export interface StoryEntry {
@@ -15,12 +17,14 @@ export const REPO_ROOT = path.resolve(__dirname, '..');
 export const STORYBOOK_INDEX = path.join(REPO_ROOT, 'storybook-static', 'index.json');
 
 /**
- * Every theme the system ships. Capturing all three is the point of the
- * walkthrough: a token change that reads fine in `dark` can be unusable in
- * `sketch`, and a pixel diff against a single-theme baseline will not surface
- * that.
+ * Every level the system ships, re-exported from the ladder rather than
+ * re-listed. Capturing all of them is the point of the walkthrough: a token
+ * change that reads fine on `midnight` can be unusable on `bright`, and a pixel
+ * diff against a single-level baseline will never surface that.
+ *
+ * Adding a rung to `src/theme/levels.ts` widens this matrix automatically.
  */
-export const THEMES = ['dark', 'dim', 'sketch'] as const;
+export const THEMES = THEME_LEVELS;
 
 export type Theme = (typeof THEMES)[number];
 

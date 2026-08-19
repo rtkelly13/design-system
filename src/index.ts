@@ -2,8 +2,18 @@
 
 export * from './tokens';
 
+// The theme ladder — the single source for level names, level colours, and the
+// contrast arithmetic that gates them.
+export * from './theme/levels';
+export * from './theme/contrast';
+
 // Semantic theming — prefer these over the raw palette in `tokens`.
 export * from './lib/theme';
+// Only `cn` is public. `recipe`'s type comes from the library that implements
+// it, so exporting it would put that library back into the published .d.ts and
+// make replacing it a breaking change. Components import it directly.
+export { cn } from './lib/recipe';
+export type { ClassInput } from './lib/recipe';
 export * from './lib/slug';
 
 // Hooks
@@ -20,6 +30,7 @@ export * from './components/PageHeader';
 export * from './components/Tag';
 export * from './components/Pagination';
 export * from './components/SectionContainer';
+export * from './components/Divider';
 export * from './components/AsciiDivider';
 export * from './components/ThemeProvider';
 export * from './components/BracketText';

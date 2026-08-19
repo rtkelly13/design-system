@@ -74,6 +74,22 @@ jobs:
           echo "::error::/update-snapshots only supports PR branches in this repository."
           exit 1
 
+      # `/update-snapshots` writes only missing baselines. Say `/update-snapshots
+      # all` (or `changed`) when a change is *meant* to alter rendering — that is
+      # the case worth making explicit, because it overwrites evidence.
+      - name: Resolve mode from the comment
+        id: mode
+        env:
+          BODY: ${{ github.event.comment.body }}
+        run: |
+          set -euo pipefail
+          mode=missing
+          case "$BODY" in
+            */update-snapshots\ all*|'/update-snapshots all'*) mode=all ;;
+            */update-snapshots\ changed*|'/update-snapshots changed'*) mode=changed ;;
+          esac
+          echo "mode=${mode}" >> "$GITHUB_OUTPUT"
+
       - name: Dispatch snapshot update on the PR branch
         env:
           GH_TOKEN: ${{ github.token }}
@@ -82,6 +98,7 @@ jobs:
             --repo "${{ github.repository }}" \
             --ref "${{ steps.pr.outputs.ref }}" \
             -f reason="/update-snapshots on PR #${{ github.event.issue.number }}" \
+            -f mode="${{ steps.mode.outputs.mode }}" \
             -f pr-number="${{ github.event.issue.number }}"
 
       - name: Report back on the PR

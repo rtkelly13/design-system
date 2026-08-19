@@ -50,7 +50,7 @@ export function DocsSidebar({
   }, []);
 
   return (
-    <nav className={`docs-sidebar ${className}`.trim()} aria-label="Documentation">
+    <nav className={`not-prose docs-sidebar ${className}`.trim()} aria-label="Documentation">
       {label && <p className="docs-sidebar-label">[ {label} ]</p>}
       <NodeList
         nodes={nav}

@@ -30,6 +30,30 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      # theme.css is generated from src/theme/levels.ts. This fails if the
+      # committed CSS no longer matches the source, which is the only thing
+      # keeping the TS and CSS halves of the ladder in step.
+      - name: Theme Token Drift
+        run: pnpm tokens:check
+
+      # Every text-on-surface and border-on-surface pair, on every level.
+      - name: Contrast Gate
+        run: pnpm check:contrast
+
+      # Ratchet: fails if the count of colour-instead-of-role call sites rises.
+      - name: Token Hygiene
+        run: pnpm check:tokens
+
+      # Ratchet: fails if styling moves back into a stylesheet.
+      - name: CSS Surface
+        run: pnpm check:css
+
+      # knip finds unused/unlisted packages; check-deps.mjs requires each one to
+      # have a stated reason, sit in the matching section, and — for CSS — be
+      # reachable through the exports map.
+      - name: Dependencies
+        run: pnpm check:deps
+
       - name: Type Check
         run: pnpm typecheck
 
@@ -38,6 +62,11 @@ jobs:
 
       - name: Build Storybook
         run: pnpm build-storybook
+
+      # Reads storybook-static/index.json, so it has to follow the build. Fails
+      # if a story lands without being asserted or explicitly excluded.
+      - name: Visual Coverage
+        run: pnpm check:visual-coverage
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium

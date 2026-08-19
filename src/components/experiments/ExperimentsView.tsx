@@ -17,7 +17,7 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
   {
     id: 'component-library',
     name: 'Component Library',
-    description: 'Every core primitive component rendered in both themes (dark + sketch) side by side',
+    description: 'Every core primitive component rendered across the full theme ladder, side by side',
     icon: <Boxes size={36} color="var(--brutalist-cyan, #22d3ee)" />,
     status: 'active',
     componentCount: 8,
@@ -82,7 +82,7 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperi
           <div
             key={exp.id}
             onClick={() => onSelectExperiment && onSelectExperiment(exp.id)}
-            className="brutalist-card"
+            className="bg-surface-raised text-content-primary border-2 border-edge-strong shadow-hard-md p-6 transition-[transform,box-shadow] duration-150 ease-out hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--ds-accent-primary)] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0"
             style={{
               display: 'flex',
               gap: '1.5rem',
