@@ -8,6 +8,20 @@ import { recipe } from '../lib/recipe';
 
 interface ButtonOwnProps {
   children: ReactNode;
+  /**
+   * Named for the colour it is on `midnight`, not for a colour it guarantees.
+   * All four resolve through the accent roles, so they remap with the theme
+   * level: `cyan` is `#22d3ee` on `midnight` and `#1d4ed8` on `white`.
+   *
+   * `white` follows the same rule — it is the inverted maximum-contrast button,
+   * so it is a white button with near-black text on `midnight` and inverts to
+   * dark-on-paper at the light end. Before 0.3.0 it alone was pinned to a
+   * literal `bg-white text-black`, which stayed white on a white page.
+   *
+   * The names are the honest complaint here, and they mislead for all four
+   * equally. Renaming them to the roles they resolve to is a breaking API
+   * change and is deliberately not bundled with the token migration.
+   */
   variant?: 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
   size?: 'sm' | 'md' | 'lg';
   bracketed?: boolean;
