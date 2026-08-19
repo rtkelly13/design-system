@@ -1,6 +1,5 @@
 import { test, type Page, type TestInfo } from '@playwright/test';
 import { THEMES, loadStories, type StoryEntry, type Theme } from './walkthrough.shared';
-import { pinFonts } from './pin-fonts';
 import { waitForStoryRendered } from './story-ready';
 
 /**
@@ -94,9 +93,6 @@ test.describe('Storybook walkthrough', () => {
 
       testInfo.annotations.push({ type: 'story', description: story.id });
 
-      // Same reason as the gated suite: the report is a record of how things
-      // look, and it should not vary with what the runner could download.
-      await pinFonts(page);
       await page.emulateMedia({ reducedMotion: 'reduce' });
 
       for (const theme of THEMES) {

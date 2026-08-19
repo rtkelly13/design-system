@@ -102,19 +102,20 @@ and is noted below.
 
 **Not yet pinned — known gaps**
 
-- **Web fonts still come from a third party** in the shipped stylesheet.
-  `src/styles.css` `@import`s `fonts.googleapis.com`, and that `@import` survives
-  into the built Storybook, so the browser attempts the fetch on every
-  screenshot. Whether a baseline recorded webfont metrics or *fallback* metrics
-  would therefore depend on whether the runner could reach Google, which is not
-  a property of this repository.
+- **Web fonts come from a third party.** `src/styles.css` `@import`s
+  `fonts.googleapis.com`, and that `@import` survives into the built Storybook —
+  it is present in both `iframe.html` and the compiled `iframe-*.css` — so the
+  browser attempts the fetch on **every screenshot**. Whether a baseline records
+  webfont metrics or *fallback* metrics therefore depends on whether the runner
+  could reach Google, which is not a property of this repository. The gap is not
+  subtle: unifying the fallback chains once reflowed a blog post by 60px.
 
-  The suites now abort those requests (`tests/pin-fonts.ts`), which makes the
-  fallback stack the decision rather than the accident and holds it whatever the
-  runner can reach. That closes the hazard for the *tests*; it does not fix the
-  shipped package, where the import is still a render-blocking third-party
-  request on every consumer's first paint. Self-hosting via `@fontsource` —
-  which the blog already does — fixes both and would make the helper redundant.
+  Blocking the request in the harness was tried and rejected: it makes the
+  baselines deterministic on a rendering **no user ever sees**. Self-hosting via
+  `@fontsource` is the fix, because it makes them deterministic *and*
+  representative — the font binaries land in the lockfile, so the exact bytes are
+  pinned by the same mechanism as every other dependency. That is the next change
+  after this one, and it re-records every baseline once.
 - **CI and local render in different environments.** CI is `ubuntu-latest` plus
   `npx playwright install --with-deps chromium`. The industry-standard fix is to
   run both CI and local baselining inside the same official image
@@ -371,7 +372,8 @@ Revisit when one of these becomes true:
      (`mcr.microsoft.com/playwright:v1.62.1-noble` for both CI and local), so a
      baseline can be reproduced off CI at all. Forces one full re-record.
   2. Self-host the fonts via `@fontsource`, which removes a render-blocking
-     third-party request for consumers and makes `pin-fonts.ts` redundant.
+     third-party request for consumers and makes the baselines representative of
+     what a user sees rather than of what the runner could download.
   3. A second viewport, once the shells are decomposed enough to be worth it.
   4. Revisit `threshold`, which is still Playwright's default 0.2.
 

@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-import { pinFonts } from './pin-fonts';
 import { waitForStoryRendered } from './story-ready';
 
 /**
@@ -15,12 +14,6 @@ import { waitForStoryRendered } from './story-ready';
 
 // Skip visual tests on non-Linux platforms (local dev on macOS/Windows)
 test.skip(process.platform !== 'linux', 'Visual tests run on Linux CI');
-
-// Whether the runner can reach Google Fonts must not decide what a baseline
-// records. See pin-fonts.ts.
-test.beforeEach(async ({ page }) => {
-  await pinFonts(page);
-});
 
 /**
  * A fixed delay used to be the only wait here, which is how every baseline in
