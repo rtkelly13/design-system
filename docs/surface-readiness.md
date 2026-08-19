@@ -143,8 +143,9 @@ marketing page.
 `src/styles.css:2` is an `@import` of `fonts.googleapis.com`. That is a
 render-blocking cross-origin request on the one surface where LCP is a business
 metric — and the blog already solved it by self-hosting via `@fontsource`. Note
-this survives the theme work in
-[#33](https://github.com/rtkelly13/design-system/pull/33); it is still open.
+this survived the theme work in
+[#33](https://github.com/rtkelly13/design-system/pull/33), which has since landed
+in 0.2.0.
 
 ---
 
@@ -189,14 +190,16 @@ grep -rlE '\b(bg|text|border|divide)-(zinc|red)-[0-9]' src/components
 # Modal.tsx  PageHeader.tsx  experiments/DesignSandbox.tsx
 ```
 
-`bg-zinc-900` is a literal. In `sketch` — the light paper theme — these render
+`bg-zinc-900` is a literal. In `bright` — the light paper theme — these render
 as dark boxes on a light page. The blog and docs surfaces barely touch these
 components; admin is built from nothing else.
 
-In flight: `Input` and `StatCard` are migrated by
-[#36](https://github.com/rtkelly13/design-system/pull/36), and `Input` again by
-[#33](https://github.com/rtkelly13/design-system/pull/33). `DataTable`,
-`Pagination`, `Modal` and `PageHeader` remain.
+`Input` is migrated as of 0.2.0
+([#33](https://github.com/rtkelly13/design-system/pull/33)); `StatCard` is migrated by
+[#36](https://github.com/rtkelly13/design-system/pull/36). `DataTable`, `Pagination`
+and `PageHeader` are covered by
+[#40](https://github.com/rtkelly13/design-system/pull/40), and `Modal`'s a11y gaps
+by [#38](https://github.com/rtkelly13/design-system/pull/38).
 
 ### Missing for any real admin
 
@@ -229,17 +232,17 @@ So consumers re-declare them, and they have already drifted:
 
 | Value | Design system | `blog/components/graphics/palette.ts` |
 |---|---|---|
-| sketch paper | `#fcfbf9` | `#f5f3ec` |
-| sketch ink | `#18181b` | `#23262e` |
+| bright paper | `#fcfbf9` | `#f5f3ec` |
+| bright ink | `#18181b` | `#23262e` |
 
 `blog/components/talks/theme.ts` re-declares the accents a third time for
 Spectacle. This is one gap producing three copies of the palette.
 
-**Mostly solved in flight.** [#33](https://github.com/rtkelly13/design-system/pull/33)
-introduces `src/theme/levels.ts`, which holds the ladder as literal colours in
-TypeScript and generates `theme.css` from it. What remains after that lands is
-the small part: exporting those literals from the package entrypoint, and
-migrating the blog's two copies onto them.
+**Mostly solved as of 0.2.0.** [#33](https://github.com/rtkelly13/design-system/pull/33)
+introduced `src/theme/levels.ts`, which holds the ladder as literal colours in
+TypeScript and generates `theme.css` from it. What remains is the small part:
+exporting those literals from the package entrypoint, and migrating the blog's
+two copies onto them.
 
 ---
 
@@ -279,16 +282,20 @@ Cross-referenced so this document does not generate duplicate work.
 | Open PR / issue | Covers |
 |---|---|
 | [#31](https://github.com/rtkelly13/design-system/pull/31) | Stories for every component + widened visual suite |
-| [#33](https://github.com/rtkelly13/design-system/pull/33) | Four-level theme ladder, literal tokens in TS, SSR-safe `ThemeProvider`, `Input` migration, contrast/CSS/token/coverage gates |
+| [#33](https://github.com/rtkelly13/design-system/pull/33) — **merged, 0.2.0** | Four-level theme ladder, literal tokens in TS, SSR-safe `ThemeProvider`, `Input` migration, contrast/CSS/token/coverage gates |
 | [#34](https://github.com/rtkelly13/design-system/pull/34) | Vitest suite over `lib`/`hooks`, and `gap-analysis.md` |
 | [#35](https://github.com/rtkelly13/design-system/pull/35) | Semantic Tailwind aliases follow nested theme panels |
 | [#36](https://github.com/rtkelly13/design-system/pull/36) | `Input` + `StatCard` onto semantic roles |
+| [#38](https://github.com/rtkelly13/design-system/pull/38) | `Modal` focus trap, Escape, portal, scroll lock, labelled title |
+| [#39](https://github.com/rtkelly13/design-system/pull/39) | `Button` renders an anchor when given an `href` |
+| [#40](https://github.com/rtkelly13/design-system/pull/40) | `DataTable`, `Pagination`, `PageHeader` onto semantic roles |
 | [#32](https://github.com/rtkelly13/design-system/issues/32) | Visual regression tolerance too loose |
 
 Between them, most of §4's theming problem and all of §5's hard part are handled.
-**Nothing in flight touches** `Modal`, `Button`, `DataTable`, `Pagination`,
-`SaasLandingPage` or `BlogPost` — which is where the surface-readiness work
-starts.
+`Modal`, `Button`, `DataTable` and `Pagination` were untouched when this was
+written; #38, #39 and #40 were opened immediately afterwards and now cover them.
+**What remains unclaimed** is `SaasLandingPage` and `BlogPost` — which is where
+the surface-readiness work starts.
 
 ---
 
@@ -302,7 +309,7 @@ the open branches above.
 2. **Polymorphic `Button`** — `as` / `href`, so a CTA can be a link. Unblocks
    every marketing composition.
 3. **`DataTable` and `Pagination` onto semantic tokens** — finishes the
-   `zinc-*` sweep that #33 and #36 start.
+   `zinc-*` sweep that #33 started and #36 and #40 continue.
 4. **Decompose `SaasLandingPage`** into `Hero`, `FeatureGrid`, `PricingTable`,
    `CTA`, `FAQ`, `SiteFooter`; move the YNAB copy into stories. Responsive grids
    in the same pass.
@@ -312,7 +319,7 @@ the open branches above.
 6. **Parameterise `BlogPost`** — author object, no hardcoded bio.
 7. **Site chrome** — `SiteHeader`, `SiteNav`, `MobileNav`, `SiteFooter`, `Link`,
    shared by blog and marketing.
-8. **Export the literal tokens** from `src/theme/levels.ts` (after #33), then
+8. **Export the literal tokens** from `src/theme/levels.ts` (now on `main`), then
    migrate the blog's two palette copies onto them.
 9. **Error and empty states**, then the demand-ranked primitives from
    `gap-analysis.md` §5.
