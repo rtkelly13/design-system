@@ -2,11 +2,13 @@ import tseslint from 'typescript-eslint';
 import tailwindcss from 'eslint-plugin-tailwindcss';
 
 import { authoredClasses } from './scripts/authored-classes.mjs';
-import { TOKEN_RULES } from './scripts/token-rules.mjs';
+import { noColourLiterals } from './scripts/eslint-token-rule.mjs';
 
 /**
- * Lint config, and for now it does exactly one job: report a colour written as a
- * literal at the line that wrote it.
+ * Lint config. Two rules, answering the two ways a class can be wrong: a colour
+ * named by its value instead of its role, and a class that names nothing at all.
+ * `src/lint.test.ts` pins both, and pins this configuration — most of what can
+ * break here is a setting, not rule logic.
  *
  * ## Why this exists next to `pnpm check:tokens`
  *
@@ -43,47 +45,6 @@ import { TOKEN_RULES } from './scripts/token-rules.mjs';
  * class names out in full because Tailwind's scanner reads source text, and a
  * template literal would generate no CSS at all.
  */
-const noColourLiterals = {
-  meta: {
-    type: 'problem',
-    docs: {
-      description:
-        'Address a colour by its role, not by its value. See AGENTS.md § Semantic Theming.',
-    },
-    schema: [],
-  },
-  create(context) {
-    /** Report every match in a string, not just the first. */
-    function check(node, text) {
-      if (!text) return;
-      for (const rule of TOKEN_RULES) {
-        // A fresh regex per pass: the shared ones carry /g, so lastIndex would
-        // otherwise leak between files and silently skip matches.
-        const pattern = new RegExp(rule.pattern.source, rule.pattern.flags);
-        let match;
-        while ((match = pattern.exec(text)) !== null) {
-          context.report({
-            node,
-            message: `${rule.label}: \`${match[0]}\`. ${rule.fix}`,
-          });
-          if (match[0] === '') pattern.lastIndex += 1;
-        }
-      }
-    }
-
-    return {
-      // String literals, including JSX attribute values.
-      Literal(node) {
-        if (typeof node.value === 'string') check(node, node.value);
-      },
-      // Template literals are where composed class strings live, so skipping
-      // them would exempt exactly the code most likely to be wrong.
-      TemplateElement(node) {
-        check(node, node.value?.cooked ?? node.value?.raw);
-      },
-    };
-  },
-};
 
 export default tseslint.config(
   {
