@@ -129,6 +129,11 @@ async function main(argv: readonly string[]) {
 
   // One warning block per input, not per document: four levels of one report
   // share a source file and would otherwise repeat themselves four times.
+  // Degradations are a property of the invocation, not of any one report.
+  for (const note of results[0]?.notes ?? []) {
+    process.stderr.write(`  note   ${note}\n\n`);
+  }
+
   const reported = new Set<string>();
   for (const result of results) {
     if (result.warnings.length === 0 || reported.has(result.input)) continue;

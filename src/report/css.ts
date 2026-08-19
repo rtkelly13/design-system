@@ -12,7 +12,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { compile } from 'tailwindcss';
 
 const require_ = createRequire(import.meta.url);
 
@@ -33,6 +32,30 @@ async function loadModule(id: string, base: string) {
   const file = id.startsWith('.') ? path.resolve(base, id) : require_.resolve(id, { paths: [base] });
   const loaded = await import(file);
   return { path: file, base: path.dirname(file), module: loaded.default ?? loaded };
+}
+
+/**
+ * `prose.css` loads the typography plugin, and this pipeline compiles
+ * `styles.css`, which imports `prose.css`. That made an *optional* peer
+ * effectively required — a clean install without it crashed the whole render,
+ * which a packed-tarball test caught and no in-repo test could.
+ *
+ * Dropping the `@plugin` line is the honest resolution rather than a patch. The
+ * plugin is genuinely optional: it styles the bare tags a Markdown pipeline
+ * emits, so a report that never renders `<Prose>` — which is most of them —
+ * needs nothing from it. What is not acceptable is doing that silently, so the
+ * caller gets told, and a report that *does* use `<Prose>` gets a warning naming
+ * the package to install rather than unexplained plain text.
+ */
+const TYPOGRAPHY_PLUGIN = /^@plugin\s+["']@tailwindcss\/typography["'];?\s*$/m;
+
+function hasTypographyPlugin(base: string) {
+  try {
+    require_.resolve('@tailwindcss/typography', { paths: [base] });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** Drops the webfont `@import` so the document needs no network to render. */
@@ -61,19 +84,40 @@ export interface ReportCssOptions {
  */
 export interface ReportCssCompiler {
   build(candidates: readonly string[]): string;
+  /** Degradations the caller should pass on — a dropped optional plugin. */
+  notes: string[];
 }
 
 export async function createReportCssCompiler({
   entry,
   offline = false,
 }: Omit<ReportCssOptions, 'candidates'>): Promise<ReportCssCompiler> {
-  const source = await readFile(entry, 'utf8');
-  const compiler = await compile(offline ? source.replace(WEBFONT_IMPORT, '') : source, {
-    base: path.dirname(entry),
-    loadStylesheet,
-    loadModule,
-  });
-  return { build: (candidates) => compiler.build([...candidates]) };
+  // Dynamic for the same reason as esbuild in `markup.ts`: tailwindcss is an
+  // optional peer, and a static import turns its absence into a module-load
+  // crash that no error handler in this package can reach.
+  const { compile } = await import('tailwindcss');
+  const base = path.dirname(entry);
+  const notes: string[] = [];
+
+  const typography = hasTypographyPlugin(base);
+  if (!typography) {
+    notes.push(
+      '@tailwindcss/typography is not installed, so the prose layer was skipped. ' +
+        'Install it if this report renders <Prose> or Markdown; otherwise ignore this.',
+    );
+  }
+
+  const resolve: typeof loadStylesheet = async (id, from) => {
+    const sheet = await loadStylesheet(id, from);
+    return typography ? sheet : { ...sheet, content: sheet.content.replace(TYPOGRAPHY_PLUGIN, '') };
+  };
+
+  let source = await readFile(entry, 'utf8');
+  if (offline) source = source.replace(WEBFONT_IMPORT, '');
+  if (!typography) source = source.replace(TYPOGRAPHY_PLUGIN, '');
+
+  const compiler = await compile(source, { base, loadStylesheet: resolve, loadModule });
+  return { build: (candidates) => compiler.build([...candidates]), notes };
 }
 
 /** One-shot convenience over {@link createReportCssCompiler}. */

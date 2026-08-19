@@ -23,7 +23,6 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { build } from 'esbuild';
 
 /**
  * `require` of a Node builtin, for CJS dependencies esbuild converts to ESM —
@@ -73,6 +72,14 @@ export async function renderMarkup({
   designSystemEntry,
   props = {},
 }: MarkupOptions): Promise<string> {
+  // Imported here rather than at module scope, and that is not a style choice.
+  // esbuild is an *optional* peer: a consumer who only renders components should
+  // not have to install a build toolchain. A static import makes its absence a
+  // module-load failure, which throws before any of this package's code runs —
+  // so the CLI's `explain()` never sees it and the promise of an install
+  // instruction instead of a stack trace is quietly false. A clean-install test
+  // caught exactly that. Keep this dynamic.
+  const { build } = await import('esbuild');
   const scratch = await mkdtemp(path.join(tmpdir(), 'ds-report-'));
   const outfile = path.join(scratch, 'report.mjs');
   try {

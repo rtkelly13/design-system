@@ -3,6 +3,7 @@
   "entry": [
     "src/report/template.tsx",
     "src/report/sample.tsx",
+    "reports/*.tsx",
     "src/stories/**/*.stories.tsx",
     ".storybook/{main,preview}.ts",
     "scripts/*.mjs",
@@ -11,6 +12,7 @@
   ],
   "project": [
     "src/**/*.{ts,tsx}",
+    "reports/*.tsx",
     "scripts/**/*.mjs",
     "tests/*.ts",
     ".storybook/**/*.ts"

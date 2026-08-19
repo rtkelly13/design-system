@@ -30,3 +30,6 @@ src/report/.dev-cli.mjs
 
 # Written by a `renderReport` default-path test; removed again on success.
 src/report/__fixtures__/*.html
+
+# Rendered by `pnpm report reports/<name>.tsx`.
+reports/*.html

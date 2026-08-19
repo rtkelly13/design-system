@@ -293,17 +293,69 @@ choice of assertion catches the other two.
 
 ---
 
-## The two files
+## The three kinds of report in this repo
 
-| | `template.tsx` | `sample.tsx` |
-|---|---|---|
-| Job | what you **copy** | what you **read** |
-| Size | small on purpose | every supported path |
-| Also | — | the regression: `render.test.ts` asserts it, `foundations-reportdocument--sample` screenshots it |
+| | `src/report/template.tsx` | `src/report/sample.tsx` | `reports/contrast.tsx` |
+|---|---|---|---|
+| Job | what you **copy** | what you **read** | what the repo **uses** |
+| Size | small on purpose | every supported path | one real job |
+| Data | placeholder | fixed, by design | **computed at render** |
+| Ships | `dist/report/` | `dist/report/` | nowhere — repo-local |
+| Also | — | the regression: `render.test.ts` asserts it, `foundations-reportdocument--sample` screenshots it | `pnpm contrast:report:html` |
+
+`reports/contrast.tsx` is the one that answers "does this actually work". It calls
+`auditContrast(LEVELS)` during the render, so it *is* the audit rather than a
+picture of one — nothing is passed in and nothing can go stale. It also shows
+what the `nondeterministic` lint rule is really drawing a line around: this report
+is full of real data and still renders identically every time, because the data
+comes from `levels.ts` rather than from a clock.
+
+`pnpm check:contrast` answers yes or no; `pnpm contrast:report` prints 200 rows to
+a terminal. Neither answers *which pair is closest to failing on which rung*,
+which is the question anyone touching a level colour actually has. That is what
+the report is for.
 
 Both ship to `dist/report/` so they are readable from an install. Adding a
 component to the report vocabulary means adding it to `sample.tsx`, which is what
 keeps the screenshot and the test honest.
+
+---
+
+## Checking what consumers actually get
+
+Everything else that tests the generator runs from `src/` inside this repo, where
+every dependency is already installed and every path resolves. That is exactly
+why it cannot see what a consumer sees: a tarball, an `exports` map, a `bin`, and
+peers they have to install themselves.
+
+`pnpm verify:report-cli` packs the package, installs it into a throwaway project
+with **only the peers the README names**, and drives `ds-report` there. Twelve
+checks, and its first run found two real bugs that no in-repo test could have:
+
+**1. The optional-peer promise was false.** `esbuild` was a static import, so its
+absence failed at module load — before any code in this package ran, and
+therefore before `explain()` could turn it into an install instruction. The
+promise was written into the code, `AGENTS.md`, the README and this file, and it
+did not work. Both optional peers are now `await import(…)` inside the function
+that needs them.
+
+**2. An optional peer was effectively required.** `prose.css` loads
+`@tailwindcss/typography` via `@plugin`, `styles.css` imports `prose.css`, and
+this pipeline compiles `styles.css` — so a clean install without the plugin
+crashed the entire render. It is declared optional because "theme.css-only
+consumers never load prose.css", which is true of consumers and false of
+`ds-report`.
+
+The fix is degradation rather than a new required dependency, because the plugin
+genuinely is optional here: it styles the bare tags a Markdown pipeline emits, so
+a report that never renders `<Prose>` — most of them — needs nothing from it.
+`css.ts` drops the `@plugin` line when the package cannot be resolved and returns
+a note, which the CLI prints. Silence would have been the wrong answer: a report
+whose Markdown is mysteriously unstyled is worse than one that says why.
+
+Both bugs share a shape worth remembering: **a promise about what happens when
+something is missing cannot be tested in an environment where nothing is
+missing.**
 
 ---
 

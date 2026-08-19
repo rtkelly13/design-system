@@ -30,5 +30,9 @@
       "@rtkelly13/design-system": ["./src/index.ts"]
     }
   },
-  "include": ["src/**/*"]
+  // `reports/` holds repo-local reports rendered by `pnpm report`. They are not
+  // in `files` and ship nowhere, but they import this package and must typecheck
+  // like anything else — a report that fails at render time is a worse error
+  // than one that fails at build time.
+  "include": ["src/**/*", "reports/**/*"]
 }

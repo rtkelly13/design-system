@@ -1,6 +1,6 @@
 {
   "name": "@rtkelly13/design-system",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Brutalist design system with a four-level theme ladder, slide deck system, and experiments foundation for Ryan Kelly websites",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -35,6 +35,7 @@
     "tokens:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs --check",
     "check:contrast": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs",
     "contrast:report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs --report",
+    "contrast:report:html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/report.mjs reports/contrast.tsx",
     "check:tokens": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs",
     "check:tokens:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs --list",
     "check:css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs",
@@ -46,6 +47,7 @@
     "knip": "knip --no-progress",
     "dev": "tsup --watch",
     "report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/report.mjs",
+    "verify:report-cli": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-report-cli.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

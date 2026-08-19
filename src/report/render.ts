@@ -71,6 +71,8 @@ export interface RenderReportResult {
   bytes: number;
   /** Lint warnings that did not block. Empty under `strict`, which throws. */
   warnings: ReportProblem[];
+  /** Degradations, such as an optional Tailwind plugin that was not installed. */
+  notes: string[];
 }
 
 export interface RenderReportOptions extends ReportOptions {
@@ -186,6 +188,7 @@ export async function renderReports({
         candidates: candidates.length,
         bytes: Buffer.byteLength(html),
         warnings: warnings.get(input) ?? [],
+        notes: compiler.notes,
       });
     }
   }

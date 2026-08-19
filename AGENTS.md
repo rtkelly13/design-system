@@ -29,6 +29,7 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm check:deps` (dependency reasons, sections and usage)
    - `pnpm check:visual-coverage` (every story asserted or excluded with a reason)
+   - `pnpm verify:report-cli` (the packed package, installed and driven as a consumer)
    - `pnpm typecheck`
    - `pnpm test` (unit — see "Unit Tests" below)
    - `pnpm build`
@@ -286,6 +287,7 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm tokens:check`: Fails if the generated CSS is stale. Runs in CI.
 - `pnpm check:contrast`: Audits every role pair on every level. Runs in CI.
 - `pnpm contrast:report`: Prints the full matrix with margins, worst first.
+- `pnpm contrast:report:html`: The same audit as a report — `reports/contrast.tsx`.
 - `pnpm check:tokens`: Ratchet on colour-instead-of-role call sites. Runs in CI.
 - `pnpm check:tokens:list`: Same, broken down by file.
 - `pnpm check:css`: Ratchet on styling that lives in a stylesheet. Runs in CI.
@@ -294,6 +296,7 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm deps:list`: Prints the dependency table with each package's reason.
 - `pnpm knip`: Full hygiene sweep — also unused files and exports. Not gated.
 - `pnpm report <file.tsx>`: Renders a TSX report to one self-contained HTML file. See below.
+- `pnpm verify:report-cli`: Packs the package, installs it into a throwaway project and drives `ds-report` as a consumer. Runs in CI.
 - `pnpm build`: Regenerates tokens, then bundles ESM, CJS, DTS types, and CSS via `tsup`.
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
@@ -337,8 +340,14 @@ Two files, with different jobs:
   test asserts it and `foundations-reportdocument--sample` screenshots it.
   Adding a component to the report vocabulary means adding it there.
 
-Both ship to `dist/report/` so they are readable from an install. `ReportDocument`,
-`ReportSection` and `ReportDetails` are the frame; everything inside is ordinary
+Both ship to `dist/report/` so they are readable from an install.
+`reports/contrast.tsx` is a third kind — a repo-local report, rendered by
+`pnpm contrast:report:html`, that runs `auditContrast` **during the render**. It
+is the proof that a report can compute rather than display: the audit is not
+passed in and cannot go stale. Repo-local reports live in `reports/`, are
+typechecked, and ship nowhere.
+
+`ReportDocument`, `ReportSection` and `ReportDetails` are the frame; everything inside is ordinary
 composition with `Card`, `StatCard`, `DataTable`, `NoteBlock` and `Prose`.
 
 ### What makes a generated report worth reading
@@ -403,6 +412,21 @@ is a fresh design decision every time, and it inherits nothing: not the four run
 of the ladder, not roles whose contrast `pnpm check:contrast` has audited, not a
 layout the visual suite has pinned. A report built from these components inherits
 all of it and costs the agent less code than the HTML would.
+
+### Checking the thing consumers actually get
+
+Everything else that tests the generator runs from `src/` inside this repo, where
+every dependency is installed and every path resolves — which is precisely why it
+cannot see what a consumer sees.
+
+`pnpm verify:report-cli` packs the tarball, installs it into a throwaway project
+with **only the peers the README names**, and drives `ds-report` there. It is the
+only check that can catch a broken `bin` path, a file missing from `files`, an
+entry absent from `exports`, or a peer documented as optional that is not.
+
+Its first run found two real bugs, both invisible from inside the repo: the
+static imports above, and the typography plugin. Add a check here whenever the
+published surface grows.
 
 ### Deterministic, and quick
 

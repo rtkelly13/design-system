@@ -270,7 +270,9 @@ collapsible `<details>` sections that need no script, a chart with no charting
 library, a designed empty state — and it doubles as the generator's regression
 fixture. `@rtkelly13/design-system/report` exports `renderReport()` and
 `renderReports()` for calling the same pipeline from code. `esbuild` and
-`tailwindcss` are optional peers, needed only by the generator.
+`tailwindcss` are optional peers, needed only by the generator; add
+`@tailwindcss/typography` too if your report renders `<Prose>` or Markdown —
+without it the prose layer is skipped and the CLI says so.
 
 ---
 

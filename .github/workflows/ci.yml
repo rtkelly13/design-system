@@ -70,6 +70,14 @@ jobs:
       - name: Build Package
         run: pnpm build
 
+      # Packs the tarball, installs it into a throwaway project with only the
+      # peers the README names, and drives `ds-report` there. The only check that
+      # sees what a consumer sees: a broken `bin` path, a file missing from
+      # `files`, an entry absent from `exports`, or a peer documented as optional
+      # that is not. It found both of those last two on its first run.
+      - name: Published Report CLI
+        run: pnpm verify:report-cli
+
       - name: Build Storybook
         run: pnpm build-storybook
 
