@@ -30,7 +30,7 @@ export const LoremIpsumPost: React.FC = () => {
 
       <NoteBlock type="important" title="SYSTEM RULE ENFORCEMENT">
         Never hardcode pixel border radii or hex literals inside downstream component code.
-        All colors must resolve through standard CSS tokens (<code style={{ color: 'var(--ds-accent-primary)' }}>--brutalist-cyan</code>, <code style={{ color: 'var(--ds-accent-tertiary)' }}>--brutalist-pink</code>) to preserve paper-and-ink theme remapping.
+        All colors must resolve through standard CSS tokens (<code style={{ color: 'var(--ds-accent-primary)' }}>--ds-accent-primary</code>, <code style={{ color: 'var(--ds-accent-tertiary)' }}>--ds-accent-tertiary</code>) to preserve paper-and-ink theme remapping.
       </NoteBlock>
 
       <h2 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.75rem', fontWeight: 800, textTransform: 'uppercase', marginTop: '2.5rem', color: 'var(--ds-accent-tertiary)' }}>
