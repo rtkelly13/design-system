@@ -105,17 +105,32 @@ and is noted below.
 - **Web fonts come from a third party.** `src/styles.css` `@import`s
   `fonts.googleapis.com`, and that `@import` survives into the built Storybook —
   it is present in both `iframe.html` and the compiled `iframe-*.css` — so the
-  browser attempts the fetch on **every screenshot**. Whether a baseline records
-  webfont metrics or *fallback* metrics therefore depends on whether the runner
-  could reach Google, which is not a property of this repository. The gap is not
-  subtle: unifying the fallback chains once reflowed a blog post by 60px.
+  browser fetches it on **every screenshot**.
 
-  Blocking the request in the harness was tried and rejected: it makes the
+  They do load. This was an open question, because an earlier note reasoned from
+  pixel agreement with a sandbox that cannot reach Google that CI probably could
+  not either. Two pieces of evidence say otherwise: Playwright's own call log
+  reports `waiting for fonts to load... fonts loaded`, and blocking the requests
+  in the harness changed **nearly all 38 screenshots** where blocking a resource
+  nobody was fetching would have changed none.
+
+  So the baselines are not ambiguous — they record real webfont rendering. The
+  hazard is narrower and worse: **a third party decides what our baselines look
+  like.** Google can ship a new font binary with no commit here, and both
+  consumer rendering and all 38 baselines move with nothing to explain why.
+
+  Blocking the request in the harness was tried and rejected — it makes the
   baselines deterministic on a rendering **no user ever sees**. Self-hosting via
   `@fontsource` is the fix, because it makes them deterministic *and*
-  representative — the font binaries land in the lockfile, so the exact bytes are
-  pinned by the same mechanism as every other dependency. That is the next change
-  after this one, and it re-records every baseline once.
+  representative: the font binaries land in the lockfile, pinned by the same
+  mechanism as every other dependency. It is also the answer to a question worth
+  asking separately — whether Google Fonts is a stable base for a published
+  package at all. It is not: the Munich Regional Court held that transmitting
+  visitor IPs to Google without consent breaches the GDPR precisely because
+  self-hosting was available; cache partitioning ended the shared-cache
+  performance argument; and `@import` of a remote stylesheet is the slowest
+  delivery available, serialising three round trips of render-blocking work
+  before text can paint.
 - **CI and local render in different environments.** CI is `ubuntu-latest` plus
   `npx playwright install --with-deps chromium`. The industry-standard fix is to
   run both CI and local baselining inside the same official image
@@ -168,8 +183,12 @@ against an image that could not change ([#32](https://github.com/rtkelly13/desig
 
 1. **No allowance until a real run demands one.** Rendering is pinned to one
    browser build on one OS, so the honest expectation is an identical
-   screenshot. `maxDiffPixels: 0` states that, and CI is the instrument that
-   tests whether it holds.
+   screenshot. `maxDiffPixels: 0` states that, and it holds: on the run that
+   introduced it, **37 of 38 baselines matched byte-for-byte.** The one that did
+   not was the tall `fullPage` blog post, off by 57 pixels — and *stable* at 57
+   across all three attempts, so not noise but a genuinely drifted baseline that
+   the old 5% tolerance had been hiding. It was re-recorded with `changed`. That
+   is the gate paying for itself on its first run.
 2. **An absolute count, never a ratio.** `maxDiffPixels` means the same thing on
    a 1280×720 shot and a five-screen `fullPage` one; a ratio silently grants the
    tall images a much larger budget, which is exactly backwards — the big
