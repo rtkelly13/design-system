@@ -4,6 +4,7 @@ import type {
   DetailedHTMLProps,
   ReactNode,
 } from 'react';
+import { recipe } from '../lib/recipe';
 
 interface ButtonOwnProps {
   children: ReactNode;
@@ -31,24 +32,46 @@ export type ButtonLinkProps = ButtonOwnProps &
 
 export type ButtonProps = ButtonElementProps | ButtonLinkProps;
 
-const BASE = 'font-mono font-bold uppercase border-2 transition-all duration-200';
-
-const SIZES = {
-  sm: 'px-4 py-2 text-sm',
-  md: 'px-6 py-3 text-base',
-  lg: 'px-8 py-4 text-lg',
-} as const;
-
+/**
+ * The press affordance — offset shadow that collapses as the control moves into
+ * it. Shared rather than repeated so the four accents cannot drift apart.
+ */
 const PRESS =
   'shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none';
 
-const VARIANTS = {
-  cyan: `bg-brutalist-cyan text-black border-white ${PRESS}`,
-  pink: `bg-brutalist-pink text-black border-white ${PRESS}`,
-  yellow: `bg-brutalist-yellow text-black border-white ${PRESS}`,
-  white: `bg-white text-black border-black ${PRESS}`,
-  default: `bg-brutalist-cyan text-black border-white ${PRESS}`,
-} as const;
+/** `default` is an alias for `cyan`; sharing the constant keeps them identical. */
+const CYAN = `bg-brutalist-cyan text-black border-white ${PRESS}`;
+
+const button = recipe({
+  base: 'font-mono font-bold uppercase border-2 transition-all duration-200',
+  variants: {
+    size: {
+      sm: 'px-4 py-2 text-sm',
+      md: 'px-6 py-3 text-base',
+      lg: 'px-8 py-4 text-lg',
+    },
+    variant: {
+      cyan: CYAN,
+      pink: `bg-brutalist-pink text-black border-white ${PRESS}`,
+      yellow: `bg-brutalist-yellow text-black border-white ${PRESS}`,
+      white: `bg-white text-black border-black ${PRESS}`,
+      default: CYAN,
+    },
+    /**
+     * An anchor is not `inline-flex` by default and carries an underline, so the
+     * two forms would otherwise lay out and read differently from identical
+     * props. A variant rather than a prepended string so a caller's own
+     * `className` still resolves against it.
+     */
+    asLink: {
+      true: 'inline-flex items-center justify-center no-underline',
+    },
+  },
+  defaultVariants: {
+    variant: 'pink',
+    size: 'md',
+  },
+});
 
 /**
  * A button, or a link that looks like one.
@@ -77,12 +100,9 @@ export function Button(props: ButtonProps) {
     variant = 'pink',
     size = 'md',
     bracketed = false,
-    className = '',
+    className,
     ...rest
   } = props;
-
-  const variantKey = variant === 'default' ? 'cyan' : variant;
-  const classes = `${BASE} ${SIZES[size]} ${VARIANTS[variantKey]} ${className}`.trim();
 
   const content = bracketed ? (
     <span className="inline-flex items-center justify-center gap-2">
@@ -111,9 +131,7 @@ export function Button(props: ButtonProps) {
           anchorProps.rel ??
           (anchorProps.target === '_blank' ? 'noopener noreferrer' : undefined)
         }
-        // `inline-flex` rather than the anchor default, so padding and the
-        // bracket glyphs lay out identically to the button form.
-        className={`inline-flex items-center justify-center no-underline ${classes}`}
+        className={button({ variant, size, asLink: true, class: className })}
       >
         {content}
       </a>
@@ -122,10 +140,8 @@ export function Button(props: ButtonProps) {
 
   const buttonProps = rest as Omit<ButtonElementProps, keyof ButtonOwnProps>;
   return (
-    <button {...buttonProps} className={classes}>
+    <button {...buttonProps} className={button({ variant, size, class: className })}>
       {content}
     </button>
   );
 }
-
-export default Button;
