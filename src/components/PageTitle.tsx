@@ -16,7 +16,7 @@ export function PageTitle({
   ...props
 }: PageTitleProps) {
   const baseClasses =
-    'text-3xl font-display font-bold leading-tight tracking-tight text-[var(--color-white)] uppercase sm:text-4xl md:text-5xl border-4 border-double border-[var(--border-color)] inline-block px-6 py-4';
+    'text-3xl font-display font-bold leading-tight tracking-tight text-[var(--ds-text-primary)] uppercase sm:text-4xl md:text-5xl border-4 border-double border-[var(--ds-border-strong)] inline-block px-6 py-4';
 
   return (
     <div className="mb-8">
@@ -24,7 +24,7 @@ export function PageTitle({
         {bracketed ? <BracketText>{children}</BracketText> : children}
       </h1>
       {subtitle && (
-        <p className="mt-2 font-mono text-sm text-brutalist-cyan">
+        <p className="mt-2 font-mono text-sm text-accent-primary">
           {subtitle}
         </p>
       )}

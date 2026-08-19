@@ -8,6 +8,20 @@ import { recipe } from '../lib/recipe';
 
 interface ButtonOwnProps {
   children: ReactNode;
+  /**
+   * Named for the colour it is on `midnight`, not for a colour it guarantees.
+   * All four resolve through the accent roles, so they remap with the theme
+   * level: `cyan` is `#22d3ee` on `midnight` and `#1d4ed8` on `white`.
+   *
+   * `white` follows the same rule — it is the inverted maximum-contrast button,
+   * so it is a white button with near-black text on `midnight` and inverts to
+   * dark-on-paper at the light end. Before 0.3.0 it alone was pinned to a
+   * literal `bg-white text-black`, which stayed white on a white page.
+   *
+   * The names are the honest complaint here, and they mislead for all four
+   * equally. Renaming them to the roles they resolve to is a breaking API
+   * change and is deliberately not bundled with the token migration.
+   */
   variant?: 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
   size?: 'sm' | 'md' | 'lg';
   bracketed?: boolean;
@@ -40,7 +54,7 @@ const PRESS =
   'shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none';
 
 /** `default` is an alias for `cyan`; sharing the constant keeps them identical. */
-const CYAN = `bg-brutalist-cyan text-black border-white ${PRESS}`;
+const CYAN = `bg-accent-primary text-content-inverse border-edge-strong ${PRESS}`;
 
 const button = recipe({
   base: 'font-mono font-bold uppercase border-2 transition-all duration-200',
@@ -52,9 +66,9 @@ const button = recipe({
     },
     variant: {
       cyan: CYAN,
-      pink: `bg-brutalist-pink text-black border-white ${PRESS}`,
-      yellow: `bg-brutalist-yellow text-black border-white ${PRESS}`,
-      white: `bg-white text-black border-black ${PRESS}`,
+      pink: `bg-accent-tertiary text-content-inverse border-edge-strong ${PRESS}`,
+      yellow: `bg-accent-secondary text-content-inverse border-edge-strong ${PRESS}`,
+      white: `bg-content-primary text-content-inverse border-content-primary ${PRESS}`,
       default: CYAN,
     },
     /**
@@ -106,11 +120,11 @@ export function Button(props: ButtonProps) {
 
   const content = bracketed ? (
     <span className="inline-flex items-center justify-center gap-2">
-      <span className="bracket-glyph select-none" aria-hidden="true">
+      <span className="select-none" aria-hidden="true">
         [
       </span>
       <span className="inline-flex items-center gap-2">{children}</span>
-      <span className="bracket-glyph select-none" aria-hidden="true">
+      <span className="select-none" aria-hidden="true">
         ]
       </span>
     </span>

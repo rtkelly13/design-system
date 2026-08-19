@@ -18,7 +18,7 @@ export const DefaultDeck: Story = {
     <SlideDeck>
       <Slide title="WELCOME TO THE SLIDE DECK" subtitle="Brutalist presentation system for talks and decks">
         <div style={{ textAlign: 'center' }}>
-          <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '1.25rem', color: 'var(--brutalist-yellow, #facc15)' }}>
+          <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '1.25rem', color: 'var(--ds-accent-secondary)' }}>
             Use [LEFT] / [RIGHT] Arrow Keys or Spacebar to Navigate
           </p>
           <div style={{ marginTop: '2rem' }}>

@@ -46,6 +46,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # The SHA every baseline below is generated against. Compared to the
+      # branch tip again before committing, because a run that regenerates
+      # against one tree and commits onto another produces a baseline that
+      # matches neither.
+      - name: Record the commit under test
+        id: base
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -110,9 +118,27 @@ jobs:
       # Commit straight back to the branch this run was dispatched on — the
       # repo blocks Actions from creating pull requests, so the previous
       # peter-evans/create-pull-request approach can never work here.
+      #
+      # The push is checked against the tip rather than forced onto it. A run
+      # takes about three minutes, and pushing during that window used to lose
+      # the whole thing: the baselines regenerated correctly, the verify step
+      # passed, the commit was made, and `git push` was rejected as non-fast-
+      # forward — after which the failure comment blamed a story that would not
+      # render. The baselines existed and were thrown away with the runner.
+      #
+      # Rebasing the snapshot commit onto the new tip would make the push
+      # succeed and is the wrong fix: these images were rendered from
+      # ${{ steps.base.outputs.sha }} and verified against it, so re-applying
+      # them over someone else's later commit commits a baseline nothing has
+      # checked. Failing here loses three minutes; that would bake in an
+      # unverified expectation, which is the exact failure `maxDiffPixels: 0`
+      # exists to prevent.
       - name: Commit & push snapshots
         id: commit
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
         run: |
+          set -uo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [ -z "$(git status --porcelain tests/__snapshots__)" ]; then
@@ -120,6 +146,19 @@ jobs:
             echo "committed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+
+          git fetch --depth=1 origin "${GITHUB_REF_NAME}"
+          tip=$(git rev-parse FETCH_HEAD)
+          if [ "${tip}" != "${BASE_SHA}" ]; then
+            {
+              echo "committed=false"
+              echo "raced=true"
+              echo "moved_to=${tip}"
+            } >> "$GITHUB_OUTPUT"
+            echo "::error::${GITHUB_REF_NAME} moved from ${BASE_SHA} to ${tip} while this run was generating baselines. Nothing committed — re-run /update-snapshots on the new tip."
+            exit 1
+          fi
+
           git add tests/__snapshots__
           git commit -m "chore(visual): update Playwright baseline visual snapshots"
           git push origin "HEAD:${GITHUB_REF_NAME}"
@@ -188,22 +227,52 @@ jobs:
         uses: actions/github-script@v7
         env:
           PR_NUMBER: ${{ inputs.pr-number }}
+          RACED: ${{ steps.commit.outputs.raced }}
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+          MOVED_TO: ${{ steps.commit.outputs.moved_to }}
         with:
           script: |
+            const { RACED, BASE_SHA, MOVED_TO } = process.env;
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const short = (sha) => (sha || '').slice(0, 7);
+
+            // Named causes only. This comment used to assert a story had failed
+            // to render whatever had actually gone wrong, which sent the reader
+            // looking for a bug that was not there.
+            const body = RACED === 'true'
+              ? [
+                  '### ❌ Snapshot update raced a push',
+                  '',
+                  `This run generated its baselines against \`${short(BASE_SHA)}\`, but the`,
+                  `branch is now at \`${short(MOVED_TO)}\`. They were **not** committed:`,
+                  'they were rendered from, and verified against, a tree that is no longer',
+                  'the tip, so committing them would record an expectation nothing has',
+                  'checked.',
+                  '',
+                  'Nothing is wrong with the branch — re-run `/update-snapshots` and let it',
+                  'finish before pushing again. It takes about three minutes.',
+                  '',
+                  `[Run log](${runUrl})`,
+                ].join('\n')
+              : [
+                  '### ❌ Snapshot update failed',
+                  '',
+                  'No baselines were committed. The run log says which step failed; the',
+                  'two that usually do are:',
+                  '',
+                  '- **Verify** — the regenerated baselines did not reproduce on a second',
+                  '  run, so a story renders non-deterministically.',
+                  "- **Generate** — a story failed to render and `tests/story-ready.ts`",
+                  "  caught it, rather than screenshotting Storybook's error overlay.",
+                  '',
+                  `[Run log](${runUrl})`,
+                ].join('\n');
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: Number(process.env.PR_NUMBER),
-              body: [
-                '### ❌ Snapshot update failed',
-                '',
-                'No baselines were committed. A likely cause is a story that fails to',
-                'render, which `tests/story-ready.ts` now catches rather than silently',
-                'screenshotting Storybook\'s error overlay.',
-                '',
-                `[Run log](${runUrl})`,
-              ].join('\n'),
+              body,
             });
 
       - name: Upload Snapshot Artifacts

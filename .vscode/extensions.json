@@ -1,0 +1,4 @@
+{
+  "//": "The lint rules only pay for themselves if they appear while you type. In CI they are a slower version of the ratchet they replaced.",
+  "recommendations": ["dbaeumer.vscode-eslint"]
+}

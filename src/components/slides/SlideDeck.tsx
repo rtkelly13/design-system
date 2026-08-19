@@ -72,9 +72,9 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
         width: '100%',
         maxWidth: isFullscreen ? '100vw' : '1000px',
         margin: '0 auto',
-        border: '3px solid var(--border-color, #ffffff)',
-        boxShadow: isFullscreen ? 'none' : '8px 8px 0px 0px var(--brutalist-shadow-color, #ffffff)',
-        backgroundColor: 'var(--color-black, #000000)',
+        border: '3px solid var(--ds-border-strong)',
+        boxShadow: isFullscreen ? 'none' : '8px 8px 0px 0px var(--ds-shadow-color)',
+        backgroundColor: 'var(--ds-surface-base)',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -96,8 +96,8 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
       <div
         style={{
           padding: '1rem 1.5rem',
-          borderTop: '2px solid var(--border-color, #ffffff)',
-          backgroundColor: 'var(--color-black, #000000)',
+          borderTop: '2px solid var(--ds-border-strong)',
+          backgroundColor: 'var(--ds-surface-base)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -105,7 +105,7 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
         }}
       >
         {/* Slide Counter */}
-        <div style={{ color: 'var(--brutalist-yellow, #facc15)', fontWeight: 700, fontSize: '0.9rem' }}>
+        <div style={{ color: 'var(--ds-accent-secondary)', fontWeight: 700, fontSize: '0.9rem' }}>
           SLIDE {String(currentSlide + 1).padStart(2, '0')} / {String(totalSlides).padStart(2, '0')}
         </div>
 
