@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { cn } from '../lib/recipe';
 
 export interface Column<T> {
   header: string;
@@ -22,12 +23,23 @@ export function DataTable<T>({
   className = '',
 }: DataTableProps<T>) {
   return (
-    <div className={`overflow-x-auto border-2 border-edge-strong bg-surface-base ${className}`.trim()}>
+    <div
+      className={cn(
+        'overflow-x-auto border-2 border-edge-strong bg-surface-base',
+        className,
+      )}
+    >
       <table className="w-full text-left font-mono border-collapse">
         <thead>
           <tr className="bg-surface-raised border-b-2 border-edge-strong text-xs font-bold uppercase tracking-wider text-accent-primary">
             {columns.map((col, idx) => (
-              <th key={idx} className={`px-4 py-3 border-r-2 border-edge-strong last:border-r-0 ${col.className || ''}`}>
+              <th
+                key={idx}
+                className={cn(
+                  'px-4 py-3 border-r-2 border-edge-strong last:border-r-0',
+                  col.className,
+                )}
+              >
                 [ {col.header} ]
               </th>
             ))}
@@ -44,7 +56,13 @@ export function DataTable<T>({
             data.map((row, rowIdx) => (
               <tr key={keyExtractor(row, rowIdx)} className="hover:bg-surface-raised transition-colors">
                 {columns.map((col, colIdx) => (
-                  <td key={colIdx} className={`px-4 py-3 border-r-2 border-edge-strong last:border-r-0 ${col.className || ''}`}>
+                  <td
+                    key={colIdx}
+                    className={cn(
+                      'px-4 py-3 border-r-2 border-edge-strong last:border-r-0',
+                      col.className,
+                    )}
+                  >
                     {typeof col.accessor === 'function' ? col.accessor(row) : (row[col.accessor] as ReactNode)}
                   </td>
                 ))}

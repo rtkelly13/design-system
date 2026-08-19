@@ -1,4 +1,5 @@
 import type { ReactNode, ElementType } from 'react';
+import { cn } from '../lib/recipe';
 import type { AccentToken } from '../lib/theme';
 
 /** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
@@ -45,7 +46,7 @@ export function PageHeader({
   const accentText = ACCENT_TEXT[accent] ?? ACCENT_TEXT.primary;
 
   return (
-    <header className={`bg-surface-raised px-6 pt-8 pb-10 ${className}`}>
+    <header className={cn('bg-surface-raised px-6 pt-8 pb-10', className)}>
       <div className="mb-4 flex items-center gap-4">
         {Icon && <Icon className={`h-10 w-10 ${accentText}`} />}
         <h1 className="font-display text-4xl font-bold uppercase text-content-primary md:text-6xl">

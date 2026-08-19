@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { cn } from '../lib/recipe';
 
 export interface PaginationProps {
   totalPages: number;
@@ -48,7 +49,7 @@ export function Pagination({
 
     if (getPageHref) {
       return (
-        <a href={getPageHref(prevPageNum)} className={`${activeBtnClasses} bg-accent-primary`}>
+        <a href={getPageHref(prevPageNum)} className={cn(activeBtnClasses, 'bg-accent-primary')}>
           &lt;&lt; PREV
         </a>
       );
@@ -57,7 +58,7 @@ export function Pagination({
     return (
       <button
         onClick={handlePrevClick}
-        className={`${activeBtnClasses} bg-accent-primary`}
+        className={cn(activeBtnClasses, 'bg-accent-primary')}
         aria-label="Previous Page"
       >
         &lt;&lt; PREV
@@ -76,7 +77,7 @@ export function Pagination({
 
     if (getPageHref) {
       return (
-        <a href={getPageHref(nextPageNum)} className={`${activeBtnClasses} bg-accent-tertiary`}>
+        <a href={getPageHref(nextPageNum)} className={cn(activeBtnClasses, 'bg-accent-tertiary')}>
           NEXT &gt;&gt;
         </a>
       );
@@ -85,7 +86,7 @@ export function Pagination({
     return (
       <button
         onClick={handleNextClick}
-        className={`${activeBtnClasses} bg-accent-tertiary`}
+        className={cn(activeBtnClasses, 'bg-accent-tertiary')}
         aria-label="Next Page"
       >
         NEXT &gt;&gt;
@@ -94,7 +95,7 @@ export function Pagination({
   };
 
   return (
-    <div className={`pt-6 pb-8 space-y-2 md:space-y-5 ${className}`}>
+    <div className={cn('pt-6 pb-8 space-y-2 md:space-y-5', className)}>
       <nav className="flex justify-between items-center font-mono" aria-label="Pagination Navigation">
         {renderPrevButton()}
         <span className="text-content-primary font-bold border-2 border-edge-strong px-6 py-3 bg-surface-base">
