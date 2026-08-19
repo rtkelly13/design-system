@@ -48,7 +48,7 @@ jobs:
         run: pnpm check:contrast
 
       # Ratchet: fails if the count of colour-instead-of-role call sites rises.
-      - name: Token Hygiene
+      - name: Lint — colour literals and unknown classnames
         run: pnpm lint
 
       # Ratchet: fails if styling moves back into a stylesheet.

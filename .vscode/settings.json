@@ -1,0 +1,7 @@
+{
+  "//": "eslint.config.mjs is flat config, which the extension uses by default from ESLint 9 on. Listed explicitly so a stale global setting cannot switch it back to eslintrc lookup and silently find nothing.",
+  "eslint.useFlatConfig": true,
+  "eslint.validate": ["typescript", "typescriptreact"],
+  "//fix": "Neither rule is autofixable — both need a human to choose the role or the class — so fix-on-save is deliberately off. It would give the impression they are advisory.",
+  "editor.codeActionsOnSave": {}
+}
