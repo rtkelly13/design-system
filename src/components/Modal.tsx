@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { cn } from '../lib/recipe';
 import { Button } from './Button';
 
 /**
@@ -54,7 +55,7 @@ export function Modal({
   children,
   footer,
   closeOnBackdropClick = true,
-  className = '',
+  className,
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   // Captured at open time rather than read at close time: by the time the
@@ -146,7 +147,14 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`max-h-[90vh] w-full max-w-lg overflow-y-auto border-4 border-edge-strong bg-surface-raised font-mono shadow-hard-lg ${className}`.trim()}
+        // `cn`, not a template string: appended, a caller's `max-w-3xl` would
+        // have emitted alongside `max-w-lg` and left CSS source order to pick
+        // one. A dialog is sized by its caller often enough that this is the
+        // prop most likely to be reached for.
+        className={cn(
+          'max-h-[90vh] w-full max-w-lg overflow-y-auto border-4 border-edge-strong bg-surface-raised font-mono shadow-hard-lg',
+          className,
+        )}
       >
         <div className="flex items-center justify-between border-b-2 border-edge-strong bg-surface-base px-6 py-4">
           <h3
