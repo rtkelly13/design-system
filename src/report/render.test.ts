@@ -17,9 +17,12 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { renderReport } from './render';
+import { renderReport, renderReports } from './render';
 
 const FIXTURE = path.join(import.meta.dirname, '__fixtures__/minimal.tsx');
+/** The worked example. Rendering it is the regression over every path it uses. */
+const SAMPLE = path.join(import.meta.dirname, 'sample.tsx');
+const fixture = (name: string) => path.join(import.meta.dirname, '__fixtures__', name);
 
 let scratch: string;
 const out = (name: string) => path.join(scratch, name);
@@ -77,6 +80,24 @@ describe('renderReport', () => {
     ).rejects.toThrow(/Unknown theme level "neon"/);
   });
 
+  /** Every path the sample exercises, in one render. */
+  it('renders the worked example end to end', async () => {
+    const { html, candidates } = await renderReport({ input: SAMPLE, output: out('sample.html') });
+
+    // Static disclosure — the one interactive affordance that needs no script.
+    expect(html).toContain('<details');
+    expect(html).not.toMatch(/<script\b/);
+    // Sections are addressable, from the title, so the contents list resolves.
+    expect(html).toContain('id="coverage"');
+    expect(html).toContain('href="#coverage"');
+    // The zero case renders its designed text rather than an empty table.
+    expect(html).toContain('No advisories. 24 packages audited.');
+    // A runtime accent travels as a custom property, never as a class.
+    expect(html).toContain('var(--ds-intent-success)');
+    // Rich enough to be a real regression rather than a smoke test.
+    expect(candidates).toBeGreaterThan(120);
+  }, 60_000);
+
   it('drops the webfont import only when asked', async () => {
     const online = await renderReport({ input: FIXTURE, output: out('online.html') });
     const offline = await renderReport({
@@ -91,6 +112,18 @@ describe('renderReport', () => {
     expect(offline.html).toContain('sans-serif');
   }, 30_000);
 
+  /**
+   * Determinism is the property that makes a generated report diffable, and it
+   * is not free: the pipeline sorts its candidates, and the lint blocks the
+   * values that would otherwise vary. Two renders, byte for byte.
+   */
+  it('renders the same bytes twice', async () => {
+    const first = await renderReport({ input: SAMPLE, output: out('det-1.html') });
+    const second = await renderReport({ input: SAMPLE, output: out('det-2.html') });
+    expect(first.html).toBe(second.html);
+    expect(first.bytes).toBe(second.bytes);
+  }, 60_000);
+
   it('defaults the output path to the input with an .html extension', async () => {
     // Genuinely omits `output`, so this writes beside the fixture and cleans up.
     const result = await renderReport({ input: FIXTURE });
@@ -100,5 +133,67 @@ describe('renderReport', () => {
     } finally {
       await rm(result.output, { force: true });
     }
+  }, 30_000);
+
+  /**
+   * The level lives on `<html>`, so the markup — and therefore the candidate set
+   * and the stylesheet — is identical on every rung. Four documents cost one
+   * bundle, one render and one Tailwind compile, which is what makes rendering
+   * the whole ladder cheap enough to do in a regression suite.
+   */
+  it('emits every rung from a single render', async () => {
+    const themes = ['midnight', 'dim', 'bright', 'white'] as const;
+    const results = await renderReports({
+      inputs: [SAMPLE],
+      themes,
+      outputFor: (_input, theme) => out(`ladder-${theme}.html`),
+    });
+
+    expect(results.map((r) => r.theme)).toEqual([...themes]);
+    expect(new Set(results.map((r) => r.candidates)).size).toBe(1);
+    // Same document, differing only in the rung it declares.
+    const bodies = results.map((r) => r.html.slice(r.html.indexOf('<body>')));
+    expect(new Set(bodies).size).toBe(1);
+    expect(results[0]?.html).toContain('data-theme="midnight"');
+  }, 60_000);
+});
+
+describe('the design system lint', () => {
+  it('refuses a report that addresses colours instead of roles', async () => {
+    await expect(
+      renderReport({ input: fixture('lints-badly.tsx'), output: out('bad.html') }),
+    ).rejects.toThrow(/breaks 3 design system rule\(s\)[\s\S]*Hex literals/);
+  });
+
+  /** Cheap enough to run first, so a bad file never pays for a render. */
+  it('rejects before writing anything', async () => {
+    const destination = out('never-written.html');
+    await expect(
+      renderReport({ input: fixture('lints-badly.tsx'), output: destination }),
+    ).rejects.toThrow();
+    await expect(readFile(destination, 'utf8')).rejects.toThrow();
+  });
+
+  it('renders through warnings, and reports them', async () => {
+    const { warnings } = await renderReport({
+      input: fixture('warns.tsx'),
+      output: out('warns.html'),
+    });
+    expect(warnings.map((w) => w.rule).sort()).toEqual(['inert', 'nondeterministic']);
+  }, 30_000);
+
+  it('promotes warnings to errors under strict', async () => {
+    await expect(
+      renderReport({ input: fixture('warns.tsx'), output: out('strict.html'), strict: true }),
+    ).rejects.toThrow(/breaks 2 design system rule\(s\)/);
+  });
+
+  it('can be turned off for a file you did not write', async () => {
+    const result = await renderReport({
+      input: fixture('lints-badly.tsx'),
+      output: out('unlinted.html'),
+      lint: false,
+    });
+    expect(result.bytes).toBeGreaterThan(0);
   }, 30_000);
 });

@@ -317,20 +317,112 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 `ds-report`. It does not write HTML.**
 
 ```bash
-ds-report audit.tsx --theme white          # → audit.html, self-contained
-pnpm report src/report/template.tsx        # the same thing from a checkout
+ds-report audit.tsx --theme white               # → audit.html, self-contained
+ds-report audit.tsx --theme midnight,white      # both rungs, one render
+ds-report a.tsx b.tsx c.tsx --strict            # a batch, lint warnings fatal
+pnpm report src/report/sample.tsx               # the same thing from a checkout
 ```
 
-`src/report/template.tsx` is the starting point — copy it, replace the data. It
-ships to `dist/report/template.tsx` so it is readable from an install.
-`ReportDocument` and `ReportSection` are the frame; everything inside is ordinary
+Two files, with different jobs:
+
+- **`src/report/template.tsx` is what you copy.** Small on purpose — a title, a
+  stat row, a table, a note.
+- **`src/report/sample.tsx` is what you read.** The worked example, exercising
+  every path the generator supports, and it is *also* the regression: the render
+  test asserts it and `foundations-reportdocument--sample` screenshots it.
+  Adding a component to the report vocabulary means adding it there.
+
+Both ship to `dist/report/` so they are readable from an install. `ReportDocument`,
+`ReportSection` and `ReportDetails` are the frame; everything inside is ordinary
 composition with `Card`, `StatCard`, `DataTable`, `NoteBlock` and `Prose`.
+
+### What makes a generated report worth reading
+
+The header comment in `sample.tsx` is the long version. The short one — seven
+patterns the report generators people actually keep converge on, none of which
+needs JavaScript:
+
+1. **The verdict comes first**, before the evidence.
+2. **Numbers before prose.** A stat row is scannable in two seconds.
+3. **Provenance is part of the report** — when, what commit, what config. A
+   report that cannot be traced to its inputs cannot be reproduced.
+4. **Progressive disclosure, not omission.** `ReportDetails` is a `<details>`
+   element, so a 200-row table folds away with no script at all. This is the one
+   interactive affordance a static document genuinely has.
+5. **Severity never rides on colour alone.** Every badge carries a word and the
+   disclosure marker is `[+]`/`[-]` text, so the report survives greyscale
+   printing and a reader who cannot distinguish the hues.
+6. **Sections are addressable.** `ReportSection` derives an `id` from its title,
+   so a reader can link to one instead of describing it.
+7. **The zero case is designed.** "No advisories" has to look deliberate rather
+   than like a rendering failure.
+
+### The lint is not optional
+
+**A report is checked against this system's own rules before it renders.** That
+closes a real hole: `pnpm check:tokens` only ever scanned `src/components` and
+`src/stories`, there is no ESLint config, and esbuild strips types without
+reading them — so the file most likely to be written in a hurry was the one file
+nothing looked at.
+
+The rules live in `src/lib/tokenRules.ts` and `scripts/check-tokens.mjs` imports
+the same module, so the two can never drift. What differs is the budget:
+
+| | Ratchet (`check:tokens`) | Report (`ds-report`) |
+|---|---|---|
+| Scope | `src/components`, `src/stories` | the report's `.tsx` |
+| Budget | the count when the ladder landed | **zero** |
+| Why | pre-existing debt, migrated file by file | new code, no debt to grandfather |
+
+A hex literal in a report renders identically on `midnight` and on `white`, which
+is precisely the failure the ladder exists to prevent — so those four rules are
+**errors** and they block.
+
+Two further rules are **warnings**, because both are context-dependent and
+neither is always a mistake:
+
+- `nondeterministic` — `new Date()`, `Date.now()`, `Math.random()`. A report that
+  differs on every run cannot be diffed to answer "did anything change". Note
+  that `new Date('2026-08-19')` is fine: only the zero-argument form varies.
+- `inert` — `onClick={…}`, `useState`, `useEffect`. The output has no client JS,
+  so these render as dead controls. `useMemo` and `useId` are untouched; both do
+  their work during the render that gets captured.
+
+`--strict` promotes warnings to errors, which is what CI should use.
+`--no-lint` skips it, for rendering a file you did not write.
 
 The reason this exists is not convenience. A hand-written `<div style="…">` report
 is a fresh design decision every time, and it inherits nothing: not the four rungs
 of the ladder, not roles whose contrast `pnpm check:contrast` has audited, not a
 layout the visual suite has pinned. A report built from these components inherits
 all of it and costs the agent less code than the HTML would.
+
+### Deterministic, and quick
+
+**The same report renders to the same bytes.** `render.test.ts` asserts it
+directly. Three things make it true: candidates are sorted, nothing in the shell
+is stamped at render time, and the lint blocks the values that would otherwise
+vary. That is what makes a generated report diffable — the useful question about
+a report is rarely "what does it say" but "what changed since the last one".
+
+**Rendering more costs almost nothing more.** Both expensive steps are paid once
+per invocation:
+
+| | Cost | Paid |
+|---|---|---|
+| Tailwind `compile()` | ~150ms | once per invocation, not per document |
+| Tailwind `build(candidates)` | ~13ms first, ~0 after | per report |
+| esbuild bundle + render | ~230ms | once per **input**, not per level |
+| Lint | 0.11ms | per input, before any bundling |
+
+The level lives on `<html>`, so the markup — and therefore the candidate set and
+the whole stylesheet — is identical on all four rungs. Measured: the entire
+ladder from one file takes **603ms**, against **2402ms** for four separate
+invocations. Use one invocation with several inputs or several levels; do not
+loop the CLI.
+
+The lint runs before any bundling for the same reason: a batch containing a bad
+file should fail in milliseconds, not after rendering its siblings.
 
 ### One pass, and why that is possible
 
@@ -362,7 +454,7 @@ against a generator that emitted all of Tailwind.
 |---|---|
 | Theme | `--theme <rung>`, default `white` — reports get read in bright rooms and printed. Every rung's tokens ship regardless, so a nested `<ThemeProvider scoped>` panel still resolves. |
 | Fonts | The webfont `@import` survives, hoisted to the top of the inlined CSS. `--offline` strips it; the `--ds-font-*` tokens all declare fallback stacks, so the type degrades to system sans and mono rather than vanishing. |
-| Interactivity | **None.** The output is static HTML with no client JS, so an `onClick`, a `useState` or a `Modal` renders inert. Say it in a report's prose rather than hiding it behind a control. |
+| Interactivity | **None**, with one exception. There is no client JS, so an `onClick`, a `useState` or a `Modal` renders inert — the `inert` lint rule warns about exactly this. The exception is `<details>`, which the browser implements itself: use `ReportDetails`. |
 | Async | `renderToStaticMarkup` is synchronous. Do the fetching before the render and pass the data in as props. |
 | Resolution | Imports resolve from the report file's own directory, so a report can import the author's modules — but it has to sit inside a project where `react` resolves. |
 | Version skew | `@rtkelly13/design-system` is aliased to the copy of the package that owns the renderer, so the markup and the CSS can never come from two versions. |

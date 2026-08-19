@@ -18,10 +18,12 @@
 
 import { Buffer } from 'node:buffer';
 import { readFile, writeFile } from 'node:fs/promises';
+import process from 'node:process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { extractCandidates } from './candidates';
-import { buildReportCss } from './css';
+import { formatProblems, lintReport, type ReportProblem } from './lint';
+import { createReportCssCompiler } from './css';
 import { renderMarkup } from './markup';
 import { documentShell } from './shell';
 import { THEME_LEVELS, type ThemeLevel } from '../theme/levels';
@@ -41,58 +43,167 @@ async function ownPaths() {
   return { entry, styles: path.join(here, '..', 'styles.css') };
 }
 
-export interface RenderReportOptions {
+/** Shared by the single- and multi-input entry points. */
+export interface ReportOptions {
+  /** `<title>`, and nothing else — the report's own heading is its business. */
+  title?: string;
+  /** Strip the webfont import so the file needs no network. */
+  offline?: boolean;
+  /** Props passed to the report component. */
+  props?: Record<string, unknown>;
+  /**
+   * Treat lint warnings as errors. The two warning rules — non-deterministic
+   * values and behaviour that cannot run — are context-dependent enough that
+   * blocking by default would be wrong, and important enough that CI should.
+   */
+  strict?: boolean;
+  /** Skip the lint entirely. For rendering a file you did not write. */
+  lint?: boolean;
+}
+
+export interface RenderReportResult {
+  input: string;
+  output: string;
+  theme: ThemeLevel;
+  html: string;
+  /** How many distinct utilities the document actually used. */
+  candidates: number;
+  bytes: number;
+  /** Lint warnings that did not block. Empty under `strict`, which throws. */
+  warnings: ReportProblem[];
+}
+
+export interface RenderReportOptions extends ReportOptions {
   /** Path to the report's `.tsx`. Must default-export a component or element. */
   input: string;
   /** Where to write the HTML. Defaults to `input` with an `.html` extension. */
   output?: string;
-  /** `<title>`, and nothing else — the report's own heading is its business. */
-  title?: string;
   /**
    * Rung of the theme ladder to render at. `white` by default: reports get read
    * in bright rooms and printed, which is the rung documented for exactly that.
    */
   theme?: ThemeLevel;
-  /** Strip the webfont import so the file needs no network. */
-  offline?: boolean;
-  /** Props passed to the report component. */
-  props?: Record<string, unknown>;
 }
 
-export interface RenderReportResult {
-  output: string;
-  html: string;
-  /** How many distinct utilities the document actually used. */
-  candidates: number;
-  bytes: number;
+export interface RenderReportsOptions extends ReportOptions {
+  inputs: readonly string[];
+  /**
+   * One document per rung. Rendering the same report on four levels costs one
+   * bundle, one render and one stylesheet: the level lives on `<html>`, so the
+   * markup — and therefore the candidate set — is identical on all of them.
+   */
+  themes?: readonly ThemeLevel[];
+  /**
+   * Where each document goes, given its input and level. The default writes
+   * beside the input, suffixing the level only when there is more than one.
+   */
+  outputFor?: (input: string, theme: ThemeLevel, themeCount: number) => string;
 }
 
+function defaultOutputFor(input: string, theme: ThemeLevel, themeCount: number) {
+  const base = input.replace(/\.tsx?$/, '');
+  return themeCount > 1 ? `${base}.${theme}.html` : `${base}.html`;
+}
+
+function assertLadder(themes: readonly ThemeLevel[]) {
+  for (const theme of themes) {
+    if (!THEME_LEVELS.includes(theme)) {
+      throw new Error(
+        `Unknown theme level "${theme}". Expected one of: ${THEME_LEVELS.join(', ')}.`,
+      );
+    }
+  }
+}
+
+/** Lint one report, throwing on anything that blocks. */
+async function lintOrThrow(input: string, enabled: boolean, strict: boolean) {
+  const problems = enabled ? lintReport(await readFile(input, 'utf8')) : [];
+  const blocking = problems.filter((p) => strict || p.severity === 'error');
+  if (blocking.length > 0) {
+    throw new Error(
+      `${path.basename(input)} breaks ${blocking.length} design system rule(s):\n\n` +
+        `${formatProblems(path.relative(process.cwd(), input), blocking)}`,
+    );
+  }
+  return problems.filter((p) => p.severity === 'warning');
+}
+
+/**
+ * Render one or more reports, on one or more rungs.
+ *
+ * The ordering is what makes this quick. Both expensive things are paid once and
+ * reused: Tailwind's compiler is built before the loop (~150ms, against ~0 per
+ * document after), and each input is bundled and rendered once no matter how
+ * many levels it is emitted at. Four levels of one report is therefore barely
+ * more work than one.
+ *
+ * Every report is linted **before** any of them is bundled, so a batch with a
+ * bad file fails in milliseconds rather than after rendering its siblings.
+ */
+export async function renderReports({
+  inputs,
+  themes = ['white'],
+  outputFor = defaultOutputFor,
+  title,
+  offline = false,
+  props,
+  strict = false,
+  lint = true,
+}: RenderReportsOptions): Promise<RenderReportResult[]> {
+  assertLadder(themes);
+  if (themes.length === 0) throw new Error('At least one theme level is required.');
+  if (inputs.length === 0) throw new Error('At least one report file is required.');
+
+  const absolute = inputs.map((input) => path.resolve(input));
+  const warnings = new Map<string, ReportProblem[]>();
+  for (const input of absolute) {
+    warnings.set(input, await lintOrThrow(input, lint, strict));
+  }
+
+  const { entry, styles } = await ownPaths();
+  const compiler = await createReportCssCompiler({ entry: styles, offline });
+
+  const results: RenderReportResult[] = [];
+  for (const input of absolute) {
+    const body = await renderMarkup({ input, designSystemEntry: entry, props });
+    const candidates = extractCandidates(body);
+    const css = compiler.build(candidates);
+
+    for (const theme of themes) {
+      const html = documentShell({
+        body,
+        css,
+        theme,
+        title: title ?? path.basename(input, path.extname(input)),
+      });
+      const output = path.resolve(outputFor(input, theme, themes.length));
+      await writeFile(output, html, 'utf8');
+      results.push({
+        input,
+        output,
+        theme,
+        html,
+        candidates: candidates.length,
+        bytes: Buffer.byteLength(html),
+        warnings: warnings.get(input) ?? [],
+      });
+    }
+  }
+  return results;
+}
+
+/** One report, one level, one file. The common case. */
 export async function renderReport({
   input,
   output,
-  title,
   theme = 'white',
-  offline = false,
-  props,
+  ...rest
 }: RenderReportOptions): Promise<RenderReportResult> {
-  if (!THEME_LEVELS.includes(theme)) {
-    throw new Error(`Unknown theme level "${theme}". Expected one of: ${THEME_LEVELS.join(', ')}.`);
-  }
-
-  const absoluteInput = path.resolve(input);
-  const destination = path.resolve(output ?? absoluteInput.replace(/\.tsx?$/, '.html'));
-  const { entry, styles } = await ownPaths();
-
-  const body = await renderMarkup({ input: absoluteInput, designSystemEntry: entry, props });
-  const candidates = extractCandidates(body);
-  const css = await buildReportCss({ entry: styles, candidates, offline });
-  const html = documentShell({
-    body,
-    css,
-    theme,
-    title: title ?? path.basename(absoluteInput, path.extname(absoluteInput)),
+  const [result] = await renderReports({
+    ...rest,
+    inputs: [input],
+    themes: [theme],
+    outputFor: output ? () => output : undefined,
   });
-
-  await writeFile(destination, html, 'utf8');
-  return { output: destination, html, candidates: candidates.length, bytes: Buffer.byteLength(html) };
+  return result as RenderReportResult;
 }

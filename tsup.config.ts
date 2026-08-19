@@ -20,5 +20,5 @@ export default defineConfig({
   // and `bin` points at a file the shell cannot execute.
   shims: true,
   onSuccess:
-    'cp src/styles.css src/theme.css src/prose.css dist/ && cp src/report/template.tsx dist/report/',
+    'cp src/styles.css src/theme.css src/prose.css dist/ && cp src/report/template.tsx src/report/sample.tsx dist/report/',
 });

@@ -9,34 +9,46 @@
 
 import process from 'node:process';
 import { THEME_LEVELS, type ThemeLevel } from '../theme/levels';
-import { renderReport } from './render';
+import { formatProblems } from './lint';
+import path from 'node:path';
+import { renderReports } from './render';
 
 const USAGE = `ds-report — render a TSX report to one self-contained HTML file
 
-  ds-report <report.tsx> [options]
+  ds-report <report.tsx> [more.tsx ...] [options]
 
 Options
-  -o, --output <file>   Where to write. Default: the input with an .html extension.
-  -t, --theme <level>   Theme ladder rung: ${THEME_LEVELS.join(' | ')}. Default: white.
+  -o, --output <file>   Where to write. Single input and single level only.
+                        Default: the input with an .html extension, suffixed
+                        with the level when more than one is asked for.
+  -t, --theme <levels>  Comma-separated rungs: ${THEME_LEVELS.join(' | ')}.
+                        Default: white. Several levels cost one render, not two.
       --title <text>    Document <title>. Default: the input's filename.
       --offline         Drop the webfont import; fall back to system type.
+      --strict          Treat lint warnings as errors. Use this in CI.
+      --no-lint         Skip the design system lint. For files you did not write.
   -h, --help            This text.
+
+The report is linted against this system's own rules before it renders: colours
+must address roles, and two static-output hazards warn. See AGENTS.md.
 
 The report must default-export a React component. Compose it from
 @rtkelly13/design-system — ReportDocument and ReportSection are the frame.
 `;
 
 interface Parsed {
-  input?: string;
+  inputs: string[];
   output?: string;
   theme?: string;
   title?: string;
   offline: boolean;
+  strict: boolean;
+  lint: boolean;
   help: boolean;
 }
 
 function parse(argv: readonly string[]): Parsed {
-  const parsed: Parsed = { offline: false, help: false };
+  const parsed: Parsed = { inputs: [], offline: false, strict: false, lint: true, help: false };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index] as string;
     const next = () => {
@@ -60,14 +72,19 @@ function parse(argv: readonly string[]): Parsed {
       case '--offline':
         parsed.offline = true;
         break;
+      case '--strict':
+        parsed.strict = true;
+        break;
+      case '--no-lint':
+        parsed.lint = false;
+        break;
       case '-h':
       case '--help':
         parsed.help = true;
         break;
       default:
         if (argument.startsWith('-')) throw new Error(`Unknown option ${argument}.`);
-        if (parsed.input) throw new Error('Only one report file at a time.');
-        parsed.input = argument;
+        parsed.inputs.push(argument);
     }
   }
   return parsed;
@@ -89,21 +106,43 @@ function explain(error: unknown): string {
 
 async function main(argv: readonly string[]) {
   const options = parse(argv);
-  if (options.help || !options.input) {
+  if (options.help || options.inputs.length === 0) {
     process.stdout.write(USAGE);
-    process.exitCode = options.input ? 0 : 1;
+    process.exitCode = options.inputs.length > 0 ? 0 : 1;
     return;
   }
-  const result = await renderReport({
-    input: options.input,
-    output: options.output,
+
+  const themes = (options.theme?.split(',').map((t) => t.trim()) ?? ['white']) as ThemeLevel[];
+  if (options.output && (options.inputs.length > 1 || themes.length > 1)) {
+    throw new Error('--output names one file, so it cannot be used with several inputs or levels.');
+  }
+
+  const results = await renderReports({
+    inputs: options.inputs,
+    themes,
+    outputFor: options.output ? () => options.output as string : undefined,
     title: options.title,
-    theme: options.theme as ThemeLevel | undefined,
     offline: options.offline,
+    strict: options.strict,
+    lint: options.lint,
   });
-  process.stdout.write(
-    `${result.output}  ${(result.bytes / 1024).toFixed(1)}kB, ${result.candidates} utilities\n`,
-  );
+
+  // One warning block per input, not per document: four levels of one report
+  // share a source file and would otherwise repeat themselves four times.
+  const reported = new Set<string>();
+  for (const result of results) {
+    if (result.warnings.length === 0 || reported.has(result.input)) continue;
+    reported.add(result.input);
+    process.stderr.write(
+      `${formatProblems(path.relative(process.cwd(), result.input), result.warnings)}\n\n` +
+        '  (--strict makes these fail)\n\n',
+    );
+  }
+  for (const result of results) {
+    process.stdout.write(
+      `${result.output}  ${(result.bytes / 1024).toFixed(1)}kB, ${result.candidates} utilities\n`,
+    );
+  }
 }
 
 main(process.argv.slice(2)).catch((error: unknown) => {

@@ -50,16 +50,38 @@ export interface ReportCssOptions {
   offline?: boolean;
 }
 
-export async function buildReportCss({
+/**
+ * A compiler bound to one stylesheet, reusable across reports.
+ *
+ * The split exists because the two halves cost wildly different amounts: parsing
+ * Tailwind's own stylesheet plus this package's four is ~150ms, while emitting
+ * the rules for a candidate set is ~13ms once and ~0 after. Rendering several
+ * reports — or one report on several rungs of the ladder — should pay the first
+ * cost once, and `renderReports` is what does.
+ */
+export interface ReportCssCompiler {
+  build(candidates: readonly string[]): string;
+}
+
+export async function createReportCssCompiler({
   entry,
-  candidates,
   offline = false,
-}: ReportCssOptions): Promise<string> {
+}: Omit<ReportCssOptions, 'candidates'>): Promise<ReportCssCompiler> {
   const source = await readFile(entry, 'utf8');
   const compiler = await compile(offline ? source.replace(WEBFONT_IMPORT, '') : source, {
     base: path.dirname(entry),
     loadStylesheet,
     loadModule,
   });
-  return compiler.build([...candidates]);
+  return { build: (candidates) => compiler.build([...candidates]) };
+}
+
+/** One-shot convenience over {@link createReportCssCompiler}. */
+export async function buildReportCss({
+  entry,
+  candidates,
+  offline = false,
+}: ReportCssOptions): Promise<string> {
+  const compiler = await createReportCssCompiler({ entry, offline });
+  return compiler.build(candidates);
 }

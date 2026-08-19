@@ -6,10 +6,17 @@
  * entry would make every consumer of the components carry a build toolchain.
  */
 
-export { renderReport } from './render';
-export type { RenderReportOptions, RenderReportResult } from './render';
+export { renderReport, renderReports } from './render';
+export type {
+  ReportOptions,
+  RenderReportOptions,
+  RenderReportsOptions,
+  RenderReportResult,
+} from './render';
 export { extractCandidates } from './candidates';
-export { buildReportCss } from './css';
-export type { ReportCssOptions } from './css';
+export { lintReport, formatProblems } from './lint';
+export type { ReportProblem, Severity } from './lint';
+export { buildReportCss, createReportCssCompiler } from './css';
+export type { ReportCssOptions, ReportCssCompiler } from './css';
 export { documentShell } from './shell';
 export type { DocumentShellOptions } from './shell';

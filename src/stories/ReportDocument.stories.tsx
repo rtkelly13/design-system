@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ReportDocument, ReportSection } from '../report/ReportDocument';
+import { ReportDocument, ReportDetails, ReportSection } from '../report/ReportDocument';
+import SampleReport from '../report/sample';
 import { Badge } from '../components/Badge';
 import { Card } from '../components/Card';
 import { DataTable } from '../components/DataTable';
@@ -69,6 +70,35 @@ export const QualityGate: Story = {
       </>
     ),
   },
+};
+
+/**
+ * `src/report/sample.tsx`, rendered exactly as `ds-report` renders it.
+ *
+ * This is the asserted case in the visual suite, and it is the reason the
+ * generator's output is reviewable at all: the shipped path writes a static file
+ * nobody watches, so a change to the report vocabulary would otherwise only show
+ * up in someone's next report. Because it is the same file the render test and
+ * the CLI use, a screenshot here covers all three.
+ */
+export const Sample: StoryObj = {
+  render: () => <SampleReport />,
+};
+
+/** Progressive disclosure with no client JS — a `<details>`, open and closed. */
+export const Disclosure: StoryObj = {
+  render: () => (
+    <div className="mx-auto flex max-w-2xl flex-col gap-4 p-8">
+      <ReportDetails summary="Open by default" note="3 lines" open>
+        <p className="font-mono text-sm text-content-secondary">
+          The block a reader came for should not need a click.
+        </p>
+      </ReportDetails>
+      <ReportDetails summary="Folded away" note="200 rows">
+        <p className="font-mono text-sm text-content-secondary">Nothing omitted, nothing in the way.</p>
+      </ReportDetails>
+    </div>
+  ),
 };
 
 /** Header only — no metadata strip, no subtitle. */

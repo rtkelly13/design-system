@@ -15,6 +15,11 @@
  * the repo has no ESLint config, and a check that runs today beats a check that
  * arrives with 200 transitive dependencies.
  *
+ * The rules themselves are in `src/lib/tokenRules.ts`, because `ds-report` runs
+ * the same ones over a report's TSX — at budget zero, since a report is new code
+ * with no debt to grandfather. This file owns the budgets and the reporting; it
+ * does not own the regexes, so the two can never drift apart.
+ *
  *   node scripts/check-tokens.mjs           fail if any category exceeds budget
  *   node scripts/check-tokens.mjs --list    show every offending line
  */
@@ -22,49 +27,12 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+// A `.ts` import from a plain `.mjs` script: Node strips the types. That is what
+// lets the rules be shared with `src/report/lint.ts` rather than copied.
+import { TOKEN_RULES, scanTokenRules } from '../src/lib/tokenRules.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SCAN = [path.join(ROOT, 'src', 'components'), path.join(ROOT, 'src', 'stories')];
-
-/**
- * Each rule is one way of naming a colour instead of a role.
- *
- * `hex` and `rawPalette` are the two that actually break a level: a literal
- * cannot follow the ladder, so it renders identically on `midnight` and
- * `white`. `legacyAlias` is less urgent — those names still resolve, through
- * the deprecated compat block in theme.css — but the block cannot be removed
- * while they exist. `darkVariant` is the one that stops making sense entirely
- * at four levels.
- */
-const RULES = [
-  {
-    id: 'hex',
-    label: 'Hex literals',
-    pattern: /#[0-9a-fA-F]{3,8}\b/g,
-    fix: 'Use a --ds-* token or a semantic utility (bg-surface-raised, text-accent-primary).',
-  },
-  {
-    id: 'rawPalette',
-    label: 'Literal Tailwind palette utilities',
-    pattern:
-      /\b(?:bg|text|border|divide|placeholder|ring|from|to|via)-(?:white|black|zinc|gray|slate|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(?:-\d{2,3})?(?:\/\d{1,3})?\b/g,
-    fix: 'Use the semantic utilities: bg-surface-*, text-content-*, border-edge-*, text-intent-*.',
-  },
-  {
-    id: 'legacyAlias',
-    label: 'Legacy brutalist-* colour aliases',
-    // `brutalist-card` / `-btn` / `-badge` are component classes in styles.css,
-    // already written against roles — they are not colour names and stay.
-    pattern: /\bbrutalist-(?:cyan|neonCyan|pink|yellow|neonGreen|green|cyberOrange|darkBg|shadow-color)\b/g,
-    fix: 'Use accent-*/intent-* utilities or --ds-* tokens. Blocks removing the compat block in theme.css.',
-  },
-  {
-    id: 'darkVariant',
-    label: 'dark: colour variants',
-    pattern: /\bdark:(?:bg|text|border|divide|placeholder|ring|from|to|via)-/g,
-    fix: 'Tokens switch on their own. dark: is only for non-colour utilities, and means "midnight or dim" now.',
-  },
-];
 
 /**
  * Counts at the commit that introduced the ladder, less what the Input, Modal,
@@ -91,27 +59,11 @@ function walk(dir) {
 }
 
 const files = SCAN.flatMap((dir) => walk(dir)).sort();
-const findings = new Map(RULES.map((rule) => [rule.id, []]));
+const findings = new Map(TOKEN_RULES.map((rule) => [rule.id, []]));
 
 for (const file of files) {
-  const source = readFileSync(file, 'utf8');
-  const lines = source.split('\n');
-  for (const rule of RULES) {
-    lines.forEach((line, index) => {
-      // Comment lines describe the rules as often as they break them.
-      const trimmed = line.trim();
-      if (trimmed.startsWith('*') || trimmed.startsWith('//')) return;
-      const matches = line.match(rule.pattern);
-      if (!matches) return;
-      for (const match of matches) {
-        findings.get(rule.id).push({
-          file: path.relative(ROOT, file),
-          line: index + 1,
-          match,
-          text: trimmed,
-        });
-      }
-    });
+  for (const finding of scanTokenRules(readFileSync(file, 'utf8'))) {
+    findings.get(finding.ruleId).push({ ...finding, file: path.relative(ROOT, file) });
   }
 }
 
@@ -120,7 +72,7 @@ let failed = false;
 
 console.log('Token hygiene — components and stories\n');
 
-for (const rule of RULES) {
+for (const rule of TOKEN_RULES) {
   const found = findings.get(rule.id);
   const budget = BUDGET[rule.id] ?? 0;
   const over = found.length > budget;
@@ -141,7 +93,7 @@ for (const rule of RULES) {
   if (over) console.log(`         ${rule.fix}`);
 }
 
-const total = RULES.reduce((sum, rule) => sum + findings.get(rule.id).length, 0);
+const total = TOKEN_RULES.reduce((sum, rule) => sum + findings.get(rule.id).length, 0);
 const budgetTotal = Object.values(BUDGET).reduce((a, b) => a + b, 0);
 console.log(`\n  ${total} total, budget ${budgetTotal}.`);
 

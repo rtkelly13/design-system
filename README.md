@@ -206,7 +206,8 @@ every byte of CSS it needs, inlined, no build step and nothing to serve.
 
 ```bash
 pnpm add -D @rtkelly13/design-system esbuild tailwindcss
-npx ds-report audit.tsx --theme white     # → audit.html
+npx ds-report audit.tsx --theme white              # → audit.html
+npx ds-report audit.tsx --theme midnight,white     # both rungs, one render
 ```
 
 ```tsx
@@ -245,12 +246,27 @@ is both minimal and complete, with no safelist and no scanner. A typical report 
 | `-t, --theme <rung>` | `midnight` · `dim` · `bright` · `white`. Default `white` — print-safe. |
 | `--title <text>` | Document `<title>`. Default: the input's filename. |
 | `--offline` | Drop the webfont import. Type falls back to the system stacks. |
+| `--strict` | Treat lint warnings as errors. Use this in CI. |
+| `--no-lint` | Skip the lint, for a file you did not write. |
 
-`dist/report/template.tsx` is a fuller worked example, and
-`@rtkelly13/design-system/report` exports `renderReport()` for calling the same
-pipeline from code. The output is **static** — no client JS, so `useState` and
-`Modal` render inert. `esbuild` and `tailwindcss` are optional peers, needed only
-by the generator.
+**The report is linted against this system's own rules before it renders.**
+Colours must address roles — a hex literal renders identically on `midnight` and
+on `white`, so those four rules are errors and they block. Two more warn: values
+that change between runs (`new Date()`, `Math.random()`), and behaviour that
+cannot run (`onClick`, `useState`) in a document with no client JS. `--strict`
+promotes the warnings.
+
+**Rendering more costs almost nothing more.** The theme lives on `<html>`, so
+every rung shares one render and one stylesheet: the whole ladder from one file
+takes 603ms against 2402ms for four separate invocations. Pass several inputs or
+several levels to one invocation rather than looping.
+
+`dist/report/sample.tsx` is the full worked example — verdict-first layout,
+collapsible `<details>` sections that need no script, a chart with no charting
+library, a designed empty state — and it doubles as the generator's regression
+fixture. `@rtkelly13/design-system/report` exports `renderReport()` and
+`renderReports()` for calling the same pipeline from code. `esbuild` and
+`tailwindcss` are optional peers, needed only by the generator.
 
 ---
 
