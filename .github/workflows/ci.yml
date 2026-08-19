@@ -55,6 +55,13 @@ jobs:
       - name: CSS Surface
         run: pnpm check:css
 
+      # Self-hosted fonts ship as @font-face rules nothing is obliged to
+      # reference. This fails if a --ds-font-* stack cannot name a family the
+      # installed @fontsource packages declare — the failure mode that otherwise
+      # surfaces only as "nearly every visual baseline moved".
+      - name: Font Reachability
+        run: pnpm check:fonts
+
       # knip finds unused/unlisted packages; check-deps.mjs requires each one to
       # have a stated reason, sit in the matching section, and — for CSS — be
       # reachable through the exports map.

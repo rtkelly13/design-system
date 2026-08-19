@@ -44,6 +44,22 @@ const pkg = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
  *             this package needs its own copy to build and test against.
  */
 const MANIFEST = {
+  '@fontsource-variable/inter': {
+    kind: 'runtime',
+    why: 'Self-hosted Inter (variable). `styles.css` imports it, so it resolves from the consumer\u2019s install \u2014 see the banner in that file for why these are not fetched from Google.',
+  },
+  '@fontsource-variable/space-grotesk': {
+    kind: 'runtime',
+    why: 'Self-hosted Space Grotesk (variable), the display face. Real axis is 300\u2013700.',
+  },
+  '@fontsource/ibm-plex-mono': {
+    kind: 'runtime',
+    why: 'Self-hosted IBM Plex Mono, the mono face. No variable build exists, so four static weights are imported individually.',
+  },
+  '@fontsource/vt323': {
+    kind: 'runtime',
+    why: 'Self-hosted VT323, the pixel face. Single weight.',
+  },
   'lucide-react': {
     kind: 'runtime',
     why: 'Icon set rendered by DocsHeader, AdminDashboardLayout and the sandbox. Runtime rather than peer so a consumer gets working icons without opting in — at the cost of a possible duplicate copy for consumers already using lucide. Worth revisiting if that bites.',
@@ -256,6 +272,29 @@ for (const name of cssImports()) {
     problems.push(
       `${name}: referenced from CSS (@import/@plugin) but not declared. It resolves from the consumer's node_modules, so it must be a peer dependency.`,
     );
+  }
+}
+
+// 4b. Every knip exemption must be earned. `ignoreDependencies` exists because
+//     knip does not parse at-rules, so a package referenced only from CSS looks
+//     unused to it. That is a narrow, checkable reason — and until now nothing
+//     checked it, which made the list a place to silence any complaint. An entry
+//     with no CSS reference behind it is exactly the abuse AGENTS.md warns about.
+{
+  let knip;
+  try {
+    knip = JSON.parse(readFileSync(path.join(ROOT, 'knip.json'), 'utf8'));
+  } catch {
+    problems.push('knip.json is missing or unparseable.');
+    knip = {};
+  }
+  const referencedFromCss = cssImports();
+  for (const name of knip.ignoreDependencies ?? []) {
+    if (!referencedFromCss.has(name)) {
+      problems.push(
+        `${name}: in knip's ignoreDependencies but referenced from no CSS @import/@plugin. That exemption exists only for packages knip cannot see because they are used from an at-rule — remove it, or reference the package from CSS.`,
+      );
+    }
   }
 }
 
