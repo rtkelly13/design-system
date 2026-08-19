@@ -97,7 +97,7 @@ const pack = (dir) => {
   check(
     `peer range ${declared} still admits the design system's ${actual}`,
     satisfied,
-    'Bump the @rtkelly13/design-system range in packages/ds-report/package.json.',
+    'Bump the @rtkelly13/design-system range in packages/design-system-report/package.json.',
   );
 }
 

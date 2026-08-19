@@ -200,13 +200,13 @@ misconfigured `@source` would half-break a sidebar rather than fail loudly.
 
 ## 📄 HTML Reports From TSX
 
-Reports are a `.tsx` file rendered by **[`@rtkelly13/ds-report`](../ds-report)**,
+Reports are a `.tsx` file rendered by **[`@rtkelly13/design-system-report`](../ds-report)**,
 a separate package — it needs esbuild, Tailwind's compiler and a TypeScript
 compiler, none of which belongs in an app that installs this library for its
 components.
 
 ```bash
-pnpm add -D @rtkelly13/design-system @rtkelly13/ds-report esbuild tailwindcss
+pnpm add -D @rtkelly13/design-system @rtkelly13/design-system-report esbuild tailwindcss
 npx ds-report audit.tsx --theme white     # → audit.html, self-contained
 ```
 

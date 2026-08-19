@@ -11,7 +11,7 @@ name: Publish Packages to npm
 #     already exist.
 #
 # Two packages, published in dependency order: @rtkelly13/design-system then
-# @rtkelly13/ds-report, which declares the first as a peer. Neither uses the
+# @rtkelly13/design-system-report, which declares the first as a peer. Neither uses the
 # `workspace:` protocol in package.json, deliberately — `npm publish` does not
 # rewrite it, and rewriting is `pnpm publish`'s job, which is not the path
 # trusted publishing goes through here. pnpm still links the local copy, because
@@ -75,7 +75,7 @@ jobs:
         run: |
           SHORT_SHA=$(git rev-parse --short HEAD)
           PR_SEGMENT="${{ inputs.pr-number }}"
-          for dir in packages/design-system packages/ds-report; do
+          for dir in packages/design-system packages/design-system-report; do
             BASE_VERSION=$(node -p "require('./${dir}/package.json').version.split('-')[0]")
             DEV_VERSION="${BASE_VERSION}-dev.${PR_SEGMENT:-0}.${SHORT_SHA}"
             (cd "${dir}" && npm version "${DEV_VERSION}" --no-git-tag-version)
@@ -91,7 +91,7 @@ jobs:
         shell: bash
         run: |
           TAG="${{ inputs.dev == true && 'dev' || 'latest' }}"
-          for dir in packages/design-system packages/ds-report; do
+          for dir in packages/design-system packages/design-system-report; do
             NAME=$(node -p "require('./${dir}/package.json').name")
             VERSION=$(node -p "require('./${dir}/package.json').version")
             if npm view "${NAME}@${VERSION}" version > /dev/null 2>&1; then
@@ -105,7 +105,7 @@ jobs:
       - name: Job summary
         shell: bash
         run: |
-          for dir in packages/design-system packages/ds-report; do
+          for dir in packages/design-system packages/design-system-report; do
             NAME=$(node -p "require('./${dir}/package.json').name")
             VERSION=$(node -p "require('./${dir}/package.json').version")
             echo "Published (or found existing) **${NAME}@${VERSION}**" >> "$GITHUB_STEP_SUMMARY"

@@ -6,7 +6,7 @@ this file only says which that is and what holds between them.
 | Package | What it is | Depends on |
 |---|---|---|
 | [`packages/design-system`](./packages/design-system/AGENTS.md) | `@rtkelly13/design-system` — the brutalist component library, the four-rung theme ladder, and the CSS contract. React and Tailwind, no Node. | react, react-dom, tailwindcss (peers) |
-| [`packages/ds-report`](./packages/ds-report/AGENTS.md) | `@rtkelly13/ds-report` — renders a `.tsx` file to one self-contained HTML report. Node-only tooling with a `ds-report` bin. | **the design system** (peer), esbuild, tailwindcss, typescript |
+| [`packages/design-system-report`](./packages/design-system-report/AGENTS.md) | `@rtkelly13/design-system-report` — renders a `.tsx` file to one self-contained HTML report. Node-only tooling. Its bin is **`ds-report`**: a package name is read, a bin name is typed. | **the design system** (peer), esbuild, tailwindcss, typescript |
 
 Package manager is **pnpm** (`node >=22`).
 
@@ -14,8 +14,8 @@ Package manager is **pnpm** (`node >=22`).
 
 ## 🛑 The dependency runs one way
 
-`ds-report` depends on `design-system`. **The design system must never depend on
-the report generator**, and nothing in it may import from that package — stories
+`design-system-report` depends on `design-system`. **The design system must never
+depend on the report generator**, and nothing in it may import from that package — stories
 and tests included.
 
 This is why the split exists at all. The generator needs esbuild, Tailwind's
@@ -45,8 +45,8 @@ Two consequences worth knowing before working across the line:
 These fan out across the workspace. Everything else is per-package.
 
 - `pnpm build`: design system first, then the generator. **That order is the
-  workspace's one hard sequencing** — `ds-report` resolves its peer through the
-  design system's `exports` map, which points at `dist/`.
+  workspace's one hard sequencing** — the report generator resolves its peer
+  through the design system's `exports` map, which points at `dist/`.
 - `pnpm typecheck`: both packages, building the design system in between for the
   same reason.
 - `pnpm test`: both suites. The design system's is ~5s; the generator's is ~30s,
@@ -67,7 +67,7 @@ Both packages publish from `main` via npm **Trusted Publishing** (OIDC) in
 Bump the version in the package's own `package.json` in the PR.
 
 > [!IMPORTANT]
-> `@rtkelly13/ds-report` has never been published. Trusted publishing is
+> `@rtkelly13/design-system-report` has never been published. Trusted publishing is
 > configured per package on npmjs.com and cannot be set up for a package that
 > does not exist yet, so its **first** release needs either a manual publish or
 > the trusted-publisher entry created first. The design system is already

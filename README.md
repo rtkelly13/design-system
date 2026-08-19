@@ -5,7 +5,7 @@ A pnpm workspace holding two published packages.
 | | |
 |---|---|
 | **[`@rtkelly13/design-system`](./packages/design-system)** | Brutalist React component library — a four-rung theme ladder, semantic role tokens, slide deck and docs chrome, visual-regression tested. [README](./packages/design-system/README.md) |
-| **[`@rtkelly13/ds-report`](./packages/ds-report)** | Renders a `.tsx` file to one self-contained HTML report, styled by the design system. [README](./packages/ds-report/README.md) |
+| **[`@rtkelly13/design-system-report`](./packages/design-system-report)** | Renders a `.tsx` file to one self-contained HTML report, styled by the design system. [README](./packages/design-system-report/README.md) |
 
 ```bash
 pnpm install

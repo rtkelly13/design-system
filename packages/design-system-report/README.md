@@ -1,11 +1,11 @@
-# 📄 @rtkelly13/ds-report
+# 📄 @rtkelly13/design-system-report
 
 Render a `.tsx` file to **one self-contained `.html` file** — markup and every
 byte of CSS it needs, inlined. No build step, nothing to serve, styled by
 [`@rtkelly13/design-system`](../design-system).
 
 ```bash
-pnpm add -D @rtkelly13/design-system @rtkelly13/ds-report esbuild tailwindcss
+pnpm add -D @rtkelly13/design-system @rtkelly13/design-system-report esbuild tailwindcss
 npx ds-report audit.tsx --theme white              # → audit.html
 npx ds-report audit.tsx --theme midnight,white     # both rungs, one render
 ```

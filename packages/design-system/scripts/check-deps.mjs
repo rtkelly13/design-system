@@ -61,7 +61,7 @@ const MANIFEST = {
   'react-dom': {
     kind: 'peer',
     alsoDev: true,
-    why: 'Not imported by this package anywhere — declared because a consumer rendering these components needs it, and the Storybook react renderer does. `@rtkelly13/ds-report` renders these components with `react-dom/server`, but it declares its own peer for that.',
+    why: 'Not imported by this package anywhere — declared because a consumer rendering these components needs it, and the Storybook react renderer does. `@rtkelly13/design-system-report` renders these components with `react-dom/server`, but it declares its own peer for that.',
   },
   typescript: { kind: 'dev', why: 'Type checking and declaration output. Pinned — see AGENTS.md.' },
   '@tailwindcss/typography': {

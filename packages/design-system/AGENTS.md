@@ -82,7 +82,7 @@ Package manager is **pnpm** (`node >=22`).
 - **Bracketed Display Typography**: Headings render in Space Grotesk enclosed in `[ BRACKETED ]` display type.
 - **Semantic Roles Over Hues**: Components address roles, never colours. See below.
 - **Styling Lives in TSX**: Tailwind utilities on the element. CSS files declare variables and nothing else. See below.
-- **Reports Are Rendered, Not Written**: an HTML report is a `.tsx` file put through `@rtkelly13/ds-report`, never hand-written markup. See below.
+- **Reports Are Rendered, Not Written**: an HTML report is a `.tsx` file put through `@rtkelly13/design-system-report`, never hand-written markup. See below.
 
 ---
 
@@ -313,7 +313,7 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 
 ## 📄 Reports Live In Another Package
 
-An HTML report is a `.tsx` file rendered by **`@rtkelly13/ds-report`**, never
+An HTML report is a `.tsx` file rendered by **`@rtkelly13/design-system-report`**, never
 hand-written markup. That package depends on this one, so the dependency runs one
 way and nothing here may import it.
 
@@ -321,8 +321,8 @@ What stays here is the **frame** — `ReportDocument`, `ReportSection` and
 `ReportDetails` in `src/components/ReportDocument.tsx`. They are ordinary
 components with a story and a visual baseline, and they are design rather than
 tooling. The generator, its lint, its typechecker and its ~10MB of build
-toolchain live in `packages/ds-report`; see
-[`packages/ds-report/AGENTS.md`](../ds-report/AGENTS.md).
+toolchain live in `packages/design-system-report`; see
+[`packages/design-system-report/AGENTS.md`](../ds-report/AGENTS.md).
 
 The split of testing follows the split of ownership: **this package asserts how
 the report frame looks**, through `foundations-reportdocument--quality-gate` and

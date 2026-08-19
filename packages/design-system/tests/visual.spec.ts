@@ -96,7 +96,7 @@ const CASES: readonly VisualCase[] = [
   // gap its own § *Screenshot Walkthrough* calls out.
   { id: 'foundations-theme-ladder--all-levels', snapshot: 'theme-ladder-all-levels.png', fullPage: true },
 
-  // The report frame. `@rtkelly13/ds-report` renders reports into it, and that
+  // The report frame. `@rtkelly13/design-system-report` renders reports into it, and that
   // package depends on this one — so this story composes the frame itself rather
   // than importing the generator's sample, which would invert the dependency.
   // This package asserts how the frame looks; the generator asserts its pipeline.

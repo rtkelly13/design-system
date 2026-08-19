@@ -29,7 +29,7 @@
   // in `files` and ship nowhere, but they import this package and must typecheck
   // like anything else — a report that fails at render time is a worse error
   // than one that fails at build time.
-  // `reports/` holds reports about this package, rendered by @rtkelly13/ds-report.
+  // `reports/` holds reports about this package, rendered by @rtkelly13/design-system-report.
   // They are not in `files` and ship nowhere, but they import this package by
   // name — which resolves by Node self-reference through the `exports` map — and
   // must typecheck like anything else.

@@ -17,7 +17,7 @@ export type { ClassInput } from './lib/recipe';
 export * from './lib/slug';
 // The colour-instead-of-role rules. Public because they are the design system's
 // rules rather than one script's: `scripts/check-tokens.mjs` ratchets the
-// components against them, and `@rtkelly13/ds-report` holds a report to them at
+// components against them, and `@rtkelly13/design-system-report` holds a report to them at
 // budget zero. A second copy of these regexes would be a second, drifting truth.
 export * from './lib/tokenRules';
 
@@ -66,7 +66,7 @@ export * from './components/admin/AdminDashboardLayout';
 export * from './components/docs';
 
 // Report Frame — the page layout a generated report is built in. The generator
-// that renders it is a separate package, `@rtkelly13/ds-report`: it needs
+// that renders it is a separate package, `@rtkelly13/design-system-report`: it needs
 // esbuild, Tailwind and a TypeScript compiler, none of which belongs in the
 // dependency graph of an app that just wants the components.
 export * from './components/ReportDocument';

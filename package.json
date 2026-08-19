@@ -7,13 +7,13 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "pnpm --filter @rtkelly13/design-system build && pnpm --filter @rtkelly13/ds-report build",
-    "typecheck": "pnpm --filter @rtkelly13/design-system typecheck && pnpm --filter @rtkelly13/design-system build && pnpm --filter @rtkelly13/ds-report typecheck",
+    "build": "pnpm --filter @rtkelly13/design-system build && pnpm --filter @rtkelly13/design-system-report build",
+    "typecheck": "pnpm --filter @rtkelly13/design-system typecheck && pnpm --filter @rtkelly13/design-system build && pnpm --filter @rtkelly13/design-system-report typecheck",
     "test": "pnpm -r test",
     "check:deps": "pnpm -r check:deps",
-    "report": "pnpm --filter @rtkelly13/ds-report report",
-    "verify:report-cli": "pnpm --filter @rtkelly13/ds-report verify:report-cli",
-    "contrast:report:html": "pnpm build && node packages/ds-report/dist/cli.js packages/design-system/reports/contrast.tsx",
+    "report": "pnpm --filter @rtkelly13/design-system-report report",
+    "verify:report-cli": "pnpm --filter @rtkelly13/design-system-report verify:report-cli",
+    "contrast:report:html": "pnpm build && node packages/design-system-report/dist/cli.js packages/design-system/reports/contrast.tsx",
     "tokens:build": "pnpm --filter @rtkelly13/design-system tokens:build",
     "tokens:check": "pnpm --filter @rtkelly13/design-system tokens:check",
     "check:contrast": "pnpm --filter @rtkelly13/design-system check:contrast",

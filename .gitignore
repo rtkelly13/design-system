@@ -26,10 +26,10 @@ walkthrough-results/
 coverage/
 
 # Dev-only bundle written by `pnpm report` (scripts/report.mjs).
-packages/ds-report/src/.dev-cli.mjs
+packages/design-system-report/src/.dev-cli.mjs
 
 # Written by a `renderReport` default-path test; removed again on success.
-packages/ds-report/src/__fixtures__/*.html
+packages/design-system-report/src/__fixtures__/*.html
 
 # Rendered by `pnpm report reports/<name>.tsx`.
 packages/*/reports/*.html

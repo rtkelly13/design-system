@@ -1,7 +1,13 @@
-# AGENTS.md — @rtkelly13/ds-report
+# AGENTS.md — @rtkelly13/design-system-report
 
 Renders a `.tsx` file to one self-contained HTML report, styled by
-`@rtkelly13/design-system`. Published to public npm; `ds-report` is the bin.
+`@rtkelly13/design-system`. Published to public npm.
+
+**The bin is `ds-report`, not the package name.** That asymmetry is deliberate: a
+package name is read, in a manifest and on npm, where
+`@rtkelly13/design-system-report` says exactly what it is and what it belongs to.
+A bin name is typed, every time, and `npx ds-report audit.tsx` is the thing
+somebody actually runs. `typescript` shipping `tsc` is the same trade.
 
 Package manager is **pnpm** (`node >=22`). This is one package in a workspace —
 see the [root AGENTS.md](../../AGENTS.md) for how the two fit together, and
@@ -12,7 +18,7 @@ every report is held to.
 
 ## 🛑 The one-way dependency
 
-`@rtkelly13/ds-report` depends on `@rtkelly13/design-system`. The design system
+`@rtkelly13/design-system-report` depends on `@rtkelly13/design-system`. The design system
 must never depend on this package, and nothing there may import from here —
 that includes stories and tests. When a change seems to need it, the thing being
 reached for belongs on the design system's side of the line.

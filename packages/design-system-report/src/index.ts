@@ -1,5 +1,5 @@
 /**
- * `@rtkelly13/ds-report` — a TSX file in, one self-contained HTML report out.
+ * `@rtkelly13/design-system-report` — a TSX file in, one self-contained HTML report out.
  *
  * A separate package on purpose. This needs esbuild, Tailwind's compiler and a
  * TypeScript compiler to do its job; none of that belongs in the dependency

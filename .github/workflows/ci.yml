@@ -38,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # Everything below runs across the workspace. The two published packages
-      # are packages/design-system and packages/ds-report; each owns its own
+      # are packages/design-system and packages/design-system-report; each owns its own
       # checks, and the root scripts fan out with `pnpm -r` or `--filter`.
 
       # theme.css is generated from src/theme/levels.ts. This fails if the
@@ -69,7 +69,7 @@ jobs:
         run: pnpm typecheck
 
       # Builds the design system first, then the report generator. That order is
-      # the workspace's only hard sequencing: `@rtkelly13/ds-report` resolves its
+      # the workspace's only hard sequencing: `@rtkelly13/design-system-report` resolves its
       # peer through the design system's `exports` map, which points at `dist/`.
       - name: Build Packages
         run: pnpm build
