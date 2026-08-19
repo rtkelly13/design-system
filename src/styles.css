@@ -20,7 +20,52 @@
  * `Badge` and `AsciiDivider`. `.brutalist-btn` and `.brutalist-btn-pink` had no
  * caller anywhere in this package and are gone; use `<Button />`.
  */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=VT323&display=swap');
+/* Fonts are self-hosted, from `@fontsource`, and that is a correctness choice
+ * before it is a performance one.
+ *
+ * These lines replace a remote `@import` of the Google Fonts CSS API. Four
+ * things were wrong with that:
+ *
+ *   1. **It transmits every visitor's IP to a third party.** The Munich
+ *      Regional Court held that doing so without consent breaches the GDPR,
+ *      specifically because self-hosting was available and so the transfer was
+ *      not necessary. A design system should not hand that decision — or that
+ *      liability — to whoever installs it.
+ *   2. **The performance argument no longer exists.** It rested on a shared
+ *      browser cache across every site using Google Fonts; cache partitioning
+ *      ended that, so each origin downloads its own copy regardless.
+ *   3. **`@import` of a remote stylesheet is the slowest possible delivery.**
+ *      It serialises: fetch this file, parse it, discover the import, fetch
+ *      Google's CSS, parse that, and only then fetch the WOFF2s. Three round
+ *      trips of render-blocking work before text can paint.
+ *   4. **The rendering was not pinned to anything.** Google can change a font
+ *      binary with no commit here, which moves both consumer rendering and this
+ *      repo's visual baselines with nothing to explain why. Now the exact bytes
+ *      are in the lockfile, pinned by the same mechanism as every other
+ *      dependency.
+ *
+ * Variable where a variable build exists — one file spans the whole weight axis
+ * instead of four to seven static files. `ibm-plex-mono` has no variable build,
+ * so its four weights are imported individually.
+ *
+ * Note `space-grotesk` really is a 300-700 family, while the old Google request
+ * asked for 800. Whatever resolved that gap before — Google clamping to 700
+ * server-side, or the browser synthesising — the outcome is unchanged: the
+ * visual suite compares all 38 baselines at `maxDiffPixels: 0` and every one of
+ * them is byte-identical across this change. Worth knowing that
+ * `font-extrabold` on a display face is not drawn at 800 by this family, but it
+ * was not before either.
+ *
+ * `theme.css` remains the bring-your-own-fonts path: it declares only the
+ * `--ds-font-*` roles, each indirecting through `var(--font-inter, ...)` so a
+ * consumer can substitute their own faces without touching this file. */
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
+@import "@fontsource/ibm-plex-mono/700.css";
+@import "@fontsource/vt323";
 @import "tailwindcss";
 @import "./theme.css";
 @import "./prose.css";

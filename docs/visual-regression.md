@@ -119,18 +119,18 @@ and is noted below.
   like.** Google can ship a new font binary with no commit here, and both
   consumer rendering and all 38 baselines move with nothing to explain why.
 
-  Blocking the request in the harness was tried and rejected — it makes the
-  baselines deterministic on a rendering **no user ever sees**. Self-hosting via
-  `@fontsource` is the fix, because it makes them deterministic *and*
-  representative: the font binaries land in the lockfile, pinned by the same
-  mechanism as every other dependency. It is also the answer to a question worth
-  asking separately — whether Google Fonts is a stable base for a published
-  package at all. It is not: the Munich Regional Court held that transmitting
-  visitor IPs to Google without consent breaches the GDPR precisely because
-  self-hosting was available; cache partitioning ended the shared-cache
-  performance argument; and `@import` of a remote stylesheet is the slowest
-  delivery available, serialising three round trips of render-blocking work
-  before text can paint.
+  **Fixed as of 0.3.0** by self-hosting via `@fontsource`, so the font binaries
+  are in the lockfile and pinned by the same mechanism as every other
+  dependency. Blocking the requests in the harness was tried first and rejected:
+  it makes the baselines deterministic on a rendering **no user ever sees**.
+
+  Google Fonts was not a stable base for a published package for reasons beyond
+  determinism, and they are worth keeping written down: the Munich Regional Court
+  held that transmitting visitor IPs to Google without consent breaches the GDPR
+  precisely because self-hosting was available; cache partitioning ended the
+  shared-cache performance argument years ago; and `@import` of a remote
+  stylesheet is the slowest delivery available, serialising three round trips of
+  render-blocking work before text can paint.
 - **CI and local render in different environments.** CI is `ubuntu-latest` plus
   `npx playwright install --with-deps chromium`. The industry-standard fix is to
   run both CI and local baselining inside the same official image
@@ -390,12 +390,17 @@ Revisit when one of these becomes true:
   1. Containerise the render environment
      (`mcr.microsoft.com/playwright:v1.62.1-noble` for both CI and local), so a
      baseline can be reproduced off CI at all. Forces one full re-record.
-  2. Self-host the fonts via `@fontsource`, which removes a render-blocking
-     third-party request for consumers and makes the baselines representative of
-     what a user sees rather than of what the runner could download.
+  2. Metric-adjusted fallbacks. Self-hosting removed the third party, but the
+     fallback stack is still whatever the browser picks while the webfont loads,
+     and mismatched fallback metrics are what reflowed a blog post by 60px once
+     already. `size-adjust` / `ascent-override` / `descent-override` /
+     `line-gap-override` on a local fallback `@font-face` makes the fallback
+     occupy the same box as the real face; `fontaine` generates those values
+     from the font's own metrics. That removes the class of bug rather than an
+     instance of it.
   3. A second viewport, once the shells are decomposed enough to be worth it.
   4. Revisit `threshold`, which is still Playwright's default 0.2.
 
 Closed recently: tolerance ([#32](https://github.com/rtkelly13/design-system/issues/32)),
-font determinism in the harness, the portal-aware render guard, and
-`/update-snapshots` being unable to create a baseline at all.
+self-hosted fonts, the portal-aware render guard, and `/update-snapshots` being
+unable to create a baseline at all.
