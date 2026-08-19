@@ -1,5 +1,7 @@
 import tseslint from 'typescript-eslint';
+import tailwindcss from 'eslint-plugin-tailwindcss';
 
+import { authoredClasses } from './scripts/authored-classes.mjs';
 import { TOKEN_RULES } from './scripts/token-rules.mjs';
 
 /**
@@ -105,5 +107,45 @@ export default tseslint.config(
     },
     plugins: { 'design-system': { rules: { 'no-colour-literals': noColourLiterals } } },
     rules: { 'design-system/no-colour-literals': 'error' },
+  },
+  {
+    /**
+     * Does this class exist at all?
+     *
+     * The rule above catches a colour named wrongly. This catches the other
+     * failure, and the more expensive one: a class that names *nothing*.
+     * `focus:border-brutalist-green`, `brutalist-card-panel`,
+     * `.sketch .ascii-divider::after` and `bracket-glyph` were all of this kind —
+     * dead on the day they were written, surviving every review that read them as
+     * intentional, because Tailwind does not care. An unknown utility emits no
+     * CSS, exits 0 and warns about nothing.
+     *
+     * `no-custom-classname` only knows Tailwind's own classes, which on its own
+     * makes it unusable here — it flags `docs-toc-link`, a real rule in
+     * `prose.css`, exactly as loudly as a dead one. The whitelist is therefore
+     * *derived* from the stylesheets rather than hand-written, which turns the
+     * question from "is this a Tailwind class" into "does this class exist", and
+     * leaves nothing to maintain: a docs-chrome class migrated into a `recipe`
+     * leaves `prose.css`, leaves the derived list, and starts being rejected.
+     */
+    name: 'design-system/classnames',
+    files: ['src/components/**/*.{ts,tsx}', 'src/stories/**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    plugins: { tailwindcss },
+    settings: {
+      tailwindcss: {
+        // Singular `src/style.css` is the plugin's default and does not exist here.
+        cssConfigPath: 'src/styles.css',
+        // `recipe` is this repo's name for `tv`. Without it the plugin never looks
+        // inside a recipe — which is where most class strings live.
+        functions: ['classnames', 'clsx', 'cn', 'cva', 'tv', 'recipe', 'twMerge'],
+      },
+    },
+    rules: {
+      'tailwindcss/no-custom-classname': ['error', { whitelist: authoredClasses() }],
+    },
   },
 );

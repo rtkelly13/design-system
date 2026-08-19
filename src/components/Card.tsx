@@ -1,4 +1,5 @@
 import type { ReactNode, HTMLAttributes, CSSProperties } from 'react';
+import { cn } from '../lib/recipe';
 import { accentVar, semanticTokens } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
 
@@ -52,7 +53,7 @@ export function Card({
   if (panel || (!title && children)) {
     return (
       <div
-        className={className.trim()}
+        className={cn(className)}
         style={{ ...baseCardStyle, padding: '1.5rem' }}
         {...props}
       >

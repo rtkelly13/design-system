@@ -86,6 +86,10 @@ const MANIFEST = {
     why: 'Reports a colour written as a literal at the line that wrote it. Replaced the check-tokens.mjs ratchet, whose text-regex counted matches inside comments and regexes and so could never reach zero.',
   },
   'typescript-eslint': { kind: 'dev', why: 'TSX parser for the lint rule above; the violations live in JSX attributes.' },
+  'eslint-plugin-tailwindcss': {
+    kind: 'dev',
+    why: 'no-custom-classname, the only check that catches a class naming nothing — the failure Tailwind is silent about. Its whitelist is derived from the stylesheets by scripts/authored-classes.mjs, so it asks "does this class exist" rather than "is it a Tailwind class".',
+  },
   '@types/node': {
     kind: 'dev',
     why: 'Types for `node:fs`/`node:path` in the unit suite, which reads the generated theme.css from disk to assert its shape.',
