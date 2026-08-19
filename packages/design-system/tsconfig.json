@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    // tsup's dts worker injects its own `baseUrl`, which TS 6 deprecates. Remove
+    // once tsup ships a rollup-plugin-dts that no longer sets it (also what
+    // currently blocks TS 7 here).
+    "ignoreDeprecations": "6.0",
+    // Named explicitly, with an explicit root, because tsup's dts worker injects
+    // its own `baseUrl` and then cannot resolve `@types/node` — every `node:`
+    // import in `src/report/` fails there while `tsc --noEmit` is happy. Remove
+    // both lines if that tsup issue is ever fixed.
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  // `reports/` holds repo-local reports rendered by `pnpm report`. They are not
+  // in `files` and ship nowhere, but they import this package and must typecheck
+  // like anything else — a report that fails at render time is a worse error
+  // than one that fails at build time.
+  // `reports/` holds reports about this package, rendered by @rtkelly13/ds-report.
+  // They are not in `files` and ship nowhere, but they import this package by
+  // name — which resolves by Node self-reference through the `exports` map — and
+  // must typecheck like anything else.
+  "include": ["src/**/*", "reports/**/*"]
+}

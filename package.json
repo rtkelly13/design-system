@@ -1,138 +1,30 @@
 {
-  "name": "@rtkelly13/design-system",
-  "version": "0.3.0",
-  "description": "Brutalist design system with a four-level theme ladder, slide deck system, and experiments foundation for Ryan Kelly websites",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "style": "./dist/styles.css",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    },
-    "./report": {
-      "types": "./dist/report/index.d.ts",
-      "import": "./dist/report/index.mjs",
-      "require": "./dist/report/index.js"
-    },
-    "./styles.css": "./dist/styles.css",
-    "./theme.css": "./dist/theme.css",
-    "./prose.css": "./dist/prose.css"
+  "name": "@rtkelly13/design-system-monorepo",
+  "private": true,
+  "description": "Workspace root. The published packages are under packages/.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
   },
-  "bin": {
-    "ds-report": "./dist/report/cli.js"
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
   "scripts": {
-    "build": "pnpm tokens:build && tsup",
-    "tokens:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs",
-    "tokens:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs --check",
-    "check:contrast": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs",
-    "contrast:report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs --report",
-    "contrast:report:html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/report.mjs reports/contrast.tsx",
-    "check:tokens": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs",
-    "check:tokens:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs --list",
-    "check:css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs",
-    "check:css:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs --list",
-    "check:visual-coverage": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-visual-coverage.mjs",
-    "check:visual-coverage:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-visual-coverage.mjs --list",
-    "check:deps": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deps.mjs && knip --no-progress --include dependencies,unlisted,unresolved",
-    "deps:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deps.mjs --list",
-    "knip": "knip --no-progress",
-    "dev": "tsup --watch",
-    "report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/report.mjs",
-    "verify:report-cli": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-report-cli.mjs",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static",
-    "test:visual": "playwright test tests/visual.spec.ts",
-    "test:visual:missing": "playwright test tests/visual.spec.ts --update-snapshots=missing",
-    "test:visual:update": "playwright test tests/visual.spec.ts --update-snapshots=all",
-    "prepublishOnly": "pnpm tokens:build && pnpm build",
-    "walkthrough": "playwright test --config=playwright.walkthrough.config.ts",
-    "walkthrough:show": "playwright show-report walkthrough-report"
+    "build": "pnpm --filter @rtkelly13/design-system build && pnpm --filter @rtkelly13/ds-report build",
+    "typecheck": "pnpm --filter @rtkelly13/design-system typecheck && pnpm --filter @rtkelly13/design-system build && pnpm --filter @rtkelly13/ds-report typecheck",
+    "test": "pnpm -r test",
+    "check:deps": "pnpm -r check:deps",
+    "report": "pnpm --filter @rtkelly13/ds-report report",
+    "verify:report-cli": "pnpm --filter @rtkelly13/ds-report verify:report-cli",
+    "contrast:report:html": "pnpm build && node packages/ds-report/dist/cli.js packages/design-system/reports/contrast.tsx",
+    "tokens:build": "pnpm --filter @rtkelly13/design-system tokens:build",
+    "tokens:check": "pnpm --filter @rtkelly13/design-system tokens:check",
+    "check:contrast": "pnpm --filter @rtkelly13/design-system check:contrast",
+    "contrast:report": "pnpm --filter @rtkelly13/design-system contrast:report",
+    "check:tokens": "pnpm --filter @rtkelly13/design-system check:tokens",
+    "check:css": "pnpm --filter @rtkelly13/design-system check:css",
+    "check:visual-coverage": "pnpm --filter @rtkelly13/design-system check:visual-coverage",
+    "storybook": "pnpm --filter @rtkelly13/design-system storybook",
+    "build-storybook": "pnpm --filter @rtkelly13/design-system build-storybook",
+    "test:visual": "pnpm --filter @rtkelly13/design-system test:visual",
+    "walkthrough": "pnpm --filter @rtkelly13/design-system walkthrough"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/rtkelly13/design-system.git"
-  },
-  "keywords": [
-    "design-system",
-    "brutalist",
-    "react",
-    "tailwind",
-    "storybook",
-    "visual-regression",
-    "playwright",
-    "slides",
-    "deck",
-    "experiments",
-    "theme-ladder",
-    "design-tokens",
-    "html-report"
-  ],
-  "author": "Ryan Kelly",
-  "license": "MIT",
-  "peerDependencies": {
-    "@tailwindcss/typography": "^0.5.16",
-    "esbuild": "^0.25.0 || ^0.26.0 || ^0.27.0",
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0",
-    "tailwindcss": "^4.0.0",
-    "typescript": "^5.0.0 || ^6.0.0"
-  },
-  "dependencies": {
-    "lucide-react": "^1.28.0",
-    "tailwind-variants": "^3.3.1"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.62.1",
-    "@storybook/addon-docs": "^10.5.5",
-    "@storybook/react": "^10.5.5",
-    "@storybook/react-vite": "^10.5.5",
-    "@tailwindcss/typography": "^0.5.20",
-    "@tailwindcss/vite": "^4.3.3",
-    "@testing-library/react": "^16.3.2",
-    "@types/node": "^26.2.0",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
-    "@vitest/coverage-v8": "^4.1.10",
-    "esbuild": "^0.27.7",
-    "jsdom": "^30.0.1",
-    "knip": "^6.32.2",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "storybook": "^10.5.5",
-    "tailwindcss": "^4.3.3",
-    "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
-    "vite": "^8.2.0",
-    "vitest": "^4.1.10"
-  },
-  "peerDependenciesMeta": {
-    "@tailwindcss/typography": {
-      "optional": true
-    },
-    "esbuild": {
-      "optional": true
-    },
-    "tailwindcss": {
-      "optional": true
-    },
-    "typescript": {
-      "optional": true
-    }
-  }
+  "packageManager": "pnpm@10.33.0"
 }

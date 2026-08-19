@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "reports/*.tsx",
+    "src/stories/**/*.stories.tsx",
+    ".storybook/{main,preview}.ts",
+    "scripts/*.mjs",
+    "tests/*.ts",
+    "*.config.{ts,mts,mjs}"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "reports/*.tsx",
+    "scripts/**/*.mjs",
+    "tests/*.ts",
+    ".storybook/**/*.ts"
+  ],
+  "ignoreDependencies": [
+    "@tailwindcss/typography"
+  ]
+}

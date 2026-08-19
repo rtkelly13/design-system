@@ -37,6 +37,10 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      # Everything below runs across the workspace. The two published packages
+      # are packages/design-system and packages/ds-report; each owns its own
+      # checks, and the root scripts fan out with `pnpm -r` or `--filter`.
+
       # theme.css is generated from src/theme/levels.ts. This fails if the
       # committed CSS no longer matches the source, which is the only thing
       # keeping the TS and CSS halves of the ladder in step.
@@ -64,11 +68,14 @@ jobs:
       - name: Type Check
         run: pnpm typecheck
 
+      # Builds the design system first, then the report generator. That order is
+      # the workspace's only hard sequencing: `@rtkelly13/ds-report` resolves its
+      # peer through the design system's `exports` map, which points at `dist/`.
+      - name: Build Packages
+        run: pnpm build
+
       - name: Unit Tests
         run: pnpm test
-
-      - name: Build Package
-        run: pnpm build
 
       # Packs the tarball, installs it into a throwaway project with only the
       # peers the README names, and drives `ds-report` there. The only check that
