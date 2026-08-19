@@ -102,14 +102,19 @@ and is noted below.
 
 **Not yet pinned — known gaps**
 
-- **Web fonts come from a third party.** `src/styles.css` `@import`s
-  `fonts.googleapis.com`. Whether a baseline contains webfont metrics or
-  *fallback* metrics therefore depends on whether the runner could reach Google,
-  which is not a property of this repository. Today's evidence says they do not
-  load in CI, but that is an inference from pixel-height agreement, not a
-  guarantee, and the day it changes every baseline breaks at once for a reason
-  nobody will connect to a network. Self-hosting via `@fontsource` — which the
-  blog already does — fixes this and the render-blocking LCP problem together.
+- **Web fonts still come from a third party** in the shipped stylesheet.
+  `src/styles.css` `@import`s `fonts.googleapis.com`, and that `@import` survives
+  into the built Storybook, so the browser attempts the fetch on every
+  screenshot. Whether a baseline recorded webfont metrics or *fallback* metrics
+  would therefore depend on whether the runner could reach Google, which is not
+  a property of this repository.
+
+  The suites now abort those requests (`tests/pin-fonts.ts`), which makes the
+  fallback stack the decision rather than the accident and holds it whatever the
+  runner can reach. That closes the hazard for the *tests*; it does not fix the
+  shipped package, where the import is still a render-blocking third-party
+  request on every consumer's first paint. Self-hosting via `@fontsource` —
+  which the blog already does — fixes both and would make the helper redundant.
 - **CI and local render in different environments.** CI is `ubuntu-latest` plus
   `npx playwright install --with-deps chromium`. The industry-standard fix is to
   run both CI and local baselining inside the same official image
@@ -136,47 +141,49 @@ Current configuration:
 ```ts
 expect: {
   toHaveScreenshot: {
-    maxDiffPixelRatio: 0.05,
-    threshold: 0.2,
+    maxDiffPixels: 0,
   },
 }
 ```
 
-Both lines are wrong in different ways.
+It used to be `maxDiffPixelRatio: 0.05` with `threshold: 0.2`, and both lines
+were wrong in different ways.
 
-`threshold: 0.2` **is the default**, written out. It reads as a tuned value, so
-the next person to see a flaky diff will reach for it. Delete it, and the
-default keeps applying.
+`threshold: 0.2` **was the default**, written out. A default restated in config
+reads as a tuned value, so the next person to see a flaky diff reaches for it.
+It is gone; the default still applies.
 
-`maxDiffPixelRatio: 0.05` is the real problem, and it is much looser than it
-looks: 5% of 1280×720 is **~46,000 pixels** — a region roughly 215×215 — free to
-differ completely on every screenshot. An entire button could change colour, or
-a badge could vanish, and the required check would pass. On the `fullPage`
-rows it is proportionally larger still.
+`maxDiffPixelRatio: 0.05` was the real problem, and much looser than it looks:
+5% of 1280×720 is **~46,000 pixels** — a region roughly 215×215 — free to differ
+completely on every screenshot. An entire button could change colour, or a badge
+vanish, and the required check would pass. On the `fullPage` rows, proportionally
+more.
 
 That number was never chosen for real components. It was set when all five
 baselines were the same placeholder error page, so it was only ever exercised
-against an image that could not change. `AGENTS.md` has said it is "probably
-looser than it needs to be" since, and it is tracked as
-[#32](https://github.com/rtkelly13/design-system/issues/32).
+against an image that could not change ([#32](https://github.com/rtkelly13/design-system/issues/32)).
 
-**The policy going forward**
+**The policy**
 
-1. **Tighten toward zero, and let CI measure it.** Rendering here is pinned to
-   one browser build on one OS, so the honest expectation is a byte-identical
-   screenshot. Start from no ratio at all and add the smallest allowance that
-   real runs demand.
-2. **Prefer `maxDiffPixels` over `maxDiffPixelRatio` for an allowance.** An
-   absolute count means the same thing on a 1280×720 shot and a five-screen
-   `fullPage` one; a ratio silently grants the tall images a much larger budget,
-   which is exactly backwards — the big compositions are where a small regression
-   hides.
+1. **No allowance until a real run demands one.** Rendering is pinned to one
+   browser build on one OS, so the honest expectation is an identical
+   screenshot. `maxDiffPixels: 0` states that, and CI is the instrument that
+   tests whether it holds.
+2. **An absolute count, never a ratio.** `maxDiffPixels` means the same thing on
+   a 1280×720 shot and a five-screen `fullPage` one; a ratio silently grants the
+   tall images a much larger budget, which is exactly backwards — the big
+   compositions are where a small regression hides.
 3. **Never widen the global tolerance to silence one story.** That trades every
    other assertion for the convenience of one. Reach instead for `mask` on the
    offending region, or fix the non-determinism.
 4. **Tolerance is not where flake gets fixed.** If a screenshot is unstable, the
    render is unstable. Find it — an unpinned date, a random ordering, an
    animation the defaults did not catch, a font that sometimes loads.
+
+If a genuine sub-pixel wobble does appear, raise `maxDiffPixels` to the smallest
+number that covers it and say in the commit which story forced it. `threshold`
+is the other lever and a blunter one; tighten or loosen it as its own change,
+measured on its own.
 
 ---
 
@@ -360,7 +367,14 @@ Revisit when one of these becomes true:
   compared in one screenshot. That closes the gap where a token change could
   read well on `midnight` and be unusable on `white` while passing everything.
 - Open, in rough priority order:
-  1. Tolerance — [#32](https://github.com/rtkelly13/design-system/issues/32).
-  2. Self-host the fonts, so a baseline does not depend on runner egress.
-  3. Containerise the render environment, so a baseline can be reproduced off CI.
-  4. A second viewport, once the shells are decomposed enough to be worth it.
+  1. Containerise the render environment
+     (`mcr.microsoft.com/playwright:v1.62.1-noble` for both CI and local), so a
+     baseline can be reproduced off CI at all. Forces one full re-record.
+  2. Self-host the fonts via `@fontsource`, which removes a render-blocking
+     third-party request for consumers and makes `pin-fonts.ts` redundant.
+  3. A second viewport, once the shells are decomposed enough to be worth it.
+  4. Revisit `threshold`, which is still Playwright's default 0.2.
+
+Closed recently: tolerance ([#32](https://github.com/rtkelly13/design-system/issues/32)),
+font determinism in the harness, the portal-aware render guard, and
+`/update-snapshots` being unable to create a baseline at all.
