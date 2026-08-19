@@ -83,6 +83,14 @@
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-accent-quiet: 4px 4px 0px 0px var(--ds-accent-quiet);
+  --shadow-hard-intent-info: 4px 4px 0px 0px var(--ds-intent-info);
+  --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
+  --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
+  --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
   --color-brutalist-cyan: var(--ds-accent-primary);
@@ -170,6 +178,14 @@
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-accent-quiet: 4px 4px 0px 0px var(--ds-accent-quiet);
+  --shadow-hard-intent-info: 4px 4px 0px 0px var(--ds-intent-info);
+  --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
+  --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
+  --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
   /* deprecated — see `pnpm check:tokens` */
@@ -247,6 +263,14 @@
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-accent-quiet: 4px 4px 0px 0px var(--ds-accent-quiet);
+  --shadow-hard-intent-info: 4px 4px 0px 0px var(--ds-intent-info);
+  --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
+  --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
+  --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
   /* deprecated — see `pnpm check:tokens` */
@@ -324,6 +348,14 @@
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-accent-quiet: 4px 4px 0px 0px var(--ds-accent-quiet);
+  --shadow-hard-intent-info: 4px 4px 0px 0px var(--ds-intent-info);
+  --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
+  --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
+  --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
   /* deprecated — see `pnpm check:tokens` */
@@ -401,6 +433,14 @@
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
+  --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
+  --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
+  --shadow-hard-accent-quiet: 4px 4px 0px 0px var(--ds-accent-quiet);
+  --shadow-hard-intent-info: 4px 4px 0px 0px var(--ds-intent-info);
+  --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
+  --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
+  --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
   /* deprecated — see `pnpm check:tokens` */

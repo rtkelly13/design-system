@@ -72,6 +72,38 @@ function levelVariables(definition) {
 }
 
 /**
+ * The eight accent/intent roles, in the order the token tables list them.
+ *
+ * Only used to generate the role-named hard shadows below. Written once here
+ * rather than eight times inline, for the same reason the level list lives in
+ * `levels.ts`: a ninth role should not be addable in one place and missable in
+ * another.
+ */
+const ACCENT_ROLES = [
+  'accent-primary',
+  'accent-secondary',
+  'accent-tertiary',
+  'accent-quiet',
+  'intent-info',
+  'intent-success',
+  'intent-warning',
+  'intent-danger',
+];
+
+/**
+ * Hard shadows that offset in a *role's* colour.
+ *
+ * `--shadow-hard-md` offsets in `--ds-shadow-color`, which is the right default
+ * and the wrong thing for a card that lifts in its own accent — that previously
+ * forced a component back onto `shadow-hard-cyan`, i.e. back onto a hue name.
+ * Deliberately 4px, matching `hard-md`: the palette-named three are 4px too, so
+ * swapping one for the other cannot move a layout.
+ */
+const ROLE_SHADOWS = ACCENT_ROLES.map(
+  (role) => `  --shadow-hard-${role}: 4px 4px 0px 0px var(--ds-${role});`,
+).join('\n');
+
+/**
  * The Tailwind-facing aliases and the shadow utilities, repeated per level so
  * that var() substitution re-runs at the themed element. See the banner.
  */
@@ -97,6 +129,7 @@ const TAILWIND_ALIASES = `  --color-surface-base: var(--ds-surface-base);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+${ROLE_SHADOWS}
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);`;
 
 /**

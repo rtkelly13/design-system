@@ -51,7 +51,22 @@ import { createTV, cn as merge } from 'tailwind-variants';
 const mergeConfig = {
   extend: {
     theme: {
-      shadow: ['hard-sm', 'hard-md', 'hard-lg'],
+      shadow: [
+        'hard-sm',
+        'hard-md',
+        'hard-lg',
+        // The role-named hard shadows belong in the same group: a card that
+        // sets `shadow-hard-accent-primary` on hover still needs
+        // `shadow-none` to be able to clear it.
+        'hard-accent-primary',
+        'hard-accent-secondary',
+        'hard-accent-tertiary',
+        'hard-accent-quiet',
+        'hard-intent-info',
+        'hard-intent-success',
+        'hard-intent-warning',
+        'hard-intent-danger',
+      ],
     },
   },
 } as const;
