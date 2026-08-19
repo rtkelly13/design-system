@@ -248,8 +248,15 @@ is both minimal and complete, with no safelist and no scanner. A typical report 
 | `--offline` | Drop the webfont import. Type falls back to the system stacks. |
 | `--strict` | Treat lint warnings as errors. Use this in CI. |
 | `--no-lint` | Skip the lint, for a file you did not write. |
+| `--no-typecheck` | Skip the type check. It is on by default. |
 
-**The report is linted against this system's own rules before it renders.**
+**The report is typechecked and linted before it renders.** esbuild strips types
+without reading them, so without the check a wrong prop is not an error but a
+report with `[object Object]` in it. Your own `typescript` runs it — resolved
+from the report's directory, so it is the compiler your editor uses — and it adds
+about 850ms.
+
+**And it is linted against this system's own rules.**
 Colours must address roles — a hex literal renders identically on `midnight` and
 on `white`, so those four rules are errors and they block. Two more warn: values
 that change between runs (`new Date()`, `Math.random()`), and behaviour that

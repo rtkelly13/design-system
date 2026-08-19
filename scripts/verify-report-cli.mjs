@@ -95,7 +95,11 @@ try {
   // `styles.css`, which imports `prose.css`, which loads it. Installing only the
   // documented set is what surfaced that.
   console.log('Installing the tarball and the documented peers…');
-  run('pnpm', ['add', tarball, 'react', 'react-dom', 'esbuild', 'tailwindcss'], project);
+  run(
+    'pnpm',
+    ['add', tarball, 'react', 'react-dom', 'esbuild', 'tailwindcss', 'typescript', '@types/react'],
+    project,
+  );
 
   const cli = ['--yes', 'ds-report'];
   console.log('\nDriving ds-report:');
@@ -117,6 +121,25 @@ try {
   check(
     'renders the same bytes twice',
     readFileSync(path.join(project, 'again.html'), 'utf8') === whiteHtml,
+  );
+
+  // A consumer resolves this package to `dist/index.d.ts`, which `skipLibCheck`
+  // skips — so the check should cost about a second here even though extending
+  // this repo's own tsconfig (whose `paths` point at source) costs four.
+  const started = Date.now();
+  const typed = run('npx', [...cli, 'report.tsx', '-o', 'typed.html'], project, true);
+  const elapsed = Date.now() - started;
+  check(`typechecks a consumer report in reasonable time (${elapsed}ms)`, typed.ok && elapsed < 8000, typed.out.slice(0, 300));
+
+  writeFileSync(
+    path.join(project, 'wrong-types.tsx'),
+    BAD_REPORT.replace('className="bg-zinc-900"', 'title={{ not: "a string" }}'),
+  );
+  const wrong = run('npx', [...cli, 'wrong-types.tsx'], project, true);
+  check(
+    'rejects a report that does not typecheck',
+    !wrong.ok && /error TS/.test(wrong.out),
+    wrong.out.slice(0, 300),
   );
 
   const bad = run('npx', [...cli, 'bad.tsx'], project, true);

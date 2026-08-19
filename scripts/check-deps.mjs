@@ -73,6 +73,11 @@ const MANIFEST = {
     alsoDev: true,
     why: 'styles.css does `@import "tailwindcss"`, and theme.css is a v4 `@theme` contract, so a consumer must be building with Tailwind v4. Declared so that requirement is stated rather than assumed. Also dev, for Storybook — and imported directly by src/report/css.ts, which drives its compiler over a known candidate set.',
   },
+  typescript: {
+    kind: 'peer',
+    alsoDev: true,
+    why: "Type checking and declaration output for this package, and — since ds-report typechecks a report before rendering it — the compiler that check spawns. Peer and optional because it is resolved from the *report's* directory rather than this package's, so a report is checked by the consumer's own compiler, the same one their editor uses. Pinned; see AGENTS.md.",
+  },
   esbuild: {
     kind: 'peer',
     alsoDev: true,
@@ -96,7 +101,7 @@ const MANIFEST = {
   },
   storybook: { kind: 'dev', why: 'The docs and review surface, and what both visual suites screenshot.' },
   tsup: { kind: 'dev', why: 'Bundles ESM, CJS and types. Read the TypeScript 7 note in AGENTS.md before changing it.' },
-  typescript: { kind: 'dev', why: 'Type checking and declaration output. Pinned — see AGENTS.md.' },
+
   vite: { kind: 'dev', why: 'Underlies the Storybook builder.' },
   vitest: {
     kind: 'dev',

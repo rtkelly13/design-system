@@ -26,6 +26,7 @@ import { formatProblems, lintReport, type ReportProblem } from './lint';
 import { createReportCssCompiler } from './css';
 import { renderMarkup } from './markup';
 import { documentShell } from './shell';
+import { typecheckReports } from './typecheck';
 import { THEME_LEVELS, type ThemeLevel } from '../theme/levels';
 
 /**
@@ -59,6 +60,15 @@ export interface ReportOptions {
   strict?: boolean;
   /** Skip the lint entirely. For rendering a file you did not write. */
   lint?: boolean;
+  /**
+   * Typecheck the report before rendering. On by default: esbuild strips types
+   * without reading them, so without this a wrong prop is not an error but a
+   * report with `[object Object]` in it.
+   *
+   * Skipped with a note when neither `@typescript/native-preview` nor
+   * `typescript` resolves from the report's directory.
+   */
+  typecheck?: boolean;
 }
 
 export interface RenderReportResult {
@@ -151,15 +161,35 @@ export async function renderReports({
   props,
   strict = false,
   lint = true,
+  typecheck = true,
 }: RenderReportsOptions): Promise<RenderReportResult[]> {
   assertLadder(themes);
   if (themes.length === 0) throw new Error('At least one theme level is required.');
   if (inputs.length === 0) throw new Error('At least one report file is required.');
 
   const absolute = inputs.map((input) => path.resolve(input));
+  const notes: string[] = [];
+
+  // Cheapest gate first. The lint is 0.11ms and the typecheck is ~500ms, so a
+  // report that breaks a colour rule never pays for a compiler run.
   const warnings = new Map<string, ReportProblem[]>();
   for (const input of absolute) {
     warnings.set(input, await lintOrThrow(input, lint, strict));
+  }
+
+  if (typecheck) {
+    // Every report in one compiler run: loading the lib and React types is most
+    // of the cost, and it is identical for each of them.
+    const checked = await typecheckReports(absolute);
+    if (!checked.ok) {
+      throw new Error(`${checked.checker} rejected the report:\n\n${checked.diagnostics}`);
+    }
+    if (checked.checker === 'none') {
+      notes.push(
+        'No TypeScript compiler resolved from the report, so it was not typechecked. ' +
+          'Install typescript, or @typescript/native-preview for a faster check.',
+      );
+    }
   }
 
   const { entry, styles } = await ownPaths();
@@ -188,7 +218,7 @@ export async function renderReports({
         candidates: candidates.length,
         bytes: Buffer.byteLength(html),
         warnings: warnings.get(input) ?? [],
-        notes: compiler.notes,
+        notes: [...notes, ...compiler.notes],
       });
     }
   }

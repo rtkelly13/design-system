@@ -34,5 +34,9 @@
   // in `files` and ship nowhere, but they import this package and must typecheck
   // like anything else — a report that fails at render time is a worse error
   // than one that fails at build time.
-  "include": ["src/**/*", "reports/**/*"]
+  "include": ["src/**/*", "reports/**/*"],
+  // A fixture that is *meant* not to typecheck — it is what the report
+  // typechecker is pointed at to prove it reports something. Checking it here
+  // would make this repo permanently red.
+  "exclude": ["src/report/__fixtures__/broken-types.tsx"]
 }

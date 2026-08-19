@@ -27,10 +27,11 @@ Options
       --offline         Drop the webfont import; fall back to system type.
       --strict          Treat lint warnings as errors. Use this in CI.
       --no-lint         Skip the design system lint. For files you did not write.
+      --no-typecheck    Skip the type check. It is on by default.
   -h, --help            This text.
 
-The report is linted against this system's own rules before it renders: colours
-must address roles, and two static-output hazards warn. See AGENTS.md.
+The report is linted against this system's own rules and then typechecked with
+your own TypeScript before it renders. See AGENTS.md.
 
 The report must default-export a React component. Compose it from
 @rtkelly13/design-system — ReportDocument and ReportSection are the frame.
@@ -44,11 +45,12 @@ interface Parsed {
   offline: boolean;
   strict: boolean;
   lint: boolean;
+  typecheck: boolean;
   help: boolean;
 }
 
 function parse(argv: readonly string[]): Parsed {
-  const parsed: Parsed = { inputs: [], offline: false, strict: false, lint: true, help: false };
+  const parsed: Parsed = { inputs: [], offline: false, strict: false, lint: true, typecheck: true, help: false };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index] as string;
     const next = () => {
@@ -77,6 +79,9 @@ function parse(argv: readonly string[]): Parsed {
         break;
       case '--no-lint':
         parsed.lint = false;
+        break;
+      case '--no-typecheck':
+        parsed.typecheck = false;
         break;
       case '-h':
       case '--help':
@@ -125,6 +130,7 @@ async function main(argv: readonly string[]) {
     offline: options.offline,
     strict: options.strict,
     lint: options.lint,
+    typecheck: options.typecheck,
   });
 
   // One warning block per input, not per document: four levels of one report

@@ -373,6 +373,46 @@ JavaScript:
 7. **The zero case is designed.** "No advisories" has to look deliberate rather
    than like a rendering failure.
 
+### Reports are typechecked
+
+**esbuild strips types without reading them**, so a report could pass the lint,
+bundle cleanly, and still be wrong. `value={{ nope: true }}` on a `StatCard` is
+not a lint problem and not a runtime crash — it is a report with
+`[object Object]` in it, found by whoever reads the report.
+
+`ds-report` therefore spawns a compiler over the report before rendering it, on
+by default, `--no-typecheck` to skip. Three decisions in that:
+
+- **The consumer's compiler, not ours.** `typescript` is resolved from the
+  *report's* directory, so a report is checked by the same compiler its author's
+  editor uses. It is an optional peer, like the others; without it the render
+  proceeds and the CLI says it was not checked.
+- **The CLI, not the API.** Spawning keeps the compiler swappable and keeps the
+  whole of `typescript` out of this process for a check that takes a second.
+- **Extending the nearest tsconfig**, then narrowing to the one file. A report
+  written inside somebody's project may import from it through a path alias, and
+  checking with fixed flags alone would report those as missing modules — a false
+  failure on a correct report, which is the fastest way to get a check switched
+  off.
+
+**The cost differs sharply by where the report lives, and the reason is worth
+knowing.** In a consumer project the package resolves to `dist/index.d.ts`,
+`skipLibCheck` skips it, and the whole invocation is **~850ms** —
+`verify:report-cli` measures exactly that. In *this* repo, `tsconfig.json` maps
+the package name onto `src/`, so the check follows the import into the entire
+package source and the same render takes **~4.6s**. Repo-local reports are
+already covered by `pnpm typecheck`, so use `--no-typecheck` when iterating on
+one.
+
+**On `tsgo`.** The TS 7 native compiler is a drop-in for `tsc` at the command
+line — measured here at 480ms against tsc's 1130ms on identical diagnostics — and
+spawning a CLI is what makes adopting it a one-line change. It is deliberately
+**not** used: it is a development preview, and a report silently checked by a
+preview compiler because a consumer happened to have one installed is a worse bug
+than a slow check. `CHECKERS` in `src/report/typecheck.ts` is where it goes when
+it ships. Note this is independent of the repo's own TS 7 blocker, which is
+`tsup`'s dts worker; this check is a separate program that never touches it.
+
 ### The lint is not optional
 
 **A report is checked against this system's own rules before it renders.** That
@@ -445,6 +485,7 @@ per invocation:
 | Tailwind `build(candidates)` | ~13ms first, ~0 after | per report |
 | esbuild bundle + render | ~230ms | once per **input**, not per level |
 | Lint | 0.11ms | per input, before any bundling |
+| Typecheck | ~850ms in a consumer, ~4.6s in this repo | once per invocation, all inputs in one compiler run |
 
 The level lives on `<html>`, so the markup — and therefore the candidate set and
 the whole stylesheet — is identical on all four rungs. Measured: the entire

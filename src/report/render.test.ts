@@ -24,6 +24,18 @@ const FIXTURE = path.join(import.meta.dirname, '__fixtures__/minimal.tsx');
 const SAMPLE = path.join(import.meta.dirname, 'sample.tsx');
 const fixture = (name: string) => path.join(import.meta.dirname, '__fixtures__', name);
 
+/**
+ * These tests are about rendering, so they skip the typecheck.
+ *
+ * Not for speed alone, though it is the difference between a 28s suite and a
+ * 76s one: in this repo the check follows `paths` into the whole package source,
+ * so paying it on every render would be measuring `tsc` over and over rather
+ * than the pipeline. `typecheck.test.ts` covers the checker, and the one test
+ * below named for it covers the wiring.
+ */
+const render = (options: Parameters<typeof renderReport>[0]) =>
+  renderReport({ typecheck: false, ...options });
+
 let scratch: string;
 const out = (name: string) => path.join(scratch, name);
 
@@ -36,7 +48,7 @@ afterAll(async () => {
 
 describe('renderReport', () => {
   it('writes one self-contained document', async () => {
-    const result = await renderReport({ input: FIXTURE, output: out('report.html') });
+    const result = await render({ input: FIXTURE, output: out('report.html') });
     const html = await readFile(result.output, 'utf8');
 
     expect(html).toContain('<!doctype html>');
@@ -49,7 +61,7 @@ describe('renderReport', () => {
   }, 30_000);
 
   it('emits CSS for the utilities used and none for those not', async () => {
-    const { html } = await renderReport({ input: FIXTURE, output: out('scoped.html') });
+    const { html } = await render({ input: FIXTURE, output: out('scoped.html') });
 
     // Used by the fixture, directly and through ReportDocument.
     expect(html).toContain('.text-\\[0\\.8125rem\\]');
@@ -63,7 +75,7 @@ describe('renderReport', () => {
   }, 30_000);
 
   it('puts the requested rung on the root element', async () => {
-    const { html } = await renderReport({
+    const { html } = await render({
       input: FIXTURE,
       output: out('midnight.html'),
       theme: 'midnight',
@@ -76,13 +88,13 @@ describe('renderReport', () => {
 
   it('rejects a level that is not on the ladder', async () => {
     await expect(
-      renderReport({ input: FIXTURE, output: out('bogus.html'), theme: 'neon' as never }),
+      render({ input: FIXTURE, output: out('bogus.html'), theme: 'neon' as never }),
     ).rejects.toThrow(/Unknown theme level "neon"/);
   });
 
   /** Every path the sample exercises, in one render. */
   it('renders the worked example end to end', async () => {
-    const { html, candidates } = await renderReport({ input: SAMPLE, output: out('sample.html') });
+    const { html, candidates } = await render({ input: SAMPLE, output: out('sample.html') });
 
     // Static disclosure — the one interactive affordance that needs no script.
     expect(html).toContain('<details');
@@ -112,7 +124,7 @@ describe('renderReport', () => {
    * provider that ignored its props entirely.
    */
   it('resolves a scoped ThemeProvider inside a report', async () => {
-    const { html } = await renderReport({
+    const { html } = await render({
       input: fixture('scoped.tsx'),
       output: out('scoped.html'),
     });
@@ -123,8 +135,8 @@ describe('renderReport', () => {
   }, 30_000);
 
   it('drops the webfont import only when asked', async () => {
-    const online = await renderReport({ input: FIXTURE, output: out('online.html') });
-    const offline = await renderReport({
+    const online = await render({ input: FIXTURE, output: out('online.html') });
+    const offline = await render({
       input: FIXTURE,
       output: out('offline.html'),
       offline: true,
@@ -142,15 +154,15 @@ describe('renderReport', () => {
    * values that would otherwise vary. Two renders, byte for byte.
    */
   it('renders the same bytes twice', async () => {
-    const first = await renderReport({ input: SAMPLE, output: out('det-1.html') });
-    const second = await renderReport({ input: SAMPLE, output: out('det-2.html') });
+    const first = await render({ input: SAMPLE, output: out('det-1.html') });
+    const second = await render({ input: SAMPLE, output: out('det-2.html') });
     expect(first.html).toBe(second.html);
     expect(first.bytes).toBe(second.bytes);
   }, 60_000);
 
   it('defaults the output path to the input with an .html extension', async () => {
     // Genuinely omits `output`, so this writes beside the fixture and cleans up.
-    const result = await renderReport({ input: FIXTURE });
+    const result = await render({ input: FIXTURE });
     try {
       expect(result.output).toBe(FIXTURE.replace(/\.tsx$/, '.html'));
       await expect(readFile(result.output, 'utf8')).resolves.toContain('Fixture');
@@ -168,6 +180,7 @@ describe('renderReport', () => {
   it('emits every rung from a single render', async () => {
     const themes = ['midnight', 'dim', 'bright', 'white'] as const;
     const results = await renderReports({
+      typecheck: false,
       inputs: [SAMPLE],
       themes,
       outputFor: (_input, theme) => out(`ladder-${theme}.html`),
@@ -185,7 +198,7 @@ describe('renderReport', () => {
 describe('the design system lint', () => {
   it('refuses a report that addresses colours instead of roles', async () => {
     await expect(
-      renderReport({ input: fixture('lints-badly.tsx'), output: out('bad.html') }),
+      render({ input: fixture('lints-badly.tsx'), output: out('bad.html') }),
     ).rejects.toThrow(/breaks 3 design system rule\(s\)[\s\S]*Hex literals/);
   });
 
@@ -193,13 +206,13 @@ describe('the design system lint', () => {
   it('rejects before writing anything', async () => {
     const destination = out('never-written.html');
     await expect(
-      renderReport({ input: fixture('lints-badly.tsx'), output: destination }),
+      render({ input: fixture('lints-badly.tsx'), output: destination }),
     ).rejects.toThrow();
     await expect(readFile(destination, 'utf8')).rejects.toThrow();
   });
 
   it('renders through warnings, and reports them', async () => {
-    const { warnings } = await renderReport({
+    const { warnings } = await render({
       input: fixture('warns.tsx'),
       output: out('warns.html'),
     });
@@ -208,12 +221,21 @@ describe('the design system lint', () => {
 
   it('promotes warnings to errors under strict', async () => {
     await expect(
-      renderReport({ input: fixture('warns.tsx'), output: out('strict.html'), strict: true }),
+      render({ input: fixture('warns.tsx'), output: out('strict.html'), strict: true }),
     ).rejects.toThrow(/breaks 2 design system rule\(s\)/);
   });
 
+  /** The one place the typecheck's wiring into the pipeline is asserted. */
+  it('refuses a report that does not typecheck, before rendering', async () => {
+    const destination = out('typed.html');
+    await expect(
+      renderReport({ input: fixture('broken-types.tsx'), output: destination }),
+    ).rejects.toThrow(/tsc rejected the report[\s\S]*TS2322/);
+    await expect(readFile(destination, 'utf8')).rejects.toThrow();
+  }, 60_000);
+
   it('can be turned off for a file you did not write', async () => {
-    const result = await renderReport({
+    const result = await render({
       input: fixture('lints-badly.tsx'),
       output: out('unlinted.html'),
       lint: false,

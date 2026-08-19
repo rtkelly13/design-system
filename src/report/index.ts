@@ -19,4 +19,6 @@ export type { ReportProblem, Severity } from './lint';
 export { buildReportCss, createReportCssCompiler } from './css';
 export type { ReportCssOptions, ReportCssCompiler } from './css';
 export { documentShell } from './shell';
+export { typecheckReports, findChecker } from './typecheck';
+export type { Checker, TypecheckResult } from './typecheck';
 export type { DocumentShellOptions } from './shell';

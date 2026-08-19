@@ -191,6 +191,71 @@ file should fail in milliseconds rather than after rendering its siblings.
 
 ---
 
+## The typecheck
+
+esbuild strips types without reading them. Until this existed, a report could
+pass the lint, bundle cleanly, and still be wrong — `value={{ nope: true }}` on a
+`StatCard` is not a lint problem and not a runtime crash, it is a report with
+`[object Object]` in it, discovered by whoever reads the report. This was listed
+here as a known gap; it is now closed.
+
+`ds-report` spawns a compiler over the report before rendering, on by default,
+`--no-typecheck` to skip.
+
+### Three decisions
+
+**The consumer's compiler, not ours.** `typescript` resolves from the *report's*
+directory rather than this package's, so a report is checked by the same compiler
+its author's editor and CI use. It is an optional peer like the rest; without it
+the render proceeds and the CLI notes that nothing checked it.
+
+**The CLI, not the API.** The API would pull the whole of `typescript` into this
+process for a check that takes a second either way, and would bind this code to
+one compiler's internals. Spawning keeps the compiler swappable — which matters,
+because the compiler here is expected to change.
+
+**Extend the nearest tsconfig, then narrow to the one file.** A report written
+inside somebody's project may import from it through a path alias; checking with
+fixed flags alone would report those as missing modules. That is a false failure
+on a correct report, and a check that cries wolf is a check somebody turns off.
+`include: []` alongside `files` is what stops the extended config's own `include`
+widening the check to that project's whole source tree.
+
+### The cost depends on where the report lives
+
+| | Resolves this package to | Whole invocation |
+|---|---|---|
+| A consumer project | `dist/index.d.ts`, which `skipLibCheck` skips | **~850ms** |
+| This repo | `src/index.ts`, via the `paths` mapping | **~4.6s** |
+
+The difference is not the checker — it is that in this repo the check follows the
+import into the entire package source rather than stopping at a declaration file.
+`scripts/verify-report-cli.mjs` measures the consumer number, which is the one
+that matters, and asserts a ceiling on it.
+
+Repo-local reports are already covered by `pnpm typecheck`, so `--no-typecheck`
+is the right flag when iterating on one. `render.test.ts` passes it for the same
+reason: those tests are about rendering, and paying the check on every render
+took the unit suite from 28s to 76s while measuring `tsc` over and over.
+
+### On tsgo
+
+The TS 7 native compiler is a drop-in for `tsc` at the command line. Measured
+here on `sample.tsx`: **480ms against tsc's 1130ms**, identical diagnostics.
+Spawning a CLI rather than calling an API is what makes adopting it a one-line
+change — `CHECKERS` in `src/report/typecheck.ts` is the whole surface.
+
+It is deliberately not used yet. It is a development preview, and a report
+silently checked by a preview compiler — because a consumer happened to have one
+installed for their own experiments — would be a worse bug than a slow check.
+
+This is independent of the repo's own TS 7 blocker, which is `tsup`'s dts worker
+(see `AGENTS.md` § *The TypeScript 7 blocker*). This check is a separate program
+and never touches it, so the report checker can move to TS 7 before the build
+can.
+
+---
+
 ## The lint
 
 A report written outside this repo was the one file nothing checked.
@@ -382,12 +447,11 @@ imports them by name like anything else.
 - **`compile()` is not documented API.** It is Tailwind's main export and what
   `@tailwindcss/vite` is built on, but a v4 minor could move it. `css.ts` is the
   only file that would need to change, which is the mitigation rather than a fix.
-- **The report's types are stripped, not checked.** esbuild does not typecheck,
-  so a report with a type error fails at render time rather than at lint time.
-  Running `tsc` on it would cost seconds against the lint's 0.11ms; the honest
-  position is that this is a gap, not a decision.
 - **`TLDR` and friends still emit inline styles against `--brutalist-*`.** They
   resolve through the deprecated compat block in `theme.css`, so reports render
   correctly today and get better for free as that migration lands.
-- **The unit suite went from 12s to 28s.** That is what a dozen real renders
+- **The unit suite went from 12s to 26s.** That is what a dozen real renders
   cost. If it becomes a problem, the sample renders are the ones to share.
+- **Typechecking a repo-local report costs 4.6s against a consumer's 850ms**,
+  because this repo's `paths` mapping sends the check into the package source.
+  `--no-typecheck` is the workaround rather than the fix.
