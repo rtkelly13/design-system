@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { cn } from '../lib/recipe';
 
 export interface PaginationProps {
   totalPages: number;
@@ -33,9 +34,9 @@ export function Pagination({
   };
 
   const activeBtnClasses =
-    'border-2 border-white text-black px-6 py-3 font-bold uppercase shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none transition-all';
+    'border-2 border-edge-strong text-content-inverse px-6 py-3 font-bold uppercase shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none transition-all';
   const disabledBtnClasses =
-    'cursor-not-allowed opacity-50 border-2 border-white bg-zinc-900 text-white px-6 py-3 font-bold uppercase';
+    'cursor-not-allowed opacity-50 border-2 border-edge-strong bg-surface-raised text-content-primary px-6 py-3 font-bold uppercase';
 
   const renderPrevButton = (): ReactNode => {
     if (!hasPrev) {
@@ -48,7 +49,7 @@ export function Pagination({
 
     if (getPageHref) {
       return (
-        <a href={getPageHref(prevPageNum)} className={`${activeBtnClasses} bg-brutalist-cyan`}>
+        <a href={getPageHref(prevPageNum)} className={cn(activeBtnClasses, 'bg-accent-primary')}>
           &lt;&lt; PREV
         </a>
       );
@@ -57,7 +58,7 @@ export function Pagination({
     return (
       <button
         onClick={handlePrevClick}
-        className={`${activeBtnClasses} bg-brutalist-cyan`}
+        className={cn(activeBtnClasses, 'bg-accent-primary')}
         aria-label="Previous Page"
       >
         &lt;&lt; PREV
@@ -76,7 +77,7 @@ export function Pagination({
 
     if (getPageHref) {
       return (
-        <a href={getPageHref(nextPageNum)} className={`${activeBtnClasses} bg-brutalist-pink`}>
+        <a href={getPageHref(nextPageNum)} className={cn(activeBtnClasses, 'bg-accent-tertiary')}>
           NEXT &gt;&gt;
         </a>
       );
@@ -85,7 +86,7 @@ export function Pagination({
     return (
       <button
         onClick={handleNextClick}
-        className={`${activeBtnClasses} bg-brutalist-pink`}
+        className={cn(activeBtnClasses, 'bg-accent-tertiary')}
         aria-label="Next Page"
       >
         NEXT &gt;&gt;
@@ -94,10 +95,10 @@ export function Pagination({
   };
 
   return (
-    <div className={`pt-6 pb-8 space-y-2 md:space-y-5 ${className}`}>
+    <div className={cn('pt-6 pb-8 space-y-2 md:space-y-5', className)}>
       <nav className="flex justify-between items-center font-mono" aria-label="Pagination Navigation">
         {renderPrevButton()}
-        <span className="text-white font-bold border-2 border-white px-6 py-3 bg-black">
+        <span className="text-content-primary font-bold border-2 border-edge-strong px-6 py-3 bg-surface-base">
           [ {currentPage} / {totalPages} ]
         </span>
         {renderNextButton()}
