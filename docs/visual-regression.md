@@ -179,6 +179,43 @@ That number was never chosen for real components. It was set when all five
 baselines were the same placeholder error page, so it was only ever exercised
 against an image that could not change ([#32](https://github.com/rtkelly13/design-system/issues/32)).
 
+### What `maxDiffPixels: 0` does not mean
+
+It does not mean "no pixel may differ". It means no pixel may differ *by more
+than `threshold`*, and `threshold` is still Playwright's default `0.2` — a
+perceived YIQ distance, not an exact-match test. The two knobs compose, and the
+looser one is the per-pixel one.
+
+That gap is wide enough to hide a change across an entire screenshot, and it
+did. `card-default.png` was recorded in #24, before the 0.2.0 ladder existed,
+with a page background of pure `#000000`. Since #33 that surface has been
+`--ds-surface-base`, which is `#0a0a1a` on `midnight`. So for every run since,
+**921,600 of that baseline's pixels have been wrong** — and it passed, first
+under the 5% ratio and then under `maxDiffPixels: 0`, because `#000000` versus
+`#0a0a1a` is far below `0.2` in YIQ distance. Measured with pixelmatch's own
+metric: 909,818 bytes differ, 1,435 clear the threshold.
+
+Two things follow.
+
+**Reading a diff count needs care.** A byte-level comparison of two baselines and
+Playwright's reported number can differ by three orders of magnitude on the same
+pair of images. When triaging, say which one you measured.
+
+**Uniform near-black and near-white shifts are the blind spot.** Exactly where a
+four-rung dark-to-light ladder does most of its work. Anti-aliasing is what
+`threshold` is for and is a real need, so the fix is not simply `threshold: 0` —
+that would make every baseline brittle to sub-pixel text rendering. Candidates,
+none yet measured:
+
+- `threshold: 0` on a small set of flat-colour surface stories, kept separate
+  from the text-heavy ones.
+- A non-pixel assertion for surfaces — read the computed background of a story
+  root and compare it to the level's token, which is exact and needs no image.
+
+The second is probably right: it tests the property that actually matters rather
+than tightening a number until text starts failing. Tracked as follow-up, not
+done here.
+
 **The policy**
 
 1. **No allowance until a real run demands one.** Rendering is pinned to one
