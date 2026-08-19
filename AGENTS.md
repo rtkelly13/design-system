@@ -195,6 +195,20 @@ the chrome-inside-prose resets are gone. What remains is the docs chrome —
 roughly twelve components, each with a 1:1 class. Migrate one per PR with
 `recipe`, and lower its budget line.
 
+**When that reaches zero, adopt `eslint-plugin-tailwindcss`'s
+`no-custom-classname`** — and not before. It is the only thing that catches a
+class which exists *nowhere*, which is this repo's most expensive recurring bug:
+`focus:border-brutalist-green`, `brutalist-card-panel` and
+`.sketch .ascii-divider::after` all matched nothing and failed quietly, and
+Tailwind will not help — an unknown utility emits no CSS, exits 0 and warns about
+nothing. Evaluated against this repo at 4.3.0: it found the dead `bracket-glyph`
+unprompted, but also flagged 51 live `docs-*` classes, because it can only know
+"not a Tailwind class" and not "matches no CSS anywhere". Adopting it today means
+whitelisting those 51 and duplicating `prose.css`; adopting it after the docs
+chrome is migrated means no whitelist at all. It needs
+`cssConfigPath: 'src/styles.css'` (it defaults to the singular `style.css`) and
+`recipe` added to its `functions`, or it never looks inside a recipe.
+
 ---
 
 ## 🪜 The Theme Ladder

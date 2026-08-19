@@ -106,11 +106,11 @@ export function Button(props: ButtonProps) {
 
   const content = bracketed ? (
     <span className="inline-flex items-center justify-center gap-2">
-      <span className="bracket-glyph select-none" aria-hidden="true">
+      <span className="select-none" aria-hidden="true">
         [
       </span>
       <span className="inline-flex items-center gap-2">{children}</span>
-      <span className="bracket-glyph select-none" aria-hidden="true">
+      <span className="select-none" aria-hidden="true">
         ]
       </span>
     </span>
