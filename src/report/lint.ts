@@ -42,9 +42,20 @@ const STATIC_RULES: readonly StaticRule[] = [
   {
     id: 'inert',
     label: 'Behaviour that will not run',
-    // `onClick={...}`, `onChange={...}` and the state hooks. `useMemo` and
-    // `useId` are fine: both do their work during the render that we capture.
-    pattern: /\son[A-Z]\w+=\{|\buseState\(|\buseEffect\(|\buseLayoutEffect\(|\buseReducer\(/g,
+    /**
+     * `onClick={...}`, `onChange={...}` and the state hooks. `useMemo` and
+     * `useId` are fine: both do their work during the render that we capture.
+     *
+     * Two details are load-bearing, and both were found by running this rule
+     * over the package's own components and not believing the result. Rules
+     * match a *trimmed* line, so the handler pattern must anchor on a word
+     * boundary rather than whitespace — `onClick={` is at index 0 of any line
+     * that starts with it, which is most of them. And a hook can be called with
+     * an explicit type argument, so `useState<Record<string, boolean>>({})` has
+     * no `(` after the name at all.
+     */
+    pattern:
+      /\bon[A-Z]\w+=\{|\b(?:useState|useEffect|useLayoutEffect|useReducer)\s*[(<]/g,
     fix: 'The output is static HTML with no client JS. Put the information in the document instead of behind a control — <details> gives collapsible sections with no script at all.',
   },
 ];

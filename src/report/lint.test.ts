@@ -40,6 +40,28 @@ describe('lintReport', () => {
     expect(problemsFor('const [open, setOpen] = useState(false);')).toEqual(['warning:inert']);
   });
 
+  /**
+   * Both of these were false negatives, found by running the rule over this
+   * package's own components and checking the answer against the source rather
+   * than trusting it. Rules match a trimmed line, so a handler is routinely at
+   * index 0 with no whitespace in front of it; and a hook called with an
+   * explicit type argument has no `(` after its name.
+   */
+  it('catches a handler at the start of a line', () => {
+    expect(problemsFor('onClick={onCopy}')).toEqual(['warning:inert']);
+  });
+
+  it('catches a hook called with a type argument', () => {
+    expect(problemsFor('const [o, setO] = useState<Record<string, boolean>>({});')).toEqual([
+      'warning:inert',
+    ]);
+  });
+
+  /** `button` ends in no word boundary before `on`, so this is not a handler. */
+  it('does not mistake a word ending in on for a handler', () => {
+    expect(lintReport('const buttonClick={handler};')).toEqual([]);
+  });
+
   /** `useMemo` and `useId` both do their work during the captured render. */
   it('leaves render-time hooks alone', () => {
     expect(lintReport('const id = useId(); const rows = useMemo(build, []);')).toEqual([]);

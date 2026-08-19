@@ -1,0 +1,341 @@
+# Reports
+
+Why an HTML report in this system is a `.tsx` file rather than markup, what
+makes a generated report worth reading, and the parts of the pipeline that will
+bite you.
+
+`AGENTS.md` § *Reports Are TSX, Not Hand-Written HTML* is the short version and
+remains the rule. This is the reference behind it: the reasoning, the sources,
+the measurements, and what is not yet good enough.
+
+---
+
+## The problem this replaces
+
+An agent asked for an HTML report writes markup. That markup inherits nothing:
+not the four rungs of the ladder, not roles whose contrast `pnpm check:contrast`
+has audited, not a layout the visual suite pins, not the type scale. It is a
+fresh design decision every time, made by whatever was in context, and the second
+report looks nothing like the first.
+
+`ds-report` takes the `.tsx` and emits one self-contained `.html` — markup and
+every byte of CSS it needs, inlined. The report author writes components; the
+system supplies the appearance. That it also takes **less** code than the HTML
+would is the part that makes it stick.
+
+---
+
+## What makes a generated report worth reading
+
+Seven patterns. None of them needs JavaScript, which matters because this
+pipeline emits none.
+
+### 1. The verdict comes first
+
+A reader learns the outcome before the evidence. `sample.tsx` opens with a
+`<Verdict>` band — one word, one line of context — above the contents, the stats
+and everything else.
+
+This is the "understand high-level results, then drill down into specific areas
+of interest" shape that report tooling converges on
+([McGarrah][mcgarrah], [Artic6][artic6]).
+
+### 2. Numbers before prose
+
+A stat row is scannable in about two seconds; a paragraph saying the same thing
+is not. `StatCard` for the counts, then the narrative.
+
+### 3. Provenance is part of the report
+
+When it ran, from what commit, on what branch, under what configuration. That is
+what the `meta` strip on `ReportDocument` is for, and it is not decoration: a
+report that cannot be traced back to its inputs cannot be reproduced or trusted.
+A report header carrying the title, the generation date and a pointer to the
+configuration used is the near-universal convention ([Artic6][artic6]).
+
+### 4. Progressive disclosure, not omission
+
+Detail belongs **in** the document, folded away — not cut, and not in the way.
+Show what is essential first and reveal the rest on demand
+([NN/g][nng], [UXPin][uxpin]).
+
+`ReportDetails` is a `<details>` element, which the browser implements itself.
+That makes it the one interactive affordance a static report genuinely has: a
+200-row table, a stack trace or a full diff collapses with no script at all.
+
+Keep it to one level. Nested disclosure past two levels is where these designs
+start causing problems ([LogRocket][logrocket]).
+
+### 5. Severity never rides on colour alone
+
+Every badge carries a word; the disclosure marker is `[+]`/`[-]` **text** rather
+than an icon. Similar shades are hard to tell apart under colour blindness, on a
+poor screen, and in greyscale printing — which is exactly where a report ends up
+([Eval Academy][evalacademy]).
+
+This is also why `pnpm check:contrast` gating every role pair matters more for
+reports than for an app: nobody is going to notice a report is unreadable until
+they have already sent it to someone.
+
+### 6. Sections are addressable
+
+`ReportSection` derives an `id` from its title, so the contents strip links
+resolve and a reader can paste a URL instead of writing "the third section
+down". A generated report is very often the thing someone drops into a ticket.
+
+### 7. The zero case is designed
+
+"No advisories. 24 packages audited." is a result. An empty region is a bug
+someone will spend ten minutes investigating. `DataTable`'s `emptyText` exists
+for this; the sample exercises it.
+
+---
+
+## Sources
+
+Consulted while designing the report vocabulary. Where a claim above rests on
+one, it is cited inline.
+
+- [AI-Generated HTML Reports on GitHub Pages — McGarrah Technical Blog][mcgarrah] —
+  the case for a single file as a deliverable: no toolchain, no build step, no
+  framework boilerplate, and it renders anywhere.
+- [Building a Self-Contained HTML Report — Artic6][artic6] — self-containment as
+  a hard requirement (no external requests for structure or styling), and the
+  report-header/provenance convention.
+- [Progressive Disclosure — Nielsen Norman Group][nng] — the canonical statement
+  of showing essentials first and deferring the rest.
+- [What Is Progressive Disclosure in UX? — UXPin][uxpin] — prioritisation and
+  consistency when applying it.
+- [Progressive disclosure in UX design — LogRocket][logrocket] — the practical
+  limit: past two levels of disclosure these designs typically have problems.
+- [Accessible Reports: 10 Best Practices — Eval Academy][evalacademy] — contrast,
+  plain language, and why colour alone cannot carry meaning in a document that
+  gets printed.
+- [pytest-html user guide][pytesthtml] — a widely used generator in this shape,
+  as a reference point for what shipped reports actually contain.
+
+The observations about Lighthouse, coverage output and CI report tooling
+converging on these patterns are our own reading of those artefacts, not claims
+from the sources above.
+
+[mcgarrah]: https://mcgarrah.org/ai-generated-html-reports-jekyll-github-pages/
+[artic6]: https://www.a6n.co.uk/2026/07/building-self-contained-html-report-for.html
+[nng]: https://www.nngroup.com/articles/progressive-disclosure/
+[uxpin]: https://www.uxpin.com/studio/blog/what-is-progressive-disclosure/
+[logrocket]: https://blog.logrocket.com/ux-design/progressive-disclosure-ux-types-use-cases/
+[evalacademy]: https://www.evalacademy.com/articles/10-tips-for-making-your-evaluation-report-more-accessible
+[pytesthtml]: https://pytest-html.readthedocs.io/en/latest/user_guide.html
+
+---
+
+## The pipeline
+
+```
+TSX ──esbuild──▶ markup ──class attributes──▶ candidates ──tailwind──▶ CSS ──▶ one .html
+```
+
+### Why one pass is possible
+
+Tailwind normally has to **guess** which utilities a build will need, by scanning
+source text before anything renders. That guess is why the generated `theme.css`
+carries `@source "./"`, and why `text-${role}` assembled at runtime generates no
+CSS at all — the constraint `src/lib/accentClasses.ts` exists to work around.
+
+Rendering first removes the guess. By the time the generator asks, the document
+is finished markup, so the class attributes in it are exactly and only the
+utilities it uses. `candidates.ts` reads them out, `css.ts` hands that list to
+Tailwind's own compiler, and the `sources` the compiler offers back are ignored.
+
+The emitted CSS is therefore minimal **and** complete by construction — no
+safelist, no scanner, no arbitrary-value edge case. A `text-[0.8125rem]` a
+scanner might miss is plainly there in the output.
+
+`render.test.ts` asserts the negative half, which is the half that matters: CSS
+for a utility the document does not use must be **absent**. A test that only
+checked the used utilities were present would pass just as happily against a
+generator that emitted the whole framework.
+
+### Determinism
+
+The same report renders to the same bytes, and the test asserts it rather than
+assuming it. Three things make it true:
+
+1. Candidates are sorted before they reach the compiler.
+2. The document shell stamps nothing at render time.
+3. The lint blocks the values that would otherwise vary — see `nondeterministic`
+   below.
+
+This is what makes a generated report diffable, and the useful question about a
+report is rarely "what does it say" but "what changed since the last one".
+
+### Speed
+
+Both expensive steps are paid once per invocation, not once per document:
+
+| | Cost | Paid |
+|---|---|---|
+| Tailwind `compile()` | ~150ms | once per invocation |
+| Tailwind `build(candidates)` | ~13ms first, ~0 after | per report |
+| esbuild bundle + render | ~230ms | once per **input**, not per level |
+| Lint | 0.11ms | per input, before any bundling |
+
+The level lives on `<html>`, so the markup — and therefore the candidate set and
+the entire stylesheet — is identical on all four rungs.
+
+Measured on `sample.tsx`: the whole ladder from one file takes **603ms**, against
+**2402ms** for four separate invocations. Pass several inputs or several levels
+to one invocation; never loop the CLI.
+
+The lint runs before any bundling for the same reason: a batch containing a bad
+file should fail in milliseconds rather than after rendering its siblings.
+
+---
+
+## The lint
+
+A report written outside this repo was the one file nothing checked.
+`pnpm check:tokens` only ever scanned `src/components` and `src/stories`, there
+is no ESLint config, and esbuild strips types without reading them.
+
+The rules live in `src/lib/tokenRules.ts`; `scripts/check-tokens.mjs` imports the
+same module, so the two enforcers cannot drift. What differs is the budget:
+
+| | Ratchet (`check:tokens`) | Report (`ds-report`) |
+|---|---|---|
+| Scope | `src/components`, `src/stories` | the report's `.tsx` |
+| Budget | the count when the ladder landed | **zero** |
+| Why | pre-existing debt, migrated file by file | new code, no debt to grandfather |
+
+A hex literal in a report renders identically on `midnight` and on `white`, which
+is precisely the failure the ladder exists to prevent. Those four rules are
+**errors** and they block.
+
+Two further rules **warn**, because neither is always a mistake:
+
+| Rule | Catches | Why it is a warning |
+|---|---|---|
+| `nondeterministic` | `new Date()`, `Date.now()`, `Math.random()` | A timestamp is a reasonable thing to want. `new Date('2026-08-19')` is deliberately fine — only the zero-argument form varies. |
+| `inert` | `onClick={…}`, `useState`, `useEffect` | Some components are worth rendering without their behaviour. `useMemo` and `useId` are untouched: both do their work during the render that gets captured. |
+
+`--strict` promotes warnings to errors, which is what CI should use.
+`--no-lint` skips the lint entirely, for rendering a file you did not write.
+
+### A note on writing regex rules against trimmed lines
+
+Rules match the **trimmed** line, so that the reported text is what gets printed
+under the finding. Two false negatives came from forgetting that, and both were
+found by running the `inert` rule over this package's own components and
+checking the answer against the source instead of believing it:
+
+- `\son[A-Z]` never matched `onClick={`, because after trimming the handler is at
+  index 0 with no whitespace in front of it — which is where handlers usually
+  are. It anchors on `\b` now.
+- `useState\(` never matched `useState<Record<string, boolean>>({})`, because a
+  hook called with an explicit type argument has no `(` after its name.
+
+Both have regression tests. The lesson generalises: a rule that reports nothing
+is indistinguishable from a rule that is broken, so point a new one at code you
+already know the answer for.
+
+---
+
+## What renders, and what renders inert
+
+The output has no client JS. A component whose behaviour lives in a handler or a
+state hook still renders — it simply does nothing when clicked. That is fine for
+some and useless for others, and the difference is worth knowing before a report
+ships with a dead control in it.
+
+Generated by running the `inert` rule over `src/components`: of 38 components,
+**24 are static-safe and 14 contain behaviour that will not run.**
+
+| Component | In a static report |
+|---|---|
+| `Modal` | **Avoid.** A dialog with no way to close it. |
+| `SlideDeck` | **Avoid.** Renders one slide, no navigation. |
+| `DesignSandbox` | **Avoid.** The whole point is the interaction. |
+| `DocsSidebar`, `AdminDashboardLayout` | Renders its default expanded state; toggles are dead. |
+| `DocsHeader` | Renders; the search does nothing. |
+| `Pagination` | Renders the page numbers; they do not navigate. |
+| `CodeBlock` | **Fine.** The code renders; only the copy button is dead. |
+| `AnchorHeading` | **Fine.** Heading and `id` render; only copy-link is dead. |
+| `TableOfContents` | **Fine.** The anchor links work; only scroll-spy is dead. |
+| `Tag` | **Fine** with `href`; the `onClick` form is dead. |
+| `ThemeProvider` | Unnecessary at the root — the generator sets `data-theme` on `<html>`. See below for the scoped case. |
+
+The other 24 are static-safe: `AsciiDivider`, `Avatar`, `Badge`, `BracketText`,
+`Button`, `Card`, `DataTable`, `Divider`, `Input`, `NoteBlock`, `PageHeader`,
+`PageTitle`, `SectionContainer`, `StatCard`, `TLDR`, `BlogPost`,
+`LoremIpsumPost`, `Breadcrumbs`, `DocPager`, `DocsLinkProvider`, `Prose`,
+`mdxComponents`, `SaasLandingPage`, `Slide`.
+
+`Button` is on that list because its only `onClick` is in a JSDoc example — it
+renders an anchor when given an `href`, which is the form a report wants anyway.
+Regenerate the split with the rule itself rather than by reading the components,
+and check a couple of answers against the source; that is how the two false
+negatives above were found.
+
+### A scoped theme panel does work
+
+Every rung's tokens ship in the stylesheet regardless of which one the document
+declares, so `<ThemeProvider scoped>` emits its `data-theme` attribute into the
+markup and a `dim` panel inside a `white` report resolves correctly. There is a
+test, because it would break silently.
+
+The test is worth reading as a cautionary one. Its first version passed while
+proving nothing: the fixture set a `level` prop that does not exist — the real
+name is `defaultLevel` — so React dropped it and the panel rendered
+`DEFAULT_LEVEL`, which was the very value being asserted. It now scopes to a
+level that is neither the document's nor the provider's default, and reads the
+body rather than the whole file, since the stylesheet names all four rungs in its
+own variant selectors. `pnpm typecheck` catches the prop name; nothing but the
+choice of assertion catches the other two.
+
+---
+
+## The two files
+
+| | `template.tsx` | `sample.tsx` |
+|---|---|---|
+| Job | what you **copy** | what you **read** |
+| Size | small on purpose | every supported path |
+| Also | — | the regression: `render.test.ts` asserts it, `foundations-reportdocument--sample` screenshots it |
+
+Both ship to `dist/report/` so they are readable from an install. Adding a
+component to the report vocabulary means adding it to `sample.tsx`, which is what
+keeps the screenshot and the test honest.
+
+---
+
+## Where it lives
+
+`src/report/` is a separate entry point (`@rtkelly13/design-system/report`) plus
+a `bin`. It imports `esbuild` and `tailwindcss`, which are Node-only, so folding
+it into the main entry would put a ~10MB build toolchain into every browser app
+that installs this package for the components.
+
+Both are **optional peer dependencies**, the same shape `@tailwindcss/typography`
+already has. That trade is only defensible because the CLI turns a missing one
+into an install instruction rather than a stack trace — see `explain()` in
+`src/report/cli.ts`, and keep that true.
+
+`ReportDocument`, `ReportSection` and `ReportDetails` are the exception and ship
+from the **main** entry: ordinary components with no Node imports, so a report
+imports them by name like anything else.
+
+---
+
+## Not yet good enough
+
+- **`compile()` is not documented API.** It is Tailwind's main export and what
+  `@tailwindcss/vite` is built on, but a v4 minor could move it. `css.ts` is the
+  only file that would need to change, which is the mitigation rather than a fix.
+- **The report's types are stripped, not checked.** esbuild does not typecheck,
+  so a report with a type error fails at render time rather than at lint time.
+  Running `tsc` on it would cost seconds against the lint's 0.11ms; the honest
+  position is that this is a gap, not a decision.
+- **`TLDR` and friends still emit inline styles against `--brutalist-*`.** They
+  resolve through the deprecated compat block in `theme.css`, so reports render
+  correctly today and get better for free as that migration lands.
+- **The unit suite went from 12s to 28s.** That is what a dozen real renders
+  cost. If it becomes a problem, the sample renders are the ones to share.

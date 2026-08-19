@@ -98,6 +98,30 @@ describe('renderReport', () => {
     expect(candidates).toBeGreaterThan(120);
   }, 60_000);
 
+  /**
+   * Every rung's tokens ship in the stylesheet regardless of which one the
+   * document declares, so a subtree can declare a different one. This is the
+   * capability behind a differently-themed panel inside a report, and it would
+   * break silently.
+   *
+   * The fixture scopes to `dim`, which is neither the document's level nor
+   * `DEFAULT_LEVEL` — and the assertion reads the **body**, not the whole file,
+   * because the stylesheet names every rung in its own variant selectors. An
+   * earlier version of this test asserted against the whole document for a level
+   * that happened to be the provider's default, and would have passed against a
+   * provider that ignored its props entirely.
+   */
+  it('resolves a scoped ThemeProvider inside a report', async () => {
+    const { html } = await renderReport({
+      input: fixture('scoped.tsx'),
+      output: out('scoped.html'),
+    });
+    const body = html.slice(html.indexOf('</style>'));
+    expect(html).toContain('<html lang="en" data-theme="white"');
+    expect(body).toContain('data-theme="dim"');
+    expect(body).not.toContain('data-theme="midnight"');
+  }, 30_000);
+
   it('drops the webfont import only when asked', async () => {
     const online = await renderReport({ input: FIXTURE, output: out('online.html') });
     const offline = await renderReport({

@@ -316,6 +316,11 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 **An agent that needs to emit an HTML report renders a `.tsx` file through
 `ds-report`. It does not write HTML.**
 
+The rules are here. The reference behind them — report design and its sources,
+the determinism and speed measurements, the lint's two rule families, and which
+components render inert in a static document — is
+[`docs/reports.md`](./docs/reports.md).
+
 ```bash
 ds-report audit.tsx --theme white               # → audit.html, self-contained
 ds-report audit.tsx --theme midnight,white      # both rungs, one render
@@ -338,9 +343,11 @@ composition with `Card`, `StatCard`, `DataTable`, `NoteBlock` and `Prose`.
 
 ### What makes a generated report worth reading
 
-The header comment in `sample.tsx` is the long version. The short one — seven
-patterns the report generators people actually keep converge on, none of which
-needs JavaScript:
+The full reference, with the sources it rests on, is
+[`docs/reports.md`](./docs/reports.md); the header comment in `sample.tsx` is the
+same list next to the code that implements it. The short version — seven patterns
+the report generators people actually keep converge on, none of which needs
+JavaScript:
 
 1. **The verdict comes first**, before the evidence.
 2. **Numbers before prose.** A stat row is scannable in two seconds.

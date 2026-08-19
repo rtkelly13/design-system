@@ -261,6 +261,10 @@ every rung shares one render and one stylesheet: the whole ladder from one file
 takes 603ms against 2402ms for four separate invocations. Pass several inputs or
 several levels to one invocation rather than looping.
 
+[`docs/reports.md`](./docs/reports.md) is the reference: what makes a generated
+report readable and the sources for it, the determinism and speed numbers, the
+lint rules, and a table of which components render inert without client JS.
+
 `dist/report/sample.tsx` is the full worked example — verdict-first layout,
 collapsible `<details>` sections that need no script, a chart with no charting
 library, a designed empty state — and it doubles as the generator's regression
