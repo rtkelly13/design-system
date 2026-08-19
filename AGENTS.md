@@ -325,9 +325,10 @@ Dependencies are fine. **Undocumented ones are not.** Every entry in
 Three things it catches that knip structurally cannot:
 
 1. **Shipped source importing a devDependency.** That publishes a package which
-   breaks on install. `src/stories/**` is excluded from "shipped", since those
-   files sit under `src/` but are unreachable from `src/index.ts` — which is why
-   Storybook is legitimately a devDependency.
+   breaks on install. `src/stories/**` and `src/**/*.test.ts(x)` are excluded
+   from "shipped", since those files sit under `src/` but are unreachable from
+   `src/index.ts` — which is why Storybook and Vitest are legitimately
+   devDependencies despite being imported from inside `src/`.
 2. **The CSS contract.** `styles.css` does `@import "tailwindcss"` and
    `prose.css` does `@plugin "@tailwindcss/typography"`. Both resolve from the
    *consumer's* `node_modules` at their build time, so both are real
