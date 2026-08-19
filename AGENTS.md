@@ -25,7 +25,7 @@ Package manager is **pnpm** (`node >=22`).
 6. **Required Checks**:
    - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
    - `pnpm check:contrast` (every role pair, every level)
-   - `pnpm check:tokens` (colour-instead-of-role ratchet)
+   - `pnpm lint` (colour-instead-of-role, reported at the site)
    - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm check:deps` (dependency reasons, sections and usage)
    - `pnpm check:visual-coverage` (every story asserted or excluded with a reason)
@@ -118,7 +118,7 @@ could not otherwise clear `shadow-hard-md`. Everything else works untouched: the
 merger classifies the semantic tokens correctly out of the box, including telling
 a colour from a size in the same `text-*` position.
 
-`pnpm check:css` enforces it, and it is a ratchet like `check:tokens`: it counts
+`pnpm check:css` enforces it, and it is still a ratchet: it counts
 every declaration whose selector names a class this repo authors and fails when
 the number rises. `pnpm check:css:list` shows what is left.
 
@@ -245,10 +245,17 @@ first paint, which React cannot do without either a flash or a hydration mismatc
 ## 🎯 Semantic Theming
 
 Components must **never** reference `--brutalist-cyan`, `--color-white`, `--border-color`
-or the `brutalist-*` Tailwind utilities directly. Those names now resolve through a
-**deprecated compatibility block** in the generated `theme.css`, which exists only so the
-~30 not-yet-migrated components keep rendering while they are ported. `pnpm check:tokens`
-counts the remaining call sites; the block is deleted when that reaches zero.
+or the `brutalist-*` Tailwind utilities directly, nor a hex literal, nor a raw palette
+utility like `bg-zinc-900`. `pnpm lint` reports each one at the line that wrote it, with
+the role to use instead.
+
+**The migration is done: zero call sites remain.** Those names still resolve through a
+**deprecated compatibility block** in the generated `theme.css`, which existed only so
+the not-yet-migrated components kept rendering while they were ported. Nothing in this
+package needs it now, so removing it is unblocked — but it ships in `theme.css`, so a
+consumer may be leaning on it, which makes deletion a breaking change and a deliberate
+one rather than a tidy-up.
+
 `src/components/Input.tsx` is the worked example of a migrated component.
 
 | Role group | Tokens | Use for |
@@ -285,8 +292,8 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm tokens:check`: Fails if the generated CSS is stale. Runs in CI.
 - `pnpm check:contrast`: Audits every role pair on every level. Runs in CI.
 - `pnpm contrast:report`: Prints the full matrix with margins, worst first.
-- `pnpm check:tokens`: Ratchet on colour-instead-of-role call sites. Runs in CI.
-- `pnpm check:tokens:list`: Same, broken down by file.
+- `pnpm lint`: Reports a colour written as a literal at the line that wrote it. Runs in CI.
+- `pnpm lint:fix`: Same, applying any autofixes.
 - `pnpm check:css`: Ratchet on styling that lives in a stylesheet. Runs in CI.
 - `pnpm check:css:list`: Same, showing the offending selectors.
 - `pnpm check:deps`: Dependency reasons, sections and usage. Runs in CI.

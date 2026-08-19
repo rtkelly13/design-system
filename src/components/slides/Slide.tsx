@@ -21,14 +21,14 @@ export const Slide: React.FC<SlideProps> = ({
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: '3rem 4rem',
-        backgroundColor: 'var(--color-black, #000000)',
-        color: 'var(--color-white, #ffffff)',
+        backgroundColor: 'var(--ds-surface-base)',
+        color: 'var(--ds-text-primary)',
         boxSizing: 'border-box',
       }}
     >
       {/* Slide Header */}
       {title && (
-        <div style={{ marginBottom: '2rem', borderBottom: '2px solid var(--border-color, #ffffff)', paddingBottom: '1rem' }}>
+        <div style={{ marginBottom: '2rem', borderBottom: '2px solid var(--ds-border-strong)', paddingBottom: '1rem' }}>
           <h2
             style={{
               fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
@@ -36,7 +36,7 @@ export const Slide: React.FC<SlideProps> = ({
               fontWeight: 800,
               textTransform: 'uppercase',
               letterSpacing: '-0.02em',
-              color: 'var(--color-white, #ffffff)',
+              color: 'var(--ds-text-primary)',
               margin: 0,
             }}
           >
@@ -47,7 +47,7 @@ export const Slide: React.FC<SlideProps> = ({
               style={{
                 fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
                 fontSize: '1rem',
-                color: 'var(--brutalist-cyan, #22d3ee)',
+                color: 'var(--ds-accent-primary)',
                 marginTop: '0.5rem',
               }}
             >
@@ -67,13 +67,13 @@ export const Slide: React.FC<SlideProps> = ({
         style={{
           marginTop: '2rem',
           paddingTop: '1rem',
-          borderTop: '2px solid var(--border-color, #ffffff)',
+          borderTop: '2px solid var(--ds-border-strong)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
           fontSize: '0.75rem',
-          color: 'var(--brutalist-cyan, #22d3ee)',
+          color: 'var(--ds-accent-primary)',
         }}
       >
         <span>// BRUTALIST PRESENTATION ENGINE //</span>

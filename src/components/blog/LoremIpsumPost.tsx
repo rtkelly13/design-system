@@ -20,7 +20,7 @@ export const LoremIpsumPost: React.FC = () => {
         we achieve an unmistakable visual identity that scales across every application.
       </TLDR>
 
-      <h2 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.75rem', fontWeight: 800, textTransform: 'uppercase', marginTop: '2.5rem', color: 'var(--brutalist-cyan, #22d3ee)' }}>
+      <h2 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.75rem', fontWeight: 800, textTransform: 'uppercase', marginTop: '2.5rem', color: 'var(--ds-accent-primary)' }}>
         [ 01. The Problem with Generic Web UI ]
       </h2>
       <p style={{ marginTop: '1rem' }}>
@@ -30,28 +30,28 @@ export const LoremIpsumPost: React.FC = () => {
 
       <NoteBlock type="important" title="SYSTEM RULE ENFORCEMENT">
         Never hardcode pixel border radii or hex literals inside downstream component code.
-        All colors must resolve through standard CSS tokens (<code style={{ color: 'var(--brutalist-cyan, #22d3ee)' }}>--brutalist-cyan</code>, <code style={{ color: 'var(--brutalist-pink, #ec4899)' }}>--brutalist-pink</code>) to preserve paper-and-ink theme remapping.
+        All colors must resolve through standard CSS tokens (<code style={{ color: 'var(--ds-accent-primary)' }}>--brutalist-cyan</code>, <code style={{ color: 'var(--ds-accent-tertiary)' }}>--brutalist-pink</code>) to preserve paper-and-ink theme remapping.
       </NoteBlock>
 
-      <h2 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.75rem', fontWeight: 800, textTransform: 'uppercase', marginTop: '2.5rem', color: 'var(--brutalist-pink, #ec4899)' }}>
+      <h2 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.75rem', fontWeight: 800, textTransform: 'uppercase', marginTop: '2.5rem', color: 'var(--ds-accent-tertiary)' }}>
         [ 02. Executable Design Tokens ]
       </h2>
       <p style={{ marginTop: '1rem' }}>
         Below is an example of code block rendering within the design system:
       </p>
 
-      <div style={{ margin: '1.5rem 0', border: '2px solid var(--border-color, #ffffff)', backgroundColor: 'var(--color-black, #000000)' }}>
-        <div style={{ padding: '0.75rem 1.25rem', backgroundColor: 'var(--border-color, #ffffff)', color: 'var(--color-black, #000000)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontWeight: 800, fontSize: '0.875rem' }}>
+      <div style={{ margin: '1.5rem 0', border: '2px solid var(--ds-border-strong)', backgroundColor: 'var(--ds-surface-base)' }}>
+        <div style={{ padding: '0.75rem 1.25rem', backgroundColor: 'var(--ds-border-strong)', color: 'var(--ds-surface-base)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontWeight: 800, fontSize: '0.875rem' }}>
           // tailwind-preset.ts
         </div>
-        <pre style={{ padding: '1.25rem', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', color: 'var(--brutalist-neonGreen, #39ff14)', overflowX: 'auto', margin: 0 }}>
+        <pre style={{ padding: '1.25rem', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', color: 'var(--ds-intent-success)', overflowX: 'auto', margin: 0 }}>
 {`export const brutalistTailwindPreset = {
   theme: {
     extend: {
       borderRadius: { none: '0px' },
       boxShadow: {
-        'hard-md': '4px 4px 0px 0px var(--brutalist-shadow-color)',
-        'hard-cyan': '4px 4px 0px 0px var(--brutalist-cyan)',
+        'hard-md': '4px 4px 0px 0px var(--ds-shadow-color)',
+        'hard-cyan': '4px 4px 0px 0px var(--ds-accent-primary)',
       }
     }
   }

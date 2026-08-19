@@ -81,6 +81,11 @@ const MANIFEST = {
   '@tailwindcss/vite': { kind: 'dev', why: 'Compiles Tailwind inside the Storybook build.' },
   '@types/react': { kind: 'dev', why: 'Types for the react peer.' },
   '@types/react-dom': { kind: 'dev', why: 'Types for the react-dom peer.' },
+  eslint: {
+    kind: 'dev',
+    why: 'Reports a colour written as a literal at the line that wrote it. Replaced the check-tokens.mjs ratchet, whose text-regex counted matches inside comments and regexes and so could never reach zero.',
+  },
+  'typescript-eslint': { kind: 'dev', why: 'TSX parser for the lint rule above; the violations live in JSX attributes.' },
   '@types/node': {
     kind: 'dev',
     why: 'Types for `node:fs`/`node:path` in the unit suite, which reads the generated theme.css from disk to assert its shape.',

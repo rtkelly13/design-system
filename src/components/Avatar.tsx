@@ -28,10 +28,10 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   const getAccentColor = () => {
     switch (accent) {
-      case 'pink': return 'var(--brutalist-pink, #ec4899)';
-      case 'yellow': return 'var(--brutalist-yellow, #facc15)';
-      case 'green': return 'var(--brutalist-neonGreen, #39ff14)';
-      default: return 'var(--brutalist-cyan, #22d3ee)';
+      case 'pink': return 'var(--ds-accent-tertiary)';
+      case 'yellow': return 'var(--ds-accent-secondary)';
+      case 'green': return 'var(--ds-intent-success)';
+      default: return 'var(--ds-accent-primary)';
     }
   };
 
@@ -44,9 +44,9 @@ export const Avatar: React.FC<AvatarProps> = ({
       style={{
         width: sizePx,
         height: sizePx,
-        border: '2px solid var(--border-color, #ffffff)',
+        border: '2px solid var(--ds-border-strong)',
         boxShadow: `3px 3px 0px 0px ${accentColor}`,
-        backgroundColor: 'var(--color-black, #000000)',
+        backgroundColor: 'var(--ds-surface-base)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

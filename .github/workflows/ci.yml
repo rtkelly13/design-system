@@ -49,7 +49,7 @@ jobs:
 
       # Ratchet: fails if the count of colour-instead-of-role call sites rises.
       - name: Token Hygiene
-        run: pnpm check:tokens
+        run: pnpm lint
 
       # Ratchet: fails if styling moves back into a stylesheet.
       - name: CSS Surface

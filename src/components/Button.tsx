@@ -40,7 +40,7 @@ const PRESS =
   'shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none';
 
 /** `default` is an alias for `cyan`; sharing the constant keeps them identical. */
-const CYAN = `bg-brutalist-cyan text-black border-white ${PRESS}`;
+const CYAN = `bg-accent-primary text-content-inverse border-edge-strong ${PRESS}`;
 
 const button = recipe({
   base: 'font-mono font-bold uppercase border-2 transition-all duration-200',
@@ -52,9 +52,9 @@ const button = recipe({
     },
     variant: {
       cyan: CYAN,
-      pink: `bg-brutalist-pink text-black border-white ${PRESS}`,
-      yellow: `bg-brutalist-yellow text-black border-white ${PRESS}`,
-      white: `bg-white text-black border-black ${PRESS}`,
+      pink: `bg-accent-tertiary text-content-inverse border-edge-strong ${PRESS}`,
+      yellow: `bg-accent-secondary text-content-inverse border-edge-strong ${PRESS}`,
+      white: `bg-content-primary text-content-inverse border-content-primary ${PRESS}`,
       default: CYAN,
     },
     /**

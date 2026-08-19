@@ -65,7 +65,7 @@ export function Card({
               fontFamily: semanticTokens.font.mono,
               fontWeight: 700,
               textTransform: 'uppercase',
-              color: '#000',
+              color: 'var(--ds-text-inverse)',
               backgroundColor: accentColor ?? semanticTokens.accent.tertiary,
               marginBottom: '0.75rem',
             }}

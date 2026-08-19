@@ -45,7 +45,7 @@ export const DesignSandbox: React.FC = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-white font-mono">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 text-content-primary font-mono">
       {/* Sandbox Header */}
       <div className="flex justify-between items-start flex-wrap gap-4 mb-8">
         <div>
@@ -55,7 +55,7 @@ export const DesignSandbox: React.FC = () => {
         </div>
 
         {/* 3-Way Theme Switcher Controls */}
-        <div className="flex gap-2 bg-black p-2 border-2 border-white">
+        <div className="flex gap-2 bg-surface-base p-2 border-2 border-edge-strong">
           {levels.map((t) => (
             <button
               key={t}
@@ -76,7 +76,7 @@ export const DesignSandbox: React.FC = () => {
       </div>
 
       {/* Navigation Sub-Tabs */}
-      <div className="flex gap-2 mb-8 border-b-2 border-white pb-4 overflow-x-auto">
+      <div className="flex gap-2 mb-8 border-b-2 border-edge-strong pb-4 overflow-x-auto">
         <Button onClick={() => setActiveTab('components')} variant={activeTab === 'components' ? 'pink' : 'default'} bracketed size="sm">
           COMPONENTS & THEMES
         </Button>
@@ -111,7 +111,7 @@ export const DesignSandbox: React.FC = () => {
 
           {/* Card & Button Primitives */}
           <Card>
-            <h3 className="font-display text-xl font-bold text-brutalist-cyan mb-4">
+            <h3 className="font-display text-xl font-bold text-accent-primary mb-4">
               [ BADGES & BUTTON VARIANTS ]
             </h3>
             <div className="flex gap-3 flex-wrap mb-6">
@@ -129,8 +129,8 @@ export const DesignSandbox: React.FC = () => {
           </Card>
 
           {/* Form Primitives */}
-          <div className="bg-zinc-900 border-2 border-white p-6">
-            <h3 className="font-display text-xl font-bold text-brutalist-yellow mb-4">
+          <div className="bg-surface-raised border-2 border-edge-strong p-6">
+            <h3 className="font-display text-xl font-bold text-accent-secondary mb-4">
               [ FORM & INPUT PRIMITIVES ]
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -160,7 +160,7 @@ export const DesignSandbox: React.FC = () => {
       {activeTab === 'saas' && (
         <div className="flex flex-col gap-6">
           <div className="flex justify-between items-center flex-wrap gap-4">
-            <h2 className="font-display text-2xl font-bold text-brutalist-cyan uppercase">
+            <h2 className="font-display text-2xl font-bold text-accent-primary uppercase">
               [ CLOUD OPERATIONS COMMAND CENTER ]
             </h2>
             <div className="w-full sm:w-72">
@@ -182,7 +182,7 @@ export const DesignSandbox: React.FC = () => {
 
           {/* Data Table */}
           <div className="mt-4">
-            <h3 className="font-display text-lg font-bold text-white mb-3 uppercase">
+            <h3 className="font-display text-lg font-bold text-content-primary mb-3 uppercase">
               [ AUTHORIZED WORKSPACE OPERATORS ]
             </h3>
             <DataTable<UserRecord>
@@ -222,19 +222,19 @@ export const DesignSandbox: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card title="NEON TERMINAL DISPLAY" description="Ultra-wide 4K brutalist developer monitor with anti-glare matte coating." filename="hardware_display.spec">
               <div className="mt-4 flex justify-between items-center">
-                <span className="font-display text-2xl font-bold text-brutalist-cyan">$899.00</span>
+                <span className="font-display text-2xl font-bold text-accent-primary">$899.00</span>
                 <Button variant="cyan" size="sm" bracketed>ADD TO CART</Button>
               </div>
             </Card>
             <Card title="CYBERDECK MECHANICAL" description="Hotswappable mechanical keyboard with custom laser-engraved keycaps." filename="keyboard_v2.spec">
               <div className="mt-4 flex justify-between items-center">
-                <span className="font-display text-2xl font-bold text-brutalist-pink">$349.00</span>
+                <span className="font-display text-2xl font-bold text-accent-tertiary">$349.00</span>
                 <Button variant="pink" size="sm" bracketed>ADD TO CART</Button>
               </div>
             </Card>
             <Card title="HSM HARDWARE TOKEN" description="FIPS 140-3 Level 4 physical cryptographic key with hardware destruction." filename="hsm_security.spec">
               <div className="mt-4 flex justify-between items-center">
-                <span className="font-display text-2xl font-bold text-brutalist-yellow">$199.00</span>
+                <span className="font-display text-2xl font-bold text-accent-secondary">$199.00</span>
                 <Button variant="yellow" size="sm" bracketed>ADD TO CART</Button>
               </div>
             </Card>
@@ -244,14 +244,14 @@ export const DesignSandbox: React.FC = () => {
 
       {/* Tab 4: Slide Deck Engine */}
       {activeTab === 'slides' && (
-        <div className="border-4 border-white p-6 bg-black">
+        <div className="border-4 border-edge-strong p-6 bg-surface-base">
           <SlideDeck>
             <Slide title="BUILDING SINGULAR DESIGN SURFACES">
-              <p className="text-xl text-zinc-300 font-mono mb-4">&gt; Dual-Mode Token Remappings across Dark, Dim, and Sketch.</p>
+              <p className="text-xl text-content-secondary font-mono mb-4">&gt; Dual-Mode Token Remappings across Dark, Dim, and Sketch.</p>
               <Badge accent="cyan">REUSABLE ENGINE</Badge>
             </Slide>
             <Slide title="ZERO TOKEN DRIFT PRINCIPLE">
-              <p className="text-xl text-zinc-300 font-mono mb-4">&gt; Every downstream app imports @rtkelly13/design-system/tailwind-preset.</p>
+              <p className="text-xl text-content-secondary font-mono mb-4">&gt; Every downstream app imports @rtkelly13/design-system/tailwind-preset.</p>
               <Badge accent="pink">SINGLE SOURCE OF TRUTH</Badge>
             </Slide>
           </SlideDeck>
@@ -268,7 +268,7 @@ export const DesignSandbox: React.FC = () => {
       {/* Modal Dialog */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="CONFIRM SYSTEM OVERRIDE">
         <p className="mb-4">Are you sure you want to execute system configuration override on node <strong>cluster-us-east-1</strong>?</p>
-        <p className="text-xs font-mono text-zinc-400">&gt; This action will trigger a rolling reload of active workload containers.</p>
+        <p className="text-xs font-mono text-content-muted">&gt; This action will trigger a rolling reload of active workload containers.</p>
       </Modal>
     </div>
   );
