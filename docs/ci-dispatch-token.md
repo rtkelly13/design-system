@@ -3,6 +3,11 @@
 **Status:** proposed, not implemented. Nothing in the repo reads `CI_DISPATCH_TOKEN`
 yet; this describes what to build and the token to create for it.
 
+The whole thing hangs off a PR comment — `/update-snapshots` — so the flow it
+plugs into is the one already used by hand today. That is the point: the PAT does
+not introduce a new mechanism, it removes the two clicks at the end of an existing
+one. See *The comment-based flow, hop by hop* below.
+
 ## The problem
 
 `/update-snapshots` already does almost everything: it regenerates the Playwright
@@ -53,6 +58,58 @@ and the rest of this design is unchanged apart from where the token comes from.
 Avoid a **classic** PAT. Its narrowest useful scope is `repo`, which grants full
 read/write across *every* repository you can reach — for a token whose only job is
 to commit PNGs to one of them.
+
+## The comment-based flow, hop by hop
+
+Four hops, three of which already work. Worth drawing out because a different
+identity acts at each one, and only one of them is the problem.
+
+1. A maintainer comments **`/update-snapshots`** on the PR.
+2. **`update-snapshots-command.yml`** wakes on `issue_comment`, validates the
+   request, and dispatches the worker at the PR's branch.
+3. **`update-snapshots.yml`** builds Storybook on Linux, writes the baselines,
+   re-runs the suite against them, commits and **pushes**.
+4. The push is a `pull_request` **`synchronize`** event, `ci.yml` runs, and the
+   check the reviewer is looking at updates in place.
+
+| Hop | Trigger | Acting identity | Starts a run? |
+|---|---|---|---|
+| Comment → command workflow | `issue_comment` | The human commenting | Yes — an ordinary event |
+| Command → worker | `workflow_dispatch` via `gh workflow run` | `github.token` | **Yes** — the documented exception |
+| Worker → push | `git push` | `GITHUB_TOKEN` today | **No** — this is the hop that breaks |
+| Push → CI | `pull_request` `synchronize` | Whoever pushed | Only if the pusher was not `GITHUB_TOKEN` |
+
+**Hop 2 needs no change, and that is not luck.** `workflow_dispatch` and
+`repository_dispatch` are explicitly exempt from the anti-recursion rule — GitHub
+treats them as deliberate calls rather than accidents, so they *always* create a
+run even when fired with `GITHUB_TOKEN`. Every other `GITHUB_TOKEN`-triggered
+event is suppressed. That is why the command chain works today at all, and why
+this design touches exactly one hop.
+
+**Hop 3 is the whole fix.** Give the worker's checkout the PAT (see *Design A*)
+and hop 4 follows for free.
+
+### One asymmetry that will confuse you
+
+An `issue_comment` workflow always runs the copy of itself on the **default
+branch** — never the copy on the PR branch. The worker is the opposite: it is
+dispatched with `--ref <pr-branch>`, so the PR's own version of it runs.
+
+Three consequences:
+
+- **Editing the command workflow on a branch has no effect until it merges.** You
+  cannot test a change to `/update-snapshots`' own parsing from a PR; the comment
+  will keep running `main`'s copy.
+- **Editing the worker workflow on a branch takes effect immediately** on that
+  branch, because that is the ref being dispatched. This is where to iterate.
+- That asymmetry is also a **security property**, not just an annoyance: an
+  untrusted branch cannot rewrite the guard deciding who may run the command,
+  because the guard that executes is always the default branch's.
+
+Concretely right now: the `mode` parsing added in this branch lives in the
+*command* workflow, so until it merges, `/update-snapshots all` on this PR
+dispatches without `-f mode` and the worker falls back to its own default,
+`missing`. Safe degradation — but not what the comment asked for.
 
 ## Design A — push as the PAT (recommended)
 
@@ -132,6 +189,24 @@ Design A is also strictly less code: one input, no new trigger.
 Store it as a **secret**, not a variable — variables are readable in logs and by
 anyone with read access to the repo settings.
 
+### Confirming it is actually set
+
+A token exported in a shell, a dev container or an agent sandbox does **nothing**
+for CI. The only place that counts is the repository's Actions secrets, and
+GitHub never reveals a secret's value once saved — not through the UI, not through
+the API — so "is it there" is answered by name only:
+
+- **UI:** Settings → Secrets and variables → Actions. `CI_DISPATCH_TOKEN` should
+  be listed with a *Last updated* date.
+- **CLI:** `gh secret list --repo rtkelly13/design-system` prints names and
+  update times.
+
+Neither shows the value, which is the point. If the name is missing, the workflow
+resolves `secrets.CI_DISPATCH_TOKEN` to an empty string and `actions/checkout`
+silently falls back to `GITHUB_TOKEN` — so the job succeeds, the baselines commit,
+and nothing re-runs. That failure is indistinguishable from today's behaviour,
+which is why it is worth checking the name rather than inferring from a green run.
+
 ## Constraints to know before relying on it
 
 **It cannot push workflow-file changes.** GitHub refuses writes to anything under
@@ -203,6 +278,7 @@ re-run. Then revoke the token. Nothing else in the repo depends on it.
 - [GITHUB_TOKEN — GitHub Docs](https://docs.github.com/en/actions/concepts/security/github_token)
 - [Triggering a workflow — GitHub Docs](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)
 - [Permissions required for fine-grained personal access tokens](https://docs.github.com/en/rest/authentication/permissions-required-for-fine-grained-personal-access-tokens)
+- [Use GITHUB_TOKEN with workflow_dispatch and repository_dispatch — GitHub Changelog](https://github.blog/changelog/2022-09-08-github-actions-use-github_token-with-workflow_dispatch-and-repository_dispatch/) — the exception hop 2 relies on
 - [`actions/create-github-app-token`](https://github.com/actions/create-github-app-token) — the App-token route
 - [Push from Action does not trigger subsequent action (community discussion)](https://github.com/orgs/community/discussions/25702)
 - [Resource not accessible by personal access token for dispatch (community discussion)](https://github.com/orgs/community/discussions/58868)
