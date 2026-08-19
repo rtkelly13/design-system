@@ -39,6 +39,12 @@ Package manager is **pnpm** (`node >=22`).
    **`/update-snapshots`** on the PR to generate the baseline, then push.
    `missing` mode writes only what does not exist, so this cannot re-record an
    existing baseline that has drifted.
+   Note that Playwright reports a test that *creates* a baseline as failed, on
+   purpose — `missing` mode attaches a soft error so a new baseline is never
+   silent. So the update workflow's generate step is expected to exit non-zero
+   whenever it does its job, and tolerates it; the **verify** step that follows,
+   which re-runs the suite with no update flag, is the gate that decides whether
+   the baselines get committed.
    This is not a convention you have to remember: `pnpm check:visual-coverage`
    reads Storybook's own build index and fails when a **component** has no
    asserted story and no `EXCLUDED` entry giving a reason. The budget is **0** and

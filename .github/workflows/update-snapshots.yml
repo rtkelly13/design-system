@@ -65,7 +65,21 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
+      # `missing` mode writes the baseline and then reports that test as failed —
+      # deliberately, via a Playwright soft error, so that creating a baseline is
+      # never silent. A non-zero exit is therefore the *expected* outcome of
+      # bootstrapping a story, not an error, and failing the job on it is why
+      # `/update-snapshots` could never actually create one: every step below,
+      # including the commit, was skipped. The baselines were written on the
+      # runner and thrown away with it.
+      #
+      # Tolerated, not ignored. The verify step re-runs the suite with no update
+      # flag, so a baseline that does not reproduce — a story that renders
+      # non-deterministically, or Storybook's error overlay caught by
+      # `story-ready.ts` — fails there and nothing is committed. That step is the
+      # gate; this one only produces candidates.
       - name: Generate Visual Snapshots
+        continue-on-error: true
         env:
           MODE: ${{ inputs.mode }}
         run: npx playwright test tests/visual.spec.ts --update-snapshots="${MODE:-missing}"
