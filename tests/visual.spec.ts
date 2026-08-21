@@ -96,6 +96,10 @@ const CASES: readonly VisualCase[] = [
   // gap its own § *Screenshot Walkthrough* calls out.
   { id: 'foundations-theme-ladder--all-levels', snapshot: 'theme-ladder-all-levels.png', fullPage: true },
 
+  { id: 'foundations-dropdownmenu--default', snapshot: 'dropdownmenu-default.png' },
+  { id: 'foundations-popover--default', snapshot: 'popover-default.png' },
+  { id: 'foundations-tooltip--default', snapshot: 'tooltip-default.png' },
+
   // The two page-level shells. Their baselines will churn when the remaining
   // token migration reaches them, which is the intended behaviour and not a
   // reason to leave them unasserted — `dim` because it is the rung these
