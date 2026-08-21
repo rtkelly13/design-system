@@ -68,6 +68,10 @@ const MANIFEST = {
     kind: 'runtime',
     why: 'Builds the style recipes in src/lib/recipe.ts. Confined to that one file and deliberately absent from the published .d.ts, so it can be replaced without a breaking change.',
   },
+  '@tanstack/react-table': {
+    kind: 'runtime',
+    why: 'Headless data table state engine for DataTable and BrutalistTable (sorting, filtering, pagination, selection).',
+  },
 
   react: {
     kind: 'peer',
