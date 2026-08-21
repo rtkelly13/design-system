@@ -84,6 +84,10 @@ const MANIFEST = {
     kind: 'runtime',
     why: 'Headless accessible tooltip primitive with delay and positioning management.',
   },
+  cmdk: {
+    kind: 'runtime',
+    why: 'Headless command palette and spotlight search primitive with fuzzy filtering and keyboard navigation.',
+  },
 
   react: {
     kind: 'peer',
