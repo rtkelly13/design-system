@@ -68,6 +68,10 @@ const MANIFEST = {
     kind: 'runtime',
     why: 'Builds the style recipes in src/lib/recipe.ts. Confined to that one file and deliberately absent from the published .d.ts, so it can be replaced without a breaking change.',
   },
+  cmdk: {
+    kind: 'runtime',
+    why: 'Headless command palette and spotlight search primitive with fuzzy filtering and keyboard navigation.',
+  },
 
   react: {
     kind: 'peer',

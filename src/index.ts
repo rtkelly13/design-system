@@ -40,6 +40,7 @@ export * from './components/Input';
 export * from './components/StatCard';
 export * from './components/DataTable';
 export * from './components/Modal';
+export * from './components/Command';
 
 // Slides & Presentation Deck Engine
 export * from './components/slides/Slide';
