@@ -10,16 +10,18 @@ import { noColourLiterals } from './scripts/eslint-token-rule.mjs';
  * `src/lint.test.ts` pins both, and pins this configuration — most of what can
  * break here is a setting, not rule logic.
  *
- * ## Why this exists next to `pnpm check:tokens`
+ * ## What this replaced
  *
- * They are not duplicates, they answer different questions. `check:tokens`
- * answers *how much debt is left* — one number, in CI, after you have pushed.
- * This answers *where, and what should it be instead* — in the editor, before
- * the code is written. The second is what actually stops new violations, since
- * the first only ever says no once the work is done.
+ * `pnpm check:tokens` was a counting ratchet: one number, in CI, after you had
+ * pushed. It is gone, and this is not the same check made stricter — it answers
+ * a different question. A ratchet says *how much debt is left*; this says
+ * *where, and what to use instead*, in the editor, before the code is written.
+ * Only the second actually stops new violations, since the first can only say no
+ * once the work is done. The ratchet also counted matches inside comments and
+ * regexes, so it could never reach zero.
  *
- * Both read `scripts/token-rules.mjs`, so there is one definition of what counts
- * and the two cannot drift apart.
+ * The rules still live in `scripts/token-rules.mjs` rather than inline here, so
+ * that a second consumer cannot end up with its own copy of the regexes.
  *
  * ## Why a local rule rather than `no-restricted-syntax`
  *
@@ -32,7 +34,7 @@ import { noColourLiterals } from './scripts/eslint-token-rule.mjs';
  *
  * ## Scope is load-bearing — read before widening it
  *
- * Only `src/components/**` and `src/stories/**`, matching `check:tokens`.
+ * Only `src/components/**` and `src/stories/**`, matching where components and stories are written.
  *
  * `src/theme/levels.ts` is deliberately *not* linted, and must not be. Ladder
  * rule 4 says every level colour is a literal, precisely so `check:contrast`

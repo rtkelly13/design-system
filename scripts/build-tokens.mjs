@@ -142,15 +142,17 @@ ${ROLE_SHADOWS}
  * them rendering correctly — including on the two new levels — so the component
  * migration can happen file by file instead of in one commit.
  *
- * `pnpm check:tokens` counts the remaining call sites; this block comes out
- * when that reaches zero.
+ * Nothing in this package needs it any more — `pnpm lint` rejects every one of
+ * these names and reports zero call sites — so removal is unblocked. It is not
+ * a tidy-up, though: this block ships inside `theme.css`, so a consumer may be
+ * leaning on it, which makes deleting it a breaking change and a deliberate one.
  *
  * Not covered, and not coverable: literal Tailwind greys (`bg-zinc-900`,
  * `text-zinc-400`) baked into some components. They are real colours, not
- * aliases, so they stay dark on the light levels. The checker reports them.
+ * aliases, so they stay dark on the light levels. `pnpm lint` reports them.
  */
 function compatAliases(definition) {
-  return `  /* deprecated — see \`pnpm check:tokens\` */
+  return `  /* deprecated — address the --ds-* role above instead */
   --color-black: ${definition.surface.base};
   --color-white: ${definition.text.primary};
   --border-color: ${definition.border.strong};

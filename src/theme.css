@@ -188,7 +188,7 @@
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  /* deprecated — see `pnpm check:tokens` */
+  /* deprecated — address the --ds-* role above instead */
   --color-black: #0a0a1a;
   --color-white: #ffffff;
   --border-color: #ffffff;
@@ -273,7 +273,7 @@
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  /* deprecated — see `pnpm check:tokens` */
+  /* deprecated — address the --ds-* role above instead */
   --color-black: #121316;
   --color-white: #e4e4e7;
   --border-color: #e4e4e7;
@@ -358,7 +358,7 @@
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  /* deprecated — see `pnpm check:tokens` */
+  /* deprecated — address the --ds-* role above instead */
   --color-black: #fcfbf9;
   --color-white: #18181b;
   --border-color: #18181b;
@@ -443,7 +443,7 @@
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  /* deprecated — see `pnpm check:tokens` */
+  /* deprecated — address the --ds-* role above instead */
   --color-black: #ffffff;
   --color-white: #0b0b0d;
   --border-color: #0b0b0d;

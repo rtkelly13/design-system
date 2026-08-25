@@ -20,8 +20,8 @@
  *      Storybook), listed in THIRD_PARTY. We never render those elements, so
  *      there is no TSX to move the styling into.
  *
- * A ratchet, like check-tokens: BUDGET is the count today and CI fails if it
- * rises. Lower a line as a file is migrated; delete it at zero.
+ * A ratchet: BUDGET is the count today and CI fails if it rises. Lower a line
+ * as a file is migrated; delete it at zero.
  *
  *   node scripts/check-css.mjs           fail if any file exceeds budget
  *   node scripts/check-css.mjs --list    show the offending selectors
