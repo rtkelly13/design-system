@@ -96,5 +96,3 @@ export function Prose({ children, brutalist = true, className = '', ...rest }: P
     </div>
   );
 }
-
-export default Prose;

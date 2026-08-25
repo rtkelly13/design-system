@@ -434,14 +434,23 @@ Three things it catches that knip structurally cannot:
    declared it — so following the documentation produced a resolution error. The
    check found that on its first run.
 
-### Known and not yet gated
+### Duplicate exports, gated
 
-`pnpm knip` (the full sweep) reports **28 duplicate exports**: every component
-has both a named and a `default` export. `src/index.ts` uses `export *`, which
-does not forward defaults, and the `exports` map has no deep paths — so all 28
-defaults are unreachable from any consumer. Dead API surface, safe to delete,
-not yet done. The gated run is scoped to dependency issues so this does not
-block CI while it stands.
+`pnpm knip` used to report duplicate exports: every component had both a named
+and a `default` export, while `src/index.ts` uses `export *`, which does not
+forward defaults, and the `exports` map has no deep paths — so every one of them
+was unreachable from any consumer. There were **27**, not the 28 recorded here
+before; no component ever imported another's default either.
+
+All 27 are deleted, and the emitted `dist/index.d.ts` came out byte-identical
+before and after, which is the proof they were dead rather than an argument that
+they should have been. `duplicates` is now part of the gated `knip` run in
+`check:deps`, so a `default` export cannot come back alongside a named one
+without failing CI.
+
+If a deep import path is ever wanted, that is an `exports` map change and a
+deliberate API decision — not a reason to reintroduce a default nothing can
+reach.
 
 ---
 

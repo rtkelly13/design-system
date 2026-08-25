@@ -17,5 +17,3 @@ export type AsciiDividerProps = DividerProps;
  * the component instead.
  */
 export const AsciiDivider: React.FC<AsciiDividerProps> = (props) => <Divider {...props} />;
-
-export default AsciiDivider;

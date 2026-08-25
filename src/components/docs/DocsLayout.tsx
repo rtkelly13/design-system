@@ -85,5 +85,3 @@ export function DocsLayout({
     </div>
   );
 }
-
-export default DocsLayout;

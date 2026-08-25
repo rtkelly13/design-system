@@ -193,5 +193,3 @@ function NodeItem({
     </li>
   );
 }
-
-export default DocsSidebar;

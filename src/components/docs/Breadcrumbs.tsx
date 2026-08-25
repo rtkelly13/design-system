@@ -58,5 +58,3 @@ export function Breadcrumbs({ items, separator = '/', className = '' }: Breadcru
     </nav>
   );
 }
-
-export default Breadcrumbs;
