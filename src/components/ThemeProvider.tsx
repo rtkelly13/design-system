@@ -4,6 +4,7 @@ import {
   isThemeLevel,
   LEVELS,
   nextLevel,
+  reportRenamedLevel,
   SYSTEM_LEVEL,
   THEME_LEVELS,
 } from '../theme/levels';
@@ -63,7 +64,11 @@ export interface ThemeProviderProps {
 function readStoredLevel(): ThemeLevel | undefined {
   try {
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-    return isThemeLevel(stored) ? stored : undefined;
+    if (isThemeLevel(stored)) return stored;
+    // A visitor who last chose a level before 0.2.0 still has the old name in
+    // storage. It resolves to nothing and they silently get the default.
+    reportRenamedLevel(stored, THEME_STORAGE_KEY);
+    return undefined;
   } catch {
     // Safari in private mode throws on localStorage access rather than
     // returning null. A theme preference is not worth breaking the render for.
@@ -128,6 +133,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       setLevelState(applied);
       return;
     }
+    // The consumer's own theme switcher writing a pre-0.2.0 name is the case
+    // this catches: the attribute is set, it matches no selector in theme.css,
+    // and the page renders at the default with nothing to explain why.
+    reportRenamedLevel(applied, `${THEME_ATTRIBUTE} on <html>`);
     const resolved =
       (persist ? readStoredLevel() : undefined) ??
       (followSystem ? readSystemLevel() : undefined) ??

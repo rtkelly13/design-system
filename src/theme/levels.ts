@@ -250,6 +250,63 @@ export function isThemeLevel(value: unknown): value is ThemeLevel {
   return typeof value === 'string' && (THEME_LEVELS as readonly string[]).includes(value);
 }
 
+/**
+ * Level names from before 0.2.0, and what replaced them.
+ *
+ * `dim` is deliberately absent: it is the one rung whose name did not change.
+ * The pre-0.2.0 ladder was `dark | dim | sketch`, so this is a clean 1:1
+ * rename with `white` added at the light end — not a merge, and not a guess.
+ *
+ * **This is a diagnostic table, not an alias table.** Nothing resolves through
+ * it, and that is the decision: a compatibility shim emitting
+ * `[data-theme="dark"]` would have been safe to write and impossible to remove.
+ * `theme.css` already carries one deprecated compat block for exactly this
+ * reason — it ships to consumers, so deleting it is a breaking change, and it
+ * has outlived every call site it was written for. One of those is enough.
+ *
+ * What a rename needs instead is to fail where someone can see it. A
+ * `data-theme` selector that matches nothing fails silently, which is the
+ * failure mode `Divider`'s doc comment was written about.
+ */
+export const RENAMED_LEVELS: Readonly<Record<string, ThemeLevel>> = {
+  dark: 'midnight',
+  sketch: 'bright',
+};
+
+/** The message for a renamed level, or `undefined` if this is not one. */
+export function describeRenamedLevel(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const replacement = RENAMED_LEVELS[value];
+  if (!replacement) return undefined;
+  return `theme level "${value}" was renamed to "${replacement}" in 0.2.0 and no longer matches anything`;
+}
+
+/** Reported at most once per (value, source) pair, so a render loop cannot spam. */
+const reported = new Set<string>();
+
+/**
+ * Complain about a pre-0.2.0 level name, once.
+ *
+ * Not gated behind `NODE_ENV`, on purpose. It fires only for the two names in
+ * `RENAMED_LEVELS` — never for arbitrary junk — so it cannot become noise, and
+ * a production app silently rendering the wrong rung is worse than a line in
+ * the console. It also keeps this package free of a `process.env` assumption
+ * about the consumer's bundler.
+ */
+export function reportRenamedLevel(value: unknown, source: string): void {
+  const message = describeRenamedLevel(value);
+  if (message === undefined) return;
+
+  const key = `${source}:${String(value)}`;
+  if (reported.has(key)) return;
+  reported.add(key);
+
+  console.error(
+    `[@rtkelly13/design-system] ${message} (read from ${source}). ` +
+      `The ladder is ${THEME_LEVELS.join(' → ')}. See CHANGELOG.md § 0.2.0.`
+  );
+}
+
 /** The next level on the ladder, wrapping from the lightest back to the darkest. */
 export function nextLevel(level: ThemeLevel): ThemeLevel {
   const index = THEME_LEVELS.indexOf(level);
