@@ -28,6 +28,7 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm lint` (colour-instead-of-role, reported at the site)
    - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm check:deps` (dependency reasons, sections and usage)
+   - `pnpm check:licenses` (licence policy and drift — runs after `pnpm build`)
    - `pnpm check:visual-coverage` (every story asserted or excluded with a reason)
    - `pnpm typecheck`
    - `pnpm test` (unit — see "Unit Tests" below)
@@ -71,6 +72,51 @@ Package manager is **pnpm** (`node >=22`).
    designed, with the exact token to create, in
    [`docs/ci-dispatch-token.md`](./docs/ci-dispatch-token.md). Not implemented;
    nothing reads `CI_DISPATCH_TOKEN` yet.
+
+---
+
+## ⚖️ Licence Compliance
+
+This package is MIT and published to **public npm**, so every dependency's terms
+have to permit that. `pnpm check:licenses` enforces it;
+[`scripts/check-licenses.mjs`](./scripts/check-licenses.mjs) carries the full
+reasoning and the per-licence obligations.
+
+**The failure it exists for is relicensing, not a bad first import.** A GPL
+dependency arriving in a PR is loud and a reviewer catches it. A package already
+in the tree changing its licence in a later version is silent — Redis,
+Terraform, Sentry, Elasticsearch and MongoDB all moved to BUSL/SSPL/Elastic
+terms in an ordinary bump. A lockfile diff does not say "this is no longer MIT".
+So `licenses.baseline.json` records the licence of all 377 packages and the check
+compares against it: a version bump that keeps its licence is silent, a licence
+*change* fails. Re-record with `pnpm licenses:update` **after reading what
+changed** — that command is not a way to make the check go quiet.
+
+Two scopes, because the obligations differ:
+
+| Scope | What | Policy |
+|---|---|---|
+| shipped | `--prod` — the 8 runtime and peer deps a consumer installs | Strict allowlist; must be redistributable under MIT |
+| dev | build and test tooling, never in `dist` | Also permits file-level copyleft (MPL-2.0) and data licences (CC-BY-4.0) |
+
+Both are **default-deny**: an SPDX id absent from the allowlist fails, so a new
+licence in the tree is a decision someone makes rather than a default.
+
+Two consequences worth knowing:
+
+- **A dev → shipped move re-opens the question.** MPL-2.0 and CC-BY-4.0 are
+  cleared for build time only. The check fails when a package crosses that line,
+  because "safe as a build tool" is not "safe to redistribute".
+- **No font binary may enter `dist/`.** The `@fontsource` packages are OFL-1.1,
+  and OFL §5 requires the font software stay under OFL rather than be
+  relicensed — which is exactly what bundling a `.woff2` into this MIT package
+  would do. Fonts stay bare `@import` specifiers in `styles.css` so the consumer
+  resolves them from their own install; verified against `dist/` on every run,
+  which is why this check runs after `pnpm build` and fails rather than skips
+  when `dist/` is missing. `check:fonts` owns *reachability*; this owns
+  *redistribution*.
+
+`pnpm licenses:list` prints the licence table and the shipped set for review.
 
 ---
 

@@ -1,0 +1,1513 @@
+{
+  "$comment": "Recorded licence of every package in the tree, checked by scripts/check-licenses.mjs. Regenerate with `pnpm licenses:update` and review the diff — a changed licence is the thing this file exists to make visible.",
+  "packages": {
+    "@adobe/css-tools": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@asamuzakjp/css-color": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@asamuzakjp/dom-selector": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/code-frame": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/compat-data": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/core": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/generator": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/helper-compilation-targets": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/helper-globals": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/helper-module-imports": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/helper-module-transforms": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/helper-string-parser": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/helper-validator-identifier": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/helper-validator-option": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/helpers": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/parser": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/runtime": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/template": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/traverse": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@babel/types": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@bcoe/v8-coverage": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@bramus/specificity": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@csstools/color-helpers": {
+      "license": "MIT-0",
+      "scope": "dev"
+    },
+    "@csstools/css-calc": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@csstools/css-color-parser": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@csstools/css-parser-algorithms": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@csstools/css-syntax-patches-for-csstree": {
+      "license": "MIT-0",
+      "scope": "dev"
+    },
+    "@csstools/css-tokenizer": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@emnapi/core": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@emnapi/runtime": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@emnapi/wasi-threads": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@esbuild/linux-x64": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@eslint-community/eslint-utils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@eslint-community/regexpp": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@eslint/config-array": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@eslint/config-helpers": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@eslint/core": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@eslint/object-schema": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@eslint/plugin-kit": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@exodus/bytes": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@fontsource-variable/inter": {
+      "license": "OFL-1.1",
+      "scope": "shipped"
+    },
+    "@fontsource-variable/space-grotesk": {
+      "license": "OFL-1.1",
+      "scope": "shipped"
+    },
+    "@fontsource/ibm-plex-mono": {
+      "license": "OFL-1.1",
+      "scope": "shipped"
+    },
+    "@fontsource/vt323": {
+      "license": "OFL-1.1",
+      "scope": "shipped"
+    },
+    "@humanfs/core": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@humanfs/node": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@humanfs/types": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@humanwhocodes/module-importer": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@humanwhocodes/retry": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@joshwooding/vite-plugin-react-docgen-typescript": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@jridgewell/gen-mapping": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@jridgewell/remapping": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@jridgewell/resolve-uri": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@jridgewell/sourcemap-codec": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@jridgewell/trace-mapping": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@mdx-js/react": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@napi-rs/wasm-runtime": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@oxc-parser/binding-linux-x64-gnu": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@oxc-project/types": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@oxc-resolver/binding-linux-x64-gnu": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@pkgr/core": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@playwright/test": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "@rolldown/binding-linux-x64-gnu": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@rolldown/binding-wasm32-wasi": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@rolldown/pluginutils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@rollup/pluginutils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@rollup/rollup-linux-x64-gnu": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@standard-schema/spec": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@storybook/addon-docs": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@storybook/builder-vite": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@storybook/csf-plugin": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@storybook/global": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@storybook/icons": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@storybook/react": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@storybook/react-dom-shim": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@storybook/react-vite": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@tailwindcss/node": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@tailwindcss/oxide": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@tailwindcss/oxide-linux-x64-gnu": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@tailwindcss/typography": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@tailwindcss/vite": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@testing-library/dom": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@testing-library/jest-dom": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@testing-library/react": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@testing-library/user-event": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@tybys/wasm-util": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/aria-query": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/babel__core": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/babel__generator": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/babel__template": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/babel__traverse": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/chai": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/deep-eql": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/doctrine": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/esrecurse": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/estree": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/json-schema": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/mdx": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/node": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/react": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/react-dom": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@types/resolve": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/parser": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/project-service": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/scope-manager": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/tsconfig-utils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/type-utils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/types": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/utils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@typescript-eslint/visitor-keys": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@vitest/coverage-v8": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@vitest/expect": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@vitest/mocker": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@vitest/pretty-format": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@vitest/runner": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@vitest/snapshot": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@vitest/spy": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@vitest/utils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "@webcontainer/env": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "acorn": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "acorn-jsx": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ajv": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ansi-regex": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ansi-styles": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "any-promise": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "aria-query": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "assertion-error": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ast-types": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ast-v8-to-istanbul": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "balanced-match": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "baseline-browser-mapping": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "bidi-js": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "brace-expansion": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "browserslist": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "bundle-name": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "bundle-require": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "cac": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "caniuse-lite": {
+      "license": "CC-BY-4.0",
+      "scope": "dev"
+    },
+    "chai": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "check-error": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "chokidar": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "commander": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "confbox": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "consola": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "convert-source-map": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "cross-spawn": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "css-tree": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "css.escape": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "cssesc": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "csstype": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "data-urls": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "debug": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "decimal.js": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "deep-eql": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "deep-is": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "default-browser": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "default-browser-id": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "define-lazy-prop": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "dequal": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "detect-libc": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "doctrine": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "dom-accessibility-api": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "electron-to-chromium": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "empathic": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "enhanced-resolve": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "entities": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "es-errors": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "es-module-lexer": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "esbuild": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "escalade": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "escape-string-regexp": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "eslint": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "eslint-plugin-tailwindcss": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "eslint-scope": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "eslint-visitor-keys": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "espree": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "esprima": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "esquery": {
+      "license": "BSD-3-Clause",
+      "scope": "dev"
+    },
+    "esrecurse": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "estraverse": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "estree-walker": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "esutils": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "expect-type": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "exsolve": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "fast-deep-equal": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "fast-json-stable-stringify": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "fast-levenshtein": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "fd-package-json": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "fdir": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "file-entry-cache": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "find-up": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "fix-dts-default-cjs-exports": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "flat-cache": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "flatted": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "formatly": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "function-bind": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "gensync": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "get-tsconfig": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "glob": {
+      "license": "BlueOak-1.0.0",
+      "scope": "dev"
+    },
+    "glob-parent": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "graceful-fs": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "has-flag": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "hasown": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "html-encoding-sniffer": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "html-escaper": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ignore": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "imurmurhash": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "indent-string": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "is-core-module": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "is-docker": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "is-extglob": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "is-glob": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "is-inside-container": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "is-potential-custom-element-name": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "is-wsl": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "isexe": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "istanbul-lib-coverage": {
+      "license": "BSD-3-Clause",
+      "scope": "dev"
+    },
+    "istanbul-lib-report": {
+      "license": "BSD-3-Clause",
+      "scope": "dev"
+    },
+    "istanbul-reports": {
+      "license": "BSD-3-Clause",
+      "scope": "dev"
+    },
+    "jiti": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "joycon": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "js-tokens": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "jsdom": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "jsesc": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "json-buffer": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "json-schema-traverse": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "json-stable-stringify-without-jsonify": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "json5": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "jsonc-parser": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "keyv": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "knip": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "levn": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "lightningcss": {
+      "license": "MPL-2.0",
+      "scope": "dev"
+    },
+    "lightningcss-linux-x64-gnu": {
+      "license": "MPL-2.0",
+      "scope": "dev"
+    },
+    "lilconfig": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "lines-and-columns": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "load-tsconfig": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "local-pkg": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "locate-path": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "loupe": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "lru-cache": {
+      "license": "BlueOak-1.0.0",
+      "scope": "dev"
+    },
+    "lucide-react": {
+      "license": "ISC",
+      "scope": "shipped"
+    },
+    "lz-string": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "magic-string": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "magicast": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "make-dir": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "mdn-data": {
+      "license": "CC0-1.0",
+      "scope": "dev"
+    },
+    "min-indent": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "minimatch": {
+      "license": "BlueOak-1.0.0",
+      "scope": "dev"
+    },
+    "minimist": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "minipass": {
+      "license": "BlueOak-1.0.0",
+      "scope": "dev"
+    },
+    "mlly": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ms": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "mz": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "nanoid": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "natural-compare": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "node-releases": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "object-assign": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "obug": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "open": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "optionator": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "oxc-parser": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "oxc-resolver": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "p-limit": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "p-locate": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "parse5": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "path-exists": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "path-key": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "path-parse": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "path-scurry": {
+      "license": "BlueOak-1.0.0",
+      "scope": "dev"
+    },
+    "pathe": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "pathval": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "picocolors": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "picomatch": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "pirates": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "pkg-types": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "playwright": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "playwright-core": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "postcss": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "postcss-load-config": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "postcss-nested": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "postcss-selector-parser": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "prelude-ls": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "pretty-format": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "punycode": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "quansync": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "react": {
+      "license": "MIT",
+      "scope": "shipped"
+    },
+    "react-docgen": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "react-docgen-typescript": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "react-dom": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "react-is": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "readdirp": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "recast": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "redent": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "require-from-string": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "resolve": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "resolve-from": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "resolve-pkg-maps": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "rolldown": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "rollup": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "run-applescript": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "saxes": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "scheduler": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "semver": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "shebang-command": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "shebang-regex": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "siginfo": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "smol-toml": {
+      "license": "BSD-3-Clause",
+      "scope": "dev"
+    },
+    "source-map": {
+      "license": "BSD-3-Clause",
+      "scope": "dev"
+    },
+    "source-map-js": {
+      "license": "BSD-3-Clause",
+      "scope": "dev"
+    },
+    "stackback": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "std-env": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "storybook": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "strip-bom": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "strip-indent": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "strip-json-comments": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "sucrase": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "supports-color": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "supports-preserve-symlinks-flag": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "symbol-tree": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "synckit": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tailwind-api-utils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tailwind-variants": {
+      "license": "MIT",
+      "scope": "shipped"
+    },
+    "tailwindcss": {
+      "license": "MIT",
+      "scope": "shipped"
+    },
+    "tapable": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "thenify": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "thenify-all": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tiny-invariant": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tinybench": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tinyexec": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tinyglobby": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tinyrainbow": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tinyspy": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tldts": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tldts-core": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tough-cookie": {
+      "license": "BSD-3-Clause",
+      "scope": "dev"
+    },
+    "tr46": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tree-kill": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ts-api-utils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ts-dedent": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ts-interface-checker": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "tsconfig-paths": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "tslib": {
+      "license": "0BSD",
+      "scope": "dev"
+    },
+    "tsup": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "type-check": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "typescript": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "typescript-eslint": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ufo": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "unbash": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "undici": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "undici-types": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "unplugin": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "update-browserslist-db": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "uri-js": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "use-sync-external-store": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "util-deprecate": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "vite": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "vitest": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "w3c-xmlserializer": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "walk-up-path": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "webidl-conversions": {
+      "license": "BSD-2-Clause",
+      "scope": "dev"
+    },
+    "webpack-virtual-modules": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "whatwg-mimetype": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "whatwg-url": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "which": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "why-is-node-running": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "word-wrap": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "ws": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "wsl-utils": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "xml-name-validator": {
+      "license": "Apache-2.0",
+      "scope": "dev"
+    },
+    "xmlchars": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "yallist": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "yaml": {
+      "license": "ISC",
+      "scope": "dev"
+    },
+    "yocto-queue": {
+      "license": "MIT",
+      "scope": "dev"
+    },
+    "zod": {
+      "license": "MIT",
+      "scope": "dev"
+    }
+  }
+}
