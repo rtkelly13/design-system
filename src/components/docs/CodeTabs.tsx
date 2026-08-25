@@ -84,7 +84,7 @@ const styles = recipe({
     caption:
       'truncate font-mono text-xs font-bold uppercase tracking-widest text-content-secondary',
     list: 'flex items-end',
-    tab: 'shrink-0 whitespace-nowrap font-mono text-xs font-bold uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tabs-accent)] focus-visible:ring-inset',
+    tab: 'shrink-0 whitespace-nowrap font-mono text-xs font-bold uppercase tracking-widest transition-colors focus-visible:ring-2 focus-visible:ring-[var(--tabs-accent)] focus-visible:ring-inset',
   },
   variants: {
     variant: {
