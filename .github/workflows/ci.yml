@@ -23,7 +23,12 @@ jobs:
     # instead of failing runs to GitHub's six-hour default and the run is
     # reported as `cancelled` — which is how this workflow last went red on
     # `main` without anything actually being wrong with the commit.
-    timeout-minutes: 20
+    #
+    # Sized so the install step's own retry budget always expires first: two
+    # 8-minute attempts plus ~2 minutes of everything else is 18, and a job cap
+    # that fired mid-retry would report `cancelled` all over again. The step has
+    # to be the thing that fails, so the log names it.
+    timeout-minutes: 25
 
     steps:
       - name: Checkout Repository
