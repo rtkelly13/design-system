@@ -27,6 +27,9 @@ jobs:
   walkthrough:
     name: Capture Screenshot Walkthrough
     runs-on: ubuntu-latest
+    # See ci.yml — same reason. This workflow is not a gate, so a run of it
+    # sitting on a hung install for six hours is pure waste.
+    timeout-minutes: 30
 
     steps:
       - name: Checkout Repository
@@ -49,16 +52,21 @@ jobs:
         run: pnpm build-storybook
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        uses: ./.github/actions/install-playwright
 
       - name: Capture Walkthrough
         run: pnpm walkthrough
 
       - name: Upload Walkthrough Report
         id: upload
-        # `always()` so a partial report still ships when a story fails to
-        # render — the failure is exactly what you would want to look at.
-        if: always()
+        # Ships a partial report when a story fails to render — the failure is
+        # exactly what you would want to look at. Deliberately not `always()`:
+        # that also fires on cancellation, when `Capture Walkthrough` was
+        # skipped and there is no report at all, so `if-no-files-found: error`
+        # turned every cancelled run into a *failing* step. This workflow
+        # cancels its own in-flight runs by design (see `concurrency` above),
+        # so that was a self-inflicted red mark on routine behaviour.
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: storybook-walkthrough-${{ github.event.pull_request.head.sha || github.sha }}

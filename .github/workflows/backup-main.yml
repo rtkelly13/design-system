@@ -22,6 +22,8 @@ jobs:
   backup:
     name: Repoint main-backup if main moved
     runs-on: ubuntu-latest
+    # See AGENTS.md rule 9 — no job runs to the six-hour default.
+    timeout-minutes: 10
     steps:
       - name: Detect drift between main and main-backup
         id: drift

@@ -71,6 +71,22 @@ Package manager is **pnpm** (`node >=22`).
    designed, with the exact token to create, in
    [`docs/ci-dispatch-token.md`](./docs/ci-dispatch-token.md). Not implemented;
    nothing reads `CI_DISPATCH_TOKEN` yet.
+9. **Every CI Job Has A Ceiling, And Browser Installs Retry**: a job with no
+   `timeout-minutes` inherits GitHub's six-hour default, and a run killed at
+   that limit is reported as **`cancelled`**, not failed — a red mark that
+   names no step and suggests someone pressed a button. That is exactly how
+   `main` went red on `dafbc1f`: `playwright install --with-deps` hung on both
+   `ci.yml` and `storybook-walkthrough.yml`, burned six hours each, and a
+   manual re-run of the identical SHA passed in two minutes. So: every job
+   carries a `timeout-minutes`, and the browser install goes through
+   [`.github/actions/install-playwright`](./.github/actions/install-playwright/action.yml),
+   which bounds each attempt with `timeout` and retries once. Use `pnpm exec`,
+   never `npx`, for anything Playwright: `npx` falls back to fetching the
+   latest published CLI, and a Playwright other than the lockfile's installs a
+   different Chromium — which under `maxDiffPixels: 0` moves every baseline
+   rather than failing loudly. Related: `if: always()` on an upload step also
+   fires on cancellation, so paired with `if-no-files-found: error` it turns
+   every cancelled run into a failing step. Use `if: success() || failure()`.
 
 ---
 

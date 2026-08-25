@@ -36,6 +36,8 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    # See AGENTS.md rule 9 — no job runs to the six-hour default.
+    timeout-minutes: 20
     permissions:
       contents: read
       id-token: write # OIDC for npm trusted publishing + provenance
