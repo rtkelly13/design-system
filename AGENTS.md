@@ -98,7 +98,11 @@ Package manager is **pnpm** (`node >=22`).
 
 ## 🎨 Design System Principles
 
-- **Zero Border-Radius**: `0px` globally enforced.
+- **Zero Border-Radius**: nothing in this package sets a radius, and `styles.css`
+  clears the one place a radius arrives on its own — form controls. It is
+  deliberately *not* a universal `!important` reset any more: that squared every
+  element in the consuming document, third-party widgets included, while doing
+  nothing for this package's own surface.
 - **Hard Offset Shadows**: `shadow-hard-*` utilities (2px, 4px, 6px offset, no blur).
 - **A Four-Rung Theme Ladder**: `midnight` → `dim` → `bright` → `white`, selected by a `data-theme` attribute. Not a light/dark flip — see Theme Ladder below.
 - **Bracketed Display Typography**: Headings render in Space Grotesk enclosed in `[ BRACKETED ]` display type.
