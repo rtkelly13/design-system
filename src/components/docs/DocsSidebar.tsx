@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { DocsLink } from './DocsLinkProvider';
+import { cn } from '../../lib/recipe';
 
 export interface DocsNavNode {
   label: string;
@@ -50,7 +51,7 @@ export function DocsSidebar({
   }, []);
 
   return (
-    <nav className={`not-prose docs-sidebar ${className}`.trim()} aria-label="Documentation">
+    <nav className={cn('not-prose', className)} aria-label="Documentation">
       {label && <p className="docs-sidebar-label">[ {label} ]</p>}
       <NodeList
         nodes={nav}

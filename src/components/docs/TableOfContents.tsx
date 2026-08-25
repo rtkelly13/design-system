@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import type { MouseEvent } from 'react';
 import { useActiveHeading } from '../../hooks/useActiveHeading';
+import { cn } from '../../lib/recipe';
 
 export interface TocEntry {
   /** Anchor id, without the leading `#`. */
@@ -67,7 +68,7 @@ export function TableOfContents({
   if (visible.length === 0) return null;
 
   return (
-    <nav className={`not-prose docs-toc ${className}`.trim()} aria-label="Table of contents">
+    <nav className={cn('not-prose', className)} aria-label="Table of contents">
       {label && <p className="docs-toc-label">[ {label} ]</p>}
       <ul className="docs-toc-list">
         {visible.map((entry) => (
