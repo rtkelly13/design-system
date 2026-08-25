@@ -124,6 +124,12 @@ jobs:
       - name: Build Package
         run: pnpm build
 
+      # Reads dist/index.d.ts, so it belongs in this job, after the build.
+      # Fails if the published type surface moved without api/index.d.ts being
+      # updated — the diff in that file *is* the API change under review.
+      - name: Public API Surface
+        run: pnpm check:api
+
   visual:
     name: Storybook & Visual Regression
     runs-on: ubuntu-latest
