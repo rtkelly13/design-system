@@ -99,6 +99,26 @@ and is noted below.
   and renders its placeholder. Both Playwright configs therefore pass
   `--config ../serve.json` (path relative to the *served* directory), and
   `vercel.json` sets the same flag for the hosted build.
+- **Nothing captured here depends on wall-clock time**, which is why the suite
+  can run in parallel. It runs at **four workers** on CI, not one. That is a
+  claim about determinism, so it was tested as one: baselines generated at one
+  worker were re-checked against them seven times at two, four and six workers,
+  and the committed CI baselines — generated on a GitHub runner at one worker —
+  were re-checked on a different four-core Linux machine at four workers.
+  Byte-identical every time, under `maxDiffPixels: 0`.
+
+  The reason it holds is the three items above rather than luck.
+  `animations: "disabled"` *finishes* transitions instead of waiting them out,
+  `story-ready.ts` awaits `document.fonts.ready` and a verified render before
+  anything is photographed, and the viewport is fixed. A worker competing for a
+  core gets the same pixels, later. Contrast a fixed `waitForTimeout` as the only
+  wait, which is precisely the thing that does break under load — and is how
+  every baseline in this repo once became a screenshot of the "No Preview" panel.
+
+  **If a diff ever appears that a re-run does not reproduce, suspect this
+  first**: set `workers` back to `1` in `playwright.config.ts`, confirm the diff
+  goes away, and record the story here. A real non-determinism found that way is
+  worth more than the 24 seconds parallelism buys.
 
 **Not yet pinned — known gaps**
 
@@ -132,7 +152,8 @@ and is noted below.
   stylesheet is the slowest delivery available, serialising three round trips of
   render-blocking work before text can paint.
 - **CI and local render in different environments.** CI is `ubuntu-latest` plus
-  `npx playwright install --with-deps chromium`. The industry-standard fix is to
+  the Chromium that `.github/actions/install-playwright` installs (`playwright
+  install --with-deps chromium`, cached on the lockfile). The industry-standard fix is to
   run both CI and local baselining inside the same official image
   (`mcr.microsoft.com/playwright:v1.62.1-noble`), which is what makes "just
   re-record it locally" possible at all. Until then, **CI is the only place a

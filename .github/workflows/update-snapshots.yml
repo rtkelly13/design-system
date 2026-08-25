@@ -57,18 +57,8 @@ jobs:
         id: base
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Build Storybook Static
         run: pnpm build-storybook
@@ -93,7 +83,7 @@ jobs:
         continue-on-error: true
         env:
           MODE: ${{ inputs.mode }}
-        run: npx playwright test tests/visual.spec.ts --update-snapshots="${MODE:-missing}"
+        run: pnpm exec playwright test tests/visual.spec.ts --update-snapshots="${MODE:-missing}"
 
       - name: Summarise what changed
         id: changes

@@ -1,0 +1,29 @@
+name: Setup
+description: Node, pnpm, and installed dependencies.
+
+# Extracted because `ci.yml` now runs three jobs in parallel and two other
+# workflows need the same three steps. Duplicated inline, the Node version and
+# the pnpm major would drift between them, and a `pnpm install` that differs
+# between the job that writes a baseline and the job that checks it is the one
+# difference this repo can least afford.
+#
+# Browsers are deliberately not here — that is
+# `.github/actions/install-playwright`, which bounds and retries the install per
+# AGENTS.md rule 9. Only the two jobs that actually drive a browser pay for it.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 9
+
+    - name: Install Dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile

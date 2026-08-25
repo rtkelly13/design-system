@@ -22,7 +22,13 @@ Package manager is **pnpm** (`node >=22`).
    - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow (dispatch it on your branch; it commits regenerated baselines back to that branch — this repo blocks Actions from creating PRs).
    - **The update runs in `missing` mode by default**, writing only baselines that do not exist. That matters: a bare `--update-snapshots` presets to `changed`, so a run intended to add one new story would also re-record every baseline whose render had drifted — which is exactly how a regression becomes the expectation. Say **`/update-snapshots all`** (or `changed`) when a change is *meant* to alter rendering; the mode is echoed back in the PR comment so a reviewer can tell "two added" from "everything re-recorded".
    - Note that the snapshot workflow pushes as `github-actions[bot]`, and CI runs on bot-authored commits land in **`action_required`** — they need an "Approve and run" click before the PR shows a green check.
-6. **Required Checks**:
+6. **Required Checks** — all of these run on every PR, spread across three
+   parallel jobs in `ci.yml`; see § *CI Shape* for which job runs what and why.
+   Branch protection requires the single aggregate check named
+   **`Build, Typecheck, Unit Tests, Storybook & Visual Regression`**, which
+   passes only if all three jobs do. **Do not rename that job** — the string is
+   what branch protection matches on, and renaming it leaves every PR waiting
+   forever on a check that no longer reports:
    - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
    - `pnpm check:contrast` (every role pair, every level)
    - `pnpm lint` (colour-instead-of-role, reported at the site)
@@ -534,6 +540,65 @@ ref agree on the `index.json` v5 format the manager reads. That was not true whe
 this was written: #23 aligned them precisely so composition would not depend on
 cross-major tolerance. Keep them on the same major; see
 [`docs/evaluation.md`](./docs/evaluation.md).
+
+---
+
+## ⚙️ CI Shape
+
+`ci.yml` runs **three jobs in parallel**, then a fourth that reports their
+combined verdict.
+
+| Job | What it runs | Roughly | Ceiling |
+| --- | --- | --- | --- |
+| `gates` | `tokens:check`, `check:contrast`, `lint`, `check:css`, `check:fonts`, `check:deps` | 30s | 10m |
+| `unit` | `typecheck`, `test`, `build` | 35s | 10m |
+| `visual` | `build-storybook`, `check:visual-coverage`, `test:visual` | 60s | 25m |
+| `verify` | nothing — fails unless the three above succeeded | 10s | 5m |
+
+Only `visual` installs a browser, so only its ceiling has to clear
+`install-playwright`'s retry budget (rule 9). Splitting the job is what let the
+other three drop to a ceiling sized to their own work, instead of every gate
+waiting out a browser-shaped timeout.
+
+**Add a new gate to `gates` or `unit`, not to `visual`.** The visual job is the
+critical path; the other two have headroom, and putting a check behind a browser
+install and a screenshot suite is what made this slow in the first place. It was
+one job of nineteen serial steps, and nothing in it needed to be serial — so
+`lint`, the fastest and most frequently-failing check in the repo, reported after
+everything else had also run.
+
+**Where the time actually goes**, so the next person optimising this starts from
+measurements rather than a guess:
+
+- **The walkthrough is the long pole of the whole PR**, not `ci.yml` — one test
+  per story, four captures each, and it grows by four screenshots per component.
+- **Both Playwright suites are wait-bound, not CPU-bound.** They spend their time
+  on page loads, `document.fonts.ready` and per-capture settle waits, so they
+  scale past the core count. Worker counts in both configs are measured, with the
+  tables in the config comments; the gated suite's is also a determinism claim
+  and is evidenced in [`docs/visual-regression.md`](./docs/visual-regression.md).
+- **`.github/actions/setup`** is Node + pnpm + install, and nothing else. Use it
+  rather than repeating the steps: a `pnpm install` that differs between the job
+  that writes a baseline and the job that checks it is the one difference this
+  repo can least afford. Browsers are **not** here — that is
+  `install-playwright`, so only the two jobs that drive a browser pay for it.
+- **`.github/actions/install-playwright` now caches the download** as well as
+  bounding and retrying it (rule 9). 13 of that step's 25 healthy seconds were
+  spent fetching ~300MB that never changes until the lockfile does, which is
+  also why the cache keys on `pnpm-lock.yaml`: the browser revision is pinned by
+  the Playwright version in there, so a lockfile change is exactly when a cached
+  browser stops being the right one. Only the download half is cacheable — the
+  `--with-deps` apt half installs outside the cached directory, so a cache hit
+  still runs `install-deps`, through the same retry loop, since that reaches the
+  network too. Assuming the runner image carries those libraries would trade a
+  red required check for ten seconds.
+- **`ci.yml` supersedes in-flight PR runs** (`concurrency`), as the walkthrough
+  already did. The group includes the event name so rule 8's manual
+  `workflow_dispatch` re-run is never cancelled by a push or queued behind one.
+
+Not done, and the next lever if the story count doubles again: sharding the
+walkthrough across runners with `--shard` and `merge-reports`. Worth roughly
+another 30s, at the cost of a merge job and three times the runner minutes.
 
 ---
 
