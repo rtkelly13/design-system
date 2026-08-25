@@ -398,6 +398,16 @@ source text and would generate nothing for `border-${role}`. The accent travels 
 which means a class assertion there cannot tell a working accent from a broken one:
 it passes either way. Read the custom property.
 
+**The published shape is tested too.** `src/package-shape.test.ts` asserts the
+fields and files a consumer meets before any code runs — the licence text the
+`license` field claims, every checked-in `files` entry existing, `sideEffects`,
+`engines`, and each stylesheet the README tells a consumer to import being
+resolvable through the `exports` map. Nothing else here can see those: `tsup`
+does not read them and `typecheck` cannot. The failure it guards is one that
+already shipped twice — `files` listed `LICENSE` and `license` said MIT while no
+such file existed. Note it runs before `pnpm build`, so `dist/` is asserted to be
+*declared*, not to be present.
+
 ---
 
 ## 📦 Dependencies
