@@ -21,6 +21,17 @@ description: >-
 # Hence a bounded attempt plus one retry. A stall now costs minutes and clears
 # itself, and if it genuinely cannot install, the step fails with a message
 # saying so.
+#
+# The download half is also cached, which is the same story from the other end:
+# of the 25 seconds this step cost when healthy, 13 were spent fetching ~300MB
+# across three archives that never change until the lockfile does. Fewer network
+# round trips is also one less chance to hang.
+#
+# Only that half is cacheable. `--with-deps` installs system libraries via apt,
+# outside the cached directory, so a cache hit still has to run `install-deps` —
+# deliberately, rather than assuming the runner image carries them. A missing
+# shared library surfaces as a browser that will not launch, which is a red
+# required check to save ten seconds.
 
 inputs:
   browser:
@@ -41,6 +52,17 @@ inputs:
 runs:
   using: composite
   steps:
+    # Keyed on `pnpm-lock.yaml`, which is correct rather than convenient: the
+    # browser revision is pinned by the Playwright version in the lockfile (see
+    # the determinism contract in `docs/visual-regression.md`), so a lockfile
+    # change is exactly when a cached browser stops being the right one.
+    - name: Restore browsers
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ inputs.browser }}-${{ hashFiles('pnpm-lock.yaml') }}
+
     # `pnpm exec`, not `npx`: npx silently falls back to fetching the latest
     # published CLI when the local bin is missing, and a Playwright other than
     # the lockfile's installs a different Chromium build. Under
@@ -51,15 +73,27 @@ runs:
         BROWSER: ${{ inputs.browser }}
         ATTEMPT_TIMEOUT: ${{ inputs.attempt-timeout }}
         ATTEMPTS: ${{ inputs.attempts }}
+        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
       run: |
         set -uo pipefail
+
+        # One retry loop either way. A cache hit still needs the apt half, and
+        # that reaches the network too — it is no less able to hang than the
+        # download was, so it gets the same ceiling and the same second chance.
+        if [ "${CACHE_HIT}" = "true" ]; then
+          set -- install-deps "${BROWSER}"
+        else
+          set -- install --with-deps "${BROWSER}"
+        fi
+        echo "Running: playwright $*"
+
         for attempt in $(seq 1 "${ATTEMPTS}"); do
           # Status captured off the command itself. Reading `$?` after an
           # `if ...; fi` reads the *compound's* status, which is 0 when the
           # condition was false and no branch ran — every failure would have
           # looked like a success.
           status=0
-          timeout "${ATTEMPT_TIMEOUT}" pnpm exec playwright install --with-deps "${BROWSER}" || status=$?
+          timeout "${ATTEMPT_TIMEOUT}" pnpm exec playwright "$@" || status=$?
           if [ "${status}" -eq 0 ]; then
             exit 0
           fi
@@ -72,5 +106,5 @@ runs:
             sleep 15
           fi
         done
-        echo "::error::playwright install --with-deps ${BROWSER} failed ${ATTEMPTS} times."
+        echo "::error::playwright $* failed ${ATTEMPTS} times."
         exit 1

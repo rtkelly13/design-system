@@ -15,41 +15,61 @@ on:
   # next branch rather than the one that adds it.
   workflow_dispatch:
 
+# Supersede an in-flight run when the branch moves on: a result for a commit
+# nobody is looking at any more is holding a runner the next push needs.
+# `storybook-walkthrough.yml` already did this and `ci.yml` did not.
+#
+# Keyed on the event as well as the ref so a `workflow_dispatch` — rule 8's
+# manual re-run, the only way to refresh a bot-pushed baseline — is in its own
+# group. It therefore neither cancels the push run nor gets cancelled by one,
+# and `cancel-in-progress` is false for it, because a re-run someone asked for
+# by hand should never be thrown away.
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Three jobs in parallel, then one that reports their verdict.
+#
+# This was a single job of nineteen serial steps. Nothing in it needed to be
+# serial: the gates read the tree, the visual suite needs only a built
+# Storybook, and no step consumed a previous step's output except
+# `check:visual-coverage`, which reads `storybook-static/index.json`. The cost
+# was structural rather than a slow step — every gate added since has been
+# appended to the same chain, so the wall clock only ever grew, and the fastest
+# and most frequently-failing check in the repo (`lint`) reported after the
+# browser install and the screenshot suite had also run.
+#
+# Split, the critical path is the visual job alone and the gates report in about
+# half a minute. The two new gates in flight (`check:api`, `check:licenses`)
+# land in `unit` beside `build`, where there is roughly twenty seconds of
+# headroom before that job becomes the critical path again.
+#
+# Every job carries a `timeout-minutes` per AGENTS.md rule 9. Only `visual`
+# installs a browser, so only its ceiling has to clear that step's retry budget;
+# the other three are sized to their own work, which is the point of splitting
+# them — a hung gate no longer waits out a browser-shaped timeout.
 jobs:
-  verify:
-    name: Build, Typecheck, Unit Tests, Storybook & Visual Regression
+  gates:
+    name: Token, Contrast, Lint, CSS, Font & Dependency Gates
     runs-on: ubuntu-latest
-    # A green run takes about two minutes. Without a ceiling, a step that hangs
-    # instead of failing runs to GitHub's six-hour default and the run is
-    # reported as `cancelled` — which is how this workflow last went red on
-    # `main` without anything actually being wrong with the commit.
-    #
-    # Sized so the install step's own retry budget always expires first: two
-    # 8-minute attempts plus ~2 minutes of everything else is 18, and a job cap
-    # that fired mid-retry would report `cancelled` all over again. The step has
-    # to be the thing that fails, so the log names it.
-    timeout-minutes: 25
+    # ~30s of Node scripts and one eslint pass, no network past `pnpm install`.
+    timeout-minutes: 10
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup
+        uses: ./.github/actions/setup
 
       # theme.css is generated from src/theme/levels.ts. This fails if the
       # committed CSS no longer matches the source, which is the only thing
       # keeping the TS and CSS halves of the ladder in step.
+      #
+      # It reads the tree as committed, so it must not share a job with
+      # `pnpm build` — which regenerates theme.css as its first act. Being in a
+      # separate job now makes that structural rather than a matter of step
+      # ordering.
       - name: Theme Token Drift
         run: pnpm tokens:check
 
@@ -78,15 +98,51 @@ jobs:
       - name: Dependencies
         run: pnpm check:deps
 
+  unit:
+    name: Typecheck, Unit Tests & Package Build
+    runs-on: ubuntu-latest
+    # ~35s: tsc, the Vitest suite, and a tsup build.
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
       - name: Type Check
         run: pnpm typecheck
 
+      # Stays before `Build Package`, and the order is load-bearing rather than
+      # incidental: `src/package-shape.test.ts` asserts on what `files` declares
+      # while `dist/` does not yet exist. Running it after a build would change
+      # what it is testing.
       - name: Unit Tests
         run: pnpm test
 
       - name: Build Package
         run: pnpm build
 
+  visual:
+    name: Storybook & Visual Regression
+    runs-on: ubuntu-latest
+    # The only job here that installs a browser, so the only one that has to
+    # clear `install-playwright`'s retry budget: two 8-minute attempts plus
+    # ~1.5 minutes of everything else is 18. Sized above that for the same
+    # reason ci.yml's single job was — a job cap firing mid-retry reports
+    # `cancelled` and names no step, which is the failure rule 9 exists for.
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      # No `pnpm build` first: Storybook compiles from `src/`, not from `dist/`,
+      # so this job does not depend on the package build and can run beside it.
       - name: Build Storybook
         run: pnpm build-storybook
 
@@ -116,3 +172,42 @@ jobs:
           name: playwright-snapshots
           path: tests/__snapshots__/
           retention-days: 7
+
+  # One check that stands or falls with all three jobs above.
+  #
+  # The name is deliberately the one the single job used to carry, because that
+  # string is what branch protection has as its required check. Renaming it
+  # would leave every PR waiting on a check that no longer reports — a green
+  # tree that can never merge. Keeping it means the three jobs can be split,
+  # renamed or added to without touching the repository's settings again.
+  verify:
+    name: Build, Typecheck, Unit Tests, Storybook & Visual Regression
+    runs-on: ubuntu-latest
+    needs: [gates, unit, visual]
+    # `always()`, so this reports a verdict when a job fails rather than being
+    # skipped — a skipped required check is indistinguishable from one still
+    # running, and blocks the PR either way.
+    if: always()
+    # Reads three strings and exits. A ceiling anyway, per rule 9: "every job",
+    # including the ones that obviously cannot hang.
+    timeout-minutes: 5
+
+    steps:
+      - name: Report the verdict of every job
+        env:
+          GATES: ${{ needs.gates.result }}
+          UNIT: ${{ needs.unit.result }}
+          VISUAL: ${{ needs.visual.result }}
+        run: |
+          set -uo pipefail
+          failed=0
+          for job in GATES UNIT VISUAL; do
+            result="${!job}"
+            if [ "${result}" = "success" ]; then
+              echo "✅ ${job}: ${result}"
+            else
+              echo "::error::${job} did not succeed (${result})"
+              failed=1
+            fi
+          done
+          exit "${failed}"
