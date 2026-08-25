@@ -1,7 +1,6 @@
 import React from 'react';
 import { Beaker, Boxes, Palette, Type, Sparkles, Projector, Terminal } from 'lucide-react';
 import { PageTitle } from '../PageTitle';
-import { Card } from '../Card';
 import { Badge } from '../Badge';
 
 export interface ExperimentItem {
@@ -81,7 +80,27 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperi
         {DEFAULT_EXPERIMENTS.map((exp) => (
           <div
             key={exp.id}
-            onClick={() => onSelectExperiment && onSelectExperiment(exp.id)}
+            /*
+             * A card that selects an experiment is a control, and it cannot be
+             * a `<button>`: its content is flow content — nested divs — which a
+             * button may not contain. So it carries the button role explicitly
+             * and honours the keyboard contract that role promises, rather than
+             * a bare click handler no keyboard can reach. With no handler
+             * passed it is not a control at all, and takes neither.
+             */
+            role={onSelectExperiment ? 'button' : undefined}
+            tabIndex={onSelectExperiment ? 0 : undefined}
+            onClick={onSelectExperiment ? () => onSelectExperiment(exp.id) : undefined}
+            onKeyDown={
+              onSelectExperiment
+                ? (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      onSelectExperiment(exp.id);
+                    }
+                  }
+                : undefined
+            }
             className="bg-surface-raised text-content-primary border-2 border-edge-strong shadow-hard-md p-6 transition-[transform,box-shadow] duration-150 ease-out hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--ds-accent-primary)] motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0"
             style={{
               display: 'flex',

@@ -57,11 +57,19 @@ export function Tag({
     );
   }
 
-  return (
-    <span className={combinedClasses} onClick={onClick}>
-      {label}
-    </span>
-  );
+  // A tag that *does* something is a control, and a `span` with a click
+  // handler is not one: it takes no focus, answers no key, and announces as
+  // text. With no `href` and no `onClick` it really is only a label, so it
+  // stays a `span` — the element follows the behaviour, not the styling.
+  if (onClick) {
+    return (
+      <button type="button" className={combinedClasses} onClick={onClick}>
+        {label}
+      </button>
+    );
+  }
+
+  return <span className={combinedClasses}>{label}</span>;
 }
 
 export default Tag;

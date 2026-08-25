@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { StatCard } from '../components/StatCard';
-import { Activity, Cpu, ShieldCheck, DollarSign } from 'lucide-react';
+import { Activity, Cpu, ShieldCheck } from 'lucide-react';
 
 const meta: Meta<typeof StatCard> = {
   title: 'Foundations/StatCard',

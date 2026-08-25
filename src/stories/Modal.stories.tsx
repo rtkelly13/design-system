@@ -39,16 +39,18 @@ export const WithFooter: Story = {
 };
 
 /** Interactive — the close affordance and backdrop only mean something with state. */
+function ToggleableModal() {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div style={{ padding: '2rem' }}>
+      <Button bracketed onClick={() => setIsOpen(true)}>OPEN MODAL</Button>
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Session expired">
+        Re-authenticate to continue. Unsaved changes are kept.
+      </Modal>
+    </div>
+  );
+}
+
 export const Toggleable: Story = {
-  render: () => {
-    const [isOpen, setIsOpen] = useState(false);
-    return (
-      <div style={{ padding: '2rem' }}>
-        <Button bracketed onClick={() => setIsOpen(true)}>OPEN MODAL</Button>
-        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Session expired">
-          Re-authenticate to continue. Unsaved changes are kept.
-        </Modal>
-      </div>
-    );
-  },
+  render: () => <ToggleableModal />,
 };

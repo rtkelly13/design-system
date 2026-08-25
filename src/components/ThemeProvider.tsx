@@ -125,6 +125,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     // The init script has usually already resolved this before paint; trust it
     // over re-deriving, so the two can never disagree.
     if (isThemeLevel(applied)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reconciling against the DOM the init script already wrote is only possible after mount; see the `useState` above.
       setLevelState(applied);
       return;
     }
