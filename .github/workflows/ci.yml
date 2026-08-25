@@ -77,6 +77,15 @@ jobs:
       - name: Build Package
         run: pnpm build
 
+      # Reads dist/, so it has to follow the build — and it fails rather than
+      # skips when dist/ is absent, because the half of it that matters is
+      # "no OFL font binary got bundled into an MIT package". The other half
+      # compares every package's licence against licenses.baseline.json, which
+      # is what catches a dependency relicensing under a version bump — the one
+      # supply-chain change a lockfile diff says nothing about.
+      - name: Licences
+        run: pnpm check:licenses
+
       - name: Build Storybook
         run: pnpm build-storybook
 
