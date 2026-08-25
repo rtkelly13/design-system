@@ -1,5 +1,6 @@
 import type { ReactNode, HTMLAttributes } from 'react';
 import { BracketText } from './BracketText';
+import { cn } from '../lib/recipe';
 
 export interface PageTitleProps extends HTMLAttributes<HTMLHeadingElement> {
   children: ReactNode;
@@ -20,7 +21,7 @@ export function PageTitle({
 
   return (
     <div className="mb-8">
-      <h1 className={`${baseClasses} ${className}`.trim()} {...props}>
+      <h1 className={cn(baseClasses, className)} {...props}>
         {bracketed ? <BracketText>{children}</BracketText> : children}
       </h1>
       {subtitle && (

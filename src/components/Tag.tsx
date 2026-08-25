@@ -1,5 +1,6 @@
 import type { ReactNode, MouseEventHandler } from 'react';
 import type { AccentToken } from '../lib/theme';
+import { cn } from '../lib/recipe';
 
 /** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
 export type TagAccent = 'yellow' | 'cyan' | 'pink' | 'green';
@@ -46,7 +47,7 @@ export function Tag({
   const baseClasses =
     'inline-block font-mono text-xs font-bold uppercase border-2 border-edge-strong px-2 py-1 hover:shadow-hard-sm transition-all focus:outline-none focus:ring-2 focus:ring-accent-primary';
   const accentClass = ACCENT_CLASSES[accent] ?? ACCENT_CLASSES.secondary;
-  const combinedClasses = `${baseClasses} ${accentClass} ${className}`.trim();
+  const combinedClasses = cn(baseClasses, accentClass, className);
   const label = text.startsWith(prefix) ? text : `${prefix}${text.split(' ').join('-')}`;
 
   if (href) {
