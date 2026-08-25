@@ -68,6 +68,7 @@ export function Modal({
   // Rendering nothing until mounted keeps the server and client markup
   // identical instead of hydration-mismatching.
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- the one render this costs is the point: it is what keeps the server and first client markup identical.
   useEffect(() => setMounted(true), []);
 
   const handleKeyDown = useCallback(
@@ -132,11 +133,12 @@ export function Modal({
   if (!isOpen || !mounted) return null;
 
   return createPortal(
+    // A backdrop is not an interactive control, so it gets no role and no key
+    // handler — Escape already covers the keyboard path, and adding a `button`
+    // role here would put a meaningless stop in the tab order.
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- the keyboard path is Escape, handled in `handleKeyDown`.
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-surface-overlay p-4"
-      // A backdrop is not an interactive control, so it gets no role and no key
-      // handler — Escape already covers the keyboard path, and adding a
-      // `button` role here would put a meaningless stop in the tab order.
       onMouseDown={(event) => {
         if (closeOnBackdropClick && event.target === event.currentTarget) onClose();
       }}

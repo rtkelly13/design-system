@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Clock, User, Tag as TagIcon } from 'lucide-react';
+import { Calendar, Clock, User } from 'lucide-react';
 import { PageTitle } from '../PageTitle';
 import { Card } from '../Card';
 import { Badge } from '../Badge';

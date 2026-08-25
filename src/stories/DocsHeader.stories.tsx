@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BookOpen } from 'lucide-react';
 import { DocsHeader } from '../components/docs/DocsHeader';

@@ -46,8 +46,8 @@ type Story = StoryObj<typeof DocsLayout>;
 export const Default: Story = {
   render: () => (
     <DocsLayout
-      header={<DocsHeader title="Design System" nav={[{ label: 'Docs', href: '/docs', active: true }]} />}
-      sidebar={<DocsSidebar nav={nav} currentPath="/docs/semantic-tokens" />}
+    header={<DocsHeader title="Design System" nav={[{ label: 'Docs', href: '/docs', active: true }]} />}
+    sidebar={<DocsSidebar nav={nav} currentPath="/docs/semantic-tokens" />}
       toc={<TableOfContents toc={toc} spy={false} />}
     >
       {body}
@@ -71,22 +71,24 @@ export const WithoutToc: Story = {
  * The mobile drawer. `sidebarOpen` is ignored at lg and up, so narrow the
  * viewport to see this do anything.
  */
+function MobileDrawerLayout() {
+  const [open, setOpen] = useState(true);
+  return (
+    <DocsLayout
+      header={
+        <div style={{ padding: '0.75rem' }}>
+          <Button bracketed onClick={() => setOpen((v) => !v)}>TOGGLE NAV</Button>
+        </div>
+      }
+      sidebar={<DocsSidebar nav={nav} currentPath="/docs" onNavigate={() => setOpen(false)} />}
+      sidebarOpen={open}
+      onCloseSidebar={() => setOpen(false)}
+    >
+      {body}
+    </DocsLayout>
+  );
+}
+
 export const MobileDrawer: Story = {
-  render: () => {
-    const [open, setOpen] = useState(true);
-    return (
-      <DocsLayout
-        header={
-          <div style={{ padding: '0.75rem' }}>
-            <Button bracketed onClick={() => setOpen((v) => !v)}>TOGGLE NAV</Button>
-          </div>
-        }
-        sidebar={<DocsSidebar nav={nav} currentPath="/docs" onNavigate={() => setOpen(false)} />}
-        sidebarOpen={open}
-        onCloseSidebar={() => setOpen(false)}
-      >
-        {body}
-      </DocsLayout>
-    );
-  },
+  render: () => <MobileDrawerLayout />,
 };
