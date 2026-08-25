@@ -1,0 +1,76 @@
+name: Install Playwright Browsers
+description: >-
+  Installs the Chromium build the lockfile pins, bounding each attempt so a
+  stalled download cannot run away with the job.
+
+# Why this is not a one-line `run:` in each workflow.
+#
+# On 19 Aug this step took `main` red. `playwright install --with-deps` reaches
+# out twice — apt for the system libraries, then Playwright's CDN for the
+# browser — and on that run one of them hung. Nothing bounded it, so the step
+# sat there for the full six-hour job limit before GitHub killed the run, which
+# it then reported as `cancelled` rather than `failed`. Both `main` workflows
+# died that way on the same commit; re-running CI by hand on the identical SHA
+# passed in two minutes, browsers installed in 36 seconds.
+#
+# So the failure was transient, but the *cost* of it was not:
+#   - six hours of runner time per hung job,
+#   - a red `main` that reads as "cancelled", giving no hint anything hung,
+#   - and no recovery short of a human noticing and re-running.
+#
+# Hence a bounded attempt plus one retry. A stall now costs minutes and clears
+# itself, and if it genuinely cannot install, the step fails with a message
+# saying so.
+
+inputs:
+  browser:
+    description: Playwright browser to install.
+    required: false
+    default: chromium
+  attempt-timeout:
+    description: >-
+      Per-attempt wall clock. A healthy install takes well under a minute; this
+      is set to bound a hang, not to accommodate a slow one.
+    required: false
+    default: 8m
+  attempts:
+    description: Number of attempts before failing the step.
+    required: false
+    default: '2'
+
+runs:
+  using: composite
+  steps:
+    # `pnpm exec`, not `npx`: npx silently falls back to fetching the latest
+    # published CLI when the local bin is missing, and a Playwright other than
+    # the lockfile's installs a different Chromium build. Under
+    # `maxDiffPixels: 0` that does not fail loudly, it moves every baseline.
+    - name: Install browsers
+      shell: bash
+      env:
+        BROWSER: ${{ inputs.browser }}
+        ATTEMPT_TIMEOUT: ${{ inputs.attempt-timeout }}
+        ATTEMPTS: ${{ inputs.attempts }}
+      run: |
+        set -uo pipefail
+        for attempt in $(seq 1 "${ATTEMPTS}"); do
+          # Status captured off the command itself. Reading `$?` after an
+          # `if ...; fi` reads the *compound's* status, which is 0 when the
+          # condition was false and no branch ran — every failure would have
+          # looked like a success.
+          status=0
+          timeout "${ATTEMPT_TIMEOUT}" pnpm exec playwright install --with-deps "${BROWSER}" || status=$?
+          if [ "${status}" -eq 0 ]; then
+            exit 0
+          fi
+          if [ "${status}" -eq 124 ]; then
+            echo "::warning::Attempt ${attempt}/${ATTEMPTS} stalled and was killed after ${ATTEMPT_TIMEOUT}."
+          else
+            echo "::warning::Attempt ${attempt}/${ATTEMPTS} failed with exit ${status}."
+          fi
+          if [ "${attempt}" -lt "${ATTEMPTS}" ]; then
+            sleep 15
+          fi
+        done
+        echo "::error::playwright install --with-deps ${BROWSER} failed ${ATTEMPTS} times."
+        exit 1

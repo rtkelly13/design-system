@@ -19,6 +19,16 @@ jobs:
   verify:
     name: Build, Typecheck, Unit Tests, Storybook & Visual Regression
     runs-on: ubuntu-latest
+    # A green run takes about two minutes. Without a ceiling, a step that hangs
+    # instead of failing runs to GitHub's six-hour default and the run is
+    # reported as `cancelled` — which is how this workflow last went red on
+    # `main` without anything actually being wrong with the commit.
+    #
+    # Sized so the install step's own retry budget always expires first: two
+    # 8-minute attempts plus ~2 minutes of everything else is 18, and a job cap
+    # that fired mid-retry would report `cancelled` all over again. The step has
+    # to be the thing that fails, so the log names it.
+    timeout-minutes: 25
 
     steps:
       - name: Checkout Repository
@@ -86,7 +96,7 @@ jobs:
         run: pnpm check:visual-coverage
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        uses: ./.github/actions/install-playwright
 
       - name: Run Visual Regression Tests
         run: pnpm test:visual

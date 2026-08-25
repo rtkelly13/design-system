@@ -33,6 +33,8 @@ jobs:
       startsWith(github.event.comment.body, '/update-snapshots') &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
+    # See AGENTS.md rule 9 — no job runs to the six-hour default.
+    timeout-minutes: 10
     permissions:
       contents: read
       actions: write # gh workflow run

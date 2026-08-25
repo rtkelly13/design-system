@@ -38,6 +38,9 @@ jobs:
   update-snapshots:
     name: Update Snapshots on Linux
     runs-on: ubuntu-latest
+    # See ci.yml. Worth more here than anywhere else: this job holds
+    # `contents: write`, so a hung run is six hours of a job that can push.
+    timeout-minutes: 30
     permissions:
       contents: write
       pull-requests: write
@@ -71,7 +74,7 @@ jobs:
         run: pnpm build-storybook
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        uses: ./.github/actions/install-playwright
 
       # `missing` mode writes the baseline and then reports that test as failed —
       # deliberately, via a Playwright soft error, so that creating a baseline is
