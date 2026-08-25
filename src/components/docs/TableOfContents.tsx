@@ -113,5 +113,3 @@ export function collectHeadings(
       depth: Number(el.tagName.slice(1)),
     }));
 }
-
-export default TableOfContents;

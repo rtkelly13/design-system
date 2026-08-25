@@ -352,5 +352,3 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
     </div>
   );
 };
-
-export default SaasLandingPage;

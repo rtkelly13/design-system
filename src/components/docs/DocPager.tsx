@@ -51,5 +51,3 @@ export function DocPager({ prev, next, className = '' }: DocPagerProps) {
     </nav>
   );
 }
-
-export default DocPager;

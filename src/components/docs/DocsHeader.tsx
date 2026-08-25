@@ -152,5 +152,3 @@ export function DocsHeader({
     </header>
   );
 }
-
-export default DocsHeader;
