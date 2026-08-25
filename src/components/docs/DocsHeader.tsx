@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { ElementType, ReactNode } from 'react';
 import { Menu, Palette, Search, X } from 'lucide-react';
 import { DocsLink } from './DocsLinkProvider';
-import { useTheme } from '../ThemeProvider';
+import { useOptionalTheme } from '../ThemeProvider';
 import { LEVELS } from '../../theme/levels';
 
 export interface DocsNavItem {
@@ -58,7 +58,11 @@ export function DocsHeader({
   className = '',
 }: DocsHeaderProps) {
   const ref = useRef<HTMLElement | null>(null);
-  const { level, cycleLevel } = useTheme();
+  // Optional on purpose. `useTheme()` throws without a provider, and this is
+  // chrome that a consumer theming with the `data-theme` attribute alone would
+  // reasonably render — so requiring one took the whole page down rather than
+  // dropping one control. `Divider` is the same pattern.
+  const theme = useOptionalTheme();
 
   useEffect(() => {
     const el = ref.current;
@@ -139,15 +143,23 @@ export function DocsHeader({
           </button>
         )}
 
-        <button
-          type="button"
-          onClick={cycleLevel}
-          className="docs-header-icon-btn"
-          aria-label={`Switch theme level (current: ${LEVELS[level].label})`}
-          title={`Level: ${LEVELS[level].label}`}
-        >
-          <Palette size={18} />
-        </button>
+        {/*
+          * Omitted rather than disabled when there is no provider. A level
+          * switcher that cannot switch is a dead affordance in the chrome, and
+          * the consumer who never mounts a provider has no use for it — they
+          * are driving `data-theme` themselves.
+          */}
+        {theme && (
+          <button
+            type="button"
+            onClick={theme.cycleLevel}
+            className="docs-header-icon-btn"
+            aria-label={`Switch theme level (current: ${LEVELS[theme.level].label})`}
+            title={`Level: ${LEVELS[theme.level].label}`}
+          >
+            <Palette size={18} />
+          </button>
+        )}
       </div>
     </header>
   );
