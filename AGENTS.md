@@ -24,11 +24,14 @@ Package manager is **pnpm** (`node >=22`).
    - Note that the snapshot workflow pushes as `github-actions[bot]`, and CI runs on bot-authored commits land in **`action_required`** — they need an "Approve and run" click before the PR shows a green check.
 6. **Required Checks** — all of these run on every PR, spread across three
    parallel jobs in `ci.yml`; see § *CI Shape* for which job runs what and why.
-   Branch protection requires the single aggregate check named
-   **`Build, Typecheck, Unit Tests, Storybook & Visual Regression`**, which
-   passes only if all three jobs do. **Do not rename that job** — the string is
-   what branch protection matches on, and renaming it leaves every PR waiting
-   forever on a check that no longer reports:
+   Branch protection requires the single aggregate check named **`ci`** (the
+   `verify` job), which passes only if all three jobs do. That name is
+   deliberately content-free, and **must stay that way**: the string is what
+   branch protection and `shared-utilities`' governance map match on. It used to
+   list what CI did, and splitting the single job into three silently rewrote it
+   — the map went on requiring a job that no longer reported, so every PR failed
+   `repo-governance verify-pr-checks` with all seven checks green. Rename the
+   three jobs below freely; never rename `ci`:
    - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
    - `pnpm check:contrast` (every role pair, every level)
    - `pnpm lint` (colour-instead-of-role, reported at the site)
@@ -554,6 +557,16 @@ combined verdict.
 | `unit` | `typecheck`, `test`, `build` | 35s | 10m |
 | `visual` | `build-storybook`, `check:visual-coverage`, `test:visual` | 60s | 25m |
 | `verify` | nothing — fails unless the three above succeeded | 10s | 5m |
+
+**Check names are lowercase, snake_case, and at most two words**, taken from the
+shared lexicon in `shared-utilities` (`ci`, `build`, `test`, `lint`, `visual`,
+`publish`, `format`, ...) — so the four jobs report as `lint`, `test`, `visual`
+and `ci`. Names that describe their contents cannot also be stable contracts:
+the required check used to be `Build, Typecheck, Storybook & Visual Regression`,
+splitting the job silently made it `Build, Typecheck, Unit Tests, Storybook &
+Visual Regression`, and the governance map went on requiring the old string.
+`repo-governance check-names` now fails on a required check no job declares, and
+warns on names that drift from the lexicon.
 
 Only `visual` installs a browser, so only its ceiling has to clear
 `install-playwright`'s retry budget (rule 9). Splitting the job is what let the
