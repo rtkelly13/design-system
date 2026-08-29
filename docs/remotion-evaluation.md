@@ -419,6 +419,37 @@ rendered at an arbitrary frame.
 
 ---
 
+## Tracked as
+
+This evaluation is the reasoning; the issues are the units of work. Each is
+written to be picked up cold, without this document in context.
+
+**Blog** — [`rtkelly13/blog#115`](https://github.com/rtkelly13/blog/issues/115)
+is the parent:
+
+| Issue | Covers |
+|---|---|
+| [blog#116](https://github.com/rtkelly13/blog/issues/116) | Generators are deterministic per frame but have no notion of time (§7's pattern, applied to `components/graphics/`) |
+| [blog#117](https://github.com/rtkelly13/blog/issues/117) | The spike — an animated background video (§4, §5, §6) |
+| [blog#118](https://github.com/rtkelly13/blog/issues/118) | `<Terminal>`'s timing table is trapped in a `useEffect` (§7) |
+| [blog#119](https://github.com/rtkelly13/blog/issues/119) | The graphics palette is on a replaced theme model |
+| [blog#120](https://github.com/rtkelly13/blog/issues/120) | Five interactive components have no pure model (§7) |
+
+**This repo:**
+
+| Issue | Covers |
+|---|---|
+| [#70](https://github.com/rtkelly13/design-system/issues/70) | `SlideDeck` owns the presenter's clock (§1) |
+| [#71](https://github.com/rtkelly13/design-system/issues/71) | Nothing documents deterministic rendering (§2, §3, §4) |
+
+Two findings here were already filed and are **not** duplicated: the display
+type scale in §6 is a sub-case of [#49](https://github.com/rtkelly13/design-system/issues/49)
+(the token layer stopped at colour — which also covers the missing motion
+tokens behind §2), and `Slide`'s hardcoded `--font-*` in §1 is already named in
+[#47](https://github.com/rtkelly13/design-system/issues/47).
+
+---
+
 ## Recommended order
 
 1. **Answer the licence question.** Personal-only needs nothing; Sentric
