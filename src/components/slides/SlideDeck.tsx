@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Play, Pause } from 'lucide-react';
 import { Button } from '../Button';
 
@@ -6,29 +6,66 @@ export interface SlideDeckProps {
   children: React.ReactElement[];
   aspectRatio?: '16:9' | '4:3';
   autoPlayInterval?: number;
+  /**
+   * The slide to show. Pass it to drive the deck from outside — a router, a
+   * story, a frame renderer — and the deck stops owning the index. Omit it and
+   * the deck keeps its own, which is the existing behaviour.
+   *
+   * The deck holding the index is why it could not previously be screenshotted
+   * at a chosen slide, deep-linked, or driven by anything but a person.
+   */
+  slide?: number;
+  /** Fires with the slide the deck wants to move to, controlled or not. */
+  onSlideChange?: (slide: number) => void;
+  /**
+   * The presenter affordances — control bar, arrow keys, fullscreen. On by
+   * default. Turn them off for a surface that already owns its own navigation,
+   * or that has no person in front of it at all.
+   */
+  chrome?: boolean;
 }
 
 export const SlideDeck: React.FC<SlideDeckProps> = ({
   children,
   aspectRatio = '16:9',
   autoPlayInterval = 0,
+  slide,
+  onSlideChange,
+  chrome = true,
 }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  // Only consulted when uncontrolled. `slide` winning outright is what keeps a
+  // controlled deck from ever disagreeing with its caller.
+  const [uncontrolledSlide, setUncontrolledSlide] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const totalSlides = React.Children.count(children);
+  const isControlled = slide !== undefined;
+  const currentSlide = isControlled ? slide : uncontrolledSlide;
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev < totalSlides - 1 ? prev + 1 : 0));
-  };
+  const goTo = useCallback(
+    (next: number) => {
+      // Guarded rather than left to the modulo: an empty deck used to send
+      // `prevSlide` to -1, which indexed nothing and rendered blank.
+      if (totalSlides === 0) return;
+      const wrapped = ((next % totalSlides) + totalSlides) % totalSlides;
+      if (!isControlled) setUncontrolledSlide(wrapped);
+      onSlideChange?.(wrapped);
+    },
+    [isControlled, onSlideChange, totalSlides],
+  );
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev > 0 ? prev - 1 : totalSlides - 1));
-  };
+  const nextSlide = useCallback(
+    () => goTo(currentSlide + 1),
+    [goTo, currentSlide],
+  );
+  const prevSlide = useCallback(
+    () => goTo(currentSlide - 1),
+    [goTo, currentSlide],
+  );
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = useCallback(() => {
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen().catch((err) => console.error(err));
@@ -37,9 +74,10 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
       document.exitFullscreen().catch((err) => console.error(err));
       setIsFullscreen(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    if (!chrome) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
@@ -53,7 +91,10 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [totalSlides]);
+    // Previously `[totalSlides]`, which closed over stale nav functions. That
+    // worked only because they touched nothing but the state updater; the
+    // moment one read a prop it would have stopped.
+  }, [chrome, nextSlide, prevSlide, toggleFullscreen]);
 
   useEffect(() => {
     if (!isPlaying || autoPlayInterval <= 0) return;
@@ -61,7 +102,7 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
       nextSlide();
     }, autoPlayInterval);
     return () => clearInterval(timer);
-  }, [isPlaying, autoPlayInterval]);
+  }, [isPlaying, autoPlayInterval, nextSlide]);
 
   const slideList = React.Children.toArray(children);
 
@@ -92,8 +133,9 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
         {slideList[currentSlide]}
       </div>
 
-      {/* Control bar */}
-      <div
+      {/* Control bar — the presenter affordances, off when `chrome` is false. */}
+      {chrome && (
+        <div
         style={{
           padding: '1rem 1.5rem',
           borderTop: '2px solid var(--ds-border-strong)',
@@ -130,6 +172,7 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
           </Button>
         </div>
       </div>
+      )}
     </div>
   );
 };
