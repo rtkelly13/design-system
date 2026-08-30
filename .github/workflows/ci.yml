@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - main
+  # Deliberately unfiltered. `branches: [main]` here filters on the PR's *base*,
+  # so a pull request into anything else got no CI at all — not a failure, not a
+  # pending check, nothing. A stacked PR showed only the Vercel comment check and
+  # read as "nothing to run", which is the worst way for a gate to be absent.
+  #
+  # A pull request is a request to merge, and it should be gated wherever it is
+  # aimed. The push trigger keeps its filter because that one is the post-merge
+  # signal for the default branch specifically.
   pull_request:
-    branches:
-      - main
   # Manual re-run, for the one case the two triggers above cannot cover: the
   # snapshot workflow commits baselines with `GITHUB_TOKEN`, and GitHub does not
   # start workflow runs from those pushes. The PR then holds its previous visual
