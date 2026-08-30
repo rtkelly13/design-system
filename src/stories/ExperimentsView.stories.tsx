@@ -42,3 +42,39 @@ export const Interactive: Story = {
     );
   },
 };
+
+/**
+ * A custom catalogue. Until #95 this story could not exist — the component
+ * rendered `DEFAULT_EXPERIMENTS` and no other array, so the page showed one
+ * site's experiments index rather than a component anyone could use.
+ *
+ * `ExperimentItem` is exported alongside it, so a consumer's list is typed
+ * rather than shaped by guesswork.
+ */
+export const CustomCatalogue: Story = {
+  args: {
+    experiments: [
+      {
+        id: 'contrast-audit',
+        name: 'Contrast Audit',
+        description: 'Every role pair on every rung, with the margin each one actually has',
+        status: 'active',
+        componentCount: 3,
+      },
+      {
+        id: 'pencil-rules',
+        name: 'Pencil Rules',
+        description: 'Polarity-aware dividers drawn in characters rather than pixels',
+        status: 'experimental',
+        componentCount: 1,
+      },
+      {
+        id: 'preset-bridge',
+        name: 'Tailwind Preset Bridge',
+        description: 'Superseded by the theme.css @theme contract; kept for the write-up',
+        status: 'archived',
+        componentCount: 0,
+      },
+    ],
+  },
+};
