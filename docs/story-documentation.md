@@ -198,7 +198,7 @@ stacked on this branch. A row struck through has landed.
 | `Avatar.accent` still takes only the four legacy palette names, not `AccentToken` | `Avatar.tsx` | Widening it is a small, non-breaking change and a better fit for its own PR. |
 | `Card`'s form is chosen implicitly by the presence of `title` | `Card.tsx` | Changing the default is breaking. Documented as a trap and `panel` recommended explicitly. |
 | `BlogPost` defaults `readingTime` to `'5 min read'` and `tags` to a three-item sample | `BlogPost.tsx` | These are *content* defaults that publish claims nobody made. Making them required is breaking. |
-| `Slide.speakerNotes` is accepted and rendered nowhere | `slides/Slide.tsx` | There is no presenter view yet. Documented as such rather than removed. |
+| ~~`Slide.speakerNotes` is accepted and rendered nowhere~~ | `slides/Slide.tsx` | **Fixed** — [#94](https://github.com/rtkelly13/design-system/issues/94). `SlideDeck` now has a presenter-notes panel, toggled with `N`. |
 | `ExperimentsView` hardcodes its catalogue; `DEFAULT_EXPERIMENTS` is exported but not a prop | `experiments/ExperimentsView.tsx` | Taking the catalogue as a prop is the obvious next change. |
 | `ExperimentsView` picks a badge accent with `status === 'active' ? 'cyan' : 'yellow'` — a status rendered through emphasis tokens, in legacy names | `experiments/ExperimentsView.tsx` | Should be `intent` roles. A behavioural change with a visual diff, so it belongs with a re-baseline. |
 | `not-prose` had never been checked by `no-custom-classname` | `authored-classes.mjs` | Every existing call site spells it inside a template literal ending in `.trim()` — the one shape the rule does not traverse. Now whitelisted as a plugin class, which is the honest fix. |
