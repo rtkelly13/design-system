@@ -10,18 +10,49 @@ export interface BlogPostProps {
   subtitle?: string;
   author?: string;
   date: string;
+  /**
+   * Reading time, e.g. `'9 min read'`. Omitted from the byline row when not
+   * supplied — there is no default, because a reading time nobody measured is
+   * worse than no reading time at all.
+   */
   readingTime?: string;
+  /** Topic tags in the header. Omitted entirely when not supplied or empty. */
   tags?: string[];
   children: React.ReactNode;
 }
 
+/**
+ * The editorial article shell: title, byline row, tags, rule, body.
+ *
+ * It composes `PageTitle`, `Badge` and `Divider` into the standard post header
+ * so every article on the site agrees about where the date sits. The body is
+ * yours — it applies no typography of its own, so Markdown output should be
+ * wrapped in `Prose` inside it.
+ *
+ * `readingTime` and `tags` have no defaults, and that is deliberate: they are
+ * content, not configuration, so inventing them would publish a claim nobody
+ * made — a nine-thousand-word article confidently advertising "5 min read".
+ * Each is simply omitted from the header when absent.
+ *
+ * `author` *does* default, to `'Ryan Kelly'`. That is defensible where the
+ * other two are not: the byline of a personal site is the same on almost every
+ * post, where a reading time and a topic list differ on all of them. Override
+ * it for a guest post.
+ *
+ * ```tsx
+ * <BlogPost title="Where a theme stops applying" date="2026-08-11"
+ *           readingTime="9 min read" tags={['CSS', 'Design systems']}>
+ *   <Prose>{content}</Prose>
+ * </BlogPost>
+ * ```
+ */
 export const BlogPost: React.FC<BlogPostProps> = ({
   title,
   subtitle,
   author = 'Ryan Kelly',
   date,
-  readingTime = '5 min read',
-  tags = ['Engineering', 'Design System', 'Architecture'],
+  readingTime,
+  tags,
   children,
 }) => {
   return (
@@ -64,18 +95,22 @@ export const BlogPost: React.FC<BlogPostProps> = ({
             <span>{date}</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Clock size={15} />
-            <span>{readingTime}</span>
-          </div>
+          {readingTime && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Clock size={15} />
+              <span>{readingTime}</span>
+            </div>
+          )}
 
-          <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
-            {tags.map((t) => (
-              <Badge key={t} accent="primary">
-                #{t}
-              </Badge>
-            ))}
-          </div>
+          {tags && tags.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
+              {tags.map((t) => (
+                <Badge key={t} accent="primary">
+                  #{t}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </header>
 
