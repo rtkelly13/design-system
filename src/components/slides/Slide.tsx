@@ -4,6 +4,16 @@ export interface SlideProps {
   title?: string;
   subtitle?: string;
   children: React.ReactNode;
+  /**
+   * Presenter notes for this slide.
+   *
+   * `Slide` itself never renders them — they are for the presenter, not the
+   * audience. `SlideDeck` reads them off its children and shows them in a panel
+   * below the frame, toggled with `N` or the notes control, off by default. A
+   * slide rendered outside a deck therefore shows nothing, which is correct.
+   *
+   * Whitespace-only strings count as no notes.
+   */
   speakerNotes?: string;
 }
 

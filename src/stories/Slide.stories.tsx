@@ -34,6 +34,11 @@ export const WithSubtitle: Story = {
   },
 };
 
+/**
+ * `speakerNotes` renders nothing *here*, and that is the point: they are for
+ * the presenter, not the audience, so a bare `Slide` shows no trace of them.
+ * `Presentation/SlideDeck → WithSpeakerNotes` is where they surface.
+ */
 export const WithSpeakerNotes: Story = {
   args: {
     title: 'Adopt, do not manage',
