@@ -4,6 +4,19 @@ import { TLDR } from '../TLDR';
 import { NoteBlock } from '../NoteBlock';
 import { BracketText } from '../BracketText';
 
+/**
+ * A fixed specimen article, used to read the prose scale at length.
+ *
+ * It takes no props and its content is not meant to be changed casually: the
+ * point of a specimen is that it stays the same, so a typographic change shows
+ * up as a difference in the rendering rather than in the text. It composes
+ * `BlogPost`, `TLDR`, `NoteBlock` and `BracketText` into a realistic full-page
+ * article, which is why it is the one full-page baseline the gated visual suite
+ * carries for the blog surface.
+ *
+ * Exempt from the three-sample minimum for the same reason: variants of a
+ * specimen are just more specimen. Build real articles with `BlogPost`.
+ */
 export const LoremIpsumPost: React.FC = () => {
   return (
     <BlogPost

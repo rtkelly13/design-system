@@ -28,10 +28,19 @@ export const Default: Story = {
   args: { toc },
 };
 
+/**
+ * `toDepth` widens the range past the default 2–3. Worth resisting: a contents
+ * list that includes every h4 stops being a summary of the page and becomes a
+ * second copy of it.
+ */
 export const IncludingDeeperHeadings: Story = {
   args: { toc, toDepth: 4 },
 };
 
+/**
+ * `label={null}` drops the heading above the list, for a rail that already sits
+ * under one — the same escape hatch `DocsSidebar` has, for the same reason.
+ */
 export const WithoutLabel: Story = {
   args: { toc, label: null },
 };

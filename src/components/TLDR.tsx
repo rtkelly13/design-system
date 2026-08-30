@@ -2,9 +2,32 @@ import React from 'react';
 import { Zap } from 'lucide-react';
 
 export interface TLDRProps {
+  /**
+   * The summary. Body text, not display — a sentence or three, or a short list.
+   * Anything longer stops being a summary and starts being the article again.
+   */
   children: React.ReactNode;
 }
 
+/**
+ * The summary box at the top of a long piece of writing.
+ *
+ * Fixed by design: no accent prop, no variants, no title override. It is always
+ * the secondary accent with a 6px offset shadow and always says `[ TL;DR ]`,
+ * because its whole job is to be the one element a reader recognises without
+ * reading — and a recognisable element cannot also be configurable. Use
+ * `NoteBlock` when the callout needs a type or a heading of its own.
+ *
+ * One per page, immediately after the title and before the body. A `TL;DR` that
+ * appears halfway down is a section summary, which is a different thing.
+ *
+ * ```tsx
+ * <TLDR>
+ *   A custom property substitutes where it is declared, not where it is used —
+ *   which is what decides whether a nested panel keeps its own theme.
+ * </TLDR>
+ * ```
+ */
 export const TLDR: React.FC<TLDRProps> = ({ children }) => {
   return (
     <div

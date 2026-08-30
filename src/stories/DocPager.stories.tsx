@@ -11,6 +11,12 @@ const meta: Meta<typeof DocPager> = {
 export default meta;
 type Story = StoryObj<typeof DocPager>;
 
+/**
+ * The usual case: a page in the middle of a sequence. The *names* of the
+ * adjacent pages are the point — this is not `Pagination`, which counts
+ * numbered pages for a list view. A reader moving through docs wants to know
+ * what comes next, not that it is page 4.
+ */
 export const Both: Story = {
   args: {
     prev: { label: 'Semantic theming', href: '/docs/theming' },
@@ -23,6 +29,7 @@ export const NextOnly: Story = {
   args: { next: { label: 'Composition', href: '/docs/composition' } },
 };
 
+/** Last page. `prev` alone still occupies the left, so the row does not shift. */
 export const PrevOnly: Story = {
   args: { prev: { label: 'Semantic theming', href: '/docs/theming' } },
 };

@@ -11,6 +11,12 @@ const meta: Meta<typeof AnchorHeading> = {
 export default meta;
 type Story = StoryObj<typeof AnchorHeading>;
 
+/**
+ * A section heading with its copy-link affordance. Pass `id` explicitly wherever
+ * you can: build-time sluggers such as `rehype-slug` deduplicate repeated
+ * headings across a whole document, which a per-heading component cannot see,
+ * so two "Overview" sections would otherwise share an anchor.
+ */
 export const Default: Story = {
   args: { level: 2, id: 'composition', children: 'Composition' },
 };

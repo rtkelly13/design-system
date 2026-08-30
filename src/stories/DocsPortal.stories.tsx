@@ -16,7 +16,21 @@ import { NoteBlock } from '../components/NoteBlock';
 
 const meta: Meta = {
   title: 'Docs/Portal',
-  parameters: { layout: 'fullscreen' },
+  tags: ['autodocs'],
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `The documentation kit assembled into the page it exists to build — \`DocsLayout\` holding a \`DocsHeader\`, a \`DocsSidebar\`, a \`TableOfContents\` and a \`Prose\` body with \`Breadcrumbs\`, \`AnchorHeading\`, \`CodeBlock\` and \`DocPager\` inside it.
+
+It is here because the parts have contracts with each other that no single component page can show: the sidebar's open state lives in the *caller*, and both the header's toggle and the layout's scrim read it, so a portal that forgets to thread \`sidebarOpen\` through both has a drawer that opens and cannot be closed. That wiring is what the first story demonstrates.
+
+The other thing to take from it is \`not-prose\`. Chrome rendered inside the article — the breadcrumb above the title, the pager below the body — must carry it, or the typography plugin's descendant selectors style it as prose. Every \`Docs/*\` component that is meant to sit inside \`Prose\` already applies it internally; anything you add yourself does not.
+
+Each part has its own page with its own props table. This one is the composition.`,
+      },
+    },
+  },
 };
 
 export default meta;
@@ -148,6 +162,13 @@ function SampleBody() {
   );
 }
 
+/**
+ * The whole kit wired together, including the part no single component page can
+ * show: the drawer's open state lives here, in the caller, and is threaded into
+ * both `DocsHeader` (for the toggle and its `aria-expanded`) and `DocsLayout`
+ * (for the scrim). A portal that passes it to only one has a drawer that opens
+ * and cannot be closed.
+ */
 export const FullPortal: Story = {
   render: () => {
     const [open, setOpen] = useState(false);
@@ -185,6 +206,11 @@ export const FullPortal: Story = {
   },
 };
 
+/**
+ * The article without the chrome — what an MDX page compiles to inside `Prose`.
+ * The breadcrumb and the pager are inside the scope and carry `not-prose`,
+ * which is what stops the typography plugin styling them as article content.
+ */
 export const ProseOnly: Story = {
   render: () => (
     <div style={{ padding: '2rem' }}>
@@ -193,6 +219,12 @@ export const ProseOnly: Story = {
   ),
 };
 
+/**
+ * The two navigation rails side by side. They answer different questions —
+ * `DocsSidebar` is where you are in the *site*, `TableOfContents` is where you
+ * are in the *page* — which is why a docs layout carries both rather than
+ * merging them.
+ */
 export const Navigation: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '2rem', padding: '2rem' }}>

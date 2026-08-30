@@ -28,9 +28,15 @@ export interface DocsHeaderProps {
   searchShortcut?: string;
   /** Controls the mobile sidebar toggle. Omit to hide it. */
   onToggleSidebar?: () => void;
+  /**
+   * Whether the sidebar is currently open. Drives the toggle's icon and its
+   * `aria-expanded`, so a header wired for a drawer must pass it or the control
+   * announces the wrong state.
+   */
   sidebarOpen?: boolean;
   /** Extra trailing content — version switcher, repo link, and so on. */
   children?: ReactNode;
+  /** Extra classes on the `<header>`. */
   className?: string;
 }
 

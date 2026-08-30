@@ -24,8 +24,20 @@ import { auditContrast } from '../theme/contrast';
  */
 const meta = {
   title: 'Foundations/Theme Ladder',
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: `Four rungs — \`midnight\`, \`dim\`, \`bright\`, \`white\` — selected by a \`data-theme\` attribute on the root, and **not** a light/dark toggle. Each rung is a designed surface with its own literal colours, so \`dim\` is not a lighter \`midnight\` and \`bright\` is not a dimmer \`white\`.
+
+Everything derives from \`src/theme/levels.ts\`: the generated \`theme.css\`, the runtime provider, the Storybook toolbar above, the walkthrough matrix and the contrast gate. Nothing on this page lists a level name — both stories map over \`THEME_LEVELS\`, so a fifth rung appears here without this file being edited, which is the rule to copy when consuming the ladder.
+
+**Selecting a level.** Set \`data-theme\` on the root for a whole page; wrap a subtree in \`<ThemeProvider scoped>\` for a panel that differs from the page around it. For SSR, render \`getThemeInitScript()\` inline in \`<head>\` — it sets the attribute before first paint, which React cannot do without either a flash or a hydration mismatch.
+
+**Polarity is a declared field, not the axis.** \`LEVELS[x].polarity\` drives \`color-scheme\`, the \`dark:\`/\`light:\` variants and the \`prefers-color-scheme\` mapping. \`dark:\` means \"midnight or dim\" and is for non-colour utilities only — colour comes from the roles, which resolve per level on their own.`,
+      },
+    },
   },
 } satisfies Meta;
 
@@ -144,4 +156,58 @@ export const ContrastMatrix: Story = {
       </div>
     );
   },
+};
+
+/**
+ * A level applied to a subtree instead of the page.
+ *
+ * `<ThemeProvider scoped>` writes the attribute on a wrapper rather than on the
+ * document, so a `bright` panel inside a `midnight` page resolves correctly at
+ * any depth — the nested panel below is two levels down and still right.
+ *
+ * That it works at all is the one genuinely subtle thing in the CSS. A custom
+ * property substitutes where it is **declared**, not where it is used, so every
+ * `@theme` token that indirects through a per-level variable has to be
+ * re-declared inside all four level blocks. An alias left only in `@theme`
+ * resolves against the root level, and a panel like this one silently keeps the
+ * page\'s colour. `src/theme.css.test.ts` asserts that shape, because
+ * `tokens:check` would be equally happy with a generator that reproducibly
+ * emitted the wrong one — and a single-level page renders correctly either way,
+ * so no screenshot would catch it.
+ */
+export const ScopedPanels: Story = {
+  render: () => (
+    <ThemeProvider scoped defaultLevel="midnight" persist={false} followSystem={false}>
+      <div className="bg-surface-base text-content-primary" style={{ padding: '2rem' }}>
+        <p style={{ fontFamily: 'var(--ds-font-mono)', marginBottom: '1rem' }}>
+          Page level: midnight
+        </p>
+        <Badge accent="primary">OUTER</Badge>
+
+        <ThemeProvider scoped defaultLevel="bright" persist={false} followSystem={false}>
+          <div
+            className="bg-surface-base text-content-primary border-2 border-edge-strong"
+            style={{ padding: '1.5rem', marginTop: '1.5rem' }}
+          >
+            <p style={{ fontFamily: 'var(--ds-font-mono)', marginBottom: '1rem' }}>
+              Scoped panel: bright
+            </p>
+            <Badge accent="primary">INNER</Badge>
+
+            <ThemeProvider scoped defaultLevel="white" persist={false} followSystem={false}>
+              <div
+                className="bg-surface-base text-content-primary border-2 border-edge-strong"
+                style={{ padding: '1.5rem', marginTop: '1.5rem' }}
+              >
+                <p style={{ fontFamily: 'var(--ds-font-mono)', marginBottom: '1rem' }}>
+                  Nested twice: white
+                </p>
+                <Badge accent="primary">DEEPEST</Badge>
+              </div>
+            </ThemeProvider>
+          </div>
+        </ThemeProvider>
+      </div>
+    </ThemeProvider>
+  ),
 };

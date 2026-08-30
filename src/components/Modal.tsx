@@ -13,16 +13,37 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export interface ModalProps {
+  /**
+   * Whether the dialog is mounted and shown. The component renders nothing when
+   * false, so the state lives with the caller — there is no imperative
+   * `open()`.
+   */
   isOpen: boolean;
+  /**
+   * Called when the dialog asks to close: Escape, the close control, or a
+   * backdrop click. It is a request, not a notification — the dialog does not
+   * close itself, so a caller that ignores this leaves it open.
+   */
   onClose: () => void;
+  /**
+   * The dialog's accessible name. Required, because it becomes the
+   * `aria-labelledby` target: a dialog announced with no name gives a screen
+   * reader user nothing to orient on.
+   */
   title: string;
+  /** The dialog body. Scrolls within the dialog when it is taller than the viewport. */
   children: ReactNode;
+  /**
+   * Action row along the bottom, above the border. Put the confirming action
+   * last, matching the platform convention the rest of the page follows.
+   */
   footer?: ReactNode;
   /**
    * Close when the backdrop is clicked. On for the usual case; turn it off for
    * a dialog holding unsaved input, where a stray click should not discard it.
    */
   closeOnBackdropClick?: boolean;
+  /** Extra classes on the dialog panel itself, not the backdrop — width, usually. */
   className?: string;
 }
 

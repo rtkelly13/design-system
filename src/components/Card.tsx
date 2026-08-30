@@ -7,22 +7,72 @@ import type { AccentToken } from '../lib/theme';
 export type CardAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Card heading. Its presence is what selects the full card form over the
+   * panel form — see the note on `panel`.
+   */
   title?: string;
+  /** Supporting line under the title. Body face in the full form, mono in a panel. */
   description?: string;
+  /** Cover image, rendered above the body and clipped to 192px tall. */
   imgSrc?: string;
+  /**
+   * Destination. When set, the title, the image and a trailing
+   * `[ Learn More → ]` all become links to it.
+   */
   href?: string;
+  /** ASCII decoration in the filename bar, right-aligned. Full card form only. */
   asciiArt?: string;
+  /**
+   * Text in the filename bar. Defaults to the title slugged to `.md`, which is
+   * the blog-card convention this form was built for.
+   */
   filename?: string;
+  /** Body content, rendered after `description` in both forms. */
   children?: ReactNode;
+  /** Extra classes on the outer element. */
   className?: string;
   /** Semantic accent for the left border highlight. */
   accent?: AccentToken;
   /** Badge text shown in the card header */
   badge?: string;
-  /** If true, renders as a simple panel without the filename header bar */
+  /**
+   * Render the plain panel — padding, border, accent stripe, no filename bar
+   * and no width constraint.
+   *
+   * Worth reading before relying on the default: the panel form is also chosen
+   * *implicitly* when there is no `title` but there are `children`. So a card
+   * given a title later silently changes shape. Pass `panel` explicitly
+   * whichever form you want, and the choice stops being incidental.
+   */
   panel?: boolean;
 }
 
+/**
+ * A bordered container, in two forms.
+ *
+ * **Panel** (`panel`) is the general one: border, 1.5rem of padding, an
+ * optional accent stripe down the left edge, and whatever you put in it. Reach
+ * for this unless you specifically want the other.
+ *
+ * **Full card** (pass a `title`) is the blog/project card — a filename bar
+ * across the top reading `some_title.md`, an optional cover image, then title,
+ * description and a `[ Learn More → ]` link. It is opinionated on purpose and
+ * carries its own width and float classes, so it belongs in a card grid rather
+ * than as a general-purpose box.
+ *
+ * The accent is a *stripe*, not a fill: `accent` thickens the left border to
+ * 4px and colours it. That is the whole colour budget of the component, which
+ * is why a card conveys category rather than status.
+ *
+ * ```tsx
+ * <Card panel accent="info" badge="DRAFT">
+ *   <p>Anything.</p>
+ * </Card>
+ *
+ * <Card title="Where a theme stops applying" description="…" href="/posts/theme" />
+ * ```
+ */
 export function Card({
   title,
   description,

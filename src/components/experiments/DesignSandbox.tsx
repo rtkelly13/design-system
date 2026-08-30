@@ -27,6 +27,24 @@ interface UserRecord {
   usage: string;
 }
 
+/**
+ * The kitchen sink: every primitive in the package, rendered on one page with
+ * live state.
+ *
+ * It takes no props and is not a building block — it is a *surface* whose
+ * purpose is to be looked at. Two uses. First, switching the theme toolbar over
+ * it is the fastest way to see whether a token change holds across the whole
+ * inventory at once, which no single-component story can show. Second, it is
+ * the honest answer to "what does this design system look like".
+ *
+ * It is deliberately excluded from the gated visual suite and from the
+ * three-sample minimum: it changes whenever anything changes, so a pixel
+ * baseline over it would fail constantly while localising nothing, and its
+ * variants are the four ladder levels rather than stories.
+ *
+ * Do not import it into an application. Copy the composition you want out of
+ * it instead.
+ */
 export const DesignSandbox: React.FC = () => {
   const { level, cycleLevel, setLevel, levels } = useTheme();
   const [activeTab, setActiveTab] = useState<'components' | 'saas' | 'ecommerce' | 'slides' | 'post'>('components');

@@ -50,7 +50,7 @@ concurrency:
 # them — a hung gate no longer waits out a browser-shaped timeout.
 jobs:
   gates:
-    name: Token, Contrast, Lint, CSS, Font & Dependency Gates
+    name: Token, Contrast, Lint, CSS, Font, Docs & Dependency Gates
     runs-on: ubuntu-latest
     # ~30s of Node scripts and one eslint pass, no network past `pnpm install`.
     timeout-minutes: 10
@@ -91,6 +91,12 @@ jobs:
       # surfaces only as "nearly every visual baseline moved".
       - name: Font Reachability
         run: pnpm check:fonts
+
+      # Every component page carries a description, three samples, a caption per
+      # sample and a description per prop. Reads source rather than a built
+      # Storybook, which is why it belongs here and not in `visual`.
+      - name: Story Documentation
+        run: pnpm check:story-docs
 
       # knip finds unused/unlisted packages; check-deps.mjs requires each one to
       # have a stated reason, sit in the matching section, and — for CSS — be

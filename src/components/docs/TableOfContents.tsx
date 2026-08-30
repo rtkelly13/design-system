@@ -21,6 +21,7 @@ export interface TableOfContentsProps {
   label?: string | null;
   /** Disable scroll-spy — useful in Storybook and other non-scrolling frames. */
   spy?: boolean;
+  /** Extra classes on the `<nav>` — sticky offsets usually live here. */
   className?: string;
 }
 

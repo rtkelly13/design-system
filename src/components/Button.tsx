@@ -7,6 +7,10 @@ import type {
 import { recipe } from '../lib/recipe';
 
 interface ButtonOwnProps {
+  /**
+   * The label. Uppercased by the base style, so write it in normal case; an
+   * icon node beside the text lays out correctly without extra wrapping.
+   */
   children: ReactNode;
   /**
    * Named for the colour it is on `midnight`, not for a colour it guarantees.
@@ -23,8 +27,24 @@ interface ButtonOwnProps {
    * change and is deliberately not bundled with the token migration.
    */
   variant?: 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
+  /**
+   * Padding and type scale: `sm` for a toolbar or table row, `md` for the
+   * body of a page, `lg` for a landing-page CTA. The 2px border and the offset
+   * shadow do not scale with it, which is what keeps the three recognisable as
+   * one control.
+   */
   size?: 'sm' | 'md' | 'lg';
+  /**
+   * Wrap the label in `[ BRACKETS ]`. Off by default — unlike `PageTitle`,
+   * where it is on — because a page carries many buttons and few titles, and
+   * bracketing all of them spends the device on nothing. Reserve it for the
+   * primary action.
+   */
   bracketed?: boolean;
+  /**
+   * Extra classes. Merged rather than appended, so a caller's `bg-*` genuinely
+   * replaces the variant's instead of racing it in CSS source order.
+   */
   className?: string;
 }
 
@@ -35,12 +55,18 @@ interface ButtonOwnProps {
  */
 export type ButtonElementProps = ButtonOwnProps &
   DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
+    /** Absent on the button form. Passing it selects the anchor form instead. */
     href?: never;
   };
 
 /** The `<a>` form. Passing `href` selects it; there is no `as` prop to remember. */
 export type ButtonLinkProps = ButtonOwnProps &
   DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> & {
+    /**
+     * Destination. Its presence is what selects the anchor form — there is no
+     * `as` prop — after which TypeScript offers `target`, `rel` and `download`
+     * and withdraws `disabled` and `type`.
+     */
     href: string;
   };
 

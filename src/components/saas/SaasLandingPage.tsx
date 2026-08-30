@@ -77,13 +77,39 @@ const ACCENT_COLORS: Record<string, string> = {
 };
 
 export interface SaasLandingPageProps {
+  /** Hero headline. Rendered through `PageTitle`, so it is bracketed and uppercased. */
   title?: string;
+  /** Hero standfirst, under the headline. */
   subtitle?: string;
+  /**
+   * Pricing table contents. Defaults to `DEFAULT_PRICING_TIERS` — a working
+   * sample, not a neutral one, so a page that omits this advertises prices
+   * nobody set.
+   */
   pricingTiers?: PricingTier[];
   /** Terminal output for the deploy section. Pass `''` to hide it. */
   deployLog?: string;
 }
 
+/**
+ * A complete marketing page: hero, feature grid, terminal panel, pricing tiers,
+ * closing CTA.
+ *
+ * Read this before reaching for it: it is **one page, not a page kit**. The
+ * section order is fixed, the copy comes from props with working defaults
+ * (`DEFAULT_PRICING_TIERS`, `DEFAULT_DEPLOY_LOG`), and there is no way to drop
+ * a section or reorder them. That makes it a very good demonstration of the
+ * system on a marketing surface and a poor foundation for a second, different
+ * marketing page.
+ *
+ * If you need a real landing page, take this as the reference composition and
+ * build from the primitives it uses — `PageTitle`, `Card`, `Button`, `Badge`,
+ * `Divider`. `docs/surface-readiness.md` tracks the work to make marketing a
+ * composable surface rather than a screenshot of one product.
+ *
+ * Its stories are the three theme levels, because the level is the axis this
+ * page actually varies on.
+ */
 export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
   title = 'HIGH-PERFORMANCE BRUTALIST SAAS PLATFORM',
   subtitle = 'Ship faster with real-time sync, automated rules, and zero-compromise design',

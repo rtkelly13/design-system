@@ -35,6 +35,7 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm check:deps` (dependency reasons, sections and usage)
    - `pnpm check:visual-coverage` (every story asserted or excluded with a reason)
+   - `pnpm check:story-docs` (every component page documented — see rule 10)
    - `pnpm typecheck`
    - `pnpm test` (unit — see "Unit Tests" below)
    - `pnpm build`
@@ -93,6 +94,42 @@ Package manager is **pnpm** (`node >=22`).
    rather than failing loudly. Related: `if: always()` on an upload step also
    fires on cancellation, so paired with `if-no-files-found: error` it turns
    every cancelled run into a failing step. Use `if: success() || failure()`.
+
+10. **Every Component Documents Itself, And It Is Checked**: a Storybook docs
+   page is published whether or not anyone wrote anything on it, so an empty one
+   looks exactly like a finished one — a title, a props table with a blank
+   Description column, and a story called `Default`. Nothing about that page
+   says it is empty. `pnpm check:story-docs` fails the build unless every
+   component has all five of:
+   - **a docs page** — `tags: ['autodocs']` on the meta;
+   - **a description** — what it is for and when to reach for it. Prefer a JSDoc
+     block on the exported component, because that also reaches editor hover and
+     the emitted `.d.ts`; `parameters.docs.description.component` is accepted
+     where the component is not the natural home for the prose. A JSDoc above
+     `const meta` reaches **neither** — Storybook does not read it, and that is
+     where the best writing in this repo used to sit;
+   - **at least three samples.** One story shows a component renders; the second
+     and third are what force its axis of variation to be named. `Badge`'s
+     `Emphasis` and `Intent` pair is the whole token distinction, and it could
+     not exist on a one-story page;
+   - **a caption on every story** — a JSDoc block above the export. This is the
+     text under the sample, and it is where *when to choose this one* goes, not
+     "the pink one";
+   - **a description on every prop.**
+
+   Two waiver maps in the script, both taking a sentence rather than a number,
+   for the reason `check-visual-coverage.mjs` gives: `EXCLUDED` waives the
+   sample minimum or the props table for one component, and `UNSTORIED` lists
+   publicly exported components with no page. Nothing waives a description, a
+   caption or a prop doc.
+
+   It reads **source, not a built Storybook**, so it lives in the `gates` job
+   rather than behind the browser install. Its prop discovery deliberately does
+   not trust `react-docgen`: `Button`'s discriminated union makes docgen emit
+   **zero** props, silently, so that page's `argTypes` are written by hand and
+   the check accepts an `argTypes` description in place of a JSDoc. The full
+   before-and-after audit, and the API problems documenting everything
+   surfaced, are in [`docs/story-documentation.md`](./docs/story-documentation.md).
 
 ---
 
@@ -350,6 +387,8 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
 - `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
+- `pnpm check:story-docs`: Fails if a component page lacks a description, three samples, a caption per sample or a description per prop. Runs in CI.
+- `pnpm check:story-docs:list`: Same, grouped by component, plus every waiver and its reason.
 - `pnpm check:visual-coverage`: Fails if a component has no asserted story and no exclusion. Runs in CI.
 - `pnpm check:visual-coverage:list`: Same, naming every uncovered component and every exclusion.
 - `pnpm test:visual:missing`: Writes only baselines that do not yet exist.
@@ -550,7 +589,7 @@ combined verdict.
 
 | Job | What it runs | Roughly | Ceiling |
 | --- | --- | --- | --- |
-| `gates` | `tokens:check`, `check:contrast`, `lint`, `check:css`, `check:fonts`, `check:deps` | 30s | 10m |
+| `gates` | `tokens:check`, `check:contrast`, `lint`, `check:css`, `check:fonts`, `check:story-docs`, `check:deps` | 30s | 10m |
 | `unit` | `typecheck`, `test`, `build` | 35s | 10m |
 | `visual` | `build-storybook`, `check:visual-coverage`, `test:visual` | 60s | 25m |
 | `verify` | nothing — fails unless the three above succeeded | 10s | 5m |
