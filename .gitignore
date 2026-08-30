@@ -28,3 +28,4 @@ coverage/
 # Book of Shapes reference SVGs - third-party artwork, no published license.
 # Local inspiration material only; re-fetch with reference/bookofshapes/fetch.py.
 reference/bookofshapes/svg/
+reference/bookofshapes/contact-sheet.html
