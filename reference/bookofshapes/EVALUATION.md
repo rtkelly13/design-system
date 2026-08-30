@@ -26,15 +26,19 @@ build there.
 
 | | Count | Meaning |
 |---|---|---|
-| **port** | 23 | Strong fit — worth building as a generator |
-| **adapt** | 17 | Good idea, needs rework (weight, or a missing capability) |
-| **covered** | 4 | We already have an equivalent |
+| **port** | 17 | Strong fit — worth building as a generator |
+| **adapt** | 18 | Good idea, needs rework (weight, or a missing capability) |
+| **covered** | 9 | We already have an equivalent — 4 before this work, 5 built since |
 | **skip** | 13 | Aesthetic or technical mismatch |
 
-Only four are already covered — `joy_division` → `ridgeline`, `node_garden` →
-`node-network`, `noise_landscape_1` → `contour`, `triangular_mosaic` →
-`triangle-grid`. The overlap being that small is itself the finding: nine generators
-against a 57-pattern reference set means the gap is opportunity, not duplication.
+Four were covered before any of this work — `joy_division` → `ridgeline`, `node_garden`
+→ `node-network`, `noise_landscape_1` → `contour`, `triangular_mosaic` →
+`triangle-grid`. The overlap being that small was itself the finding: nine generators
+against a 57-pattern reference set meant the gap was opportunity, not duplication.
+
+Five more are covered now, built in blog#138 — `radial_spokes`, `interference-mesh`,
+`wave-field`, `quarter_circles_grid` and `isometric-cube-grid`. Verdicts are kept current
+as things ship, so this file stays a worklist rather than becoming a snapshot.
 
 ## The gap that matters most: there is no radial generator
 
@@ -83,15 +87,30 @@ sharply, and *not* along the lines its own tags suggest.
 
 **Best fits — `project` is pure formula, no sampled structure needed at all:**
 
-- `flow_lines` and `flow_poles` — streamlines through a vector field. `flow_poles`
-  builds its field from vortices and sinks rather than a closed formula, so the poles
-  themselves can orbit on whole cycles: the field evolves, the seed structure does not.
 - `lissajous_field` — integer frequency ratios close the loop *by construction*.
   `cycles()` is enforcing by hand exactly the property Lissajous figures have natively.
 - `interference-mesh` and `ripple_grid` — two-source interference as displaced lines.
   Sample the grid once; project the wave. The sources orbit on whole cycles, the marks
   never re-roll. This is the closest fit to the machinery already built, and
-  `contour`'s travelling-wave phase advance is the precedent.
+  `contour`'s travelling-wave phase advance is the precedent. **Shipped** as
+  `interference` in [blog#138](https://github.com/rtkelly13/blog/pull/138).
+
+**A correction, from building it.** This section originally led with `flow_lines` and
+`flow_poles` as the best fits of all, on the reasoning that streamlines through a vector
+field are pure arithmetic. Implementing them disproved it, and the failure is worth more
+than the recommendation was.
+
+Integrating a streamline feeds each step's position into the next, so an angular nudge at
+the seed compounds all the way down the line — and near a separatrix the tail *switches
+channel* rather than drifting. It scored a smoothness ratio of **1.0**, the confetti
+signature, from a generator that re-rolls nothing at all: one value moved 271px in a
+single 1/300 step. Weakening the field only postpones it; a sweep over amplitudes
+0.4–1.1 and step counts 4–26 never cleared 5.5, against 45+ for everything else.
+
+Advection and coherence are in genuine tension. The form of the idea that survives is
+`wave-field` — the direction field itself, no feedback between marks — and that is what
+shipped as `flow-field`. **"Pure arithmetic" was the wrong test; "no term feeds the next"
+is the right one**, and it is the property worth checking any future adaptation against.
 
 **Motion ideas the current generators lack:**
 
@@ -133,19 +152,24 @@ because every cell is three filled faces plus strokes. If occlusion gets added a
 isometric generators follow, they need a lower `density` ceiling than the others, and
 `iso-grid` should probably get one now regardless.
 
-## Suggested order
+## Suggested order — all five now done
 
-1. **`occlusion` on `GraphicParams`**, defaulting to the theme surface. Unblocks the
-   isometric family and costs one optional field.
-2. **A radial generator** — `radial_spokes` or `modular_circle`. Closes the biggest
-   compositional gap for the least code, and proves polar arithmetic in `project`.
-3. **`interference-mesh`** — the best animation fit in the set, and reuses `contour`'s
-   travelling-wave phase advance directly.
-4. **A `t` scrubber in `/experiments/graphics`.** The gallery has no time control at
-   all, so the animation work in #121/#132 is currently only visible through Remotion.
-   `GeneratedBackground` re-samples on every prop change and says so in its own
-   docstring — the scrubber wants `getGenerator()` and a `project`-per-frame loop,
-   which is exactly the usage the split was built for and nothing on the site
-   demonstrates yet.
-5. **A disorder-gradient parameter**, from `flow_dots`. Cross-cutting: it applies to
-   every existing grid generator rather than adding a tenth.
+Carried out in [blog#138](https://github.com/rtkelly13/blog/pull/138), which took this
+list in order:
+
+1. ✅ **`occlusion` on `GraphicParams`**, defaulting to the theme surface. Unblocked the
+   isometric family for one optional field, and `iso-cubes` uses it.
+2. ✅ **A radial generator** — `radial-spokes`. Closed the biggest compositional gap for
+   the least code, and proved polar arithmetic in `project`.
+3. ✅ **`interference`** — reuses `contour`'s travelling-wave phase advance directly.
+4. ✅ **A time control**, as `/experiments/backgrounds` rather than a scrubber bolted to
+   the still gallery. `AnimatedBackground` samples once and projects per frame, which
+   `getGenerator()` existed for and only the tests were doing.
+5. ✅ **A disorder gradient**, from `flow_dots`. Cross-cutting as hoped: wired into
+   `dot-grid`, `iso-grid` and `truchet-arcs` without moving a single golden, because it
+   perturbs from a coordinate hash rather than an rng draw.
+
+Still open, in rough order of value: an isometric height field beyond `iso-cubes`
+(`iso_test_noise_field`), the Truchet tile parameterised for the mirrored variant
+(`concentric_arc_truchet_3`), and `signal_decay`, which matches the site's terminal voice
+more directly than anything currently in the set.
