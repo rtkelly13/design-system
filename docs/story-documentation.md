@@ -200,7 +200,7 @@ stacked on this branch. A row struck through has landed.
 | `BlogPost` defaults `readingTime` to `'5 min read'` and `tags` to a three-item sample | `BlogPost.tsx` | These are *content* defaults that publish claims nobody made. Making them required is breaking. |
 | `Slide.speakerNotes` is accepted and rendered nowhere | `slides/Slide.tsx` | There is no presenter view yet. Documented as such rather than removed. |
 | ~~`ExperimentsView` hardcodes its catalogue; `DEFAULT_EXPERIMENTS` is exported but not a prop~~ | `experiments/ExperimentsView.tsx` | **Fixed** — [#95](https://github.com/rtkelly13/design-system/issues/95). |
-| `ExperimentsView` picks a badge accent with `status === 'active' ? 'cyan' : 'yellow'` — a status rendered through emphasis tokens, in legacy names | `experiments/ExperimentsView.tsx` | Should be `intent` roles. A behavioural change with a visual diff, so it belongs with a re-baseline. |
+| ~~`ExperimentsView` picks a badge accent with `status === 'active' ? 'cyan' : 'yellow'` — a status rendered through emphasis tokens, in legacy names~~ | `experiments/ExperimentsView.tsx` | **Fixed** — [#96](https://github.com/rtkelly13/design-system/issues/96). Now a `Record` over the intent roles; needed a re-baseline. |
 | `not-prose` had never been checked by `no-custom-classname` | `authored-classes.mjs` | Every existing call site spells it inside a template literal ending in `.trim()` — the one shape the rule does not traverse. Now whitelisted as a plugin class, which is the honest fix. |
 
 Two structural follow-ups worth considering, neither gated:

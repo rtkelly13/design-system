@@ -3,6 +3,7 @@ import { Beaker, Boxes, Palette, Type, Sparkles, Projector, Terminal } from 'luc
 import { PageTitle } from '../PageTitle';
 import { Card } from '../Card';
 import { Badge } from '../Badge';
+import type { AccentToken } from '../../lib/theme';
 
 export interface ExperimentItem {
   /** Stable identifier, handed back by `onSelectExperiment`. */
@@ -13,7 +14,10 @@ export interface ExperimentItem {
   description: string;
   /** Leading glyph. A node rather than a component type, so it can carry its own size. */
   icon?: React.ReactNode;
-  /** Lifecycle state, shown as a badge. */
+  /**
+   * Lifecycle state, shown as a badge and coloured by {@link STATUS_ACCENT} —
+   * `success` for `active`, `info` for `experimental`, `quiet` for `archived`.
+   */
   status: 'active' | 'archived' | 'experimental';
   /** How many primitives the experiment exercises, shown in the footer line. */
   componentCount: number;
@@ -69,6 +73,29 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
   },
 ];
 
+/**
+ * How a lifecycle state is coloured.
+ *
+ * A `Record` over the union rather than a ternary, which is the ladder rule
+ * from AGENTS.md applied to a smaller union: a fourth status becomes a compile
+ * error here instead of silently falling through to whichever branch the
+ * ternary ended on. The expression this replaced —
+ * `status === 'active' ? 'cyan' : 'yellow'` — rendered `archived` and
+ * `experimental` identically, so two different states looked the same while
+ * their labels differed.
+ *
+ * `active` and `experimental` take **intent** roles because they are states a
+ * reader acts on: one is live, one is in progress. `archived` takes `quiet`,
+ * an *emphasis* role, and that is the deliberate exception — "archived" is not
+ * a signal, it is the absence of one, so the right treatment is to recede
+ * rather than to communicate.
+ */
+const STATUS_ACCENT: Record<ExperimentItem['status'], AccentToken> = {
+  active: 'success',
+  experimental: 'info',
+  archived: 'quiet',
+};
+
 export interface ExperimentsViewProps {
   /**
    * The catalogue to render, in display order. Defaults to
@@ -94,9 +121,10 @@ export interface ExperimentsViewProps {
  * `onSelectExperiment` turns the cards into navigation — without it the grid is
  * a read-only display.
  *
- * `status` on an item is the only place the component uses colour to mean
- * something — `active`, `experimental`, `archived` — so it reads from the
- * intent roles rather than from a per-card accent.
+ * `status` is the only place the component uses colour to mean something, and
+ * it reads from {@link STATUS_ACCENT} — intent roles for the two states a
+ * reader acts on, `quiet` for `archived`. See that constant for why the third
+ * one is the exception.
  */
 export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
   experiments = DEFAULT_EXPERIMENTS,
@@ -146,7 +174,7 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
                 >
                   {exp.name}
                 </h3>
-                <Badge accent={exp.status === 'active' ? 'cyan' : 'yellow'}>{exp.status.toUpperCase()}</Badge>
+                <Badge accent={STATUS_ACCENT[exp.status]}>{exp.status.toUpperCase()}</Badge>
               </div>
               <p
                 style={{

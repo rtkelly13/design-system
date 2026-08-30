@@ -44,12 +44,15 @@ export const Interactive: Story = {
 };
 
 /**
- * A custom catalogue. Until #95 this story could not exist — the component
- * rendered `DEFAULT_EXPERIMENTS` and no other array, so the page showed one
- * site's experiments index rather than a component anyone could use.
+ * A custom catalogue, and the only place the three `status` values appear
+ * together — every entry in `DEFAULT_EXPERIMENTS` is `active`, so the default
+ * page shows one badge colour and says nothing about the other two.
  *
- * `ExperimentItem` is exported alongside it, so a consumer's list is typed
- * rather than shaped by guesswork.
+ * That is how the bug fixed in #96 survived: a ternary collapsed `archived`
+ * and `experimental` into one colour, and no story rendered either of them.
+ * `active` is now `success`, `experimental` is `info`, and `archived` is
+ * `quiet` — receding rather than signalling, because it is the absence of a
+ * state to act on.
  */
 export const CustomCatalogue: Story = {
   args: {
