@@ -21,6 +21,11 @@ export const Default: Story = {
   },
 };
 
+/**
+ * `subtitle` sits under the title inside the ruled header. Both are optional:
+ * omitting them gives a full-bleed frame, which is what a title card or an
+ * image slide wants.
+ */
 export const WithSubtitle: Story = {
   args: {
     title: 'Composition',
@@ -34,6 +39,12 @@ export const WithSubtitle: Story = {
   },
 };
 
+/**
+ * `speakerNotes` is accepted and **renders nothing** — there is no presenter
+ * view in this package yet, and `SlideDeck` does not read it either. It exists
+ * so a deck can carry its notes with its content. Nothing in it reaches the
+ * audience, and nothing in it reaches the presenter either, for now.
+ */
 export const WithSpeakerNotes: Story = {
   args: {
     title: 'Adopt, do not manage',

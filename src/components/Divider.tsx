@@ -62,8 +62,37 @@ export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: DividerVariant;
   /** An explicit mark, overriding both the variant and the level. */
   pattern?: string;
+  /** Extra classes on the rule — vertical margin usually. */
+  className?: string;
 }
 
+/**
+ * A horizontal rule drawn in characters rather than pixels.
+ *
+ * The mark is not the same on every rung of the ladder. The dark rungs are a
+ * terminal, so the rule is `//====//`; the light rungs are paper, so it is a
+ * pencil dash. `auto` — the default — reads the current level's declared
+ * polarity and picks, which means a page that changes theme changes its rules
+ * with it and no call site has to know.
+ *
+ * Force a mark with `variant` only when the surrounding content is fixed in one
+ * idiom regardless of theme; `pattern` overrides both and is an escape hatch,
+ * not a styling channel.
+ *
+ * The glyph is real text rather than generated content, and it is
+ * `aria-hidden`: decoration a screen reader should not read out, but which is
+ * still selectable and searchable, which a `::after` would not be. It clips
+ * rather than ellipsising in a narrow container — an ellipsis on a rule reads
+ * as a broken string.
+ *
+ * `AsciiDivider` is a deprecated alias of this component and has no story of
+ * its own, deliberately: a story is a recommendation.
+ *
+ * ```tsx
+ * <Divider />
+ * <Divider variant="pencil" />
+ * ```
+ */
 export const Divider: React.FC<DividerProps> = ({
   variant = 'auto',
   pattern,

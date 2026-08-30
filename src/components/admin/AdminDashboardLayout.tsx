@@ -40,15 +40,47 @@ export const DEFAULT_ADMIN_STATUS: AdminStatusBadge[] = [
 ];
 
 export interface AdminDashboardLayoutProps {
+  /** Product name in the sidebar head. */
   appTitle?: string;
+  /** Sidebar navigation. Defaults to `DEFAULT_ADMIN_NAV`, which is this demo's own list. */
   navItems?: AdminNavItem[];
   /** Header status pills. Pass `[]` to render none. */
   statusBadges?: AdminStatusBadge[];
+  /**
+   * Which nav item reads as current, by `id`. The layout does no route
+   * matching — a host router decides what "current" means and passes it here.
+   */
   activeNavId?: string;
+  /**
+   * Called with a nav item's `id` on click. Without it the sidebar is a
+   * display: the layout holds no navigation state of its own.
+   */
   onNavSelect?: (id: string) => void;
+  /**
+   * Main-region content, replacing the built-in demo body. Everything else on
+   * the page — the stat row, the table, the status panel — is fixed, so this is
+   * the only region a consumer controls.
+   */
   children?: React.ReactNode;
 }
 
+/**
+ * A complete admin shell: sidebar navigation, top bar with theme control, stat
+ * row, data table and status panel.
+ *
+ * The same caveat as `SaasLandingPage` applies, and more sharply: this is one
+ * dashboard rather than a layout you compose into. Nav items, stats and status
+ * badges are props with defaults (`DEFAULT_ADMIN_NAV`, `DEFAULT_ADMIN_STATUS`),
+ * but the arrangement is fixed and the content regions are not slots. Treat it
+ * as the reference for what an admin surface should look like in this system,
+ * and as the thing to decompose when a real one is needed —
+ * `docs/surface-readiness.md` scores this surface at roughly 20% ready for
+ * exactly that reason.
+ *
+ * It reads the theme through `useTheme`, so it must be rendered inside a
+ * `ThemeProvider`; its stories each wrap it in one at a fixed level, which is
+ * also why the level is its axis of variation.
+ */
 export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
   appTitle = 'ADMIN CONSOLE',
   navItems = DEFAULT_ADMIN_NAV,

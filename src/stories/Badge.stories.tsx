@@ -11,6 +11,11 @@ const meta: Meta<typeof Badge> = {
 export default meta;
 type Story = StoryObj<typeof Badge>;
 
+/**
+ * The default accent is `primary`, so a badge written with no `accent` is a
+ * hierarchy statement rather than a neutral one. Reach for `quiet` when the
+ * pill is metadata the reader can skip.
+ */
 export const Default: Story = {
   args: { children: 'ACTIVE' },
 };

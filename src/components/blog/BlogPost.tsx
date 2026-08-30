@@ -6,15 +6,50 @@ import { Badge } from '../Badge';
 import { AsciiDivider } from '../AsciiDivider';
 
 export interface BlogPostProps {
+  /** Article title, rendered through `PageTitle`. */
   title: string;
+  /** Standfirst under the title. */
   subtitle?: string;
+  /** Byline. Defaults to `'Ryan Kelly'` — override it for a guest post. */
   author?: string;
+  /** Publication date, rendered as given. Format it at the call site. */
   date: string;
+  /**
+   * Reading time. Defaults to `'5 min read'`, which is a *placeholder rather
+   * than a measurement* — pass the real figure, because the default is
+   * confidently wrong for a long article.
+   */
   readingTime?: string;
+  /**
+   * Topic tags in the header. Also defaulted to a sample set
+   * (`Engineering`/`Design System`/`Architecture`), so an article that omits
+   * them silently claims three it may not have. Pass `[]` for none.
+   */
   tags?: string[];
+  /** The article body. Wrap Markdown output in `Prose`; bare tags are unstyled outside it. */
   children: React.ReactNode;
 }
 
+/**
+ * The editorial article shell: title, byline row, tags, rule, body.
+ *
+ * It composes `PageTitle`, `Badge` and `Divider` into the standard post header
+ * so every article on the site agrees about where the date sits. The body is
+ * yours — it applies no typography of its own, so Markdown output should be
+ * wrapped in `Prose` inside it.
+ *
+ * Note the two defaults that are content rather than configuration:
+ * `readingTime` and `tags` both have plausible-looking placeholder values, so a
+ * post that does not pass them renders a claim nobody made. Treat both as
+ * required in real use.
+ *
+ * ```tsx
+ * <BlogPost title="Where a theme stops applying" date="2026-08-11"
+ *           readingTime="9 min read" tags={['CSS', 'Design systems']}>
+ *   <Prose>{content}</Prose>
+ * </BlogPost>
+ * ```
+ */
 export const BlogPost: React.FC<BlogPostProps> = ({
   title,
   subtitle,

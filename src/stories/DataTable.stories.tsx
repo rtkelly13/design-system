@@ -43,6 +43,12 @@ const meta: Meta<typeof DataTable<Deployment>> = {
 export default meta;
 type Story = StoryObj<typeof DataTable<Deployment>>;
 
+/**
+ * String accessors, which is the whole API for a plain table. `keyExtractor` is
+ * required rather than defaulting to the row index — the index is available as
+ * its second argument, but making it the default is how a re-sorted table ends
+ * up reusing the wrong DOM node.
+ */
 export const Default: Story = {
   args: {
     data: rows,
@@ -72,6 +78,11 @@ export const WithRenderedCells: Story = {
   },
 };
 
+/**
+ * `emptyText` replaces the body when `data` is empty. Set it per table:
+ * "NO DEPLOYMENTS YET" tells the reader they are looking at an empty system,
+ * where the generic default leaves open whether the filter is too narrow.
+ */
 export const Empty: Story = {
   args: {
     data: [],

@@ -17,6 +17,11 @@ const meta: Meta<typeof Divider> = {
 export default meta;
 type Story = StoryObj<typeof Divider>;
 
+/**
+ * `auto`, the default: the mark follows the current level's polarity. Switch the
+ * toolbar between `midnight` and `bright` over this story and the rule changes
+ * from `//====//` to a pencil dash without the story changing.
+ */
 export const Default: Story = {};
 
 /**

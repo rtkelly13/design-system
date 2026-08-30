@@ -8,9 +8,15 @@ export interface Crumb {
 }
 
 export interface BreadcrumbsProps {
+  /**
+   * The trail, root first and current page last. Rendering nothing for an empty
+   * array is intentional — a one-item trail is noise, and a zero-item one is a
+   * bordered empty strip.
+   */
   items: readonly Crumb[];
   /** Separator glyph between crumbs. */
   separator?: string;
+  /** Extra classes on the `<nav>`. */
   className?: string;
 }
 

@@ -8,10 +8,16 @@ export interface DocsLayoutProps {
   sidebar?: ReactNode;
   /** Right rail. Normally a `TableOfContents`. Hidden below `xl`. */
   toc?: ReactNode;
+  /** The page body — normally a `Prose` scope holding the compiled MDX. */
   children: ReactNode;
   /** Mobile drawer state. Ignored at `lg` and up, where the rail is always shown. */
   sidebarOpen?: boolean;
+  /**
+   * Called when the mobile drawer asks to close — the scrim, or Escape. Paired
+   * with `sidebarOpen`; the layout holds no state of its own.
+   */
   onCloseSidebar?: () => void;
+  /** Extra classes on the layout's outermost element. */
   className?: string;
 }
 

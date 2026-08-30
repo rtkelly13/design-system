@@ -2,6 +2,12 @@ import { createContext, useContext } from 'react';
 import type { AnchorHTMLAttributes, ElementType, ReactNode } from 'react';
 
 export type DocsLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  /**
+   * Destination. Whether it routes through the host's link component or falls
+   * back to a plain `<a>` is decided by {@link isExternalHref}, not by the
+   * caller — an absolute URL, a mailto or a file download must not be handed to
+   * a client router.
+   */
   href: string;
 };
 

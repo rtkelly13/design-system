@@ -10,6 +10,11 @@ const meta: Meta<typeof Input> = {
 export default meta;
 type Story = StoryObj<typeof Input>;
 
+/**
+ * Label, control and helper text, wired together. The `id` comes from `useId`
+ * rather than a slug of the label, so two fields labelled the same way on one
+ * page still focus their own control.
+ */
 export const DefaultInput: Story = {
   args: {
     label: 'API Key',
@@ -19,6 +24,11 @@ export const DefaultInput: Story = {
   },
 };
 
+/**
+ * `error` replaces `helperText` rather than stacking under it, and turns the
+ * border to the danger role. One message at a time: the one telling the reader
+ * what to fix.
+ */
 export const InputWithError: Story = {
   args: {
     label: 'Workspace Domain',
@@ -28,6 +38,11 @@ export const InputWithError: Story = {
   },
 };
 
+/**
+ * The multi-line shape. Same label, error and helper contract as `Input` — the
+ * only difference is box padding instead of line padding, which is a variant of
+ * the shared recipe rather than a separate component.
+ */
 export const TextAreaStory: StoryObj<typeof TextArea> = {
   render: () => (
     <TextArea
@@ -38,6 +53,11 @@ export const TextAreaStory: StoryObj<typeof TextArea> = {
   ),
 };
 
+/**
+ * The choice shape, taking `options` as data rather than `<option>` children so
+ * a caller cannot style the list into something the native control will not
+ * render.
+ */
 export const SelectStory: StoryObj<typeof Select> = {
   render: () => (
     <Select

@@ -12,6 +12,10 @@ export interface DocsNavNode {
 }
 
 export interface DocsSidebarProps {
+  /**
+   * The navigation tree. A node with `items` is a group, a node with `href` is
+   * a link, and one with both is a group whose own page is reachable.
+   */
   nav: readonly DocsNavNode[];
   /** Current page path, matched against `href` to mark the active item. */
   currentPath?: string;
@@ -19,6 +23,7 @@ export interface DocsSidebarProps {
   label?: string | null;
   /** Called after any nav link is clicked — close the mobile drawer here. */
   onNavigate?: () => void;
+  /** Extra classes on the `<nav>`. */
   className?: string;
 }
 

@@ -35,6 +35,25 @@ export interface PageHeaderProps {
   className?: string;
 }
 
+/**
+ * The banded heading at the top of a section or an application page.
+ *
+ * Where `PageTitle` is a title in a double-ruled box, this is a full-width band
+ * on the raised surface carrying a title, an optional icon, a `>`-prompted
+ * strapline and a slot for badges or actions underneath. Use it for
+ * application and docs surfaces; use `PageTitle` for editorial ones.
+ *
+ * It renders an `<h1>` inside a `<header>`, so the same rule applies: one per
+ * page. `accent` colours the icon and the prompt glyph only — the title itself
+ * stays `--ds-text-primary`, which is what keeps the band readable when the
+ * accent is a low-contrast role like `quiet`.
+ *
+ * ```tsx
+ * <PageHeader title="Deployments" subtitle="Every build, newest first" icon={Rocket}>
+ *   <Badge accent="success">42 HEALTHY</Badge>
+ * </PageHeader>
+ * ```
+ */
 export function PageHeader({
   title,
   subtitle,

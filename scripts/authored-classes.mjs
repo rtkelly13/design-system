@@ -28,8 +28,25 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /** The stylesheets that may define a class. `theme.css` is variables. */
 const SHEETS = ['src/styles.css', 'src/prose.css', 'src/theme.css'];
 
+/**
+ * Real classes that no stylesheet here declares because a plugin generates them.
+ *
+ * The same exemption `check-css.mjs` keeps as `THIRD_PARTY`, for the same
+ * reason: we never write the rule, so deriving the name from our own CSS cannot
+ * find it. `not-prose` is `@tailwindcss/typography`'s own escape hatch — every
+ * selector the plugin generates excludes a `not-prose` subtree — and it is the
+ * documented way to nest chrome inside a `Prose` scope.
+ *
+ * It went unchecked until a story used it as a plain string: every existing
+ * call site spells it inside a template literal ending in `.trim()`, which is
+ * the one class-string shape `no-custom-classname` does not traverse (AGENTS.md
+ * § Styling Lives in TSX). Keep this list short, and add to it only for a class
+ * a dependency really does emit.
+ */
+const PLUGIN_CLASSES = ['not-prose'];
+
 export function authoredClasses() {
-  const found = new Set();
+  const found = new Set(PLUGIN_CLASSES);
 
   for (const sheet of SHEETS) {
     let css;

@@ -11,6 +11,7 @@ const meta: Meta<typeof NoteBlock> = {
 export default meta;
 type Story = StoryObj<typeof NoteBlock>;
 
+/** `note` — context the reader can skip without losing the thread. Info role. */
 export const Note: Story = {
   args: {
     type: 'note',
@@ -18,6 +19,7 @@ export const Note: Story = {
   },
 };
 
+/** `tip` — an optional advantage. Success role, so it reads as a good outcome rather than a requirement. */
 export const Tip: Story = {
   args: {
     type: 'tip',
@@ -25,6 +27,10 @@ export const Tip: Story = {
   },
 };
 
+/**
+ * `warning` — the strongest of the four, and it uses the **danger** role. Note
+ * that the names are not in the order they suggest: this outranks `important`.
+ */
 export const Warning: Story = {
   args: {
     type: 'warning',
@@ -32,6 +38,11 @@ export const Warning: Story = {
   },
 };
 
+/**
+ * `important` — something the reader must know, on the warning role. Also shows
+ * `title` overriding the default heading: the icon and colour do not change
+ * with it, so use it to say *what*, not to re-badge the severity.
+ */
 export const Important: Story = {
   args: {
     type: 'important',

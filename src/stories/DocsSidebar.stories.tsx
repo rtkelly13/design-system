@@ -40,10 +40,20 @@ export const Default: Story = {
   args: { nav, currentPath: '/docs/semantic-tokens' },
 };
 
+/**
+ * No `currentPath`. Nothing is marked active and only groups flagged
+ * `defaultCollapsed` are shut — the expansion state follows the active path, so
+ * without one the tree opens to its declared defaults.
+ */
 export const NothingActive: Story = {
   args: { nav },
 };
 
+/**
+ * `label={null}` removes the heading above the tree. Use it when the sidebar
+ * sits under a header that already names the section, so the page does not say
+ * "Documentation" twice.
+ */
 export const WithoutLabel: Story = {
   args: { nav, currentPath: '/docs/badge', label: null },
 };

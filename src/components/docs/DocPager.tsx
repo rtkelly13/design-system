@@ -2,13 +2,18 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { DocsLink } from './DocsLinkProvider';
 
 export interface DocPagerTarget {
+  /** The adjacent page's title — the thing a sequential reader is actually looking for. */
   label: string;
+  /** Its URL. Routed through `DocsLink`, so a host router handles it if one is provided. */
   href: string;
 }
 
 export interface DocPagerProps {
+  /** The previous page. Omit on the first page; the slot collapses to a spacer. */
   prev?: DocPagerTarget;
+  /** The next page. Omit on the last page. */
   next?: DocPagerTarget;
+  /** Extra classes on the `<nav>`. */
   className?: string;
 }
 

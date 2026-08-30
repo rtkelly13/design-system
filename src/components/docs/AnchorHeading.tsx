@@ -10,7 +10,17 @@ export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface AnchorHeadingProps
   extends Omit<HTMLAttributes<HTMLHeadingElement>, 'id'> {
+  /**
+   * Which heading tag to render, `1`–`6`. It is the real document level, not a
+   * size: the type scale follows from it, so do not pick `3` because `2` looks
+   * too large.
+   */
   level: HeadingLevel;
+  /**
+   * The heading text. When `id` is omitted this is also what the slug is
+   * derived from, so nodes that render no text (an icon alone) need an explicit
+   * `id`.
+   */
   children: ReactNode;
   /**
    * Explicit anchor id. Prefer passing this — build-time sluggers
@@ -27,6 +37,8 @@ export interface AnchorHeadingProps
    * without every heading restating it.
    */
   emphasis?: AccentToken;
+  /** Extra classes on the heading element itself. */
+  className?: string;
 }
 
 /**

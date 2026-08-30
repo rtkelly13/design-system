@@ -12,6 +12,10 @@ const meta: Meta<typeof BlogPost> = {
 export default meta;
 type Story = StoryObj<typeof BlogPost>;
 
+/**
+ * The minimum: a title, a date and a body. Everything else in the header came
+ * from a default, which is exactly the trap the third story documents.
+ */
 export const Default: Story = {
   args: {
     title: 'Where a theme stops applying',
@@ -25,6 +29,11 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Every field supplied, which is how a real post should call it. The body here
+ * is bare `<p>` elements — the shell applies no typography of its own, so
+ * Markdown output belongs inside a `Prose` scope within it.
+ */
 export const FullMetadata: Story = {
   args: {
     title: 'Where a theme stops applying',
@@ -38,6 +47,28 @@ export const FullMetadata: Story = {
         <p>Re-declaring the indirected tokens on the mode classes re-runs substitution at the panel.</p>
         <p>Without it, utilities resolve to whatever the root theme happened to compute.</p>
       </>
+    ),
+  },
+};
+
+/**
+ * The two content defaults made visible.
+ *
+ * `readingTime` and `tags` are both optional with plausible-looking defaults —
+ * `'5 min read'` and a three-tag sample set — so a post that omits them
+ * publishes a claim nobody made. This story passes neither, which is why the
+ * header reads as though it were measured. Treat both as required in real use;
+ * `tags={[]}` is how you say "none".
+ */
+export const DefaultsAreNotMeasurements: Story = {
+  args: {
+    title: 'A post that supplied no metadata',
+    date: '2026-08-30',
+    children: (
+      <p>
+        Everything in the header except the title and the date came from a default, including a
+        reading time that no one calculated and three topics this post is not about.
+      </p>
     ),
   },
 };

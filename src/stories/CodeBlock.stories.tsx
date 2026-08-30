@@ -11,6 +11,11 @@ const meta: Meta<typeof CodeBlock> = {
 export default meta;
 type Story = StoryObj<typeof CodeBlock>;
 
+/**
+ * The bare block. The copy control is always in the DOM and revealed on
+ * hover or focus rather than mounted on hover — a button that only exists while
+ * the pointer is over it cannot be reached by keyboard at all.
+ */
 export const Default: Story = {
   args: {
     children: `import { Badge } from '@rtkelly13/design-system';
@@ -19,6 +24,11 @@ export const Default: Story = {
   },
 };
 
+/**
+ * `title` and `language` add the header bar. Use `title` for the file a snippet
+ * comes from: a reader who cannot tell where to paste something has to guess,
+ * and the guess is usually wrong.
+ */
 export const WithTitleAndLanguage: Story = {
   args: {
     title: '.storybook/main.ts',

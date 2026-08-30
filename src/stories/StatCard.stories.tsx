@@ -11,6 +11,11 @@ const meta: Meta<typeof StatCard> = {
 export default meta;
 type Story = StoryObj<typeof StatCard>;
 
+/**
+ * The full set: figure, delta, context line, icon and accent. Note the two
+ * colour channels are independent — `accent` decides which card in a row the
+ * eye reaches first, `changeType` decides whether the movement reads as good.
+ */
 export const SystemHealth: Story = {
   args: {
     title: 'SYSTEM HEALTH',
@@ -23,6 +28,12 @@ export const SystemHealth: Story = {
   },
 };
 
+/**
+ * Why `changeType` is explicit rather than inferred. The delta here is
+ * *negative* — `-3.1 ms` — and it is good news, so it renders in the success
+ * colour. A component that read the sign would get every latency and error-rate
+ * card backwards.
+ */
 export const ComputeLatency: Story = {
   args: {
     title: 'COMPUTE LATENCY',
@@ -35,6 +46,10 @@ export const ComputeLatency: Story = {
   },
 };
 
+/**
+ * `change` is a string, not a number, so a card can report a verdict rather
+ * than a delta. `subtitle` carries the evidence for it.
+ */
 export const SecurityAudit: Story = {
   args: {
     title: 'SECURITY AUDIT',

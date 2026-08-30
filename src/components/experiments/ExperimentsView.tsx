@@ -57,9 +57,29 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
 ];
 
 export interface ExperimentsViewProps {
+  /**
+   * Called with the experiment's `id` when a card is chosen. The only input the
+   * component takes — omit it and the grid is a read-only display.
+   */
   onSelectExperiment?: (id: string) => void;
 }
 
+/**
+ * The experiments index: a grid of cards, one per experiment, each with a
+ * status badge and a component count.
+ *
+ * The catalogue is **fixed**. `DEFAULT_EXPERIMENTS` is exported, but the
+ * component does not accept it as a prop — it renders that array and no other,
+ * so this is *this site's* experiments index rather than a reusable one.
+ * `onSelectExperiment` is the whole API: without it the cards are inert; with
+ * it they become the navigation for a showcase section. Taking the catalogue as
+ * a prop is the obvious next change, and until then a consumer wanting their
+ * own list should copy the composition rather than import this.
+ *
+ * `status` on an item is the only place the component uses colour to mean
+ * something — `active`, `experimental`, `archived` — so it reads from the
+ * intent roles rather than from a per-card accent.
+ */
 export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperiment }) => {
   return (
     <div

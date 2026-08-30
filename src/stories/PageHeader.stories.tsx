@@ -13,10 +13,20 @@ const meta: Meta<typeof PageHeader> = {
 export default meta;
 type Story = StoryObj<typeof PageHeader>;
 
+/**
+ * Title only. The band is `bg-surface-raised` rather than the page ground,
+ * which is what separates it from the content below without a rule.
+ */
 export const Default: Story = {
   args: { title: 'Deployments' },
 };
 
+/**
+ * `subtitle` renders after a `>` prompt glyph in the accent colour — the one
+ * terminal device in this component. The title itself stays
+ * `--ds-text-primary`, which keeps the band readable when `accent` is a
+ * low-contrast role like `quiet`.
+ */
 export const WithSubtitle: Story = {
   args: {
     title: 'Deployments',

@@ -5,6 +5,7 @@ import { ThemeProvider } from '../components/ThemeProvider';
 
 const meta: Meta<typeof SaasLandingPage> = {
   title: 'SaaS/LandingPage',
+  tags: ['autodocs'],
   component: SaasLandingPage,
   parameters: {
     layout: 'fullscreen',
@@ -14,6 +15,11 @@ const meta: Meta<typeof SaasLandingPage> = {
 export default meta;
 type Story = StoryObj<typeof SaasLandingPage>;
 
+/**
+ * `midnight`. As with the admin shell, the theme level is this page's only real
+ * axis — the section order is fixed and the copy comes from props with working
+ * defaults, so what varies between useful versions of it is the rung.
+ */
 export const DarkMode: Story = {
   render: () => (
     <ThemeProvider defaultLevel="midnight" persist={false} followSystem={false}>
@@ -45,6 +51,11 @@ export const DimMode: Story = {
   ),
 };
 
+/**
+ * `bright`. Worth checking a marketing page at the light end specifically: the
+ * hero and the pricing tiers lean hardest on accent fills, which is where a
+ * contrast problem shows up first.
+ */
 export const LiteMode: Story = {
   render: () => (
     <ThemeProvider defaultLevel="bright" scoped persist={false} followSystem={false} className="min-h-screen bg-surface-base text-content-primary">

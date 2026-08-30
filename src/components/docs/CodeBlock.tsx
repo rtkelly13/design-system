@@ -4,6 +4,11 @@ import { Check, Copy } from 'lucide-react';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 
 export interface CodeBlockProps extends HTMLAttributes<HTMLPreElement> {
+  /**
+   * The code. Copied verbatim from the rendered `<pre>` via `innerText`, so
+   * whatever is here is what lands in the reader's clipboard — including
+   * leading indentation, which is worth trimming at the call site.
+   */
   children: ReactNode;
   /** Filename or caption shown in the header bar. */
   title?: string;
@@ -11,6 +16,8 @@ export interface CodeBlockProps extends HTMLAttributes<HTMLPreElement> {
   language?: string;
   /** Hide the copy button (e.g. for output-only samples). */
   copyable?: boolean;
+  /** Extra classes on the wrapper, not the `<pre>`. */
+  className?: string;
 }
 
 /**

@@ -33,6 +33,11 @@ export const WithUnlinkedGroup: Story = {
   },
 };
 
+/**
+ * `separator` is the glyph between crumbs. It is decoration only — the trail is
+ * an ordered list and the final crumb is `aria-current`, so a screen reader
+ * reads the structure whatever character is set here.
+ */
 export const CustomSeparator: Story = {
   args: {
     separator: '/',

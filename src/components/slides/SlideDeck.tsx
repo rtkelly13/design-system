@@ -3,11 +3,42 @@ import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Play, Pause } from 'lu
 import { Button } from '../Button';
 
 export interface SlideDeckProps {
+  /**
+   * The slides, as an **array of elements** — normally `Slide`s. Typed as an
+   * array rather than `ReactNode` on purpose: the deck counts and indexes its
+   * children, so a single child or a fragment breaks the count.
+   */
   children: React.ReactElement[];
+  /** Frame shape. `16:9` for anything shown on a modern display; `4:3` for print or legacy projectors. */
   aspectRatio?: '16:9' | '4:3';
+  /**
+   * Milliseconds between automatic advances. `0` — the default — disables
+   * autoplay and hides nothing: the play control is still there, so a reader
+   * can start it themselves. Non-zero starts the deck advancing on its own,
+   * which is right for a kiosk and wrong for a talk.
+   */
   autoPlayInterval?: number;
 }
 
+/**
+ * The presentation shell around a set of `Slide`s: framing, paging, fullscreen
+ * and optional autoplay.
+ *
+ * It owns the aspect ratio so slides do not have to, wraps at both ends (next
+ * from the last slide returns to the first), and exposes fullscreen through the
+ * Fullscreen API on its own container rather than the document — so a deck
+ * embedded in a page goes fullscreen without taking the page with it.
+ *
+ * Slides are indexed by position, so the children must be a stable array. A
+ * conditional slide that disappears shifts every index after it.
+ *
+ * ```tsx
+ * <SlideDeck aspectRatio="16:9">
+ *   <Slide title="Overview">…</Slide>
+ *   <Slide title="Deployments">…</Slide>
+ * </SlideDeck>
+ * ```
+ */
 export const SlideDeck: React.FC<SlideDeckProps> = ({
   children,
   aspectRatio = '16:9',

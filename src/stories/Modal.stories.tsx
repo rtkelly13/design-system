@@ -23,6 +23,12 @@ export const Open: Story = {
   },
 };
 
+/**
+ * `footer` is the action row. The confirming action goes last, matching the
+ * platform convention the rest of the page follows — and a destructive one is
+ * worth pairing with `closeOnBackdropClick={false}` so a stray click outside
+ * cannot dismiss the decision.
+ */
 export const WithFooter: Story = {
   args: {
     isOpen: true,
