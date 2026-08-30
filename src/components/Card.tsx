@@ -6,10 +6,19 @@ import type { AccentToken } from '../lib/theme';
 /** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
 export type CardAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
+/**
+ * The two shapes a `Card` renders.
+ *
+ * `panel` is the general container — border, padding, optional accent stripe.
+ * `card` is the blog/project card: a filename bar, an optional cover image and
+ * a `[ Learn More → ]` footer, carrying its own width and float classes.
+ */
+export type CardVariant = 'panel' | 'card';
+
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   /**
-   * Card heading. Its presence is what selects the full card form over the
-   * panel form — see the note on `panel`.
+   * Card heading. With no `variant` set, its presence is also what selects the
+   * full card form over the panel form — see the note on `variant`.
    */
   title?: string;
   /** Supporting line under the title. Body face in the full form, mono in a panel. */
@@ -37,40 +46,54 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   /** Badge text shown in the card header */
   badge?: string;
   /**
-   * Render the plain panel — padding, border, accent stripe, no filename bar
-   * and no width constraint.
+   * Render the plain panel.
    *
-   * Worth reading before relying on the default: the panel form is also chosen
-   * *implicitly* when there is no `title` but there are `children`. So a card
-   * given a title later silently changes shape. Pass `panel` explicitly
-   * whichever form you want, and the choice stops being incidental.
+   * @deprecated Use `variant="panel"`. This is kept because it is what existing
+   * call sites pass, and `variant` takes precedence over it.
    */
   panel?: boolean;
+  /**
+   * Which of the component's two forms to render.
+   *
+   * Setting it is the whole point: with `variant` omitted the form is
+   * *inferred* — panel when there is no `title`, full card otherwise — so a
+   * panel that later gains a title silently becomes a floated blog card with a
+   * filename bar. Nothing in the diff that adds the title says so.
+   *
+   * Omitting it keeps that inference exactly as it was, for the call sites that
+   * already rely on it. New code should say which form it wants.
+   */
+  variant?: CardVariant;
 }
 
 /**
  * A bordered container, in two forms.
  *
- * **Panel** (`panel`) is the general one: border, 1.5rem of padding, an
+ * **`variant="panel"`** is the general one: border, 1.5rem of padding, an
  * optional accent stripe down the left edge, and whatever you put in it. Reach
  * for this unless you specifically want the other.
  *
- * **Full card** (pass a `title`) is the blog/project card — a filename bar
- * across the top reading `some_title.md`, an optional cover image, then title,
- * description and a `[ Learn More → ]` link. It is opinionated on purpose and
- * carries its own width and float classes, so it belongs in a card grid rather
- * than as a general-purpose box.
+ * **`variant="card"`** is the blog/project card — a filename bar across the top
+ * reading `some_title.md`, an optional cover image, then title, description and
+ * a `[ Learn More → ]` link. It is opinionated on purpose and carries its own
+ * width and float classes, so it belongs in a card grid rather than as a
+ * general-purpose box.
+ *
+ * **Say which one you want.** With `variant` omitted the form is inferred from
+ * whether a `title` is present, which means adding a title to a panel silently
+ * turns it into a floated blog card. The inference is kept for the call sites
+ * that predate `variant`; new code should not rely on it.
  *
  * The accent is a *stripe*, not a fill: `accent` thickens the left border to
  * 4px and colours it. That is the whole colour budget of the component, which
  * is why a card conveys category rather than status.
  *
  * ```tsx
- * <Card panel accent="info" badge="DRAFT">
+ * <Card variant="panel" accent="info" badge="DRAFT">
  *   <p>Anything.</p>
  * </Card>
  *
- * <Card title="Where a theme stops applying" description="…" href="/posts/theme" />
+ * <Card variant="card" title="Where a theme stops applying" href="/posts/theme" />
  * ```
  */
 export function Card({
@@ -85,10 +108,21 @@ export function Card({
   accent,
   badge,
   panel = false,
+  variant,
   style,
   ...props
 }: CardProps) {
   const accentColor = accent ? accentVar(accent) : undefined;
+
+  /**
+   * An explicit `variant` decides; otherwise fall back to the historical
+   * inference, unchanged, so nothing that renders today renders differently.
+   *
+   * Written as one resolved value rather than left inline in the branch below,
+   * because the inference is the part worth being able to point at — and worth
+   * being able to delete in one place when it goes in a major.
+   */
+  const form: CardVariant = variant ?? (panel || (!title && children) ? 'panel' : 'card');
 
   const baseCardStyle: CSSProperties = {
     backgroundColor: semanticTokens.surface.base,
@@ -100,7 +134,7 @@ export function Card({
   };
 
   // Simple panel mode: no filename header, no width constraints
-  if (panel || (!title && children)) {
+  if (form === 'panel') {
     return (
       <div
         className={cn(className)}
