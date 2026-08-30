@@ -65,6 +65,14 @@ function levelVariables(definition) {
   for (const [key, value] of Object.entries(definition.border)) push(`border-${key}`, value);
   for (const [key, value] of Object.entries(definition.accent)) push(`accent-${key}`, value);
   for (const [key, value] of Object.entries(definition.intent)) push(`intent-${key}`, value);
+  for (const [key, value] of Object.entries(definition.syntax)) push(`syntax-${key}`, value);
+  // Emphasis is sparse by design — a role with no entry renders at the body
+  // weight, upright, so emitting a default for it would be noise in every
+  // level block. Consumers read these with a fallback: var(--ds-syntax-keyword-weight, 400).
+  for (const [key, value] of Object.entries(definition.syntaxEmphasis)) {
+    if (value.weight !== undefined) push(`syntax-${key}-weight`, String(value.weight));
+    if (value.italic) push(`syntax-${key}-style`, 'italic');
+  }
   push('shadow-color', definition.shadow);
   push('polarity', definition.polarity);
 

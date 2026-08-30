@@ -39,6 +39,39 @@ export type TextTone = 'primary' | 'secondary' | 'muted' | 'inverse';
 export type BorderTone = 'strong' | 'default' | 'subtle';
 
 /**
+ * A token role in rendered source code.
+ *
+ * Deliberately eight coarse roles rather than a grammar's full scope list. A
+ * TextMate theme distinguishes `storage.modifier` from `keyword.control`; a
+ * reader distinguishes neither at a glance, and every extra role costs
+ * luminance range that {@link ../theme/separation} shows is already scarce.
+ */
+export type SyntaxRole =
+  | 'keyword'
+  | 'string'
+  | 'number'
+  | 'function'
+  | 'type'
+  | 'variable'
+  | 'comment'
+  | 'punctuation';
+
+/**
+ * The non-colour half of a syntax role.
+ *
+ * The light rungs need it. WCAG AA pins every colour into one luminance band
+ * relative to the ground, and that band is narrower on paper than on black —
+ * 117 steps against `white` versus 132 against `midnight`. Weight and slant are
+ * a second axis that does not consume any of it. Solarized Light and GitHub
+ * Light both lean on this; here it is a declared consequence rather than a
+ * habit.
+ */
+export interface SyntaxEmphasis {
+  readonly weight?: 400 | 500 | 600 | 700;
+  readonly italic?: boolean;
+}
+
+/**
  * Palette names accepted by components predating the semantic layer.
  *
  * @deprecated Pass an {@link Emphasis} or {@link Intent} instead. These remain
