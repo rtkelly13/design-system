@@ -5,14 +5,27 @@ import { Card } from '../Card';
 import { Badge } from '../Badge';
 
 export interface ExperimentItem {
+  /** Stable identifier, handed back by `onSelectExperiment`. */
   id: string;
+  /** Card heading, uppercased by the type scale. */
   name: string;
+  /** One line under the heading saying what the experiment explores. */
   description: string;
+  /** Leading glyph. A node rather than a component type, so it can carry its own size. */
   icon?: React.ReactNode;
+  /** Lifecycle state, shown as a badge. */
   status: 'active' | 'archived' | 'experimental';
+  /** How many primitives the experiment exercises, shown in the footer line. */
   componentCount: number;
 }
 
+/**
+ * The catalogue `ExperimentsView` falls back to — ryankelly.dev's own.
+ *
+ * Exported so a consumer can spread it, slice it or use it as the shape of
+ * their own list. Until #95 it was exported and *not* accepted as a prop, so
+ * the name promised a fallback the component had no way to take.
+ */
 export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
   {
     id: 'component-library',
@@ -58,8 +71,15 @@ export const DEFAULT_EXPERIMENTS: ExperimentItem[] = [
 
 export interface ExperimentsViewProps {
   /**
-   * Called with the experiment's `id` when a card is chosen. The only input the
-   * component takes — omit it and the grid is a read-only display.
+   * The catalogue to render, in display order. Defaults to
+   * {@link DEFAULT_EXPERIMENTS}, which is *this site's* list rather than a
+   * neutral one — pass your own to use this anywhere else.
+   */
+  experiments?: readonly ExperimentItem[];
+  /**
+   * Called with the experiment's `id` when a card is chosen. Omit it and the
+   * grid is a read-only display: the cards lose their pointer cursor and do
+   * nothing when clicked.
    */
   onSelectExperiment?: (id: string) => void;
 }
@@ -68,19 +88,20 @@ export interface ExperimentsViewProps {
  * The experiments index: a grid of cards, one per experiment, each with a
  * status badge and a component count.
  *
- * The catalogue is **fixed**. `DEFAULT_EXPERIMENTS` is exported, but the
- * component does not accept it as a prop — it renders that array and no other,
- * so this is *this site's* experiments index rather than a reusable one.
- * `onSelectExperiment` is the whole API: without it the cards are inert; with
- * it they become the navigation for a showcase section. Taking the catalogue as
- * a prop is the obvious next change, and until then a consumer wanting their
- * own list should copy the composition rather than import this.
+ * Pass `experiments` to supply the catalogue; it defaults to
+ * {@link DEFAULT_EXPERIMENTS}, which is this site's own list and is exported so
+ * a consumer can extend it rather than start from nothing.
+ * `onSelectExperiment` turns the cards into navigation — without it the grid is
+ * a read-only display.
  *
  * `status` on an item is the only place the component uses colour to mean
  * something — `active`, `experimental`, `archived` — so it reads from the
  * intent roles rather than from a per-card accent.
  */
-export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperiment }) => {
+export const ExperimentsView: React.FC<ExperimentsViewProps> = ({
+  experiments = DEFAULT_EXPERIMENTS,
+  onSelectExperiment,
+}) => {
   return (
     <div
       style={{
@@ -98,7 +119,7 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperi
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '2rem' }}>
-        {DEFAULT_EXPERIMENTS.map((exp) => (
+        {experiments.map((exp) => (
           <div
             key={exp.id}
             onClick={() => onSelectExperiment && onSelectExperiment(exp.id)}
