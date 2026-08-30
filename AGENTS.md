@@ -671,6 +671,29 @@ The path is relative to the **served directory**, not the repo root. Do not drop
 the `--config` flag.
 
 
+## 🖼️ Third-Party Reference Material
+
+`reference/bookofshapes/` holds a local, **gitignored** copy of the 57 SVG patterns from
+[bookofshapes.com](https://bookofshapes.com/) (Nikolaj Sokolowski), kept as inspiration
+for background and geometric-pattern work.
+
+1. **Reference only — not shippable.** The source site publishes **no licence**, so the
+   artwork is all rights reserved. Nothing in `reference/bookofshapes/svg/` may be
+   committed, bundled, or shipped in `src/`, and attribution alone does not make it
+   permissible. Ask the author first (`nikolaj@creasurf.net`).
+2. **Keep the ignore rule.** `.gitignore` excludes `reference/bookofshapes/svg/`; never
+   remove it. `manifest.json` and `ATTRIBUTION.md` are the committed catalogue, and stay
+   browsable without the artwork present.
+3. **Nothing here reaches the dependency or licence gates.** No package is added and no
+   third-party file is committed, so `check:licenses` has nothing to see — which is
+   precisely the point of keeping the artwork out of the tree.
+4. **Repopulate with `python3 reference/bookofshapes/fetch.py`** — stdlib only, rate
+   limited, and it must never touch the site's `/api/` path (robots-disallowed).
+5. **Read `reference/bookofshapes/README.md` before using any of it.** It covers the
+   licensing position and the `--fill-color` / `--stroke-color` / `--background-color` /
+   `--occlusion-color` theming contract worth adopting for our own generated patterns.
+
+
 ## 🛑 Repository Conventions & Workflow Policy
 
 1. **Squash Merge Only**: All pull requests must be merged into `main` using **Squash and Merge** exclusively.
