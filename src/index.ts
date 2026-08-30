@@ -6,6 +6,10 @@ export * from './tokens';
 // contrast arithmetic that gates them.
 export * from './theme/levels';
 export * from './theme/contrast';
+// The separation gate travels with the contrast gate: `auditSeparation` takes
+// the ladder as an argument precisely so a consumer can audit their own
+// overrides, which is only true if they can reach it.
+export * from './theme/separation';
 
 // Semantic theming — prefer these over the raw palette in `tokens`.
 export * from './lib/theme';

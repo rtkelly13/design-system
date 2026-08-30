@@ -80,6 +80,18 @@ The list is in `ADJACENT_PAIRS` with the distribution in its doc comment. If the
 corpus changes shape — a language with different punctuation density — remeasure
 rather than guess.
 
+### The corpus is five TypeScript files, and that is a limit worth stating
+
+`punctuation · variable` at 51.9% is a property of TypeScript, not of source
+code. Markdown, YAML, shell and SQL have different punctuation densities and
+different hot pairs, and this ladder ships to a blog whose fenced blocks are in
+several of them.
+
+Nothing measured here is wrong; it is narrower than "real files" suggests. The
+distribution should be remeasured across a wider corpus before `ADJACENT_PAIRS`
+is treated as settled — and before anything is generated from it for an editor,
+where the languages a reader opens are not the ones this package is written in.
+
 ## 4. Hand-picking does not converge; solve it
 
 Six attempts failed. A trivial backtracking search over per-role candidate

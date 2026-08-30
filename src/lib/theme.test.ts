@@ -6,6 +6,10 @@ import {
   HEADING_EMPHASIS,
   semanticTokens,
   surfaceVar,
+  SYNTAX_ROLES,
+  syntaxStyleVar,
+  syntaxVar,
+  syntaxWeightVar,
   textVar,
   type Emphasis,
   type Intent,
@@ -143,6 +147,7 @@ describe('semanticTokens', () => {
       'intent',
       'shadowColor',
       'surface',
+      'syntax',
       'text',
     ]);
   });
@@ -153,6 +158,7 @@ describe('semanticTokens', () => {
     expect(semanticTokens.surface.raised).toBe(surfaceVar('raised'));
     expect(semanticTokens.text.muted).toBe(textVar('muted'));
     expect(semanticTokens.border.subtle).toBe(borderVar('subtle'));
+    expect(semanticTokens.syntax.keyword).toBe(syntaxVar('keyword'));
     expect(semanticTokens.font).toBe(fontVar);
   });
 
@@ -166,6 +172,7 @@ describe('semanticTokens', () => {
       ...Object.values(semanticTokens.surface),
       ...Object.values(semanticTokens.text),
       ...Object.values(semanticTokens.border),
+      ...Object.values(semanticTokens.syntax),
       ...Object.values(semanticTokens.font),
       semanticTokens.shadowColor,
     ];
@@ -174,6 +181,41 @@ describe('semanticTokens', () => {
     for (const value of values) {
       expect(value).toMatch(/^var\(--ds-[a-z-]+\)$/);
       expect(value).not.toMatch(/#[0-9a-fA-F]{3,8}|rgba?\(|brutalist-/);
+    }
+  });
+});
+
+describe('the syntax accessors', () => {
+  it('lists every role exactly once', () => {
+    expect([...SYNTAX_ROLES].sort()).toEqual([
+      'comment',
+      'function',
+      'keyword',
+      'number',
+      'punctuation',
+      'string',
+      'type',
+      'variable',
+    ]);
+    expect(new Set(SYNTAX_ROLES).size).toBe(SYNTAX_ROLES.length);
+  });
+
+  it('resolves every role to its own variable', () => {
+    for (const role of SYNTAX_ROLES) {
+      expect(syntaxVar(role)).toBe(`var(--ds-syntax-${role})`);
+    }
+  });
+
+  // The reason these two functions exist rather than being written inline at
+  // the call site. `syntaxEmphasis` is partial, so the variable is absent on
+  // most role/level combinations — and a custom property that resolves to
+  // nothing makes the declaration invalid and drops it, which renders a wrong
+  // weight silently rather than failing. A fallback is not optional here, so it
+  // is not left to the caller.
+  it('carries a fallback, because the emphasis layer is sparse', () => {
+    for (const role of SYNTAX_ROLES) {
+      expect(syntaxWeightVar(role)).toBe(`var(--ds-syntax-${role}-weight, 400)`);
+      expect(syntaxStyleVar(role)).toBe(`var(--ds-syntax-${role}-style, normal)`);
     }
   });
 });

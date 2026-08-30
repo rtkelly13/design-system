@@ -31,6 +31,7 @@ Package manager is **pnpm** (`node >=22`).
    forever on a check that no longer reports:
    - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
    - `pnpm check:contrast` (every role pair, every level)
+   - `pnpm check:separation` (adjacent syntax roles, every level)
    - `pnpm lint` (colour-instead-of-role, reported at the site)
    - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm check:deps` (dependency reasons, sections and usage)
@@ -279,7 +280,7 @@ Four rules follow from that, and they are what keep four levels maintainable:
    `dark:` now means "midnight or dim" and is only for non-colour utilities.
 4. **Every level colour is a literal.** No `color-mix` derivation, because percentages tuned
    against near-black do not hold at the light end — and because literals make
-   `pnpm check:contrast` able to audit all 200 role pairs without a browser.
+   `pnpm check:contrast` able to audit all 296 role pairs without a browser.
 
 Selection is `data-theme="<level>"` on the root (the level class is mirrored for consumers
 whose own CSS selects on it). `<ThemeProvider scoped>` themes a subtree instead — a `bright`
@@ -339,6 +340,8 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm tokens:check`: Fails if the generated CSS is stale. Runs in CI.
 - `pnpm check:contrast`: Audits every role pair on every level. Runs in CI.
 - `pnpm contrast:report`: Prints the full matrix with margins, worst first.
+- `pnpm check:separation`: Asserts adjacent syntax roles are far enough apart in luma. Runs in CI.
+- `pnpm separation:report`: Prints every adjacent pair per level, tightest first.
 - `pnpm lint`: Reports a colour written as a literal at the line that wrote it. Runs in CI.
 - `pnpm lint:fix`: Same, applying any autofixes.
 - `pnpm check:css`: Ratchet on styling that lives in a stylesheet. Runs in CI.
@@ -557,7 +560,7 @@ trigger is the post-merge signal for the default branch specifically.
 
 | Job | What it runs | Roughly | Ceiling |
 | --- | --- | --- | --- |
-| `gates` | `tokens:check`, `check:contrast`, `lint`, `check:css`, `check:fonts`, `check:deps` | 30s | 10m |
+| `gates` | `tokens:check`, `check:contrast`, `check:separation`, `lint`, `check:css`, `check:fonts`, `check:deps` | 30s | 10m |
 | `unit` | `typecheck`, `test`, `build` | 35s | 10m |
 | `visual` | `build-storybook`, `check:visual-coverage`, `test:visual` | 60s | 25m |
 | `verify` | nothing — fails unless the three above succeeded | 10s | 5m |
