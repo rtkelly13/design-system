@@ -1,4 +1,6 @@
 import React from 'react';
+import { accentVar } from '../lib/theme';
+import type { AccentToken } from '../lib/theme';
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Image URL. Omit it and the `fallback` initials render instead. */
@@ -20,13 +22,13 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Colour of the offset shadow and of the fallback initials.
    *
-   * This one prop still takes the *legacy palette names* rather than the
-   * `AccentToken` roles the rest of the package moved to — the values it
-   * resolves to are the semantic variables (`cyan` is `--ds-accent-primary`),
-   * so it rethemes correctly, but the vocabulary is the old one. Widening it to
-   * `AccentToken` is tracked in `docs/story-documentation.md`.
+   * Accepts an `Emphasis` (`primary`…`quiet`) or an `Intent`
+   * (`info`/`success`/`warning`/`danger`); the legacy hue names still resolve to
+   * the same values. It is *identity*, not status — pick one per person or per
+   * source and keep it stable, because an avatar that changes colour reads as a
+   * different person.
    */
-  accent?: 'cyan' | 'pink' | 'yellow' | 'green';
+  accent?: AccentToken;
   /** Extra classes on the chip. The box size comes from `size`, not from here. */
   className?: string;
 }
@@ -53,7 +55,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   alt = 'Avatar',
   fallback = 'RK',
   size = 'md',
-  accent = 'cyan',
+  accent = 'primary',
   className = '',
   style,
   ...props
@@ -66,17 +68,13 @@ export const Avatar: React.FC<AvatarProps> = ({
     }
   };
 
-  const getAccentColor = () => {
-    switch (accent) {
-      case 'pink': return 'var(--ds-accent-tertiary)';
-      case 'yellow': return 'var(--ds-accent-secondary)';
-      case 'green': return 'var(--ds-intent-success)';
-      default: return 'var(--ds-accent-primary)';
-    }
-  };
-
   const sizePx = getSizePx();
-  const accentColor = getAccentColor();
+  // `accentVar` is the package's shared resolver: it covers the emphasis roles,
+  // the intent roles and the legacy hue names in one place, and degrades to the
+  // primary accent on an unknown token rather than emitting `color: undefined`.
+  // The switch it replaced knew only the four hues and silently made anything
+  // else primary — including every intent role.
+  const accentColor = accentVar(accent);
 
   return (
     <div

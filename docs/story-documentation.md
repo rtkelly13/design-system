@@ -195,7 +195,7 @@ stacked on this branch. A row struck through has landed.
 | What | Where | Why it was not fixed here |
 | --- | --- | --- |
 | `Button`'s `variant` names are hues (`cyan`, `pink`) for props that resolve to roles | `Button.tsx` | Renaming is a breaking API change; deliberately not bundled with the token migration. |
-| `Avatar.accent` still takes only the four legacy palette names, not `AccentToken` | `Avatar.tsx` | Widening it is a small, non-breaking change and a better fit for its own PR. |
+| ~~`Avatar.accent` still takes only the four legacy palette names, not `AccentToken`~~ | `Avatar.tsx` | **Fixed** — [#91](https://github.com/rtkelly13/design-system/issues/91). |
 | `Card`'s form is chosen implicitly by the presence of `title` | `Card.tsx` | Changing the default is breaking. Documented as a trap and `panel` recommended explicitly. |
 | `BlogPost` defaults `readingTime` to `'5 min read'` and `tags` to a three-item sample | `BlogPost.tsx` | These are *content* defaults that publish claims nobody made. Making them required is breaking. |
 | `Slide.speakerNotes` is accepted and rendered nowhere | `slides/Slide.tsx` | There is no presenter view yet. Documented as such rather than removed. |
