@@ -15,16 +15,12 @@ export interface BlogPostProps {
   /** Publication date, rendered as given. Format it at the call site. */
   date: string;
   /**
-   * Reading time. Defaults to `'5 min read'`, which is a *placeholder rather
-   * than a measurement* — pass the real figure, because the default is
-   * confidently wrong for a long article.
+   * Reading time, e.g. `'9 min read'`. Omitted from the byline row when not
+   * supplied — there is no default, because a reading time nobody measured is
+   * worse than no reading time at all.
    */
   readingTime?: string;
-  /**
-   * Topic tags in the header. Also defaulted to a sample set
-   * (`Engineering`/`Design System`/`Architecture`), so an article that omits
-   * them silently claims three it may not have. Pass `[]` for none.
-   */
+  /** Topic tags in the header. Omitted entirely when not supplied or empty. */
   tags?: string[];
   /** The article body. Wrap Markdown output in `Prose`; bare tags are unstyled outside it. */
   children: React.ReactNode;
@@ -38,10 +34,15 @@ export interface BlogPostProps {
  * yours — it applies no typography of its own, so Markdown output should be
  * wrapped in `Prose` inside it.
  *
- * Note the two defaults that are content rather than configuration:
- * `readingTime` and `tags` both have plausible-looking placeholder values, so a
- * post that does not pass them renders a claim nobody made. Treat both as
- * required in real use.
+ * `readingTime` and `tags` have no defaults, and that is deliberate: they are
+ * content, not configuration, so inventing them would publish a claim nobody
+ * made — a nine-thousand-word article confidently advertising "5 min read".
+ * Each is simply omitted from the header when absent.
+ *
+ * `author` *does* default, to `'Ryan Kelly'`. That is defensible where the
+ * other two are not: the byline of a personal site is the same on almost every
+ * post, where a reading time and a topic list differ on all of them. Override
+ * it for a guest post.
  *
  * ```tsx
  * <BlogPost title="Where a theme stops applying" date="2026-08-11"
@@ -55,8 +56,8 @@ export const BlogPost: React.FC<BlogPostProps> = ({
   subtitle,
   author = 'Ryan Kelly',
   date,
-  readingTime = '5 min read',
-  tags = ['Engineering', 'Design System', 'Architecture'],
+  readingTime,
+  tags,
   children,
 }) => {
   return (
@@ -99,18 +100,22 @@ export const BlogPost: React.FC<BlogPostProps> = ({
             <span>{date}</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Clock size={15} />
-            <span>{readingTime}</span>
-          </div>
+          {readingTime && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Clock size={15} />
+              <span>{readingTime}</span>
+            </div>
+          )}
 
-          <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
-            {tags.map((t) => (
-              <Badge key={t} accent="cyan">
-                #{t}
-              </Badge>
-            ))}
-          </div>
+          {tags && tags.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
+              {tags.map((t) => (
+                <Badge key={t} accent="cyan">
+                  #{t}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </header>
 

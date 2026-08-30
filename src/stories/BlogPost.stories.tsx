@@ -13,8 +13,9 @@ export default meta;
 type Story = StoryObj<typeof BlogPost>;
 
 /**
- * The minimum: a title, a date and a body. Everything else in the header came
- * from a default, which is exactly the trap the third story documents.
+ * The minimum: a title, a date and a body. The byline row carries the author
+ * and the date and nothing else — no reading time, no tags — because neither
+ * was supplied and neither is invented.
  */
 export const Default: Story = {
   args: {
@@ -52,22 +53,23 @@ export const FullMetadata: Story = {
 };
 
 /**
- * The two content defaults made visible.
+ * Partial metadata: tags but no reading time.
  *
- * `readingTime` and `tags` are both optional with plausible-looking defaults —
- * `'5 min read'` and a three-tag sample set — so a post that omits them
- * publishes a claim nobody made. This story passes neither, which is why the
- * header reads as though it were measured. Treat both as required in real use;
- * `tags={[]}` is how you say "none".
+ * The two are independent, and each simply disappears when absent. Until #93
+ * they did not — a post omitting them rendered `5 min read` and three sample
+ * topics, indistinguishable from a post that had supplied them. Absent
+ * metadata now looks absent, which is the only honest option for a value only
+ * the author can know.
  */
-export const DefaultsAreNotMeasurements: Story = {
+export const PartialMetadata: Story = {
   args: {
-    title: 'A post that supplied no metadata',
+    title: 'A post that supplied only some metadata',
     date: '2026-08-30',
+    tags: ['css'],
     children: (
       <p>
-        Everything in the header except the title and the date came from a default, including a
-        reading time that no one calculated and three topics this post is not about.
+        The byline row carries an author, a date and one tag. No reading time is shown, because
+        none was measured.
       </p>
     ),
   },
