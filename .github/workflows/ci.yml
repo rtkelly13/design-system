@@ -7,6 +7,14 @@ on:
   pull_request:
     branches:
       - main
+      # Stacked work targets a feature branch rather than `main`, and this
+      # filter reads the *base*. Without this line a stacked PR shows no checks
+      # whatsoever — not red, not pending, simply absent — and a reviewer has no
+      # way to tell an unverified branch from a passing one. Retargeting to
+      # `main` when the parent merges fires `edited`, which is not one of the
+      # default `pull_request` types either, so the gap does not close by
+      # itself.
+      - 'claude/**'
   # Manual re-run, for the one case the two triggers above cannot cover: the
   # snapshot workflow commits baselines with `GITHUB_TOKEN`, and GitHub does not
   # start workflow runs from those pushes. The PR then holds its previous visual

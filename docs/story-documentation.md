@@ -186,7 +186,11 @@ that passed while measuring nothing:
 
 Documenting every component surfaced several things that are **API problems
 rather than documentation problems**. They are written down in the prop docs
-where a consumer will meet them, and left alone otherwise:
+where a consumer will meet them, and left alone otherwise.
+
+Each open row has an issue — [#90](https://github.com/rtkelly13/design-system/issues/90)
+through [#96](https://github.com/rtkelly13/design-system/issues/96) — and a PR
+stacked on this branch. A row struck through has landed.
 
 | What | Where | Why it was not fixed here |
 | --- | --- | --- |
