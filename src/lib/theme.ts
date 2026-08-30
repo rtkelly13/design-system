@@ -128,6 +128,26 @@ const BORDER_VARS: Record<BorderTone, string> = {
   subtle: 'var(--ds-border-subtle)',
 };
 
+const SYNTAX_VARS: Record<SyntaxRole, string> = {
+  keyword: 'var(--ds-syntax-keyword)',
+  string: 'var(--ds-syntax-string)',
+  number: 'var(--ds-syntax-number)',
+  function: 'var(--ds-syntax-function)',
+  type: 'var(--ds-syntax-type)',
+  variable: 'var(--ds-syntax-variable)',
+  comment: 'var(--ds-syntax-comment)',
+  punctuation: 'var(--ds-syntax-punctuation)',
+};
+
+/**
+ * Every syntax role, at runtime.
+ *
+ * Derived from {@link SYNTAX_VARS} rather than written a second time, so the
+ * `Record` is the only place the roles are listed and a new one is a compile
+ * error there before it is a missing entry here.
+ */
+export const SYNTAX_ROLES = Object.keys(SYNTAX_VARS) as readonly SyntaxRole[];
+
 /**
  * Resolve any accent token to the CSS variable expression that renders it.
  *
@@ -155,6 +175,29 @@ export function textVar(token: TextTone = 'primary'): string {
 
 export function borderVar(token: BorderTone = 'strong'): string {
   return BORDER_VARS[token] ?? BORDER_VARS.strong;
+}
+
+export function syntaxVar(role: SyntaxRole): string {
+  return SYNTAX_VARS[role] ?? SYNTAX_VARS.variable;
+}
+
+/**
+ * The weight for a syntax role, with the fallback its sparse declaration needs.
+ *
+ * `syntaxEmphasis` is deliberately partial — a role that renders at the body
+ * weight declares nothing, so `--ds-syntax-keyword-weight` exists on the light
+ * rungs and not on the dark ones. Reading it without a fallback yields an
+ * invalid value and the property is dropped, which is a silent wrong weight
+ * rather than an error. Encoding the fallback here means no call site has to
+ * know that, and no call site can forget.
+ */
+export function syntaxWeightVar(role: SyntaxRole): string {
+  return `var(--ds-syntax-${role}-weight, 400)`;
+}
+
+/** The slant for a syntax role. Same fallback argument as {@link syntaxWeightVar}. */
+export function syntaxStyleVar(role: SyntaxRole): string {
+  return `var(--ds-syntax-${role}-style, normal)`;
 }
 
 /** Semantic font roles. */
@@ -188,6 +231,7 @@ export const semanticTokens = {
   surface: SURFACE_VARS,
   text: TEXT_VARS,
   border: BORDER_VARS,
+  syntax: SYNTAX_VARS,
   font: fontVar,
   shadowColor: 'var(--ds-shadow-color)',
 } as const;
