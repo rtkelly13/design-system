@@ -24,40 +24,103 @@ build there.
 
 ## The verdicts
 
+All 57 judged against the 17 generators now in
+[blog#138](https://github.com/rtkelly13/blog/pull/138):
+
 | | Count | Meaning |
 |---|---|---|
-| **port** | 17 | Strong fit — worth building as a generator |
-| **adapt** | 18 | Good idea, needs rework (weight, or a missing capability) |
-| **covered** | 9 | We already have an equivalent — 4 before this work, 5 built since |
-| **skip** | 13 | Aesthetic or technical mismatch |
+| **covered** | 12 | Shipped |
+| **variation** | 36 | A *parameter* away from something we have |
+| **port** | 4 | A mechanism nothing in the set has |
+| **skip** | 5 | Aesthetic or technical mismatch |
 
-Four were covered before any of this work — `joy_division` → `ridgeline`, `node_garden`
-→ `node-network`, `noise_landscape_1` → `contour`, `triangular_mosaic` →
-`triangle-grid`. The overlap being that small was itself the finding: nine generators
-against a 57-pattern reference set meant the gap was opportunity, not duplication.
+**Thirty-six of fifty-seven are variations.** That is the finding, and it only
+becomes visible when the set is sorted by *mechanism* rather than by look — two
+patterns can be unrecognisably different on screen and still be one generator
+and one argument apart. Sorting by appearance is what produced the first pass of
+this file, which called `chevron_blocks`, `radial_harmony` and `brockmann_arcs`
+three separate builds; they are one isometric face treatment and two ring
+parameters.
 
-Five more are covered now, built in blog#138 — `radial_spokes`, `interference-mesh`,
-`wave-field`, `quarter_circles_grid` and `isometric-cube-grid`. Verdicts are kept current
-as things ship, so this file stays a worklist rather than becoming a snapshot.
+So the remaining work is **4 generators and 6 parameters**, not 45 generators.
 
-## The gap that matters most: there is no radial generator
+### The families
 
-All nine current generators are Cartesian — grids, lattices, hatches, horizontal
-bands. The reference set has **18 radial patterns**, and we cover exactly none of them.
+| Family | n | What one parameter would absorb |
+|---|---|---|
+| `iso-cubes` | 11 | A height-field source, a carve mask, a face treatment |
+| `mesh-mode` | 8 | Any lattice drawn as a connected wireframe instead of as marks |
+| `radial-ring` | 5 | Cell counts and stroke weights on the three ring generators |
+| `disorder` | 4 | **Already shipped** — the order-to-chaos ramp |
+| `truchet` | 3 | Arcs per tile |
+| `wave-envelope` | 2 | An amplitude/frequency envelope across `contour` |
+| `interference` | 2 | Mark type and source count |
+| `field-source` | 1 | A field built from poles rather than crossed sines |
 
-That is not a coverage statistic, it is a compositional one. Every background the site
-can currently draw is edge-to-edge uniform texture. A radial pattern has a *centre*,
-which means it can sit behind a title, focus a hero, or anchor a slide — things no
-amount of `dot-grid` achieves. `rect_field_void` makes the point from the other
-direction: a dense Cartesian field with a hole punched in it, where the negative space
-is the composition.
+**`mesh-mode` is the single highest-value thing left.** Eight patterns —
+`polar_mesh`, `joy_division_mesh`, `deformed_grid_mesh` and five others — differ
+from what we have in exactly one respect: their lattice points are *joined to
+their neighbours* rather than drawn as independent marks. `lattice.ts` already
+computes neighbour relationships for hex and triangle tilings and throws them
+away. A mesh renderer is one function over data that already exists, and it
+converts more of the reference set than any new generator could.
 
-Cheapest way in, in order: `radial_spokes` (24 KB), `modular_circle` (24 KB),
-`radial_harmony` (35 KB), `brockmann_arcs` (2 KB — the lightest of all 57). All four
-are simple polar arithmetic, and all four animate by rotation, which is a free seamless
-loop under the `cycles()` rule.
+The `iso-cubes` family is larger but shallower: eleven patterns that are all the
+same cube lattice with a different rule for how tall each column is. Four of
+them exceed 950 KB as drawn, and `iso-sphere` — the heaviest of all 57 at
+1.76 MB — is just the carve mask applied to a sphere.
 
-## The colour contract needs a third slot
+### Corrections from looking rather than reading
+
+Three verdicts in the first pass came from the source site's own descriptions
+and were wrong:
+
+- **`chevron_blocks`** — described as "ruled hexagons", actually striped-face
+  isometric cubes. An `iso-cubes` face treatment, not a new tiling.
+- **`radial_harmony`** — described as "concentric circles with radial
+  divisions", actually a ring of short radial dashes. `radial-spokes` with a
+  high inner radius.
+- **`brockmann_arcs`** — three or four very thick arc segments, not a fine
+  concentric structure. `broken-ring` with a handful of cells per band.
+
+`wavy_fabric` also moved: it is a quad mesh under wave displacement, not the
+over/under weaving the name suggests, so the "genuine 2D occlusion" claim this
+file used to make about it does not hold.
+
+### The four that are genuinely new
+
+- **`phyllotaxis-bloom`** and **`spiral_dot_field`** — golden-angle placement.
+  Every generator we have places marks by lattice, by scatter, or on a ring;
+  none has a *growth* rule. Build one, get both.
+- **`lissajous_field`** — parametric curves whose integer frequency ratios close
+  the loop natively, which is the property `cycles()` enforces by hand.
+- **`rect_field_void`** — negative space as the composition. Wants a
+  cross-cutting mask parameter more than a generator of its own, and that same
+  mask is what `iso-cross` and `iso-sphere` need.
+
+## The radial gap, closed
+
+This file used to lead with it: all nine original generators were Cartesian —
+grids, lattices, hatches, horizontal bands — against 18 radial patterns in the
+reference set, so every background the site could draw was edge-to-edge uniform
+texture with nothing to sit behind a title.
+
+Three radial generators shipped (`radial-spokes`, `broken-ring`,
+`modular-circle`), and the five patterns left in the `radial-ring` family are
+parameters on them rather than new work. `rect_field_void` still makes the point
+from the other direction and remains unbuilt: a dense Cartesian field with a
+hole punched in it, where the negative space is the composition.
+
+Building them turned up something the survey could not have: **rigid rotation
+does not work at this scale.** `radial-spokes` first turned the whole wheel once
+per loop and was much the fastest thing in the set — peak displacement 1581px
+against 155px for the next busiest generator — because tangential speed is
+`ω · r`, so the rim always outruns the hub. Sweeping each spoke through an angle
+*inversely* proportional to its reach gives every tip the same arc and shears
+the wheel into a spiral. Any future centred generator wants the same treatment,
+and both of the others are capped at one turn per loop for the same reason.
+
+## The colour contract needed a third slot, and got one
 
 `GraphicParams` carries a single `accent` plus a `background`, and generators fake
 depth with `withAlpha(accent, α)`. The reference set separates `--fill-color`,
@@ -69,15 +132,21 @@ solids show through each other and the depth cue collapses. And it cannot be der
 from `background` either, because `background` defaults to `'transparent'` — which is
 correct for layering over a surface, and leaves literally no colour to occlude with.
 
-So `iso-grid` draws diamonds rather than cubes, and every isometric idea in the
-reference set — `isometric-cube-grid`, `iso_test_noise_field`, `sine-cube`,
-`isometric_cubes` — is blocked behind one missing parameter. Adding
-`occlusion?: string` to `GraphicParams`, defaulting to the theme's surface colour
-rather than to `background`, unblocks all of them at once. It is the single
-highest-leverage change here.
+So `iso-grid` drew diamonds rather than cubes, and the whole eleven-pattern
+isometric family sat behind one missing parameter. `occlusion` on
+`GraphicParams` — defaulting to the theme's surface rather than to `background`
+— unblocked it, and `iso-cubes` uses it.
 
-`wavy_fabric` is the interesting counter-example: over/under weaving is a genuine
-occlusion use that is not isometric at all.
+It turned out to have a second user nobody predicted. `ridgeline` filled its
+layered ranges with `withAlpha(p.accent, 0.04 + depth * 0.07)`, so every far
+range stayed fully visible through every near one: the layers were stacked in
+draw order and occluded *nothing*, and the depth cue was carried entirely by
+stroke contrast. It read as a pile of overlapping line charts. Mountains hide
+what is behind them, and that is most of what makes a range look like distance.
+
+The lesson generalises past isometrics: **any generator that draws things in
+front of other things needs this, and alpha will not do it.** Worth checking
+`contour` next, which stacks bands the same way.
 
 ## Animation fit
 
@@ -152,24 +221,27 @@ because every cell is three filled faces plus strokes. If occlusion gets added a
 isometric generators follow, they need a lower `density` ceiling than the others, and
 `iso-grid` should probably get one now regardless.
 
-## Suggested order — all five now done
+## What is left, in order of value
 
-Carried out in [blog#138](https://github.com/rtkelly13/blog/pull/138), which took this
-list in order:
+The first list here has been done in full — `occlusion`, a radial generator,
+`interference`, a time control, and the disorder ramp, all in blog#138. What the
+family analysis says to do next is mostly *parameters*:
 
-1. ✅ **`occlusion` on `GraphicParams`**, defaulting to the theme surface. Unblocked the
-   isometric family for one optional field, and `iso-cubes` uses it.
-2. ✅ **A radial generator** — `radial-spokes`. Closed the biggest compositional gap for
-   the least code, and proved polar arithmetic in `project`.
-3. ✅ **`interference`** — reuses `contour`'s travelling-wave phase advance directly.
-4. ✅ **A time control**, as `/experiments/backgrounds` rather than a scrubber bolted to
-   the still gallery. `AnimatedBackground` samples once and projects per frame, which
-   `getGenerator()` existed for and only the tests were doing.
-5. ✅ **A disorder gradient**, from `flow_dots`. Cross-cutting as hoped: wired into
-   `dot-grid`, `iso-grid` and `truchet-arcs` without moving a single golden, because it
-   perturbs from a coordinate hash rather than an rng draw.
+1. **`mesh-mode`.** One rendering mode — join lattice neighbours instead of
+   drawing marks — absorbs eight patterns. Nothing else on this list has that
+   ratio, and `lattice.ts` already carries the indices it needs.
+2. **A height-field source on `iso-cubes`.** Noise, sine, or flat. Absorbs five
+   more of the eleven-strong isometric family, and `disorder` already covers the
+   scattered ones.
+3. **`phyllotaxis`.** The only genuinely new *placement* rule left — everything
+   we have places by lattice, scatter, or ring. Covers two patterns and is the
+   one that would not be reachable by parameterising anything existing.
+4. **A void/carve mask.** Cross-cutting: it is what `rect_field_void`,
+   `iso-cross` and `iso-sphere` all are, and it composes with every generator
+   rather than adding one.
+5. **`lissajous`.** Small, self-contained, and its integer frequency ratios
+   close the loop natively.
 
-Still open, in rough order of value: an isometric height field beyond `iso-cubes`
-(`iso_test_noise_field`), the Truchet tile parameterised for the mirrored variant
-(`concentric_arc_truchet_3`), and `signal_decay`, which matches the site's terminal voice
-more directly than anything currently in the set.
+Deliberately not on this list: anything in the `iso-cubes` family over 950 KB as
+drawn, and `masked_letter_grid`, which needs font metrics a pure-string
+generator cannot get.

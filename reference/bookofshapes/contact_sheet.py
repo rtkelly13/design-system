@@ -28,25 +28,42 @@ ACCENTS = [
     ("neonGreen", "#39ff14"), ("white", "#ffffff"), ("ink", "#23262e"),
 ]
 VERDICT_COLOR = {
-    "port": "#39ff14", "adapt": "#facc15", "covered": "#22d3ee", "skip": "#71717a",
+    "port": "#39ff14", "variation": "#facc15", "covered": "#22d3ee", "skip": "#71717a",
 }
 
 
 def main() -> int:
     man = json.loads((HERE / "manifest.json").read_text())
-    verdicts = json.loads((HERE / "verdicts.json").read_text())["verdicts"]
+    doc = json.loads((HERE / "verdicts.json").read_text())
+    verdicts = doc["verdicts"]
+    families = doc["families"]
     missing = [p["slug"] for p in man["patterns"]
                if not (HERE / "svg" / f"{p['slug']}.svg").exists()]
     if missing:
         print(f"warning: {len(missing)} SVGs missing - run fetch.py first")
 
-    order = {"port": 0, "adapt": 1, "covered": 2, "skip": 3}
-    pats = sorted(man["patterns"],
-                  key=lambda p: (order[verdicts[p["slug"]][0]], -p["bytes"]))
+    # Grouped by mechanism family, because that is the thing being judged: two
+    # patterns in the same family are one generator and a parameter apart,
+    # however different they look.
+    fam_order = ["distinct", "iso-cubes", "mesh-mode", "radial-ring", "truchet",
+                 "wave-envelope", "interference", "field-source", "disorder",
+                 "built", "reject"]
+    pats = sorted(
+        man["patterns"],
+        key=lambda p: (fam_order.index(verdicts[p["slug"]]["family"]), -p["bytes"]),
+    )
 
     cards = []
+    last_family = None
     for p in pats:
-        v, why = verdicts[p["slug"]]
+        entry = verdicts[p["slug"]]
+        v, why, fam = entry["verdict"], entry["why"], entry["family"]
+        if fam != last_family:
+            last_family = fam
+            n = sum(1 for q in pats if verdicts[q["slug"]]["family"] == fam)
+            cards.append(
+                f'<h2 class="fam" data-verdict="{v}">{fam} &middot; {n}'
+                f'<span>{families.get(fam, "already shipped")}</span></h2>')
         cards.append(f"""
     <figure class="card" data-verdict="{v}" data-tags="{' '.join(p['tags'])}">
       <div class="stage" data-src="svg/{p['slug']}.svg"></div>
@@ -66,7 +83,7 @@ def main() -> int:
         for n, v in ACCENTS)
     filters = "".join(
         f'<button class="f" data-filter="{k}">{k}</button>'
-        for k in ["all", "port", "adapt", "covered", "skip"])
+        for k in ["all", "port", "variation", "covered", "skip"])
 
     html = f"""<!doctype html>
 <meta charset="utf-8"><title>Book of Shapes - reference contact sheet</title>
@@ -89,6 +106,12 @@ def main() -> int:
   label {{ font-size:12px; color:#a1a1aa; display:flex; gap:8px; align-items:center; }}
   main {{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
           gap:2px; background:#27272a; padding:2px; }}
+  .fam {{ grid-column:1/-1; margin:18px 0 0; padding:10px 14px; background:#000;
+          border-left:4px solid #52525b; font-size:14px; text-transform:uppercase;
+          letter-spacing:.06em; color:#fff; }}
+  .fam[hidden] {{ display:none; }}
+  .fam span {{ display:block; margin-top:4px; font-size:11px; text-transform:none;
+               letter-spacing:0; color:#a1a1aa; }}
   .card {{ margin:0; background:#000; display:flex; flex-direction:column; }}
   .card[hidden] {{ display:none; }}
   .stage {{ aspect-ratio:1; display:grid; place-items:center; overflow:hidden;
@@ -128,7 +151,7 @@ def main() -> int:
   }});
   document.querySelectorAll('.f').forEach(b => b.onclick = () => {{
     const f = b.dataset.filter;
-    document.querySelectorAll('.card').forEach(c => {{
+    document.querySelectorAll('.card, .fam').forEach(c => {{
       c.hidden = f !== 'all' && c.dataset.verdict !== f;
     }});
     document.querySelectorAll('.f').forEach(x => x.classList.toggle('on', x === b));
