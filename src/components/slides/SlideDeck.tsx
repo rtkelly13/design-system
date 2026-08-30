@@ -1,6 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Play, Pause } from 'lucide-react';
+import { ChevronLeft, ChevronRight, FileText, Maximize2, Minimize2, Play, Pause } from 'lucide-react';
 import { Button } from '../Button';
+import type { SlideProps } from './Slide';
+
+/**
+ * The notes on one slide, if it has any.
+ *
+ * Reading a child's props is not a thing to do lightly, but it is the right
+ * shape here: notes belong *with* the slide that needs them, and the presenter
+ * surface belongs to the deck. The alternative — a `notes` array on the deck,
+ * indexed by position — puts the two halves of one fact in different files and
+ * silently misaligns the moment a slide is inserted.
+ */
+function speakerNotesOf(node: React.ReactNode): string | undefined {
+  if (!React.isValidElement(node)) return undefined;
+  const notes = (node.props as Partial<SlideProps>).speakerNotes;
+  return notes?.trim() ? notes : undefined;
+}
 
 export interface SlideDeckProps {
   /**
@@ -13,9 +29,9 @@ export interface SlideDeckProps {
   aspectRatio?: '16:9' | '4:3';
   /**
    * Milliseconds between automatic advances. `0` — the default — disables
-   * autoplay and hides nothing: the play control is still there, so a reader
-   * can start it themselves. Non-zero starts the deck advancing on its own,
-   * which is right for a kiosk and wrong for a talk.
+   * autoplay and hides the play control entirely, so a deck that does not want
+   * it gains no chrome. Non-zero offers the control; it is right for a kiosk
+   * and wrong for a talk, where the presenter owns the pacing.
    */
   autoPlayInterval?: number;
 }
@@ -28,6 +44,14 @@ export interface SlideDeckProps {
  * from the last slide returns to the first), and exposes fullscreen through the
  * Fullscreen API on its own container rather than the document — so a deck
  * embedded in a page goes fullscreen without taking the page with it.
+ *
+ * **Presenter notes.** Any child carrying `speakerNotes` makes a notes control
+ * appear, and `N` toggles a panel below the frame showing the current slide's.
+ * Both the control and the panel are absent unless some slide has notes, and
+ * the panel starts closed — so notes never reach a projector unasked, and a
+ * deck without them renders exactly as it did before the feature existed.
+ *
+ * Keyboard: `←`/`→` or space to page, `F` for fullscreen, `N` for notes.
  *
  * Slides are indexed by position, so the children must be a stable array. A
  * conditional slide that disappears shifts every index after it.
@@ -47,9 +71,19 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const totalSlides = React.Children.count(children);
+  const slideList = React.Children.toArray(children);
+
+  /**
+   * Notes are opt-in twice over: off until asked for, and invisible as a
+   * feature unless some slide actually carries them. A deck without notes
+   * therefore renders exactly as it did before presenter notes existed.
+   */
+  const deckHasNotes = slideList.some((slide) => speakerNotesOf(slide) !== undefined);
+  const currentNotes = speakerNotesOf(slideList[currentSlide]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev < totalSlides - 1 ? prev + 1 : 0));
@@ -80,11 +114,18 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
         prevSlide();
       } else if (e.key === 'f' || e.key === 'F') {
         toggleFullscreen();
+      } else if (e.key === 'n' || e.key === 'N') {
+        // Only when the deck has notes, so `N` is not a key that appears to do
+        // nothing on a deck that has none.
+        if (deckHasNotes) {
+          e.preventDefault();
+          setShowNotes((visible) => !visible);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [totalSlides]);
+  }, [totalSlides, deckHasNotes]);
 
   useEffect(() => {
     if (!isPlaying || autoPlayInterval <= 0) return;
@@ -93,8 +134,6 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
     }, autoPlayInterval);
     return () => clearInterval(timer);
   }, [isPlaying, autoPlayInterval]);
-
-  const slideList = React.Children.toArray(children);
 
   return (
     <div
@@ -156,11 +195,57 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
             NEXT <ChevronRight size={16} />
           </Button>
 
+          {deckHasNotes && (
+            <Button
+              onClick={() => setShowNotes((visible) => !visible)}
+              aria-pressed={showNotes}
+              aria-label={showNotes ? 'Hide speaker notes' : 'Show speaker notes'}
+              title="Speaker notes (N)"
+              style={{ padding: '0.4rem 0.8rem' }}
+            >
+              <FileText size={16} />
+            </Button>
+          )}
+
           <Button onClick={toggleFullscreen} style={{ padding: '0.4rem 0.8rem' }}>
             {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </Button>
         </div>
       </div>
+
+      {/*
+        Presenter notes. Below the control bar rather than over the slide, so
+        that a deck mirrored to a projector shows the audience the slide and
+        nothing else — the notes are outside the frame the viewport clips.
+      */}
+      {showNotes && (
+        <div
+          style={{
+            padding: '1rem 1.5rem',
+            borderTop: '2px solid var(--ds-border-strong)',
+            backgroundColor: 'var(--ds-surface-raised)',
+            fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
+            fontSize: '0.85rem',
+            lineHeight: 1.6,
+            color: 'var(--ds-text-primary)',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              fontSize: '0.7rem',
+              letterSpacing: '0.08em',
+              color: 'var(--ds-accent-secondary)',
+              marginBottom: '0.5rem',
+            }}
+          >
+            [ Speaker notes ]
+          </div>
+          {currentNotes ?? 'No notes on this slide.'}
+        </div>
+      )}
     </div>
   );
 };

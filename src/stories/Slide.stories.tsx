@@ -40,10 +40,9 @@ export const WithSubtitle: Story = {
 };
 
 /**
- * `speakerNotes` is accepted and **renders nothing** — there is no presenter
- * view in this package yet, and `SlideDeck` does not read it either. It exists
- * so a deck can carry its notes with its content. Nothing in it reaches the
- * audience, and nothing in it reaches the presenter either, for now.
+ * `speakerNotes` renders nothing *here*, and that is the point: they are for
+ * the presenter, not the audience, so a bare `Slide` shows no trace of them.
+ * `Presentation/SlideDeck → WithSpeakerNotes` is where they surface.
  */
 export const WithSpeakerNotes: Story = {
   args: {
