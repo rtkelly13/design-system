@@ -194,7 +194,7 @@ stacked on this branch. A row struck through has landed.
 
 | What | Where | Why it was not fixed here |
 | --- | --- | --- |
-| `Button`'s `variant` names are hues (`cyan`, `pink`) for props that resolve to roles | `Button.tsx` | Renaming is a breaking API change; deliberately not bundled with the token migration. |
+| ~~`Button`'s `variant` names are hues (`cyan`, `pink`) for props that resolve to roles~~ | `Button.tsx` | **Fixed** — [#90](https://github.com/rtkelly13/design-system/issues/90). Role names added, hue names kept as deprecated aliases. |
 | `Avatar.accent` still takes only the four legacy palette names, not `AccentToken` | `Avatar.tsx` | Widening it is a small, non-breaking change and a better fit for its own PR. |
 | `Card`'s form is chosen implicitly by the presence of `title` | `Card.tsx` | Changing the default is breaking. Documented as a trap and `panel` recommended explicitly. |
 | `BlogPost` defaults `readingTime` to `'5 min read'` and `tags` to a three-item sample | `BlogPost.tsx` | These are *content* defaults that publish claims nobody made. Making them required is breaking. |
