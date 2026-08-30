@@ -705,17 +705,28 @@ declare const BlogPost: react__default.FC<BlogPostProps>;
 declare const LoremIpsumPost: react__default.FC;
 
 interface ExperimentItem {
+
     id: string;
+
     name: string;
+
     description: string;
+
     icon?: react__default.ReactNode;
+
     status: 'active' | 'archived' | 'experimental';
+
     componentCount: number;
 }
+
 declare const DEFAULT_EXPERIMENTS: ExperimentItem[];
 interface ExperimentsViewProps {
+
+    experiments?: readonly ExperimentItem[];
+
     onSelectExperiment?: (id: string) => void;
 }
+
 declare const ExperimentsView: react__default.FC<ExperimentsViewProps>;
 
 declare const DesignSandbox: react__default.FC;

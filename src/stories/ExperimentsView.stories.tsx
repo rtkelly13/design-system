@@ -18,3 +18,58 @@ export const Default: Story = {};
 export const WithSelectionHandler: Story = {
   args: { onSelectExperiment: () => {} },
 };
+
+/**
+ * The catalogue is not configurable, so the axis this component actually varies
+ * on is what a selection does. Here the handler reports back into the page, the
+ * way a host router would.
+ */
+export const Interactive: Story = {
+  render: function Render() {
+    const [selected, setSelected] = React.useState<string | null>(null);
+    return (
+      <div>
+        <p style={{ padding: '1rem', fontFamily: 'var(--ds-font-mono)' }}>
+          Selected: {selected ?? '(none yet)'}
+        </p>
+        <ExperimentsView onSelectExperiment={setSelected} />
+      </div>
+    );
+  },
+};
+
+/**
+ * A custom catalogue. Until #95 this story could not exist — the component
+ * rendered `DEFAULT_EXPERIMENTS` and no other array, so the page showed one
+ * site's experiments index rather than a component anyone could use.
+ *
+ * `ExperimentItem` is exported alongside it, so a consumer's list is typed
+ * rather than shaped by guesswork.
+ */
+export const CustomCatalogue: Story = {
+  args: {
+    experiments: [
+      {
+        id: 'contrast-audit',
+        name: 'Contrast Audit',
+        description: 'Every role pair on every rung, with the margin each one actually has',
+        status: 'active',
+        componentCount: 3,
+      },
+      {
+        id: 'pencil-rules',
+        name: 'Pencil Rules',
+        description: 'Polarity-aware dividers drawn in characters rather than pixels',
+        status: 'experimental',
+        componentCount: 1,
+      },
+      {
+        id: 'preset-bridge',
+        name: 'Tailwind Preset Bridge',
+        description: 'Superseded by the theme.css @theme contract; kept for the write-up',
+        status: 'archived',
+        componentCount: 0,
+      },
+    ],
+  },
+};
