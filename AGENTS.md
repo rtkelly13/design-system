@@ -548,6 +548,13 @@ cross-major tolerance. Keep them on the same major; see
 `ci.yml` runs **three jobs in parallel**, then a fourth that reports their
 combined verdict.
 
+**It runs on every pull request, whatever the base branch.** `pull_request` used
+to carry `branches: [main]`, which filters on the PR's *base* — so a PR aimed at
+another branch got no CI at all. Not a failure, not a pending check: nothing.
+A stacked PR showed only the Vercel comment check and read as "no gates to run",
+which is worse than a red one. `push` keeps its `main` filter, because that
+trigger is the post-merge signal for the default branch specifically.
+
 | Job | What it runs | Roughly | Ceiling |
 | --- | --- | --- | --- |
 | `gates` | `tokens:check`, `check:contrast`, `lint`, `check:css`, `check:fonts`, `check:deps` | 30s | 10m |
