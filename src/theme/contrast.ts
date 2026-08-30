@@ -12,7 +12,7 @@
  * stable; WCAG ratios are what an audit will be run against.
  */
 
-import type { Emphasis, Intent, TextTone } from '../lib/theme';
+import type { Emphasis, Intent, SyntaxRole, TextTone } from '../lib/theme';
 import type { LevelDefinition, ThemeLevel } from './levels';
 
 export interface Rgb {
@@ -123,6 +123,17 @@ export const MINIMUM_RATIO = {
   textInverse: 4.5,
   accent: 4.5,
   intent: 4.5,
+  /** Code is read, so an emphasis role clears the body-copy bar. */
+  syntax: 4.5,
+  /**
+   * `comment` and `punctuation` are de-emphasised on purpose, and holding them
+   * to body contrast defeats the reason they are dim. 3:1 is a declared
+   * exception rather than an oversight, and it is not an outlier: Dracula's
+   * comment is 3.03:1 and Solarized Dark's is 2.79:1, with 6 of its 10 roles
+   * below AA. The alternative — a comment as loud as the code it annotates —
+   * is worse for the reader than a ratio a checker dislikes.
+   */
+  syntaxQuiet: 3,
   borderStrong: 3,
   borderDefault: 3,
   borderSubtle: 1.4,
@@ -132,6 +143,19 @@ export const MINIMUM_RATIO = {
    */
   overlaySeparation: 3,
 } as const;
+
+/** Syntax roles held to the body-copy bar. */
+const SYNTAX_EMPHASIS_ROLES = [
+  'keyword',
+  'string',
+  'number',
+  'function',
+  'type',
+  'variable',
+] as const satisfies readonly SyntaxRole[];
+
+/** Syntax roles held to the de-emphasis bar. See `MINIMUM_RATIO.syntaxQuiet`. */
+const SYNTAX_QUIET_ROLES = ['comment', 'punctuation'] as const satisfies readonly SyntaxRole[];
 
 export interface ContrastCheck {
   level: ThemeLevel;
@@ -189,6 +213,15 @@ export function auditContrast(
       }
       for (const tone of ['info', 'success', 'warning', 'danger'] as const satisfies readonly Intent[]) {
         check(`intent.${tone} on ${groundName}`, def.intent[tone], ground, MINIMUM_RATIO.intent);
+      }
+      // Syntax roles are checked on every ground, `sunken` included — a code
+      // well IS a sunken surface, and it is the darkest of the three on the
+      // light rungs, so it is the one that fails first.
+      for (const role of SYNTAX_EMPHASIS_ROLES) {
+        check(`syntax.${role} on ${groundName}`, def.syntax[role], ground, MINIMUM_RATIO.syntax);
+      }
+      for (const role of SYNTAX_QUIET_ROLES) {
+        check(`syntax.${role} on ${groundName}`, def.syntax[role], ground, MINIMUM_RATIO.syntaxQuiet);
       }
       check(`border.strong on ${groundName}`, def.border.strong, ground, MINIMUM_RATIO.borderStrong);
       check(`border.default on ${groundName}`, def.border.default, ground, MINIMUM_RATIO.borderDefault);

@@ -88,6 +88,14 @@ jobs:
       - name: Contrast Gate
         run: pnpm check:contrast
 
+      # Contrast asks whether a token reads against its background. For code,
+      # every token shares one background and still has to be told apart from
+      # its neighbour — a distinction carried by hue alone survives on screen
+      # and dies in a 4:2:0 encode. Separate gate because it is a separate
+      # question.
+      - name: Syntax Separation Gate
+        run: pnpm check:separation
+
       # Ratchet: fails if the count of colour-instead-of-role call sites rises.
       - name: Lint — colour literals and unknown classnames
         run: pnpm lint

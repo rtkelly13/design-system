@@ -32,7 +32,15 @@
  * The one exception is `surface.overlay`, which is a scrim and needs alpha.
  */
 
-import type { BorderTone, Emphasis, Intent, Surface, TextTone } from '../lib/theme';
+import type {
+  BorderTone,
+  Emphasis,
+  Intent,
+  Surface,
+  SyntaxEmphasis,
+  SyntaxRole,
+  TextTone,
+} from '../lib/theme';
 
 /**
  * The ladder, ordered from darkest to lightest. Order is meaningful: it is what
@@ -71,6 +79,22 @@ export interface LevelDefinition {
   readonly intent: Readonly<Record<Intent, string>>;
   /** Colour of the hard offset shadows. Normally tracks `border.strong`. */
   readonly shadow: string;
+  /**
+   * Token colours for rendered source code.
+   *
+   * Separate from `accent` because the constraints differ. An accent is chosen
+   * to read against a surface; a syntax role must additionally be told apart
+   * from whatever sits *next to it on the same line*. `separation.ts` gates the
+   * second requirement, and `check:contrast` gates the first — against
+   * `surface.sunken` as well as `base`, since a code well is a sunken surface.
+   */
+  readonly syntax: Readonly<Record<SyntaxRole, string>>;
+  /**
+   * Weight and slant per role, for the roles that need more than colour.
+   *
+   * Sparse on purpose: a role absent here renders at the body weight, upright.
+   */
+  readonly syntaxEmphasis: Readonly<Partial<Record<SyntaxRole, SyntaxEmphasis>>>;
 }
 
 /**
@@ -120,6 +144,17 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       danger: '#ec4899',
     },
     shadow: '#ffffff',
+    syntax: {
+      keyword: '#ec4899',
+      string: '#facc15',
+      number: '#ddd6fe',
+      function: '#67e8f9',
+      type: '#5eead4',
+      variable: '#ffffff',
+      comment: '#8b8ba3',
+      punctuation: '#a8a8c0',
+    },
+    syntaxEmphasis: { comment: { italic: true } },
   },
 
   dim: {
@@ -156,6 +191,17 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       danger: '#f43f5e',
     },
     shadow: '#e4e4e7',
+    syntax: {
+      keyword: '#f43f5e',
+      string: '#fbbf24',
+      number: '#c4b5fd',
+      function: '#7dd3fc',
+      type: '#5eead4',
+      variable: '#e4e4e7',
+      comment: '#8a8b93',
+      punctuation: '#a1a2ac',
+    },
+    syntaxEmphasis: { comment: { italic: true } },
   },
 
   bright: {
@@ -192,6 +238,21 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       danger: '#c81e1e',
     },
     shadow: '#18181b',
+    syntax: {
+      keyword: '#a21657',
+      string: '#8a5a00',
+      number: '#6b21a8',
+      function: '#1e40af',
+      type: '#0e7490',
+      variable: '#18181b',
+      comment: '#8b8a80',
+      punctuation: '#77756c',
+    },
+    syntaxEmphasis: {
+      keyword: { weight: 700 },
+      type: { weight: 600 },
+      comment: { italic: true },
+    },
   },
 
   white: {
@@ -228,6 +289,21 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       danger: '#b91c1c',
     },
     shadow: '#0b0b0d',
+    syntax: {
+      keyword: '#a4123f',
+      string: '#7a4a06',
+      number: '#5b21b6',
+      function: '#1e3a8a',
+      type: '#115e59',
+      variable: '#0b0b0d',
+      comment: '#85898f',
+      punctuation: '#6a6e75',
+    },
+    syntaxEmphasis: {
+      keyword: { weight: 700 },
+      type: { weight: 600 },
+      comment: { italic: true },
+    },
   },
 };
 
