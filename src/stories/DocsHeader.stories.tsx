@@ -19,10 +19,20 @@ const meta: Meta<typeof DocsHeader> = {
 export default meta;
 type Story = StoryObj<typeof DocsHeader>;
 
+/**
+ * Title plus nav, which is the minimum a docs site needs. `active` on a nav
+ * item is the caller's to set — the header does no route matching, so a host
+ * router decides what "current" means.
+ */
 export const Default: Story = {
   args: { title: 'Design System', nav },
 };
 
+/**
+ * `icon` takes a component, not an element — any lucide icon, or anything
+ * accepting `className`. It renders beside the title as part of the brand lockup
+ * rather than as a separate control.
+ */
 export const WithIcon: Story = {
   args: { title: 'Design System', nav, icon: BookOpen },
 };
@@ -32,6 +42,12 @@ export const WithSearch: Story = {
   args: { title: 'Design System', nav, onSearch: () => {}, searchShortcut: '⌘K' },
 };
 
+/**
+ * Everything optional omitted. Worth seeing because it is what a
+ * partially-wired header degrades to: no nav, no search, no sidebar toggle —
+ * each of those appears only when its prop is supplied, so a missing
+ * `onToggleSidebar` silently removes the only way to open the mobile drawer.
+ */
 export const BrandOnly: Story = {
   args: { title: 'Design System' },
 };

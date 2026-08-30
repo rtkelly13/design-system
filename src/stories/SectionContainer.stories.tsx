@@ -26,6 +26,11 @@ export const Default: Story = {
   ),
 };
 
+/**
+ * The measure doing its job. The column stops well short of the viewport at
+ * wide sizes, which is the whole reason this component exists — line length,
+ * not layout.
+ */
 export const LongProse: Story = {
   render: () => (
     <SectionContainer>
@@ -33,5 +38,26 @@ export const LongProse: Story = {
         {'Constrained measure keeps lines readable. '.repeat(12)}
       </p>
     </SectionContainer>
+  ),
+};
+
+/**
+ * What it does *not* do, which is the more useful thing to know. The measure is
+ * chosen for prose, so a wide table or a dashboard grid put inside it is
+ * cropped to a reading column. Those belong outside — the second block here is
+ * the same table with no container around it.
+ */
+export const WhenNotToUseIt: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: '2rem' }}>
+      <SectionContainer>
+        <div style={{ outline: '1px dashed currentColor', overflowX: 'auto', padding: '1rem' }}>
+          <div style={{ width: '1400px' }}>A 1400px-wide table inside the measure: it scrolls.</div>
+        </div>
+      </SectionContainer>
+      <div style={{ outline: '1px dashed currentColor', padding: '1rem' }}>
+        <div style={{ width: '100%' }}>The same content outside it: full viewport width.</div>
+      </div>
+    </div>
   ),
 };

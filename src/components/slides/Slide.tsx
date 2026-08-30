@@ -1,12 +1,43 @@
 import React from 'react';
 
 export interface SlideProps {
+  /** Slide heading, above a rule. Omit it for a full-bleed or title-card slide. */
   title?: string;
+  /** A line under the title, in the primary accent. */
   subtitle?: string;
+  /** The slide body, laid out between the header and the foot of the frame. */
   children: React.ReactNode;
+  /**
+   * Presenter notes.
+   *
+   * Accepted and **not rendered anywhere** — there is no presenter view in this
+   * package yet, and `SlideDeck` does not read it either. It is here so decks
+   * can carry their notes with the content rather than in a separate document,
+   * and so adding a presenter view later does not change every call site. Do
+   * not put anything in it that must reach the audience.
+   */
   speakerNotes?: string;
 }
 
+/**
+ * One slide: a full-bleed frame with a ruled header and a body.
+ *
+ * It fills its container rather than sizing itself, which is what lets
+ * `SlideDeck` own the aspect ratio and the fullscreen behaviour. Rendered on
+ * its own it will fill whatever box you put it in, so give it one.
+ *
+ * The frame is a surface, not a page — it paints `--ds-surface-base` and
+ * inherits the level, so a deck rethemes with the rest of the site rather than
+ * being pinned to a presentation palette.
+ *
+ * ```tsx
+ * <SlideDeck>
+ *   <Slide title="One stack, three modes" subtitle="Adopt, do not manage">
+ *     <ul>…</ul>
+ *   </Slide>
+ * </SlideDeck>
+ * ```
+ */
 export const Slide: React.FC<SlideProps> = ({
   title,
   subtitle,

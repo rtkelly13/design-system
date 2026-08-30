@@ -61,8 +61,19 @@ const field = recipe({
 
 /** Shared by every control here. */
 interface FieldProps {
+  /**
+   * Visible label, wired to the control by a generated id. Omitting it leaves
+   * the control unlabelled — pass `aria-label` through if the design genuinely
+   * has no visible label.
+   */
   label?: string;
+  /**
+   * Validation message. Its presence turns the border to the danger role and
+   * **replaces** `helperText`: an invalid field shows one message, the one that
+   * says what to fix.
+   */
   error?: string;
+  /** Guidance under the control, shown only while there is no `error`. */
   helperText?: string;
   /**
    * Semantic accent for the focus border. Accepts an `Emphasis`
@@ -70,6 +81,11 @@ interface FieldProps {
    * the legacy hue names still resolve to the same values.
    */
   accent?: AccentToken;
+  /**
+   * Extra classes on the **control**, not the wrapper. Passed as the recipe's
+   * `class` override, so a caller's utility genuinely replaces the base's
+   * rather than racing it in CSS source order.
+   */
   className?: string;
 }
 
@@ -125,6 +141,31 @@ export interface InputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'>,
     FieldProps {}
 
+/**
+ * A labelled single-line text field.
+ *
+ * One of three controls in this file — `Input`, `TextArea` and `Select` — that
+ * share a label, an error and a helper line, so a form built from them lines up
+ * without per-field spacing. They are documented on one page because they are
+ * one component with three shapes; pick by the kind of value, not by look.
+ *
+ * Two behaviours worth relying on. The label is wired to the control through a
+ * generated `useId`, not a slug of the label text — two fields labelled "Name"
+ * on one page used to share an `id`, so clicking one label focused the other.
+ * And `error` **replaces** `helperText` rather than stacking under it: an
+ * invalid field shows one message, which is the one that tells the reader what
+ * to do.
+ *
+ * `accent` sets the focus border and travels as the `--field-accent` custom
+ * property, because a Tailwind class cannot be assembled from a value known
+ * only at runtime. That is also why a test here asserts the property rather
+ * than the class string — every accent produces the same classes.
+ *
+ * ```tsx
+ * <Input label="Branch" placeholder="main" helperText="Deploys on push." />
+ * <Input label="Branch" error="No such branch." accent="danger" />
+ * ```
+ */
 export function Input({
   label,
   error,
@@ -161,6 +202,14 @@ export interface TextAreaProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'>,
     FieldProps {}
 
+/**
+ * The multi-line shape of the field contract.
+ *
+ * Identical to {@link Input} in label, error and helper behaviour — it is the
+ * same recipe with box padding instead of line padding — so everything on the
+ * `Foundations/Input` page applies here. Documented there rather than on a page
+ * of its own for that reason.
+ */
 export function TextArea({
   label,
   error,
@@ -199,9 +248,21 @@ export interface SelectOption {
 export interface SelectProps
   extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'className'>,
     FieldProps {
+  /**
+   * The choices, in display order. Data rather than children because the
+   * native dropdown is the platform's to render.
+   */
   options: SelectOption[];
 }
 
+/**
+ * The choice shape of the field contract.
+ *
+ * Takes `options` as data rather than `<option>` children, so a caller cannot
+ * style the list into something the native control will not render — the
+ * dropdown is the platform's, and that is deliberate. Same label, error and
+ * helper behaviour as {@link Input}, and documented on the same page.
+ */
 export function Select({
   label,
   error,

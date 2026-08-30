@@ -80,14 +80,47 @@ const prose = recipe({
 });
 
 export interface ProseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
+  /**
+   * The article. Bare tags from a Markdown pipeline are what this is for —
+   * anything already carrying its own classes should be marked `not-prose` so
+   * the typography plugin's descendant selectors skip it.
+   */
   children: ReactNode;
   /**
    * Apply the house typography on top of the plugin's defaults. Turn off only
    * to preview what the tokens alone produce.
    */
   brutalist?: boolean;
+  /**
+   * Extra classes on the scope. Merged through the recipe, so a caller's
+   * `max-w-*` genuinely replaces the measure rather than racing it.
+   */
   className?: string;
 }
+
+/**
+ * The typography scope to wrap compiled Markdown in.
+ *
+ * Reach for it whenever content arrives as bare HTML — an MDX page, a
+ * changelog, a rendered README. Nothing else in the package styles raw tags:
+ * outside this scope an `<h2>` from a Markdown pipeline is an unstyled `<h2>`,
+ * which is the deliberate consequence of styling living on elements rather than
+ * in a stylesheet.
+ *
+ * Two things to know before nesting anything in it. First, the typography
+ * plugin is an **optional peer dependency** — a consumer importing `prose.css`
+ * must have `@tailwindcss/typography` installed, where a `theme.css`-only
+ * consumer need not. Second, chrome rendered *inside* an article — a breadcrumb
+ * above the title, a pager below the body — must carry `not-prose`, or it
+ * inherits list markers and the prose link treatment.
+ *
+ * ```tsx
+ * <Prose>
+ *   <Breadcrumbs className="not-prose" items={trail} />
+ *   <MDXContent />
+ * </Prose>
+ * ```
+ */
 
 export function Prose({ children, brutalist = true, className = '', ...rest }: ProseProps) {
   return (

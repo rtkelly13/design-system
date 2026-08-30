@@ -29,6 +29,7 @@ export interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export interface ThemeProviderProps {
+  /** The subtree this provider themes. */
   children: React.ReactNode;
   /**
    * Level to use before anything persisted is read, and on the server. Must

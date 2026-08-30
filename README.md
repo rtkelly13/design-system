@@ -32,6 +32,25 @@ pnpm test:visual:update
 
 ---
 
+## 📖 Every Component Documents Itself
+
+Each component's Storybook page is required to carry a description of what it
+is for, **at least three samples** with a caption on each, and a description on
+every prop. `pnpm check:story-docs` fails the build otherwise, so a page cannot
+ship as a title over a props table with a blank Description column.
+
+```bash
+# What every component page is missing, if anything:
+pnpm check:story-docs:list
+```
+
+Component descriptions are written as JSDoc on the component itself, so the
+same text reaches editor hover and the published `.d.ts` — not only the docs
+site. The standard and the audit behind it are in
+[`docs/story-documentation.md`](./docs/story-documentation.md).
+
+---
+
 ## 📦 Installation & Prerelease Testing
 
 ### Stable Release

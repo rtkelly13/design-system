@@ -2,13 +2,44 @@ import type { ReactNode } from 'react';
 import { cn } from '../lib/recipe';
 
 export interface PaginationProps {
+  /** Total number of pages. The control disables `NEXT` once `currentPage` reaches it. */
   totalPages: number;
+  /** The current page, **1-based** — not a zero-based index. */
   currentPage: number;
+  /**
+   * Handler for the button form. Receives the page to move to, already
+   * bounds-checked, so no clamping is needed at the call site.
+   */
   onPageChange?: (page: number) => void;
+  /**
+   * Maps a page number to a URL. Supplying it switches the control to real
+   * anchors, which is the right form for a paginated *document* — the reader
+   * gets middle-click, a copyable address and a crawlable archive. Prefer this
+   * over `onPageChange` wherever the page has a URL.
+   */
   getPageHref?: (page: number) => string;
+  /** Extra classes on the `<nav>` wrapper. */
   className?: string;
 }
 
+/**
+ * Previous / next paging with the current position between them.
+ *
+ * Two forms, chosen by which callback you pass. `getPageHref` renders anchors;
+ * `onPageChange` renders buttons. The anchor form is the better default for
+ * anything with an address — a blog archive, a docs list — and the button form
+ * is for state that lives only in the client, like a filtered table.
+ *
+ * Pages are **1-based**, which is the one thing to get right at the call site:
+ * a zero-based index renders `PAGE 0 OF 10` and disables `PREV` a page early.
+ * Both ends disable rather than disappear, so the control does not change width
+ * as the reader moves through it.
+ *
+ * ```tsx
+ * <Pagination currentPage={2} totalPages={7} getPageHref={(p) => `/blog/page/${p}`} />
+ * <Pagination currentPage={page} totalPages={pages} onPageChange={setPage} />
+ * ```
+ */
 export function Pagination({
   totalPages,
   currentPage,

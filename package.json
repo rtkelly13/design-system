@@ -31,6 +31,8 @@
     "lint:fix": "eslint src --fix",
     "check:css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs",
     "check:css:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs --list",
+    "check:story-docs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-docs.mjs",
+    "check:story-docs:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-docs.mjs --list",
     "check:visual-coverage": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-visual-coverage.mjs",
     "check:visual-coverage:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-visual-coverage.mjs --list",
     "check:deps": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deps.mjs && knip --no-progress --include dependencies,unlisted,unresolved",
