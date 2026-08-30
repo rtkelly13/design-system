@@ -18,7 +18,7 @@ type Story = StoryObj<typeof Avatar>;
 export const Default: Story = {
   args: {
     fallback: 'RK',
-    accent: 'cyan',
+    accent: 'primary',
     size: 'md',
   },
 };
@@ -31,7 +31,7 @@ export const Default: Story = {
 export const PinkAccent: Story = {
   args: {
     fallback: 'AI',
-    accent: 'pink',
+    accent: 'tertiary',
     size: 'lg',
   },
 };
@@ -45,9 +45,9 @@ export const PinkAccent: Story = {
 export const Sizes: Story = {
   render: () => (
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1rem' }}>
-      <Avatar fallback="SM" size="sm" accent="cyan" />
-      <Avatar fallback="MD" size="md" accent="yellow" />
-      <Avatar fallback="LG" size="lg" accent="green" />
+      <Avatar fallback="SM" size="sm" accent="primary" />
+      <Avatar fallback="MD" size="md" accent="secondary" />
+      <Avatar fallback="LG" size="lg" accent="success" />
     </div>
   ),
 };
@@ -70,4 +70,32 @@ export const WithImage: Story = {
     alt: 'Ryan Kelly',
     size: 'lg',
   },
+};
+
+/**
+ * The full role vocabulary, which `accent` only started accepting in #91 — the
+ * top row is `Emphasis`, the bottom `Intent`. Before that this prop took the
+ * four hue names alone, so half of these were a type error and an avatar could
+ * not be given an intent at all.
+ *
+ * The legacy names still resolve identically (`cyan` is `primary`), so nothing
+ * that already compiled has changed; they are simply no longer the only option.
+ */
+export const AccentRoles: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: '0.75rem', width: 'max-content' }}>
+      <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <Avatar fallback="PR" accent="primary" />
+        <Avatar fallback="SE" accent="secondary" />
+        <Avatar fallback="TE" accent="tertiary" />
+        <Avatar fallback="QU" accent="quiet" />
+      </div>
+      <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <Avatar fallback="IN" accent="info" />
+        <Avatar fallback="SU" accent="success" />
+        <Avatar fallback="WA" accent="warning" />
+        <Avatar fallback="DA" accent="danger" />
+      </div>
+    </div>
+  ),
 };
