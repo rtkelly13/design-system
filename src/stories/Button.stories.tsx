@@ -30,10 +30,10 @@ const meta: Meta<typeof Button> = {
     },
     variant: {
       description:
-        'Named for the colour it is on `midnight`, not for a colour it guarantees — all five resolve through the accent roles and remap with the level. `default` is an alias of `cyan`; `white` is the inverted maximum-contrast button and inverts to dark-on-paper at the light end.',
+        'Which accent role fills the button. `inverse` is the maximum-contrast option and paints the text colour as the ground, so it inverts at the light end of the ladder. The hue names (`cyan`, `pink`, `yellow`, `white`, `default`) are deprecated aliases of exactly these roles and still resolve identically.',
       control: 'select',
-      options: ['default', 'cyan', 'pink', 'yellow', 'white'],
-      table: { defaultValue: { summary: 'pink' } },
+      options: ['primary', 'secondary', 'tertiary', 'inverse'],
+      table: { defaultValue: { summary: 'tertiary' } },
     },
     size: {
       description:
@@ -65,15 +65,15 @@ export default meta;
 type Story = StoryObj<typeof Button>;
 
 /**
- * The plain button. `variant="default"` is an alias of `cyan` and resolves
- * through `--ds-accent-primary`, so it is not a neutral button — it is the
- * primary one.
+ * The plain button. `primary` is the top of the emphasis ladder, not a neutral
+ * default — a page should carry one of these, and the button that is *not* the
+ * main action wants `secondary` or `tertiary`.
  */
 export const Default: Story = {
   args: {
     children: 'EXECUTE ACTION',
     bracketed: false,
-    variant: 'default',
+    variant: 'primary',
   },
 };
 
@@ -87,22 +87,50 @@ export const Bracketed: Story = {
   args: {
     children: 'SUBMIT FORM',
     bracketed: true,
-    variant: 'default',
+    variant: 'primary',
   },
 };
 
 /**
- * The variant names are honest about one thing and misleading about another.
- * They resolve through the accent roles, so `pink` is `--ds-accent-tertiary`
- * and remaps on every rung — but they are named for the colour they happen to
- * be on `midnight`. Renaming them to their roles is a breaking change and is
- * deliberately not bundled with the token migration, so read `pink` as
- * "tertiary" and pick by role rather than by hue.
+ * Every role, in descending emphasis, with `inverse` last. Switch the toolbar
+ * to `white` and watch the bottom one flip to dark-on-paper while the others
+ * hold their place in the ladder — that is the whole reason these are named for
+ * roles rather than for the colours they happen to be on `midnight`.
  */
-export const PinkAccent: Story = {
-  args: {
-    children: 'DELETE RECORD',
-    bracketed: true,
-    variant: 'pink',
-  },
+export const Variants: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+      <Button variant="primary">PRIMARY</Button>
+      <Button variant="secondary">SECONDARY</Button>
+      <Button variant="tertiary">TERTIARY</Button>
+      <Button variant="inverse">INVERSE</Button>
+    </div>
+  ),
+};
+
+/**
+ * The deprecated hue names, each above the role it aliases. The two rows are
+ * the same four buttons: the aliases share their class strings with the roles
+ * rather than repeating them, so they cannot drift, and a unit test asserts it.
+ *
+ * They are kept only so existing call sites compile. New code should use the
+ * top row.
+ */
+export const DeprecatedHueAliases: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: '0.75rem', width: 'max-content' }}>
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <Button variant="cyan">CYAN</Button>
+        <Button variant="yellow">YELLOW</Button>
+        <Button variant="pink">PINK</Button>
+        <Button variant="white">WHITE</Button>
+      </div>
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <Button variant="primary">PRIMARY</Button>
+        <Button variant="secondary">SECONDARY</Button>
+        <Button variant="tertiary">TERTIARY</Button>
+        <Button variant="inverse">INVERSE</Button>
+      </div>
+    </div>
+  ),
 };

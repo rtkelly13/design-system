@@ -6,6 +6,29 @@ import type {
 } from 'react';
 import { recipe } from '../lib/recipe';
 
+/**
+ * The roles a button can be filled with.
+ *
+ * `primary`/`secondary`/`tertiary` are the emphasis ladder; `inverse` is the
+ * maximum-contrast button, which paints `--ds-text-primary` as its ground.
+ */
+export type ButtonEmphasis = 'primary' | 'secondary' | 'tertiary' | 'inverse';
+
+/**
+ * The pre-0.4 hue names, each an alias of the role it always resolved to.
+ *
+ * Kept so existing call sites compile and render identically. They are not a
+ * second way of choosing — `cyan` and `primary` are the same value — and new
+ * code should use {@link ButtonEmphasis}.
+ *
+ * @deprecated Names a hue rather than the role it resolves to. `cyan`/`default`
+ * → `primary`, `yellow` → `secondary`, `pink` → `tertiary`, `white` →
+ * `inverse`.
+ */
+export type LegacyButtonVariant = 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
+
+export type ButtonVariant = ButtonEmphasis | LegacyButtonVariant;
+
 interface ButtonOwnProps {
   /**
    * The label. Uppercased by the base style, so write it in normal case; an
@@ -13,20 +36,19 @@ interface ButtonOwnProps {
    */
   children: ReactNode;
   /**
-   * Named for the colour it is on `midnight`, not for a colour it guarantees.
-   * All four resolve through the accent roles, so they remap with the theme
-   * level: `cyan` is `#22d3ee` on `midnight` and `#1d4ed8` on `white`.
+   * Which accent role fills the button.
    *
-   * `white` follows the same rule — it is the inverted maximum-contrast button,
-   * so it is a white button with near-black text on `midnight` and inverts to
-   * dark-on-paper at the light end. Before 0.3.0 it alone was pinned to a
-   * literal `bg-white text-black`, which stayed white on a white page.
+   * `inverse` is the maximum-contrast option: it paints the text colour as the
+   * ground, so it is a white button with near-black text on `midnight` and
+   * inverts to dark-on-paper at the light end.
    *
-   * The names are the honest complaint here, and they mislead for all four
-   * equally. Renaming them to the roles they resolve to is a breaking API
-   * change and is deliberately not bundled with the token migration.
+   * The hue names (`cyan`, `pink`, `yellow`, `white`, `default`) still resolve
+   * to exactly these roles and are kept so existing call sites compile. They
+   * are deprecated: they name the colour the role happens to be on `midnight`,
+   * which is not a colour the button guarantees — `cyan` is `#22d3ee` there and
+   * `#1d4ed8` on `white`.
    */
-  variant?: 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
+  variant?: ButtonVariant;
   /**
    * Padding and type scale: `sm` for a toolbar or table row, `md` for the
    * body of a page, `lg` for a landing-page CTA. The 2px border and the offset
@@ -79,8 +101,14 @@ export type ButtonProps = ButtonElementProps | ButtonLinkProps;
 const PRESS =
   'shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none';
 
-/** `default` is an alias for `cyan`; sharing the constant keeps them identical. */
-const CYAN = `bg-accent-primary text-content-inverse border-edge-strong ${PRESS}`;
+/**
+ * One class string per role. The hue names below alias these rather than
+ * repeating them, so an alias cannot drift from the role it claims to be.
+ */
+const PRIMARY = `bg-accent-primary text-content-inverse border-edge-strong ${PRESS}`;
+const SECONDARY = `bg-accent-secondary text-content-inverse border-edge-strong ${PRESS}`;
+const TERTIARY = `bg-accent-tertiary text-content-inverse border-edge-strong ${PRESS}`;
+const INVERSE = `bg-content-primary text-content-inverse border-content-primary ${PRESS}`;
 
 const button = recipe({
   base: 'font-mono font-bold uppercase border-2 transition-all duration-200',
@@ -91,11 +119,18 @@ const button = recipe({
       lg: 'px-8 py-4 text-lg',
     },
     variant: {
-      cyan: CYAN,
-      pink: `bg-accent-tertiary text-content-inverse border-edge-strong ${PRESS}`,
-      yellow: `bg-accent-secondary text-content-inverse border-edge-strong ${PRESS}`,
-      white: `bg-content-primary text-content-inverse border-content-primary ${PRESS}`,
-      default: CYAN,
+      primary: PRIMARY,
+      secondary: SECONDARY,
+      tertiary: TERTIARY,
+      inverse: INVERSE,
+
+      // Deprecated aliases. Sharing the constant is what makes "renders
+      // identically" a property of the code rather than a claim in a comment.
+      cyan: PRIMARY,
+      default: PRIMARY,
+      yellow: SECONDARY,
+      pink: TERTIARY,
+      white: INVERSE,
     },
     /**
      * An anchor is not `inline-flex` by default and carries an underline, so the
@@ -108,7 +143,9 @@ const button = recipe({
     },
   },
   defaultVariants: {
-    variant: 'pink',
+    // `tertiary`, spelled as the role. It is the same value `'pink'` resolved
+    // to, so the default button is unchanged.
+    variant: 'tertiary',
     size: 'md',
   },
 });
@@ -131,13 +168,13 @@ const button = recipe({
  *
  * ```tsx
  * <Button onClick={save}>SAVE</Button>
- * <Button href="/pricing" variant="pink" bracketed size="lg">SEE PRICING</Button>
+ * <Button href="/pricing" variant="tertiary" bracketed size="lg">SEE PRICING</Button>
  * ```
  */
 export function Button(props: ButtonProps) {
   const {
     children,
-    variant = 'pink',
+    variant = 'tertiary',
     size = 'md',
     bracketed = false,
     className,
