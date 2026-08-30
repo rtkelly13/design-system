@@ -17,6 +17,10 @@ design system and the blog.
 | `manifest.json` | Yes | Provenance + metadata for every pattern (title, description, tags, source URLs, viewBox, theme vars) |
 | `ATTRIBUTION.md` | Yes | Human-readable catalogue grouped by tag, with the credit line to use |
 | `fetch.py` | Yes | Reproducible fetcher — re-creates `svg/` and `manifest.json` from scratch |
+| `verdicts.json` | Yes | Per-pattern verdict — build / adapt / already covered / skip |
+| `contact_sheet.py` | Yes | Builds the local viewer below |
+| `contact-sheet.html` | **No — gitignored** | Generated viewer (embeds the artwork) |
+| `EVALUATION.md` | Yes | How these map onto the blog's generator system |
 | `README.md` | Yes | This file |
 
 `svg/` is excluded via `design-system/.gitignore`. That is deliberate and load-bearing:
@@ -30,7 +34,21 @@ cd design-system/reference/bookofshapes
 python3 fetch.py          # ~2 min, rate limited; stdlib only, no deps
 ```
 
-`manifest.json` and `ATTRIBUTION.md` *are* committed, so the catalogue — every slug,
+Then browse them in our own palette:
+
+```sh
+python3 contact_sheet.py
+python3 -m http.server 8765      # http, not file:// — see below
+open http://localhost:8765/contact-sheet.html
+```
+
+A filterable contact sheet of all 57, recoloured to the brutalist accents, each annotated
+with its verdict from `verdicts.json`. **It is local-only by design**: it embeds the
+artwork, so it is gitignored and must never be deployed. It has to be *served* rather than
+opened as a file because it inlines each SVG with `fetch()` — which is the same constraint
+described under theming below, met head-on.
+
+`manifest.json`, `verdicts.json` and `ATTRIBUTION.md` *are* committed, so the catalogue — every slug,
 title, description, tag and source URL — stays browsable and greppable without
 downloading anything.
 
@@ -115,12 +133,21 @@ Every one of the 57 files follows the same shape — a plain, script-free SVG wi
 | `--fill-color` | Filled shape bodies |
 | `--stroke-color` | Outlines and line work |
 | `--background-color` | Backdrop behind the pattern (`transparent` by default) |
-| `--occlusion-color` | Fill for shapes that hide what's behind them — the trick that makes the isometric and layered patterns read as 3D |
+| `--occlusion-color` | Fill for shapes that hide what's behind them — the trick that makes the isometric patterns read as 3D |
 
-All four appear in all 57 files, which is a nicer contract than most pattern sets offer.
-The `--occlusion-color` idea is worth stealing outright for our own generators: an
-overlapping-geometry pattern needs a *separate* colour for "this shape occludes the one
-behind it", distinct from its fill, or the depth cue collapses in dark mode.
+Every reference is written `var(--fill-color, currentColor)`, so a pattern also follows an
+inherited `color` if the variables are never set. All four are *declared* in all 57 files,
+but only three are widely *used*: **exactly 10 of the 57 reference `--occlusion-color`,
+and all 10 are tagged `isometric`** (10 of the 13 isometric patterns). 28 patterns are
+stroke-only and 14 fill-only.
+
+That distribution is the useful part. `--occlusion-color` is not decoration — it is what
+overlapping geometry needs to say *"this shape hides the one behind it"*, and it is
+load-bearing precisely where depth is being faked. Worth stealing for our own generators,
+with one catch: occlusion must be **opaque and match the backdrop**. It cannot be derived
+from the accent with an alpha, and it cannot be derived from a `transparent` background —
+stacked cubes drawn with a see-through occlusion fill show straight through each other. It
+has to be its own parameter.
 
 ### Why this matters for our theming
 
