@@ -21,6 +21,7 @@ design system and the blog.
 | `contact_sheet.py` | Yes | Builds the local viewer below |
 | `contact-sheet.html` | **No — gitignored** | Generated viewer (embeds the artwork) |
 | `EVALUATION.md` | Yes | How these map onto the blog's generator system |
+| `POTENTIALS.md` | Yes | Every pattern mapped to the generator that would draw it |
 | `README.md` | Yes | This file |
 
 `svg/` is excluded via `design-system/.gitignore`. That is deliberate and load-bearing:
