@@ -68,6 +68,18 @@ const MANIFEST = {
     kind: 'runtime',
     why: 'Builds the style recipes in src/lib/recipe.ts. Confined to that one file and deliberately absent from the published .d.ts, so it can be replaced without a breaking change.',
   },
+  '@radix-ui/react-dropdown-menu': {
+    kind: 'runtime',
+    why: 'Headless accessible dropdown and context menu primitive with collision detection and keyboard navigation.',
+  },
+  '@radix-ui/react-popover': {
+    kind: 'runtime',
+    why: 'Headless accessible popover primitive with floating positioning and focus management.',
+  },
+  '@radix-ui/react-tooltip': {
+    kind: 'runtime',
+    why: 'Headless accessible tooltip primitive with delay and positioning management.',
+  },
 
   react: {
     kind: 'peer',
