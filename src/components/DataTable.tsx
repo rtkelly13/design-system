@@ -9,9 +9,9 @@ import {
   type SortingState,
   type Table as TanStackTable,
 } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { cn } from '../lib/recipe';
+import { NerdIcon } from './NerdIcon';
 import {
   Table,
   TableBody,
@@ -161,11 +161,11 @@ export function DataTable<T>({
                       {canSort && (
                         <span className="inline-flex items-center">
                           {isSorted === 'asc' ? (
-                            <ArrowUp className="h-3 w-3 text-accent-primary" aria-label="Sorted Ascending" />
+                            <NerdIcon name="sort-asc" size="sm" accent="primary" label="Sorted Ascending" />
                           ) : isSorted === 'desc' ? (
-                            <ArrowDown className="h-3 w-3 text-accent-primary" aria-label="Sorted Descending" />
+                            <NerdIcon name="sort-desc" size="sm" accent="primary" label="Sorted Descending" />
                           ) : (
-                            <ArrowUpDown className="h-3 w-3 text-content-muted opacity-60" aria-label="Sortable" />
+                            <NerdIcon name="sort" size="sm" accent="muted" label="Sortable" />
                           )}
                         </span>
                       )}
