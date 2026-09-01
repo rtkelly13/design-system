@@ -118,6 +118,8 @@ const BRING_YOUR_OWN = {
   Inter: 'plain name of @fontsource-variable/inter, for a consumer-supplied static Inter',
   'Space Grotesk':
     'plain name of @fontsource-variable/space-grotesk, for a consumer-supplied static build',
+  'Symbols Nerd Font Mono':
+    'self-hosted Nerd Fonts symbol fallback for developer glyphs and UI icons',
 };
 
 for (const stack of stacks) {

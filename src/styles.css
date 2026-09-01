@@ -66,6 +66,16 @@
 @import "@fontsource/ibm-plex-mono/600.css";
 @import "@fontsource/ibm-plex-mono/700.css";
 @import "@fontsource/vt323";
+
+@font-face {
+  font-family: "Symbols Nerd Font Mono";
+  src: url("./fonts/SymbolsNerdFontMono-Regular.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+E000-F8FF, U+F0000-FFFFF, U+23FB-23FE, U+2B58;
+}
+
 @import "tailwindcss";
 @import "./theme.css";
 @import "./prose.css";
