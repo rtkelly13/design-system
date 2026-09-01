@@ -17,11 +17,12 @@ almost none of it is in the wrapper files themselves, because every one of those
 files is written against a token vocabulary and a styling engine this repo has
 deliberately rejected (§5B).
 
-Of the three libraries shadcn now generates against, `@base-ui/react` is the
-closest technical fit and **Radix is the choice taken**, with
-`@tanstack/react-table` (MIT) for the data-table layer — §6 records both the
-comparison and what the Radix call costs. Adopt exactly one primitive library;
-two focus-management implementations in one tree is worse than either alone.
+Of the three libraries shadcn now generates against, **`@base-ui/react` is the
+adopted one**, with `@tanstack/react-table` (MIT) for the data-table layer that
+none of them provides. §6 records the comparison, the maintenance evidence that
+decided it, and the confinement rule the decision is conditional on. Adopt
+exactly one primitive library; two focus-management implementations in one tree
+is worse than either alone.
 
 The whole adopted path is MIT — the only non-MIT packages anywhere near it are
 `class-variance-authority`, which `src/lib/recipe.ts` already replaces, and
@@ -480,43 +481,69 @@ So the real cost of an Apache-2.0 runtime dependency here is **one line in PR
 #64's shipped allowlist plus its baseline rows** — a deliberate, recorded
 decision rather than a licence risk.
 
-### Recommendation, and the decision taken
+### Decision: Base UI, with TanStack Table for tables
 
-On the analysis above, **Base UI** is the better technical fit: `render` is the
-only escape hatch that composes cleanly with `recipe`, `field` is the one
-primitive that directly closes issue #50's form gap, it removes four satellite
-dependencies rather than adding them, and it is MIT so PR #64's allowlist needs
-no widening. Against it: 11 published versions since 2025-12.
+**`@base-ui/react` is the adopted primitive layer.** The comparison behind it is
+in [`docs/radix-vs-base-ui.md`](./radix-vs-base-ui.md) — measured from both git
+histories and the published packages, not the docs sites — and it turned on
+maintenance rather than API:
 
-**The decision taken is Radix, with TanStack Table for the data-table layer.**
-That is defensible and the reasoning is recorded here so it is not
-re-litigated: 189 versions since 2022 against Base UI's 11, the deepest body of
-prior art of the three, and the largest share of shadcn's own reference code
-still targets it. Maturity beating fit is a reasonable call for a dependency
-meant to sit still for years.
+| Twelve months to 2026-09 | Radix | Base UI |
+|---|---|---|
+| Commits merged | 243 | **1,852** (7.6×) |
+| Distinct authors | 22 | 94 |
+| Top author's share | **90.4%** | 45.6% |
+| Authors to reach half the commits | **1** | 2 |
+| Months at ≤1 commit | **7** (5 at zero) | 0 |
+| Test files in repo | 45 | 274 |
+
+Both shipped nine stable npm releases in that window, which is why release
+cadence is the wrong metric here: one of them shipped those nine off 243 commits
+in two bursts with 90% of the work from one author, and the other off 1,852
+sustained across 94. Radix's continuity now rests on one person's availability —
+a different risk from the one its 2022–2024 reputation was earned under. Base
+UI's README names Colm Tuite and Jenna Smith on its team; neither appears in
+Radix's last 1,284 commits.
+
+The API case is independent and points the same way: `render` composes with
+`recipe` slots where `asChild` fights them, `useRender` is public so the same
+state-to-`data-*` machinery is available for this package's own components,
+`field` is the public equivalent of the `useField()` hook `Input.tsx` hand-rolls
+(and `CheckboxRootState extends FieldRootState`, so controls inherit field
+validity for free), `data-starting-style`/`data-ending-style` remove the need for
+hand-written keyframes on every overlay, and it ships drawer, toast, combobox and
+OTP in the box where Radix needs `vaul`, `sonner`, `cmdk` and `input-otp`.
 
 `@tanstack/react-table` **9.2.4 is MIT**, as are `@tanstack/table-core` and
-`@tanstack/store`. It also removes React Aria's only unique advantage, which
-retires the Apache-2.0 question for this decision entirely — the whole adopted
-path is MIT.
+`@tanstack/store`. Neither Radix nor Base UI has a table primitive, so that
+pairing is unaffected by this decision. The whole adopted path is MIT, so PR
+#64's shipped allowlist needs no widening.
 
-What choosing Radix costs, so each is planned rather than discovered:
+#### The accepted cost, and the rule that bounds it
 
-1. **No `field` primitive.** `useField()` stays hand-rolled and issue #50's form
-   layer stays a build rather than an import. Promote it to a real `Field`
-   component early — it is the thing `Checkbox`/`Radio`/`Switch` all compose.
-2. **`asChild` against `recipe` slots.** Workable, but every part needs a real
-   child element and the composition is invisible to typing. Expect more
-   boilerplate per wrapper than Base UI would need.
-3. **Satellite dependencies if the surface grows.** Drawer, command palette and
-   toast are `vaul`, `cmdk` and `sonner` under Radix — all MIT, but three more
-   maintainers and three more baseline entries.
-4. **55 packages into PR #64's shipped baseline**, against Base UI's ~6.
-5. **The ecosystem is drifting.** shadcn ships a first-class
-   `migrate-radix-to-base` skill. The confinement rule therefore matters *more*
-   with Radix than it would with Base UI: one wrapper per component, primitives
-   never re-exported raw, so a future migration is this package's problem rather
-   than every consumer's.
+**Churn is accepted deliberately.** Base UI has 11 published versions since
+2025-12 against Radix's 189 since 2022; a breaking major inside a year is
+plausible, and nine months of published history cannot prove stability. The
+decision is that a bounded churn risk beats an unbounded stall risk: you can
+wrap your way out of an API change, and you cannot wrap your way out of an
+unfixed upstream bug.
+
+What bounds it is the rule this package already applies to
+`tailwind-variants`, and it is a condition of the decision rather than a
+suggestion:
+
+1. **One wrapper per primitive.** No component imports `@base-ui/react` twice,
+   and no consumer imports it at all.
+2. **Never re-export a primitive raw** from `src/index.ts`. If Base UI's types
+   reach the published `.d.ts`, a major becomes a breaking change for the blog
+   and YNAB rather than one PR here — which is exactly the reasoning that keeps
+   `recipe` unexported today.
+3. **Record it in AGENTS.md** in the "Dependencies Held Back on Purpose" style,
+   in the PR that adds the dependency, so the next person finds the reason
+   before re-litigating the choice.
+
+With those in place the blast radius of a Base UI major is this package. Without
+them the decision is a worse bet than Radix would have been.
 
 ### What TanStack Table does and does not fix
 
@@ -609,16 +636,15 @@ Revised for §7. Items 1 and 2 of the original list are struck: they are PR #64'
 3. **Then #52** — the axe gate. It makes the a11y argument for adoption
    measurable instead of asserted, and it establishes the baseline the migration
    is judged against.
-4. **Add `radix-ui`** (§6), and record the reason in the AGENTS.md
-   "Dependencies Held Back on Purpose" style — including the confinement rule,
-   which matters more under Radix than it would under Base UI: one wrapper per
-   component, primitives never re-exported raw.
+4. **Add `@base-ui/react`** (§6) — one `MANIFEST` entry in `check-deps.mjs`, and
+   the confinement rule written into AGENTS.md in the same PR: one wrapper per
+   primitive, never re-exported raw, its types never in the published `.d.ts`.
 5. **Build the no-dependency set** — `Skeleton`, `Spinner`, `Empty`, `Kbd`.
    Independent of item 4, useful immediately, and it exercises `recipe` on easy
    components first.
-6. **Promote `useField()` to a `Field` component.** Radix has no `field`
-   primitive, so this stays a build — and it is issue #50's real first step,
-   since `Checkbox`, `Radio` and `Switch` all compose it.
+6. **Promote `useField()` to a `Field` component**, wrapping Base UI's `field`.
+   This is issue #50's real first step, since `Checkbox`, `Radio` and `Switch`
+   all compose it — do it before any of them, not alongside.
 7. **Move `Modal` onto `Dialog`**, taking the compound-API break at `0.3.x`.
    After PR #57.
 8. **Then #50's demanded primitives** on the chosen library, in demand order:
