@@ -11,22 +11,31 @@ reproducible with the command that produced it.
 
 ## Verdict
 
-**Take the behaviour, not the code.** shadcn/ui's value to this repo is almost
-entirely in the headless primitives it wraps — Radix UI or Base UI — and almost
-none of it is in the wrapper files themselves, because every one of those files
-is written against a token vocabulary and a styling engine this repo has
-deliberately rejected.
+**Take the behaviour, not the code — and take it from Base UI.** shadcn/ui's
+value to this repo is almost entirely in the headless primitives it wraps, and
+almost none of it is in the wrapper files themselves, because every one of those
+files is written against a token vocabulary and a styling engine this repo has
+deliberately rejected (§5B).
 
-The licences are not a blocker. Everything in the relevant path is permissive
-and compatible with publishing this package as MIT to public npm. The one
-non-MIT runtime package (`class-variance-authority`, Apache-2.0) is also the one
-package this repo would strip anyway, because `src/lib/recipe.ts` already owns
-that job.
+Of the three libraries shadcn now generates against, **`@base-ui/react`** is the
+fit (§6): its `render` prop is the only escape hatch that composes cleanly with
+`recipe`'s slot model, its `field` primitive is the public equivalent of the
+`useField()` hook `Input.tsx` already hand-rolls, it removes four satellite
+dependencies rather than adding them, and it is MIT. `react-aria-components` is
+**Apache-2.0** and covers more ground — including the only sortable `Table`
+primitive of the three — but that is a separate decision with its own
+obligations. Adopt exactly one.
 
-Two things should be fixed before anything third-party arrives:
-`package.json` declares `"license": "MIT"` and lists `LICENSE` in `files`, and
-**there is no LICENSE file in the repository** — so the published tarball ships
-none. And `docs/gap-analysis.md` is now materially wrong (below).
+The licences are not a blocker anywhere in the path. Everything is MIT or ISC
+except `class-variance-authority` (Apache-2.0), which is the one package
+`src/lib/recipe.ts` already replaces, and React Aria.
+
+**Three of this document's original recommendations were already in flight**
+(§7). PR #64 covers the missing `LICENSE` *and* a licence-drift gate that is
+stronger than what this evaluation proposed; issue #50 had already reached the
+same component gap list. What is genuinely uncovered is the build-vs-adopt
+question itself: issue #50 prescribes building all of it by hand and never
+raises it.
 
 ---
 
@@ -94,8 +103,13 @@ today with `recipe` and worth doing regardless of any shadcn decision:
 `field` and `input-group` are the two most interesting on that list. They are
 not primitives — they are *layout conventions for forms*, and shadcn enforces
 them as rules (`data-invalid` on the field, `aria-invalid` on the control).
-This repo has `Input` with no equivalent, which is why every consumer lays out
-its own forms.
+This repo has **half of `field` already**: `useField()` at
+`src/components/Input.tsx:84` wires `useId` + `aria-describedby` +
+`aria-invalid` and carries the accent as `--field-accent`. The gap is that it is
+a private hook serving three controls rather than a `Field` component any
+control can compose — which is why every consumer still lays out its own forms.
+Issue #50 names the same hook as the pattern `Checkbox`/`Radio`/`Switch` should
+reuse.
 
 **Missing, speculative** for this estate — do not build on spec:
 `command`/`combobox`, `sheet`, `drawer`, `sidebar`, `calendar`, `carousel`,
@@ -197,7 +211,9 @@ already shipping ISC (`lucide-react`) and MIT (`tailwind-variants`) at runtime:
 
 **Yes, with one asterisk.** No copyleft anywhere in the path — no GPL, LGPL,
 AGPL, MPL, or SSPL, and nothing source-available-but-not-open. Everything is
-MIT or ISC except `class-variance-authority`.
+MIT or ISC except `class-variance-authority` — and, if it is ever adopted,
+`react-aria-components`, which is Apache-2.0 across its whole `@react-*` and
+`@internationalized/*` tree (§6).
 
 **The asterisk is Apache-2.0.** It is permissive and one-way compatible into an
 MIT-licensed project, but it is not the same deal as MIT: §4 imposes
@@ -232,7 +248,7 @@ with `recipe`, taking shadcn's *composition* as a reference for API shape while
 writing every class string fresh.
 
 ```bash
-pnpm add radix-ui   # or @base-ui/react
+pnpm add @base-ui/react   # see §6 for why this one
 ```
 
 `tsup` externalises `dependencies` automatically, so this does not enter the
@@ -283,45 +299,246 @@ A registry serves the copy-paste-and-fork consumer, which this estate does not
 have. Revisit if the package ever wants outside users who need to edit the
 source.
 
-### Radix or Base UI
+---
 
-Pick one and do not chase. Taking them on their merits for this repo:
+## 6. Library gap analysis
 
-- **Radix** is the safer bet today: `radix-ui` 1.6.7 is stable, is what 30 of
-  the 57 wrappers still use, and has the deepest body of prior art. It is also
-  the thing shadcn ships a migration path *away* from.
-- **Base UI** is where the same authors went, is what the newest component
-  (`combobox`) is written against, and its `render` prop is a better-designed
-  escape hatch than Radix's `asChild` for a system that wants to own every
-  element's classes — which is exactly what "styling lives in TSX" demands.
+Choosing "the primitives" means choosing between three, all of which shadcn now
+generates against. This is the comparison the choice actually turns on.
 
-**Recommend Base UI** on that last point: `render` composition and this repo's
-`recipe`-slot model fit together cleanly, where `asChild` fights it. The cost is
-a younger library, and it should be recorded in "Dependencies Held Back on
-Purpose" style — a named reason, so the next person does not re-litigate it.
+Surfaces were read from the published packages, not the docs sites:
+
+```bash
+tar tzf react-1.7.0.tgz | grep -oP '^package/[a-z0-9-]+/index\.d\.ts$'          # Base UI: 38 components
+tar tzf react-aria-components-1.20.0.tgz | grep -oP 'dist/exports/[A-Za-z]+\.cjs' # RAC: 80 exports
+curl -s registry.npmjs.org/radix-ui/latest | jq '.dependencies|keys'             # Radix: 31 components + 23 internals
+```
+
+### Shape
+
+| | `radix-ui` | `@base-ui/react` | `react-aria-components` |
+|---|---|---|---|
+| Version / released | 1.6.7, 2026-07-24 | 1.7.0, 2026-08-04 | 1.20.0, 2026-07-31 |
+| **Licence** | **MIT** | **MIT** | **Apache-2.0** |
+| First published | 2022-08 | **2025-12** | 2018-06 |
+| Versions published | 189 | **11** | 897 |
+| Components | 31 | 38 | ~55 (of 80 exports) |
+| Install weight | 4.22 MB across **55 packages** | 9.49 MB, **1 package** | 6.42 MB, 8 packages |
+| Direct deps | 54 `@radix-ui/*` | 5 | 7 |
+| `sideEffects` | per-package | `false` | — |
+| Styling escape hatch | `asChild` (Slot) | `render` prop | `className` render-prop |
+| Ships CSS | no | no | no |
+
+Three things in that table changed since the received wisdom about these
+libraries formed, and each is worth stating because it inverts a common
+objection:
+
+- **React Aria is no longer a 90-package fan-out.** `react-aria@3.51.0` has
+  **9** direct dependencies; the `@react-aria/*` / `@react-stately/*` per-hook
+  packages have been consolidated. The "install weight" objection is dead.
+- **Radix is the one with the package sprawl now** — 55 packages for 31
+  components, because the `radix-ui` umbrella is a re-export shell over the
+  individual primitives it still publishes separately.
+- **Base UI's 9.49 MB is one package** and `sideEffects: false`, with per-component
+  subpath exports. Most of that bulk is bundled locale data and a dual CJS/ESM
+  build, and none of it reaches a consumer's bundle — but it does reach their
+  `node_modules`.
+
+### Coverage against the gaps this system actually has
+
+The needed set is issue #50's list, plus the two composites that issue calls
+thinner than their names.
+
+| Gap | Radix | Base UI | RAC |
+|---|---|---|---|
+| `Checkbox`, `RadioGroup`, `Switch` | ✅ | ✅ | ✅ |
+| `Select` (real listbox) | ✅ | ✅ | ✅ |
+| `Tabs`, `Tooltip`, `Popover`, `Menu` | ✅ | ✅ | ✅ |
+| `Accordion`, `Collapsible` | ✅ | ✅ | ✅ (`Disclosure`) |
+| `Dialog` (for `Modal`) | ✅ | ✅ | ✅ |
+| `AlertDialog` | ✅ | ✅ | via `role="alertdialog"` |
+| `Toast` | ✅ | ✅ | ✅ |
+| `Progress`, `Slider` | ✅ | ✅ | ✅ |
+| **`Field` / `Fieldset`** | ❌ | **✅** | ✅ (`Group`/`FieldError`) |
+| `Form` | ✅ (`0.1.x`) | ✅ | ✅ |
+| `Combobox` / command palette | ❌ | **✅** | ✅ |
+| `NumberField` | ❌ | ✅ | ✅ |
+| `Meter` | ❌ | ✅ | ✅ |
+| `Drawer` / `Sheet` | ❌ | **✅** | ❌ |
+| OTP field | ✅ (`0.1.x`) | ✅ | ❌ |
+| `ScrollArea` | ✅ | ✅ | ❌ |
+| `NavigationMenu`, `Menubar`, `ContextMenu` | ✅ | ✅ | ❌ |
+| `Avatar` | ✅ | ✅ | ❌ (presentational) |
+| **`Table` with sorting** | ❌ | ❌ | **✅** |
+| `Calendar` / `DatePicker` | ❌ | ❌ | ✅ |
+| `TagGroup`, `Tree`/`GridList`, `DropZone`, `ColorPicker`, `SearchField` | ❌ | ❌ | ✅ |
+| **Totals of 39** | **26** | **30** | **31** |
+
+The totals are close and misleading; the differences that matter are three
+specific cells.
+
+**Base UI is the only one with a `Field` primitive that matches what this repo
+already built by hand.** `src/components/Input.tsx` has `useField()` at line 84 —
+`useId`, `aria-describedby`, `aria-invalid`, and the accent carried as
+`--field-accent`. Base UI's `field` is that hook's public, tested equivalent,
+with `field.error`/`field.description` parts and `data-invalid`/`data-disabled`
+state attributes. Issue #50's "no `FormField`/`Fieldset` primitive, no exported
+`Label`, no form-level error summary" is a one-import fix under Base UI and a
+build under Radix.
+
+**RAC is the only one that answers the `DataTable` half of issue #50.** That
+issue lists `DataTable`'s defects — no sorting, no `scope="col"`, no `aria-sort`,
+no `<caption>`, no row selection. RAC's `Table` has `allowsSorting` and
+`sortDescriptor` and manages `aria-sort` itself. Radix and Base UI have **no
+table primitive at all**, so under either, `DataTable` stays hand-rolled. That
+is the single strongest argument for RAC, and it is a real one.
+
+**Base UI eliminates four satellite dependencies.** Under Radix, the shadcn
+convention reaches for `vaul` (drawer), `sonner` (toast), `cmdk` (command) and
+`input-otp` — four more packages, four more maintainers, four more entries in
+the `check-deps` MANIFEST and PR #64's licence baseline. Base UI ships `drawer`,
+`toast`, `autocomplete`/`combobox` and `otp-field` in the box.
+
+### Styling fit, which is the criterion AGENTS.md makes decisive
+
+"Styling lives in TSX" and `recipe`'s one-slot-per-element model mean the
+question is not what a library renders but **how it lets you own every element's
+class attribute**:
+
+- **Radix `asChild`** merges props onto a child you supply. It works, but the
+  child is a real element you must provide at every part, and the composition is
+  invisible to typing — `asChild` plus a wrapper is the shape shadcn uses, and
+  it is the shape that fights a slot-per-element recipe.
+- **Base UI `render`** takes an element or a function of `(props, state)`, and
+  every part emits `data-*` state attributes. `recipe` slots map onto those
+  one-to-one, and `data-[state=open]:bg-surface-raised` is a plain Tailwind
+  arbitrary variant. This is the cleanest fit of the three.
+- **RAC `className`** may itself be a render-prop function of state. Also
+  workable, but the idiomatic Tailwind path is the
+  `tailwindcss-react-aria-components` plugin for `data-` variants — another
+  optional peer, and a second plugin whose selectors `scripts/authored-classes.mjs`
+  would need to learn.
+
+### Licence, against PR #64's gate
+
+This is not a footnote, because **PR #64 makes it a CI failure**. That PR adds
+`scripts/check-licenses.mjs` with a **default-deny allowlist split by scope**,
+and its recorded shipped baseline is 8 packages: 4× OFL-1.1, 3× MIT, 1× ISC.
+
+- **Radix and Base UI are MIT.** They land inside the shipped allowlist as it
+  stands. Radix adds ~55 baseline entries, Base UI adds ~6.
+- **RAC is Apache-2.0** — verified from `package/LICENSE` in the tarball, and its
+  `@internationalized/*` and `@react-types/*` deps are Apache-2.0 too. PR #64's
+  body names exactly this case: *"a licence change fails — including a benign one
+  like MIT → Apache-2.0, which is harmless but adds a NOTICE obligation."*
+  Adopting RAC means widening the shipped allowlist to Apache-2.0 and accepting
+  its §4 duties across the whole `@react-*` tree.
+
+That is a decision, not a blocker — Apache-2.0 is permissive and its patent
+grant is arguably *better* than MIT. But it should be made against #64's gate
+deliberately, not discovered when CI goes red.
+
+### Recommendation
+
+**Base UI**, for four reasons in descending order of weight: `render` is the only
+escape hatch that composes cleanly with `recipe`; its `field`/`fieldset` is the
+one primitive that directly closes issue #50's form gap; it removes four
+satellite dependencies rather than adding them; and it is MIT, so PR #64's
+shipped allowlist needs no widening.
+
+Against it, honestly: **11 published versions since 2025-12**. That is the young
+library, and its API can still move. The mitigation is the same one AGENTS.md
+already uses for `tailwind-variants` — confine it. `recipe` is reachable through
+exactly one file; the primitives should be reachable through one wrapper per
+component and never re-exported raw, so the blast radius of a Base UI major is
+this package rather than every consumer.
+
+**Do not adopt more than one.** All three solve the same problem, and two of them
+in one tree means two focus-management implementations fighting over the same
+document — which is worse than either alone.
+
+**RAC deserves a second look for one thing only**: if `DataTable` is ever meant
+to be a real data table, RAC's `Table` is the only primitive here that does it,
+and pulling RAC in *just* for that is more defensible than hand-rolling
+`aria-sort`. Treat it as a separate decision with its own Apache-2.0 tradeoff,
+not as the default.
+
+---
+
+## 7. What is already in flight
+
+Checked against 22 open PRs and 37 open issues. **Three of this document's
+recommendations are already covered, and one of its findings is wrong as a
+result.**
+
+| This document said | Already covered by |
+|---|---|
+| Add the missing LICENSE file | **PR #64** *and* **PR #60** — both ship it, and #60's body flags the duplicate: the two `LICENSE` files are byte-identical, so they merge cleanly in either order |
+| Add a licence field to the `check-deps` MANIFEST with an allowlist | **PR #64**, far more thoroughly — `scripts/check-licenses.mjs`, a `licenses.baseline.json` keyed on package name so a *licence change* fails while a benign bump is silent, default-deny split by shipped/dev scope, and the OFL §5 font-bundling case. Nine failure paths exercised. My proposal was the weaker version of this |
+| The component gap list (`Checkbox`, `Switch`, `Tabs`, `Tooltip`, `Progress`, `Skeleton`, `Spinner`, `EmptyState`, the `Alert`-is-`NoteBlock` observation, the `Breadcrumbs` re-export) | **Issue #50**, independently and first |
+| `docs/gap-analysis.md` is stale | Partly **PR #63** / issue #56, *"Documentation and gates pointing at things that no longer exist"* |
+
+### What is genuinely uncovered
+
+**No PR and no issue proposes adopting a headless primitive library.** Issue #50
+lists the same missing components and prescribes building them **by hand on the
+`Input` pattern** — it never raises the build-vs-adopt question. That question,
+and §6 above, is the part of this evaluation that is new.
+
+### Two dependencies that change the ordering
+
+- **Issue #49 — "the token layer stopped at colour: no spacing, type scale,
+  motion or z-index tokens" — is a prerequisite, not a nice-to-have.** Every
+  overlay primitive in §6 needs a z-index and an enter/exit transition. `Modal`
+  currently hardcodes `z-50`. Adopting a library without #49 means every new
+  overlay invents its own stacking value, which is exactly the class of drift
+  the semantic token layer exists to prevent.
+- **Issue #52 — "no accessibility gate" — is what makes this decision
+  measurable.** The entire case for adopting a library is that hand-rolled
+  focus management is wrong in ways nothing here can currently observe; #52's
+  axe-over-the-story-index gate is what would turn that argument into a number.
+  It is also the check that would have caught the four `Modal` defects in §3.
+
+### Conflicts to expect
+
+- **PR #64 is `mergeable_state: dirty`** and based on `dafbc1f`, two commits
+  behind `main` at `650cd9f`. It needs a merge before it can land, and it should
+  land *before* any primitive library is added — otherwise 6 to 55 new
+  transitive packages arrive with no baseline to record them against.
+- **PR #57** (issue #44) already touches `Modal`'s focus ring. If `Modal` moves
+  onto a library `Dialog` (§3), #57 lands first and the migration rebases onto it
+  — not the reverse.
 
 ---
 
 ## Suggested order
 
-1. **Add the LICENSE file.** MIT text, matching `package.json`. One commit, and
-   it is a genuine compliance defect today.
-2. **Add a `licence` field to the `check-deps` MANIFEST** with an allowlist.
-   Cheap, and it converts §4 from a document into a gate.
-3. **Build the no-dependency set** — `Skeleton`, `Spinner`, `Empty`, `Kbd`,
-   `Field`/`FieldGroup`. No decision required, immediate consumer value, and it
-   exercises `recipe` on simple components before the hard ones.
-4. **Decide Radix vs Base UI**, and record the reason.
-5. **Move `Modal` onto the chosen `Dialog`**, taking the compound-API breaking
-   change while the package is at `0.3.x`. This is the item that pays for the
-   dependency on its own.
-6. **Then the demanded primitives**, in demand order: `Checkbox`, `Switch`,
-   `RadioGroup`, `Select`, `Tabs`, `Tooltip`.
-7. **Leave `sonner`, `cmdk`, `recharts`, `react-day-picker` and the rest until
-   something asks for them.** Every one is a runtime dependency in a package
-   whose consumers pay for it.
+Revised for §7. Items 1 and 2 of the original list are struck: they are PR #64's.
 
-## Correction to the existing docs
+1. **Land PR #64**, after a merge onto `main`. It is the gate everything below
+   is measured by, and it is the one blocking item that is already written.
+2. **Then #49** — spacing, motion and z-index tokens. Nothing overlay-shaped
+   should be built before there is a z-index scale to build it against.
+3. **Then #52** — the axe gate. It makes the a11y argument for adoption
+   measurable instead of asserted, and it establishes the baseline the migration
+   is judged against.
+4. **Decide Base UI** (§6), and record the reason in the AGENTS.md
+   "Dependencies Held Back on Purpose" style — including the confinement rule:
+   one wrapper per component, never re-exported raw.
+5. **Build the no-dependency set** — `Skeleton`, `Spinner`, `Empty`, `Kbd`.
+   Independent of item 4, useful immediately, and it exercises `recipe` on easy
+   components first.
+6. **Promote `useField()` to a `Field` component**, or replace it with Base UI's
+   `field`. This is issue #50's real first step and it unblocks everything in 7.
+7. **Move `Modal` onto `Dialog`**, taking the compound-API break at `0.3.x`.
+   After PR #57.
+8. **Then #50's demanded primitives** on the chosen library, in demand order:
+   `Checkbox`, `Switch`, `RadioGroup`, `Select`, `Tabs`, `Tooltip`.
+9. **Leave `Table`/`Calendar`/`Chart` alone** until something asks. If
+   `DataTable` ever needs real sorting, reopen the RAC question then, on its own
+   Apache-2.0 merits.
+
+## Appendix: correction to the existing docs
 
 `docs/gap-analysis.md` should be re-dated or deleted. It is measured against
 `95ef0ba` and three of its claims are now false:
