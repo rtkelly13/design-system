@@ -12,3 +12,15 @@ import { afterEach } from 'vitest';
  * previous test's copy of it.
  */
 afterEach(cleanup);
+
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
+if (typeof window !== 'undefined' && !window.HTMLElement.prototype.scrollIntoView) {
+  window.HTMLElement.prototype.scrollIntoView = function () {};
+}
