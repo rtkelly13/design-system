@@ -11,24 +11,24 @@ reproducible with the command that produced it.
 
 ## Verdict
 
-**Take the behaviour, not the code — and take it from Base UI.** shadcn/ui's
+**Take the behaviour, not the code.** shadcn/ui's
 value to this repo is almost entirely in the headless primitives it wraps, and
 almost none of it is in the wrapper files themselves, because every one of those
 files is written against a token vocabulary and a styling engine this repo has
 deliberately rejected (§5B).
 
-Of the three libraries shadcn now generates against, **`@base-ui/react`** is the
-fit (§6): its `render` prop is the only escape hatch that composes cleanly with
-`recipe`'s slot model, its `field` primitive is the public equivalent of the
-`useField()` hook `Input.tsx` already hand-rolls, it removes four satellite
-dependencies rather than adding them, and it is MIT. `react-aria-components` is
-**Apache-2.0** and covers more ground — including the only sortable `Table`
-primitive of the three — but that is a separate decision with its own
-obligations. Adopt exactly one.
+Of the three libraries shadcn now generates against, `@base-ui/react` is the
+closest technical fit and **Radix is the choice taken**, with
+`@tanstack/react-table` (MIT) for the data-table layer — §6 records both the
+comparison and what the Radix call costs. Adopt exactly one primitive library;
+two focus-management implementations in one tree is worse than either alone.
 
-The licences are not a blocker anywhere in the path. Everything is MIT or ISC
-except `class-variance-authority` (Apache-2.0), which is the one package
-`src/lib/recipe.ts` already replaces, and React Aria.
+The whole adopted path is MIT — the only non-MIT packages anywhere near it are
+`class-variance-authority`, which `src/lib/recipe.ts` already replaces, and
+React Aria, which this decision does not take. **Apache-2.0 would not have been
+a problem either**: depending on it is not redistributing it, and this repo has
+depended on `typescript` under exactly those terms since day one. The rule that
+matters is depend versus vendor — §6.
 
 **Three of this document's original recommendations were already in flight**
 (§7). PR #64 covers the missing `LICENSE` *and* a licence-drift gate that is
@@ -438,30 +438,117 @@ That is a decision, not a blocker — Apache-2.0 is permissive and its patent
 grant is arguably *better* than MIT. But it should be made against #64's gate
 deliberately, not discovered when CI goes red.
 
-### Recommendation
+#### Is Apache-2.0 a problem for an MIT package?
 
-**Base UI**, for four reasons in descending order of weight: `render` is the only
-escape hatch that composes cleanly with `recipe`; its `field`/`fieldset` is the
-one primitive that directly closes issue #50's form gap; it removes four
-satellite dependencies rather than adding them; and it is MIT, so PR #64's
-shipped allowlist needs no widening.
+Not as a dependency. **The distinction that matters is depend versus vendor**,
+and it is worth writing down because it decides several questions in this
+document at once.
 
-Against it, honestly: **11 published versions since 2025-12**. That is the young
-library, and its API can still move. The mitigation is the same one AGENTS.md
-already uses for `tailwind-variants` — confine it. `recipe` is reachable through
-exactly one file; the primitives should be reachable through one wrapper per
-component and never re-exported raw, so the blast radius of a Base UI major is
-this package rather than every consumer.
+**Depending on it creates essentially no obligation.** A line in `dependencies`
+is not redistribution: npm serves the package to the consumer from its own
+registry, and Apache-2.0 §4's notice duties attach to *distributing* the work.
+Your own source stays MIT and the `license` field stays honest. This repo has in
+fact been doing it since day one — **`typescript` is Apache-2.0**, and so are
+`@swc/helpers` and the whole `@internationalized/*` and `@react-types/*` tree
+under React Aria.
 
-**Do not adopt more than one.** All three solve the same problem, and two of them
-in one tree means two focus-management implementations fighting over the same
-document — which is worse than either alone.
+**Bundling it into `dist/` is what switches the obligations on.** Then §4
+applies: ship a copy of the licence, retain the copyright/patent/attribution
+notices, reproduce any NOTICE file the package carries, and state significant
+changes if you modified it (§4b). `tsup.config.ts` externalises `dependencies`,
+and PR #64 verifies nothing third-party reaches `dist` — so this stays
+theoretical for as long as that holds. It is the same mechanism that keeps the
+OFL fonts safe, and it is why PR #64 checks `dist/` rather than trusting the
+config.
 
-**RAC deserves a second look for one thing only**: if `DataTable` is ever meant
-to be a real data table, RAC's `Table` is the only primitive here that does it,
-and pulling RAC in *just* for that is more defensible than hand-rolling
-`aria-sort`. Treat it as a separate decision with its own Apache-2.0 tradeoff,
-not as the default.
+**The one hard rule is that you cannot relicense it.** Apache-2.0 is one-way
+compatible: it may be combined into an MIT-licensed project, but the
+Apache-2.0 files stay Apache-2.0 and cannot be re-published as MIT. Copying
+React Aria source into `src/` and shipping it under this package's licence is
+the thing that is actually not allowed — the vendoring trap from §5B, with more
+teeth than shadcn's MIT code has.
+
+Two further differences from MIT, neither of them a problem here:
+
+- **An express patent grant (§3), with retaliation.** The grant terminates if you
+  initiate patent litigation over the work. For a personal design system that is
+  a benefit, not a cost — MIT grants no patent rights at all.
+- **Incompatible with GPLv2** (fine with GPLv3). Only reachable if a consumer
+  wants to ship a GPLv2 application, which is not a scenario this estate has.
+
+So the real cost of an Apache-2.0 runtime dependency here is **one line in PR
+#64's shipped allowlist plus its baseline rows** — a deliberate, recorded
+decision rather than a licence risk.
+
+### Recommendation, and the decision taken
+
+On the analysis above, **Base UI** is the better technical fit: `render` is the
+only escape hatch that composes cleanly with `recipe`, `field` is the one
+primitive that directly closes issue #50's form gap, it removes four satellite
+dependencies rather than adding them, and it is MIT so PR #64's allowlist needs
+no widening. Against it: 11 published versions since 2025-12.
+
+**The decision taken is Radix, with TanStack Table for the data-table layer.**
+That is defensible and the reasoning is recorded here so it is not
+re-litigated: 189 versions since 2022 against Base UI's 11, the deepest body of
+prior art of the three, and the largest share of shadcn's own reference code
+still targets it. Maturity beating fit is a reasonable call for a dependency
+meant to sit still for years.
+
+`@tanstack/react-table` **9.2.4 is MIT**, as are `@tanstack/table-core` and
+`@tanstack/store`. It also removes React Aria's only unique advantage, which
+retires the Apache-2.0 question for this decision entirely — the whole adopted
+path is MIT.
+
+What choosing Radix costs, so each is planned rather than discovered:
+
+1. **No `field` primitive.** `useField()` stays hand-rolled and issue #50's form
+   layer stays a build rather than an import. Promote it to a real `Field`
+   component early — it is the thing `Checkbox`/`Radio`/`Switch` all compose.
+2. **`asChild` against `recipe` slots.** Workable, but every part needs a real
+   child element and the composition is invisible to typing. Expect more
+   boilerplate per wrapper than Base UI would need.
+3. **Satellite dependencies if the surface grows.** Drawer, command palette and
+   toast are `vaul`, `cmdk` and `sonner` under Radix — all MIT, but three more
+   maintainers and three more baseline entries.
+4. **55 packages into PR #64's shipped baseline**, against Base UI's ~6.
+5. **The ecosystem is drifting.** shadcn ships a first-class
+   `migrate-radix-to-base` skill. The confinement rule therefore matters *more*
+   with Radix than it would with Base UI: one wrapper per component, primitives
+   never re-exported raw, so a future migration is this package's problem rather
+   than every consumer's.
+
+### What TanStack Table does and does not fix
+
+It is a **state and logic layer with no markup and no ARIA**. Against issue
+#50's list of `DataTable` defects it splits cleanly:
+
+| Defect | TanStack Table |
+|---|---|
+| No sorting | **fixes** (`getSortedRowModel`, `SortingState`) |
+| No row selection | **fixes** |
+| Filtering, pagination, column sizing | **fixes** |
+| No `scope="col"` on header cells | does not fix |
+| No `aria-sort` | does not fix |
+| No `<caption>` | does not fix |
+| Array indices as React keys | does not fix — it gives you stable row/cell ids; using them is on you |
+| Sticky header | does not fix |
+
+That is the boundary the library advertises, not a criticism of it. But it means
+**the ARIA half of #50 stays this repo's work**, and the canonical reference
+implementation will not help:
+
+```bash
+# shadcn's own table primitive, and its 892-line Radix data-table block
+grep -c 'aria-sort\|scope=' apps/v4/registry/new-york-v4/ui/table.tsx
+grep -c 'aria-sort\|scope=' apps/v4/registry/bases/radix/blocks/dashboard-01/components/data-table.tsx
+# 0 and 0
+```
+
+Both wire `getSortedRowModel`; neither emits `aria-sort` or `scope="col"` — the
+exact defect #50 names. Copy their column and state wiring; do not copy their
+table semantics. This lands squarely in issue #52's territory: an axe gate is
+what would stop the same omission being repeated here.
 
 ---
 
@@ -522,21 +609,25 @@ Revised for §7. Items 1 and 2 of the original list are struck: they are PR #64'
 3. **Then #52** — the axe gate. It makes the a11y argument for adoption
    measurable instead of asserted, and it establishes the baseline the migration
    is judged against.
-4. **Decide Base UI** (§6), and record the reason in the AGENTS.md
-   "Dependencies Held Back on Purpose" style — including the confinement rule:
-   one wrapper per component, never re-exported raw.
+4. **Add `radix-ui`** (§6), and record the reason in the AGENTS.md
+   "Dependencies Held Back on Purpose" style — including the confinement rule,
+   which matters more under Radix than it would under Base UI: one wrapper per
+   component, primitives never re-exported raw.
 5. **Build the no-dependency set** — `Skeleton`, `Spinner`, `Empty`, `Kbd`.
    Independent of item 4, useful immediately, and it exercises `recipe` on easy
    components first.
-6. **Promote `useField()` to a `Field` component**, or replace it with Base UI's
-   `field`. This is issue #50's real first step and it unblocks everything in 7.
+6. **Promote `useField()` to a `Field` component.** Radix has no `field`
+   primitive, so this stays a build — and it is issue #50's real first step,
+   since `Checkbox`, `Radio` and `Switch` all compose it.
 7. **Move `Modal` onto `Dialog`**, taking the compound-API break at `0.3.x`.
    After PR #57.
 8. **Then #50's demanded primitives** on the chosen library, in demand order:
    `Checkbox`, `Switch`, `RadioGroup`, `Select`, `Tabs`, `Tooltip`.
-9. **Leave `Table`/`Calendar`/`Chart` alone** until something asks. If
-   `DataTable` ever needs real sorting, reopen the RAC question then, on its own
-   Apache-2.0 merits.
+9. **`DataTable` on `@tanstack/react-table`**, with the ARIA semantics written
+   by hand — `scope="col"`, `aria-sort`, `<caption>`, stable row ids. TanStack
+   supplies none of those and neither does shadcn's reference block, so this
+   wants #52's axe gate in place first.
+10. **Leave `Calendar`/`Chart` alone** until something asks for them.
 
 ## Appendix: correction to the existing docs
 
