@@ -24,3 +24,4 @@ walkthrough-results/
 
 # Vitest coverage output
 coverage/
+.vercel
