@@ -66,7 +66,7 @@ describe('DataTable', () => {
 
     // Click to sort ASC (Alpha, Beta, Zeta)
     fireEvent.click(nameHeader);
-    expect(screen.getByText('▲')).toBeDefined();
+    expect(screen.getByLabelText('Sorted Ascending')).toBeDefined();
 
     const rowsAfterAsc = screen.getAllByRole('row');
     // First row is the header row, so row 1 is Alpha
@@ -76,7 +76,7 @@ describe('DataTable', () => {
 
     // Click to sort DESC (Zeta, Beta, Alpha)
     fireEvent.click(nameHeader);
-    expect(screen.getByText('▼')).toBeDefined();
+    expect(screen.getByLabelText('Sorted Descending')).toBeDefined();
 
     const rowsAfterDesc = screen.getAllByRole('row');
     expect(rowsAfterDesc[1].textContent).toContain('Zeta');
@@ -126,8 +126,9 @@ describe('DataTable', () => {
       />,
     );
 
-    for (const node of container.querySelectorAll<HTMLElement>('*')) {
-      expect(node.className, `${node.tagName} pins a palette entry`).not.toMatch(
+    for (const node of container.querySelectorAll<HTMLElement | SVGElement>('*')) {
+      const className = typeof node.className === 'string' ? node.className : (node.className as any)?.baseVal ?? '';
+      expect(className, `${node.tagName} pins a palette entry`).not.toMatch(
         FORBIDDEN,
       );
     }

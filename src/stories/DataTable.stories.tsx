@@ -2,8 +2,10 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
+  type SortingState,
 } from '@tanstack/react-table';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 import { Badge } from '../components/Badge';
 import { DataTable } from '../components/DataTable';
 import {
@@ -86,6 +88,7 @@ export const Empty: Story = {
 export const HeadlessTanStackTable: Story = {
   render: () => {
     function ControlledExample() {
+      const [sorting, setSorting] = useState<SortingState>([]);
       const table = useReactTable({
         data: rows,
         columns: [
@@ -110,6 +113,10 @@ export const HeadlessTanStackTable: Story = {
             header: 'DURATION',
           },
         ],
+        state: {
+          sorting,
+        },
+        onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
       });

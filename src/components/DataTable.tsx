@@ -9,6 +9,7 @@ import {
   type SortingState,
   type Table as TanStackTable,
 } from '@tanstack/react-table';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { cn } from '../lib/recipe';
 import {
@@ -26,6 +27,7 @@ export interface Column<T> {
   accessor: keyof T | ((row: T) => ReactNode);
   className?: string;
   enableSorting?: boolean;
+  sortValue?: (row: T) => any;
 }
 
 export type DataTableProps<T> =
@@ -82,14 +84,26 @@ export function DataTable<T>({
         header: legacy.header,
         enableSorting: legacy.enableSorting ?? true,
         accessorFn: (row: T) => {
+          if (legacy.sortValue) {
+            return legacy.sortValue(row);
+          }
           if (typeof legacy.accessor === 'function') {
-            return legacy.accessor(row);
+            const res = legacy.accessor(row);
+            if (res && typeof res === 'object' && 'props' in (res as any)) {
+              const children = (res as any).props?.children;
+              if (typeof children === 'string' || typeof children === 'number') {
+                return children;
+              }
+            }
+            return typeof res === 'string' || typeof res === 'number' ? res : '';
           }
           return row[legacy.accessor];
         },
         cell: (info: any) => {
-          const val = info.getValue();
-          return val as ReactNode;
+          if (typeof legacy.accessor === 'function') {
+            return legacy.accessor(info.row.original);
+          }
+          return info.getValue() as ReactNode;
         },
         meta: {
           className: legacy.className,
@@ -145,8 +159,14 @@ export function DataTable<T>({
                         )}
                       </span>
                       {canSort && (
-                        <span className="text-accent-secondary">
-                          {isSorted === 'asc' ? '▲' : isSorted === 'desc' ? '▼' : '⇅'}
+                        <span className="inline-flex items-center">
+                          {isSorted === 'asc' ? (
+                            <ArrowUp className="h-3 w-3 text-accent-primary" aria-label="Sorted Ascending" />
+                          ) : isSorted === 'desc' ? (
+                            <ArrowDown className="h-3 w-3 text-accent-primary" aria-label="Sorted Descending" />
+                          ) : (
+                            <ArrowUpDown className="h-3 w-3 text-content-muted opacity-60" aria-label="Sortable" />
+                          )}
                         </span>
                       )}
                       <span>]</span>
