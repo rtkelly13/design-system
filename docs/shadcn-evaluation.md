@@ -627,33 +627,24 @@ and §6 above, is the part of this evaluation that is new.
 
 ## Suggested order
 
-Revised for §7. Items 1 and 2 of the original list are struck: they are PR #64's.
+Superseded by the staged plan in
+[`radix-vs-base-ui.md`](./radix-vs-base-ui.md#the-adoption-plan) — eight PRs,
+three gated on work already in flight, one parallel track, one breaking change,
+each with an exit criterion. The short version:
 
-1. **Land PR #64**, after a merge onto `main`. It is the gate everything below
-   is measured by, and it is the one blocking item that is already written.
-2. **Then #49** — spacing, motion and z-index tokens. Nothing overlay-shaped
-   should be built before there is a z-index scale to build it against.
-3. **Then #52** — the axe gate. It makes the a11y argument for adoption
-   measurable instead of asserted, and it establishes the baseline the migration
-   is judged against.
-4. **Add `@base-ui/react`** (§6) — one `MANIFEST` entry in `check-deps.mjs`, and
-   the confinement rule written into AGENTS.md in the same PR: one wrapper per
-   primitive, never re-exported raw, its types never in the published `.d.ts`.
-5. **Build the no-dependency set** — `Skeleton`, `Spinner`, `Empty`, `Kbd`.
-   Independent of item 4, useful immediately, and it exercises `recipe` on easy
-   components first.
-6. **Promote `useField()` to a `Field` component**, wrapping Base UI's `field`.
-   This is issue #50's real first step, since `Checkbox`, `Radio` and `Switch`
-   all compose it — do it before any of them, not alongside.
-7. **Move `Modal` onto `Dialog`**, taking the compound-API break at `0.3.x`.
-   After PR #57.
-8. **Then #50's demanded primitives** on the chosen library, in demand order:
-   `Checkbox`, `Switch`, `RadioGroup`, `Select`, `Tabs`, `Tooltip`.
-9. **`DataTable` on `@tanstack/react-table`**, with the ARIA semantics written
-   by hand — `scope="col"`, `aria-sort`, `<caption>`, stable row ids. TanStack
-   supplies none of those and neither does shadcn's reference block, so this
-   wants #52's axe gate in place first.
-10. **Leave `Calendar`/`Chart` alone** until something asks for them.
+| | | Gated on |
+|---|---|---|
+| **Stage 0** | Land PR #64, then #49 (tokens), then #52 (axe gate) | already specified; #64 needs a merge first |
+| **PR 1** | Add `@base-ui/react` — dependency, `MANIFEST` entry and the AGENTS.md confinement rule, zero components | Stage 0 |
+| **PR 2** | `Field`, replacing `useField()`; `Input`/`TextArea`/`Select` move onto it in the same PR | PR 1 |
+| **PR 3** | `Modal` onto `Dialog` — the one breaking change, ship as `0.4.0` with a deprecated shim | PR 1, rebased onto PR #57 |
+| **PR 4–7** | `Checkbox` + `Switch`, `RadioGroup`, `Select`, `Tabs` + `Tooltip` | PR 2 |
+| **PR 8** | `Skeleton`, `Spinner`, `Empty`, `Kbd` | nothing — start today |
+
+`Field` is the chokepoint: every form control composes it, which is why it ships
+alone and before any of them. `DataTable` sorting on `@tanstack/react-table` is a
+separate track, and wants #52 landed first because its ARIA semantics are
+hand-written.
 
 ## Appendix: correction to the existing docs
 

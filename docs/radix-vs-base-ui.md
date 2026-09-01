@@ -190,6 +190,180 @@ Base UI takes five of six with one tie, and loses only on age. Radix's single
 advantage is the one this evaluation expected to be decisive; the commit history
 is what changed the answer.
 
+## The adoption plan
+
+Eight pull requests. Three cannot start until work already in flight lands, one
+runs in parallel from today, and exactly one is a breaking change. Every PR has
+an exit criterion, because "add Base UI" is not a reviewable state.
+
+```
+ALREADY IN FLIGHT                                                    
+┌──────────────────────┐                                             
+│ PR #64 licence gate  │                                             
+│ #49   tokens         │──all three──▶ PR 1  ──wraps field──▶ PR 2 ──all compose──▶ PR 4–7
+│ #52   axe gate       │              add          Field            Checkbox · Switch
+└──────────────────────┘         @base-ui/react                     Radio · Select
+         │                             │                            Tabs · Tooltip
+         │                             └──────────▶ PR 3  Modal onto Dialog (breaking)
+         └── PR #57 focus ring ───────────────────────▲  rebase onto it, not before it
+
+PR 8 · no dependency on any of the above — start today
+Skeleton · Spinner · Empty · Kbd
+```
+
+`Field` is the chokepoint: every form control composes it, so it ships alone and
+first. Only `Modal` branches early, and only one track is free.
+
+### Stage 0 — clear the three gates
+
+None of this is Base UI work and all of it is already specified. Starting Stage 1
+first is the one sequencing mistake that is expensive to undo.
+
+| Gate | Why it precedes the dependency | Exit criterion |
+|---|---|---|
+| PR #64 | Base UI adds ~6 packages to the shipped scope, and `licenses.baseline.json` is default-deny. Without it they arrive with nothing recording them, and the first bump that changes one of their licences is silent. | Merged. Currently `mergeable_state: dirty` and two commits behind `main` — resolve first. |
+| #49 | Every wrapper in PRs 3–7 is an overlay or a transition. Without a z-index scale and a motion pair each invents its own — the drift the token layer exists to prevent. `Modal` hardcodes `z-50` today. | A z-index scale and a motion duration/easing pair in `levels.ts`, generated into `theme.css`, passing `tokens:check`. |
+| #52 | The whole case for adopting a library is accessibility nothing here can currently observe. Land the gate *before* the migration so there is a baseline to judge it against. | `@storybook/addon-a11y` plus an axe pass over the story index in `ci.yml`, green on `main`. |
+
+#64 and #49 are independent of each other; #52 depends on #44 and #45, which PRs
+#57 and #58 already cover. Fastest honest path: fix #64's conflict and land it
+while #49 is being written.
+
+### Stage 1 — PR 1: add the dependency, and nothing else
+
+One dependency, one `MANIFEST` entry, one AGENTS.md section, **zero components**.
+Component-free is deliberate: it makes the confinement rule reviewable on its
+own, before there is a wrapper to argue about.
+
+```js
+// scripts/check-deps.mjs
+'@base-ui/react': {
+  kind: 'runtime',
+  why: 'Headless primitives — focus management, ARIA wiring and collision-aware '
+     + 'positioning we will not hand-roll. Runtime rather than peer so a consumer '
+     + 'gets working components without opting in, matching lucide-react. Reachable '
+     + 'only through the wrapper in each component and never re-exported, so its '
+     + 'types stay out of the published .d.ts and a major is not a breaking change '
+     + 'for consumers.',
+},
+```
+
+The AGENTS.md section, in the "Dependencies Held Back on Purpose" register:
+
+> **Primitives are confined.** Base UI supplies behaviour, never surface.
+> (1) One wrapper per primitive — no component imports `@base-ui/react` twice.
+> (2) Never re-exported raw from `src/index.ts` — not the parts, not the prop types.
+> (3) Its types never appear in the published `.d.ts`.
+> Rationale: 11 published versions since 2025-12. A major then costs one PR here,
+> not a coordinated bump across the blog and YNAB.
+
+**Exit:** `check:deps` green, `build` green, `dist/` contains no Base UI source
+(`tsup` externalises `dependencies`), and `licenses.baseline.json` updated with a
+reviewed diff reading "+6 packages, all MIT".
+
+### Stage 2 — PR 2: `Field`, the chokepoint
+
+The PR that decides whether the rest is cheap. `useField()` at `Input.tsx:84` is
+**replaced, not wrapped**, and `Input`, `TextArea` and `Select` move onto the new
+component in the same PR so there is never a second field implementation in the
+tree.
+
+```tsx
+// src/components/Field.tsx — the only file that imports Base UI's field.
+import { Field as Primitive } from '@base-ui/react/field';
+import { recipe } from '../lib/recipe';
+
+// One slot per element. Base UI emits data-invalid / data-dirty / data-touched /
+// data-filled / data-focused, so every variant is a plain Tailwind selector.
+const field = recipe({
+  slots: {
+    root:        'flex flex-col gap-1',
+    label:       'font-mono text-xs uppercase tracking-wider text-content-secondary',
+    description: 'font-mono text-xs text-content-muted',
+    error:       'font-mono text-xs text-intent-danger',
+  },
+});
+```
+
+Parts available: `Field.Root`, `Label`, `Control`, `Description`, `Error`,
+`Validity`, `Item`.
+
+**Exit:** `useField()` deleted; `Input`/`TextArea`/`Select` render through
+`Field`; the `FORBIDDEN` regex guards in `Input.test.tsx` and `StatCard.test.tsx`
+still pass; story + `CASES` row + baseline so `check:visual-coverage` stays at 0.
+
+### Stage 3 — PR 3: `Modal` onto `Dialog`
+
+The one breaking change, and the PR that pays for the dependency on its own. It
+retires four defects the hand-rolled version has: a background that is not
+`inert`, a scroll lock that shifts the page by the scrollbar width, a focus trap
+that queries one subtree and so will miss the first portalled `Select` listbox,
+and two dialogs both capturing Escape.
+
+**Take the API break here.** `isOpen`/`onClose`/`title` becomes the compound
+`Dialog.Root` / `Trigger` / `Popup` / `Title` composition (parts also include
+`Backdrop`, `Portal`, `Description`, `Close`, `Viewport`). At `0.3.x` with two
+known consumers that is cheap; after a `1.0` it is not. Ship as `0.4.0` with the
+old export kept as a deprecated shim for one minor, the way `LegacyAccent` was.
+
+**Exit:** the `Modal` unit tests from #52 pass against the new internals; both
+consumers build against the shim; CHANGELOG carries the migration snippet; lands
+after PR #57, rebased onto it.
+
+### Stage 4 — PRs 4–7: the controls, in demand order
+
+One PR per pair, each ~80 lines, each following the `Field` pattern exactly.
+Demand order comes from the consumers, not the library: `Checkbox` + `Switch`
+(YNAB rule toggles, blog `TalkControls`), then `RadioGroup`, then `Select`, then
+`Tabs` + `Tooltip`.
+
+```tsx
+// src/components/Checkbox.tsx
+import { Checkbox as Primitive } from '@base-ui/react/checkbox';
+
+const checkbox = recipe({
+  slots: {
+    root: 'relative size-5 shrink-0 border-2 border-edge-strong bg-surface-base '
+        + 'data-checked:bg-accent-primary data-disabled:opacity-50 '
+        + 'data-invalid:border-intent-danger '
+        + 'focus-visible:outline-2 focus-visible:outline-offset-2 '
+        + 'focus-visible:outline-accent-primary',
+    indicator: 'grid place-content-center text-content-inverse',
+  },
+});
+```
+
+**Note what is absent**: no `useId`, no `aria-describedby`, no `aria-invalid`, no
+indeterminate handling, no hidden input for form participation.
+`CheckboxRootState extends FieldRootState`, so a checkbox inside a `Field`
+inherits `disabled`, `touched`, `dirty`, `valid`, `filled` and `focused` without
+being told. That absence is the return on the dependency.
+
+**Exit per PR:** story + `CASES` row + `/update-snapshots` baseline; axe pass from
+#52 clean; one consumer actually migrated onto it in the same week — or the
+component was speculative and should not have shipped.
+
+### Stage 5 — PR 8: free, and it can start now
+
+`Skeleton`, `Spinner`, `Empty`, `Kbd`. Pure markup and tokens, no dependency on
+Base UI or on any gate above. Worth doing first in wall-clock terms: real
+consumer value while Stage 0 is still in flight, and `recipe` practice on
+components where a mistake costs nothing.
+
+### Deliberately not in this plan
+
+- **Drawer, command palette, toast, OTP.** Base UI ships all four and none has a
+  consumer asking. Speculative surface is how a system accumulates components
+  nobody maintains.
+- **`DataTable` sorting.** Separate track on `@tanstack/react-table`, independent
+  of every stage here. Wants #52 landed first, since the ARIA semantics are
+  hand-written and shadcn's own reference block gets them wrong.
+- **Calendar, Chart, Carousel.** Neither library covers the first two; no consumer
+  wants any of the three.
+- **Migrating the docs chrome.** Ten components with a 1:1 class in `prose.css`,
+  already on a per-PR ratchet. Mixing it in would make every PR above harder to
+  review.
+
 ## The accepted risk
 
 Base UI's risk is **churn** — an API change inside a year is plausible, and nine
