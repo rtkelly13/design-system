@@ -1,10 +1,15 @@
 /**
  * What counts as naming a colour instead of a role.
  *
- * One definition, two consumers: `check-tokens.mjs` counts these against a
- * budget, and `eslint.config.mjs` reports them at the exact site while you type.
- * They used to be the same regexes written twice, which is a slower way of
- * discovering that two gates disagree about what a violation is.
+ * One definition, one consumer today: `eslint.config.mjs` reports these at the
+ * exact site while you type. There were two until the lint rule replaced the
+ * `check-tokens.mjs` ratchet, whose text-regex counted matches inside comments
+ * and regexes and so could never reach zero.
+ *
+ * The file stays separate anyway. These rules are data worth reading on their
+ * own, and the next consumer — a codemod, a report — must not mean writing the
+ * regexes a second time. Two copies disagreeing about what a violation is, at
+ * some remove from each other, is the mistake this file was extracted to fix.
  *
  * The `fix` line is not decoration — it is what the editor shows, so it has to
  * say which role to reach for rather than just that something is wrong.
