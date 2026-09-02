@@ -21,6 +21,12 @@
     "README.md",
     "LICENSE"
   ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "pnpm tokens:build && tsup",
     "tokens:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs",
