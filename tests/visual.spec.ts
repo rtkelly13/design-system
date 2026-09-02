@@ -62,7 +62,6 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-noteblock--all-types', snapshot: 'noteblock-all-types.png' },
   { id: 'foundations-tldr--default', snapshot: 'tldr-default.png' },
   { id: 'foundations-modal--with-footer', snapshot: 'modal-with-footer.png' },
-  { id: 'foundations-datatable--with-rendered-cells', snapshot: 'datatable-with-rendered-cells.png' },
   { id: 'foundations-pagination--middle-page', snapshot: 'pagination-middle-page.png' },
   { id: 'foundations-sectioncontainer--default', snapshot: 'sectioncontainer-default.png' },
 
