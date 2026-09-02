@@ -49,6 +49,8 @@
     "prepublishOnly": "pnpm tokens:build && pnpm build",
     "walkthrough": "playwright test --config=playwright.walkthrough.config.ts",
     "walkthrough:show": "playwright show-report walkthrough-report",
+    "check:api": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-api.mjs",
+    "api:update": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-api.mjs --update",
     "check:fonts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-fonts.mjs",
     "check:fonts:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-fonts.mjs --list"
   },

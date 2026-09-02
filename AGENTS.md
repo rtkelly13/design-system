@@ -38,6 +38,7 @@ Package manager is **pnpm** (`node >=22`).
    - `pnpm typecheck`
    - `pnpm test` (unit — see "Unit Tests" below)
    - `pnpm build`
+   - `pnpm check:api` (the published type surface matches `api/index.d.ts`)
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)
 7. **New Components Need Baselines**: adding a story without a snapshot leaves
@@ -347,6 +348,8 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm deps:list`: Prints the dependency table with each package's reason.
 - `pnpm knip`: Full hygiene sweep — also unused files and exports. Not gated.
 - `pnpm build`: Regenerates tokens, then bundles ESM, CJS, DTS types, and CSS via `tsup`.
+- `pnpm check:api`: Diffs the emitted `dist/index.d.ts` against `api/index.d.ts`. Runs in CI, after the build.
+- `pnpm api:update`: Accepts the current surface as the baseline. The resulting diff is the API change.
 - `pnpm storybook`: Starts interactive Storybook dev server on port `6006`.
 - `pnpm build-storybook`: Compiles static Storybook documentation site to `storybook-static/`.
 - `pnpm test:visual`: Runs Playwright visual regression suite against Storybook stories.
@@ -479,6 +482,38 @@ TS 7 does two things this repo cannot yet absorb:
 **Unblocked when** `rollup-plugin-dts` supports TS 7, or this package moves off
 `tsup` for bundling (`tsdown`, the rolldown-era successor, is the likely
 candidate). Because the blog consumes this package, move both repos together.
+
+---
+
+## 🔒 The Published API Surface
+
+`api/index.d.ts` is the committed shape of what consumers compile against.
+`pnpm check:api` regenerates it from `dist/index.d.ts` and fails when the two
+disagree; `pnpm api:update` accepts the new surface, and **the diff in that file
+is the API change** — reviewing it in the PR is the entire point of the gate.
+
+It exists because nothing else here could see a breaking type change. `pnpm
+typecheck` proves the source is internally consistent, which it remains right up
+to the moment you delete an export; `knip` answers a different question; the
+visual suite is three layers away. For a package whose value proposition is that
+consumers build against it, that was the missing check with the most leverage.
+
+Deliberately no `api-extractor`: a plain diff of the emitted `.d.ts` needs no
+second toolchain kept aligned with `tsup`. What it gives up is the ability to say
+*why* a change is breaking.
+
+**Comments are stripped before comparing, and that is the load-bearing choice.**
+The doc comments here are long and edited often, and they are documentation
+rather than API — a reworded paragraph is not something a consumer can observe
+through the type system. Baselining verbatim would move the file on nearly every
+PR, and a gate that always fails is one everybody learns to update without
+reading. The cost, stated plainly: a doc comment that lies is invisible to this
+check. That is a review problem, not a gate problem.
+
+The entrypoint's `export { … }` is exploded to one name per line, because
+`tsup` emits all 200-odd names on a single line and diffing it as a line reports
+the whole list as changed when one export moves. Exploded, a deleted export is
+three lines naming it.
 
 ---
 
