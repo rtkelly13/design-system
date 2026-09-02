@@ -102,9 +102,43 @@ code, pre {
   font-family: var(--ds-font-mono) !important;
 }
 
-/* Global Brutalist Enforcement */
-*, *::before, *::after {
-  border-radius: 0px !important;
+/* Zero radius, enforced where a radius can actually arrive.
+ *
+ * This was `*, *::before, *::after { border-radius: 0px !important }`. Importing
+ * `styles.css` therefore squared every element in the consuming document — a
+ * third-party date picker, map control, embedded player or the host element of
+ * a payment iframe, none of which this package renders, with no opt-out short
+ * of a more specific `!important`. Defensible for a first-party site;
+ * surprising for a package on public npm.
+ *
+ * Scoping it to `[data-theme] *`, the obvious narrowing, would have changed
+ * nothing: `data-theme` goes on the root, so every element in the document is
+ * still a descendant of it.
+ *
+ * What narrows it is asking what the universal rule was actually doing. The UA
+ * default radius is 0 for everything except form controls, and this package
+ * sets a radius nowhere — so on the system's own surface the rule was a no-op.
+ * Its only live effects were those controls and overriding a consumer's CSS.
+ * The first is worth keeping; the second was the bug.
+ *
+ * Tailwind's own preflight covers `button, input, select, optgroup, textarea`
+ * already. This is not redundant with it: `tailwindcss` is an *optional* peer
+ * dependency here, so the consumer supplies it and may be on a version whose
+ * preflight differs, or may not be applying preflight at all. The contract this
+ * file offers has to hold on its own.
+ *
+ * No `!important`. A component that needs to beat a radius from somewhere else
+ * carries `rounded-none` on the element, which is where styling lives here.
+ */
+button,
+input,
+select,
+optgroup,
+textarea,
+fieldset,
+dialog,
+::file-selector-button {
+  border-radius: 0;
 }
 
 /* Keyboard focus must stay visible even where a component replaces the ring
