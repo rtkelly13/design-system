@@ -282,7 +282,23 @@ Four rules follow from that, and they are what keep four levels maintainable:
    `pnpm check:contrast` able to audit all 200 role pairs without a browser.
 
 Selection is `data-theme="<level>"` on the root (the level class is mirrored for consumers
-whose own CSS selects on it). `<ThemeProvider scoped>` themes a subtree instead — a `bright`
+whose own CSS selects on it).
+
+**The pre-0.2.0 names are rejected, not aliased.** That ladder was
+`dark | dim | sketch` selected by a class; 0.2.0 made it four levels on
+`data-theme`, a clean 1:1 rename (`dark`→`midnight`, `sketch`→`bright`, `dim`
+unchanged) with `white` added. No `[data-theme="dark"]` alias is emitted, and
+`isThemeLevel()` returns false for the old names — because a shim in
+`theme.css` would have been trivial to write and impossible to remove, and this
+package already carries one deprecated compat block it is stuck with for
+exactly that reason.
+
+What replaces the shim is noise where it is useful: `reportRenamedLevel()` logs
+once when a pre-0.2.0 name arrives from `localStorage` or the `data-theme`
+attribute, naming the replacement. A selector that matches nothing fails
+silently otherwise, which is the failure `Divider`'s doc comment was written
+about. `RENAMED_LEVELS` is exported as a diagnostic table for a consumer's own
+migration code — nothing in this package resolves through it. `<ThemeProvider scoped>` themes a subtree instead — a `bright`
 panel inside a `midnight` page resolves correctly at any depth. For SSR, render
 `getThemeInitScript()` in an inline `<script>` in `<head>`: it sets the attribute before
 first paint, which React cannot do without either a flash or a hydration mismatch.
