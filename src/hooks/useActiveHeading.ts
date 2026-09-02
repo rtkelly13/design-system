@@ -39,6 +39,7 @@ export function useActiveHeading(
 
     const headingIds = key ? key.split('|') : [];
     if (headingIds.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clearing a stale heading when the TOC empties; there is no render-time value to derive it from.
       setActive(null);
       return;
     }

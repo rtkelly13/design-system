@@ -237,6 +237,36 @@ because the plugin defaults to the singular `style.css`; and `recipe` in its
 `functions`, or it never looks inside a recipe, which is where most class strings
 live.
 
+### The general ruleset underneath them
+
+Those two rules are the interesting ones, and for a long time they were the
+*only* ones — `typescript-eslint` was imported for `tseslint.config()` and its
+parser with no recommended set spread in, and neither `react-hooks` nor
+`jsx-a11y` was installed. So nothing checked an unused variable, a misused
+promise, an exhaustive dependency list, or any accessibility invariant.
+
+What that let through is worth stating, because it is the argument for the
+noise: `SlideDeck` passed all nine CI gates while registering its keydown
+handler on `window` and calling `preventDefault()` on Space — the space bar
+stopped working in every text field on the page for as long as a deck was
+mounted anywhere — while setting `isFullscreen` by hand so Esc desynced it from
+the browser, and shipping three icon-only controls with no accessible name.
+
+Turning the sets on cost 31 violations across the repo, which was small enough
+to fix outright rather than ratchet. Three kinds needed a judgement rather than
+a fix, and each carries a `-- reason` on its disable comment:
+
+| Rule | Sites | Why it stands |
+|---|---|---|
+| `react-hooks/set-state-in-effect` | `Modal`, `ThemeProvider`, `useActiveHeading` | The SSR mount guard and the hydration reconciliation against the init script are deliberate and documented where they sit; the render they cost is what keeps server and client markup identical. |
+| `react-hooks/static-components` | `DocsLinkProvider` | `Component` is read from context, not constructed during render. |
+| `jsx-a11y/no-static-element-interactions` | `Modal` backdrop | A backdrop is not a control; Escape is the keyboard path and a `button` role would put a meaningless stop in the tab order. |
+
+One rule is configured rather than taken as-is: `no-noninteractive-tabindex`
+allows `group` alongside the default `tabpanel`, because the ARIA carousel
+pattern is a focusable `role="group"` and a composite widget has to be focusable
+for its own keys to reach it.
+
 **Its one blind spot is a class string wrapped in a method call** —
 `className={foo.trim()}` is not traversed, where `cn(...)`, a recipe slot, a
 template literal and a plain string all are. That is one more reason composition
@@ -339,7 +369,7 @@ consumers keep compiling, but they are deprecated — do not use them in new cod
 - `pnpm tokens:check`: Fails if the generated CSS is stale. Runs in CI.
 - `pnpm check:contrast`: Audits every role pair on every level. Runs in CI.
 - `pnpm contrast:report`: Prints the full matrix with margins, worst first.
-- `pnpm lint`: Reports a colour written as a literal at the line that wrote it. Runs in CI.
+- `pnpm lint`: The two custom rules (a colour written as a literal, a class naming nothing) plus `typescript-eslint` recommended, `react-hooks` and `jsx-a11y`. Runs in CI.
 - `pnpm lint:fix`: Same, applying any autofixes.
 - `pnpm check:css`: Ratchet on styling that lives in a stylesheet. Runs in CI.
 - `pnpm check:css:list`: Same, showing the offending selectors.

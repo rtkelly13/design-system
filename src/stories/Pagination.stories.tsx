@@ -32,9 +32,11 @@ export const AsLinks: Story = {
   },
 };
 
+function InteractivePagination() {
+  const [page, setPage] = useState(1);
+  return <Pagination totalPages={6} currentPage={page} onPageChange={setPage} />;
+}
+
 export const Interactive: Story = {
-  render: () => {
-    const [page, setPage] = useState(1);
-    return <Pagination totalPages={6} currentPage={page} onPageChange={setPage} />;
-  },
+  render: () => <InteractivePagination />,
 };

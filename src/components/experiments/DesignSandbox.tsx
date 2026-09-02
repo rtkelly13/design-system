@@ -17,7 +17,7 @@ import { Slide } from '../slides/Slide';
 import { LoremIpsumPost } from '../blog/LoremIpsumPost';
 import { useTheme } from '../ThemeProvider';
 import { LEVELS } from '../../theme/levels';
-import { Activity, ShieldCheck, Cpu, DollarSign, Layers, Search, ShoppingBag } from 'lucide-react';
+import { Activity, ShieldCheck, Cpu, DollarSign, ShoppingBag } from 'lucide-react';
 
 interface UserRecord {
   id: string;

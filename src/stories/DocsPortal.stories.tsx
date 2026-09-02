@@ -148,41 +148,43 @@ function SampleBody() {
   );
 }
 
-export const FullPortal: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
+function FullDocsPortal() {
+  const [open, setOpen] = useState(false);
 
-    return (
-      <DocsLayout
-        sidebarOpen={open}
-        onCloseSidebar={() => setOpen(false)}
-        header={
-          <DocsHeader
-            title="TVS Docs"
-            icon={BookOpen}
-            nav={[
-              { label: 'Docs', href: '/docs', active: true },
-              { label: 'CLI', href: '/docs/cli' },
-              { label: 'GitHub', href: 'https://github.com' },
-            ]}
-            onSearch={() => undefined}
-            onToggleSidebar={() => setOpen((v) => !v)}
-            sidebarOpen={open}
-          />
-        }
-        sidebar={
-          <DocsSidebar
-            nav={NAV}
-            currentPath="/docs/cli/introspection"
-            onNavigate={() => setOpen(false)}
-          />
-        }
-        toc={<TableOfContents toc={TOC} spy={false} />}
-      >
-        <SampleBody />
-      </DocsLayout>
-    );
-  },
+  return (
+    <DocsLayout
+      sidebarOpen={open}
+      onCloseSidebar={() => setOpen(false)}
+      header={
+        <DocsHeader
+          title="TVS Docs"
+          icon={BookOpen}
+          nav={[
+            { label: 'Docs', href: '/docs', active: true },
+            { label: 'CLI', href: '/docs/cli' },
+            { label: 'GitHub', href: 'https://github.com' },
+          ]}
+          onSearch={() => undefined}
+          onToggleSidebar={() => setOpen((v) => !v)}
+          sidebarOpen={open}
+        />
+      }
+      sidebar={
+        <DocsSidebar
+          nav={NAV}
+          currentPath="/docs/cli/introspection"
+          onNavigate={() => setOpen(false)}
+        />
+      }
+      toc={<TableOfContents toc={TOC} spy={false} />}
+    >
+      <SampleBody />
+    </DocsLayout>
+  );
+}
+
+export const FullPortal: Story = {
+  render: () => <FullDocsPortal />,
 };
 
 export const ProseOnly: Story = {

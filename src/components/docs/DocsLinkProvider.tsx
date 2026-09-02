@@ -64,6 +64,7 @@ export function DocsLink({ href, children, ...rest }: DocsLinkProps) {
   }
 
   return (
+    // eslint-disable-next-line react-hooks/static-components -- `Component` is read from context, not constructed during render: a consumer supplies its router's Link once and it is stable for the life of the provider.
     <Component href={href} {...rest}>
       {children}
     </Component>

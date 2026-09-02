@@ -101,7 +101,18 @@ const MANIFEST = {
     kind: 'dev',
     why: 'Reports a colour written as a literal at the line that wrote it. Replaced the check-tokens.mjs ratchet, whose text-regex counted matches inside comments and regexes and so could never reach zero.',
   },
-  'typescript-eslint': { kind: 'dev', why: 'TSX parser for the lint rule above; the violations live in JSX attributes.' },
+  'typescript-eslint': {
+    kind: 'dev',
+    why: 'TSX parser for the lint rules above, and the recommended ruleset \u2014 for a long time only the parser was used, so nothing checked an unused variable or a misused promise.',
+  },
+  'eslint-plugin-react-hooks': {
+    kind: 'dev',
+    why: 'Hook rules. SlideDeck\u2019s keydown effect listed [totalSlides] while closing over three handlers it did not declare, and was harmless only because the setters it reached happened to be functional \u2014 exhaustive-deps exists so that is not what correctness rests on.',
+  },
+  'eslint-plugin-jsx-a11y': {
+    kind: 'dev',
+    why: 'Accessibility invariants decidable from source \u2014 a control with no accessible name, a click handler on an element no keyboard can reach. The static half of the a11y gate; an axe run over the built stories is the other half and neither subsumes it.',
+  },
   'eslint-plugin-tailwindcss': {
     kind: 'dev',
     why: 'no-custom-classname, the only check that catches a class naming nothing — the failure Tailwind is silent about. Its whitelist is derived from the stylesheets by scripts/authored-classes.mjs, so it asks "does this class exist" rather than "is it a Tailwind class".',

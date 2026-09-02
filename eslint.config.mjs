@@ -1,5 +1,7 @@
 import tseslint from 'typescript-eslint';
 import tailwindcss from 'eslint-plugin-tailwindcss';
+import reactHooks from 'eslint-plugin-react-hooks';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 import { authoredClasses } from './scripts/authored-classes.mjs';
 import { noColourLiterals } from './scripts/eslint-token-rule.mjs';
@@ -58,6 +60,82 @@ export default tseslint.config(
       'coverage/**',
       'temp/**',
     ],
+  },
+  {
+    /**
+     * The general-purpose ruleset.
+     *
+     * The two rules below are this repo's own, and they are the interesting
+     * ones — but for a long time they were the *only* ones. `typescript-eslint`
+     * was imported for `tseslint.config()` and its parser, with no recommended
+     * set spread in, so nothing checked an unused variable, a misused promise,
+     * an exhaustive hook dependency list or any accessibility invariant. Nine
+     * CI gates and a component could hijack the page's keyboard, desync its
+     * fullscreen state from the browser and ship three unlabelled icon buttons
+     * through all of them — see the `SlideDeck` fixes that landed with this
+     * config.
+     *
+     * Scoped to `src/**` because that is what `pnpm lint` runs over. Wider than
+     * the two custom rules below, which stop at `components` and `stories` for
+     * reasons documented at each.
+     */
+    name: 'design-system/general',
+    files: ['src/**/*.{ts,tsx}'],
+    extends: [tseslint.configs.recommended],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+  },
+  {
+    /**
+     * Hook rules, and the reason they are worth the noise.
+     *
+     * `SlideDeck`'s keydown effect declared `[totalSlides]` while closing over
+     * three handlers it did not list. That was harmless only by accident — the
+     * state setters it reached were all functional updates — which is exactly
+     * the condition `exhaustive-deps` exists to stop depending on.
+     */
+    name: 'design-system/react-hooks',
+    files: ['src/**/*.{ts,tsx}'],
+    // The plugin still ships its recommended set with an eslintrc-shaped
+    // `plugins: ['react-hooks']` array, which flat config rejects. Register the
+    // plugin object here and reuse its rule list, so the set stays whatever
+    // upstream recommends rather than being copied out and pinned by hand.
+    plugins: { 'react-hooks': reactHooks },
+    rules: reactHooks.configs['recommended-latest'].rules,
+  },
+  {
+    /**
+     * Accessibility invariants that can be decided from the source.
+     *
+     * This is the static half of the gap #52 covers; an axe run over the built
+     * stories is the other half, and neither subsumes the other. What this
+     * catches is the shape of the markup — a control with no accessible name, a
+     * handler on a non-interactive element, an `aria-*` attribute that does not
+     * exist. What it cannot see is contrast, focus order, or anything that
+     * depends on the rendered tree.
+     */
+    name: 'design-system/jsx-a11y',
+    files: ['src/**/*.tsx'],
+    extends: [jsxA11y.flatConfigs.recommended],
+    rules: {
+      /**
+       * `group` joins the default `tabpanel` as a role that may hold
+       * `tabIndex={0}`.
+       *
+       * A composite widget has to be focusable for its own keys to reach it, and
+       * the ARIA carousel pattern is exactly this shape: `role="group"` plus an
+       * `aria-roledescription`, with the container taking focus so the arrow
+       * keys work. `SlideDeck` is the case — the alternative to a focusable
+       * container is the `window` listener it just stopped using, which is
+       * strictly worse for a keyboard user because it fires everywhere.
+       */
+      'jsx-a11y/no-noninteractive-tabindex': [
+        'error',
+        { tags: [], roles: ['tabpanel', 'group'], allowExpressionValues: true },
+      ],
+    },
   },
   {
     name: 'design-system/tokens',
