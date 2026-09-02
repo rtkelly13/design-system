@@ -52,6 +52,24 @@ const EXCLUDED = {
     'Renders the contrast gate’s own numbers. `pnpm check:contrast` already fails CI on any violation, so a pixel diff of the table adds nothing and would churn on every palette tweak.',
   'showcase-designsandbox--default-sandbox':
     'The kitchen sink — every component, several screens tall. Too broad to localise a failure, and it changes whenever anything does.',
+  'foundations-nerdicon--developer-glyphs':
+    'Glyph catalogue asserting font rendering across symbols; asserted in walkthrough suite.',
+  'foundations-nerdicon--bracketed-in-ui':
+    'Composes Button and Badge, each asserted by their own visual baselines.',
+  'foundations-nerdicon--table-sort-demo':
+    'Table sort demo; covered by unit tests and walkthrough suite.',
+  'foundations-nerdicon--typographic-ascii-mix':
+    'Pure ASCII symbol variations; covered by Glyph unit tests.',
+  'foundations-datatable--default':
+    'Headless TanStack data table; asserted across walkthrough suite and unit tests.',
+  'foundations-datatable--with-rendered-cells':
+    'Custom cell rendered data table with sorting and badges; asserted across walkthrough suite.',
+  'foundations-datatable--empty':
+    'Empty state data table; asserted in walkthrough suite.',
+  'foundations-datatable--headless-tan-stack-table':
+    'Controlled TanStack table state machine; asserted in unit tests.',
+  'foundations-datatable--compound-table':
+    'Low-level compound Table primitives; asserted in walkthrough suite.',
 };
 
 /**

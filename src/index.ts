@@ -38,8 +38,11 @@ export * from './components/NoteBlock';
 export * from './components/TLDR';
 export * from './components/Input';
 export * from './components/StatCard';
+export * from './components/Table';
 export * from './components/DataTable';
 export * from './components/Modal';
+export * from './components/NerdIcon';
+export * from './components/Glyph';
 
 // Slides & Presentation Deck Engine
 export * from './components/slides/Slide';
