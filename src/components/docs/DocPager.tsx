@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { DocsLink } from './DocsLinkProvider';
+import { cn } from '../../lib/recipe';
 
 export interface DocPagerTarget {
   label: string;
@@ -26,7 +27,7 @@ export function DocPager({ prev, next, className = '' }: DocPagerProps) {
   if (!prev && !next) return null;
 
   return (
-    <nav className={`not-prose docs-pager ${className}`.trim()} aria-label="Page navigation">
+    <nav className={cn('not-prose docs-pager', className)} aria-label="Page navigation">
       {prev ? (
         <DocsLink href={prev.href} className="docs-pager-link" rel="prev">
           <span className="docs-pager-dir">

@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react';
 import type { HTMLAttributes, ReactNode } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
+import { cn } from '../../lib/recipe';
 
 export interface CodeBlockProps extends HTMLAttributes<HTMLPreElement> {
   children: ReactNode;
@@ -41,7 +42,7 @@ export function CodeBlock({
   }, [copy]);
 
   return (
-    <div className={`docs-codeblock ${className}`.trim()}>
+    <div className={cn('docs-codeblock', className)}>
       {(title || language) && (
         <div className="docs-codeblock-bar">
           {title && <span className="docs-codeblock-title">{title}</span>}

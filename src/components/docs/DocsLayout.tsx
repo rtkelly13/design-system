@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { cn } from '../../lib/recipe';
 
 export interface DocsLayoutProps {
   /** Rendered above everything, sticky. Normally a `DocsHeader`. */
@@ -54,7 +55,7 @@ export function DocsLayout({
   }, [sidebarOpen, onCloseSidebar]);
 
   return (
-    <div className={`docs-layout ${className}`.trim()}>
+    <div className={cn('docs-layout', className)}>
       {header}
 
       <div className="docs-layout-body">

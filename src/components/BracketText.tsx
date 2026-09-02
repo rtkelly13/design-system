@@ -1,5 +1,6 @@
 import type { ReactNode, HTMLAttributes } from 'react';
 import type { AccentToken } from '../lib/theme';
+import { cn } from '../lib/recipe';
 
 export interface BracketTextProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;
@@ -33,7 +34,7 @@ export function BracketText({
   const accentClass = accent ? accentClasses[accent] : '';
 
   return (
-    <span className={`${accentClass} ${className}`.trim()} {...props}>
+    <span className={cn(accentClass, className)} {...props}>
       <span aria-hidden="true">
         [
       </span>{' '}

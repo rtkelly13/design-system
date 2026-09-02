@@ -4,6 +4,7 @@ import { Menu, Palette, Search, X } from 'lucide-react';
 import { DocsLink } from './DocsLinkProvider';
 import { useTheme } from '../ThemeProvider';
 import { LEVELS } from '../../theme/levels';
+import { cn } from '../../lib/recipe';
 
 export interface DocsNavItem {
   label: string;
@@ -86,7 +87,7 @@ export function DocsHeader({
   }, []);
 
   return (
-    <header ref={ref} className={`not-prose docs-header ${className}`.trim()}>
+    <header ref={ref} className={cn('not-prose docs-header', className)}>
       <div className="docs-header-left">
         {onToggleSidebar && (
           <button

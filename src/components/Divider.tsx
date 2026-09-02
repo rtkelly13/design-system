@@ -2,6 +2,7 @@ import React from 'react';
 import { LEVELS, DEFAULT_LEVEL } from '../theme/levels';
 import type { Polarity } from '../theme/levels';
 import { useOptionalTheme } from './ThemeProvider';
+import { cn } from '../lib/recipe';
 
 /**
  * A rule drawn in characters rather than pixels.
@@ -81,7 +82,10 @@ export const Divider: React.FC<DividerProps> = ({
 
   return (
     <div
-      className={`font-mono text-accent-primary tracking-[0.2em] select-none my-6 overflow-hidden whitespace-nowrap ${className}`.trim()}
+      className={cn(
+        'font-mono text-accent-primary tracking-[0.2em] select-none my-6 overflow-hidden whitespace-nowrap',
+        className
+      )}
       // Clipped, not truncated: an ellipsis on a rule reads as a broken string.
       // The mark is decoration, so losing its tail to a narrow container is
       // correct and `aria-hidden` keeps it out of the accessibility tree.
