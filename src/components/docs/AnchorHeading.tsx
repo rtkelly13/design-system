@@ -129,5 +129,3 @@ export function createAnchorHeading(level: HeadingLevel) {
   Heading.displayName = `AnchorHeading${level}`;
   return Heading;
 }
-
-export default AnchorHeading;

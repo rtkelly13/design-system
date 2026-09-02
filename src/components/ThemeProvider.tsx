@@ -193,5 +193,3 @@ export const useTheme = (): ThemeContextValue => {
  */
 export const useOptionalTheme = (): ThemeContextValue | undefined =>
   useContext(ThemeContext);
-
-export default ThemeProvider;

@@ -273,5 +273,3 @@ export const DesignSandbox: React.FC = () => {
     </div>
   );
 };
-
-export default DesignSandbox;

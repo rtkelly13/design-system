@@ -92,5 +92,3 @@ export const Divider: React.FC<DividerProps> = ({
     </div>
   );
 };
-
-export default Divider;
