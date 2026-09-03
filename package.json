@@ -27,6 +27,8 @@
     "tokens:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs --check",
     "check:contrast": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs",
     "contrast:report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs --report",
+    "check:separation": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-separation.mjs",
+    "separation:report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-separation.mjs --report",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "check:css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs",

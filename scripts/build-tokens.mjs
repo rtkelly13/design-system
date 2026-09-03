@@ -53,6 +53,21 @@ const BANNER = `/* GENERATED FILE — DO NOT EDIT.
  * The Tailwind --color-* aliases DO indirect through --ds-*, so that a consumer
  * can override a role and have the utilities follow. Those are therefore
  * re-declared inside each level block, which is free in a generated file.
+ *
+ * ============================================================================
+ * --ds-syntax-*-weight and --ds-syntax-*-style are SPARSE
+ * ============================================================================
+ *
+ * A syntax role that renders at the body weight, upright, declares nothing —
+ * so --ds-syntax-keyword-weight exists on the light rungs and not on the dark
+ * ones, and only the comment role has a -style. Read them WITH a fallback:
+ *
+ *   font-weight: var(--ds-syntax-keyword-weight, 400);
+ *   font-style:  var(--ds-syntax-comment-style, normal);
+ *
+ * Without one the property resolves to an invalid value and is dropped, which
+ * is a silently wrong weight rather than an error. From TypeScript, prefer
+ * syntaxWeightVar() / syntaxStyleVar(), which carry the fallbacks for you.
  */`;
 
 /** `--ds-*` custom properties for one level, in a stable order. */
@@ -65,6 +80,15 @@ function levelVariables(definition) {
   for (const [key, value] of Object.entries(definition.border)) push(`border-${key}`, value);
   for (const [key, value] of Object.entries(definition.accent)) push(`accent-${key}`, value);
   for (const [key, value] of Object.entries(definition.intent)) push(`intent-${key}`, value);
+  for (const [key, value] of Object.entries(definition.syntax)) push(`syntax-${key}`, value);
+  // Emphasis is sparse by design — a role with no entry renders at the body
+  // weight, upright, so emitting a default for it would be noise in every
+  // level block. The fallback that requires is stated in the banner and
+  // encoded in `syntaxWeightVar()` / `syntaxStyleVar()`.
+  for (const [key, value] of Object.entries(definition.syntaxEmphasis)) {
+    if (value.weight !== undefined) push(`syntax-${key}-weight`, String(value.weight));
+    if (value.italic) push(`syntax-${key}-style`, 'italic');
+  }
   push('shadow-color', definition.shadow);
   push('polarity', definition.polarity);
 
@@ -104,6 +128,22 @@ const ROLE_SHADOWS = ACCENT_ROLES.map(
 ).join('\n');
 
 /**
+ * Tailwind aliases for the syntax roles, derived from the ladder itself.
+ *
+ * Listed nowhere: a role added to `levels.ts` gets its `--color-syntax-*`
+ * alias — and therefore its `text-syntax-*` utility — without a second edit
+ * here. Without these a component could only reach a syntax colour by writing
+ * `var(--ds-syntax-keyword)` by hand, which the styling rule exists to prevent.
+ *
+ * Only the colours. Weight and slant are sparse and are read through
+ * `syntaxWeightVar()` / `syntaxStyleVar()`, which carry the fallbacks; a
+ * Tailwind alias has nowhere to put one.
+ */
+const SYNTAX_ALIASES = Object.keys(LEVELS[THEME_LEVELS[0]].syntax)
+  .map((role) => `  --color-syntax-${role}: var(--ds-syntax-${role});`)
+  .join('\n');
+
+/**
  * The Tailwind-facing aliases and the shadow utilities, repeated per level so
  * that var() substitution re-runs at the themed element. See the banner.
  */
@@ -126,6 +166,7 @@ const TAILWIND_ALIASES = `  --color-surface-base: var(--ds-surface-base);
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+${SYNTAX_ALIASES}
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);

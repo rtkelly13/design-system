@@ -149,17 +149,39 @@ describe('indirected @theme tokens are re-declared in every level block', () => 
   // AGENTS.md tells consumers to prefer the semantic aliases over the palette
   // names, so these are the ones that most need to follow a nested panel — and
   // historically they were the half that did not.
-  it('covers every semantic alias family, on every level', () => {
-    const families = ['accent', 'intent', 'surface', 'content', 'edge'];
+  //
+  // The family list is DERIVED, not written. A hand-listed one covers exactly
+  // the families someone remembered: adding `--color-syntax-*` to `@theme` and
+  // forgetting the list leaves the newest family — the one most likely to be
+  // wrong — as the only one unchecked, and the suite stays green. Same argument
+  // as `scripts/authored-classes.mjs`: ask what exists, do not restate it.
+  const DEPRECATED_FAMILIES = new Set(['brutalist']);
 
-    for (const family of families) {
-      const aliases = [...themeTokens.keys()].filter((t) => t.startsWith(`--color-${family}-`));
+  const semanticFamilies = [
+    ...new Set(
+      [...themeTokens.keys()]
+        .map((token) => /^--color-([a-z0-9]+)-/.exec(token)?.[1])
+        .filter((family): family is string => family !== undefined)
+        .filter((family) => !DEPRECATED_FAMILIES.has(family)),
+    ),
+  ].sort();
 
-      expect(aliases.length, `no --color-${family}-* aliases found`).toBeGreaterThan(0);
-      for (const alias of aliases) {
-        for (const [level, tokens] of levelTokens) {
-          expect(tokens.has(alias), `${alias} missing from ${selectorFor(level)}`).toBe(true);
-        }
+  // The derivation itself can fail open — a changed alias prefix would yield an
+  // empty list and a vacuously passing loop. These are the families that exist
+  // today; the assertion is that the list only ever grows.
+  it('derives the family list from the aliases that exist', () => {
+    expect(semanticFamilies).toEqual(
+      expect.arrayContaining(['accent', 'content', 'edge', 'intent', 'surface', 'syntax']),
+    );
+  });
+
+  it.each(semanticFamilies)('every --color-%s-* alias follows a nested panel', (family) => {
+    const aliases = [...themeTokens.keys()].filter((t) => t.startsWith(`--color-${family}-`));
+
+    expect(aliases.length, `no --color-${family}-* aliases found`).toBeGreaterThan(0);
+    for (const alias of aliases) {
+      for (const [level, tokens] of levelTokens) {
+        expect(tokens.has(alias), `${alias} missing from ${selectorFor(level)}`).toBe(true);
       }
     }
   });

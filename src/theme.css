@@ -24,6 +24,21 @@
  * The Tailwind --color-* aliases DO indirect through --ds-*, so that a consumer
  * can override a role and have the utilities follow. Those are therefore
  * re-declared inside each level block, which is free in a generated file.
+ *
+ * ============================================================================
+ * --ds-syntax-*-weight and --ds-syntax-*-style are SPARSE
+ * ============================================================================
+ *
+ * A syntax role that renders at the body weight, upright, declares nothing —
+ * so --ds-syntax-keyword-weight exists on the light rungs and not on the dark
+ * ones, and only the comment role has a -style. Read them WITH a fallback:
+ *
+ *   font-weight: var(--ds-syntax-keyword-weight, 400);
+ *   font-style:  var(--ds-syntax-comment-style, normal);
+ *
+ * Without one the property resolves to an invalid value and is dropped, which
+ * is a silently wrong weight rather than an error. From TypeScript, prefer
+ * syntaxWeightVar() / syntaxStyleVar(), which carry the fallbacks for you.
  */
 
 /* Tailwind v4 skips node_modules during automatic content detection, so the
@@ -80,6 +95,14 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-syntax-keyword: var(--ds-syntax-keyword);
+  --color-syntax-string: var(--ds-syntax-string);
+  --color-syntax-number: var(--ds-syntax-number);
+  --color-syntax-function: var(--ds-syntax-function);
+  --color-syntax-type: var(--ds-syntax-type);
+  --color-syntax-variable: var(--ds-syntax-variable);
+  --color-syntax-comment: var(--ds-syntax-comment);
+  --color-syntax-punctuation: var(--ds-syntax-punctuation);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -153,6 +176,15 @@
   --ds-intent-success: #39ff14;
   --ds-intent-warning: #facc15;
   --ds-intent-danger: #ec4899;
+  --ds-syntax-keyword: #ec4899;
+  --ds-syntax-string: #facc15;
+  --ds-syntax-number: #ddd6fe;
+  --ds-syntax-function: #67e8f9;
+  --ds-syntax-type: #5eead4;
+  --ds-syntax-variable: #ffffff;
+  --ds-syntax-comment: #8b8ba3;
+  --ds-syntax-punctuation: #a8a8c0;
+  --ds-syntax-comment-style: italic;
   --ds-shadow-color: #ffffff;
   --ds-polarity: dark;
 
@@ -175,6 +207,14 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-syntax-keyword: var(--ds-syntax-keyword);
+  --color-syntax-string: var(--ds-syntax-string);
+  --color-syntax-number: var(--ds-syntax-number);
+  --color-syntax-function: var(--ds-syntax-function);
+  --color-syntax-type: var(--ds-syntax-type);
+  --color-syntax-variable: var(--ds-syntax-variable);
+  --color-syntax-comment: var(--ds-syntax-comment);
+  --color-syntax-punctuation: var(--ds-syntax-punctuation);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -238,6 +278,15 @@
   --ds-intent-success: #4ade80;
   --ds-intent-warning: #fbbf24;
   --ds-intent-danger: #f43f5e;
+  --ds-syntax-keyword: #f43f5e;
+  --ds-syntax-string: #fbbf24;
+  --ds-syntax-number: #c4b5fd;
+  --ds-syntax-function: #7dd3fc;
+  --ds-syntax-type: #5eead4;
+  --ds-syntax-variable: #e4e4e7;
+  --ds-syntax-comment: #8a8b93;
+  --ds-syntax-punctuation: #a1a2ac;
+  --ds-syntax-comment-style: italic;
   --ds-shadow-color: #e4e4e7;
   --ds-polarity: dark;
 
@@ -260,6 +309,14 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-syntax-keyword: var(--ds-syntax-keyword);
+  --color-syntax-string: var(--ds-syntax-string);
+  --color-syntax-number: var(--ds-syntax-number);
+  --color-syntax-function: var(--ds-syntax-function);
+  --color-syntax-type: var(--ds-syntax-type);
+  --color-syntax-variable: var(--ds-syntax-variable);
+  --color-syntax-comment: var(--ds-syntax-comment);
+  --color-syntax-punctuation: var(--ds-syntax-punctuation);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -323,6 +380,17 @@
   --ds-intent-success: #146c34;
   --ds-intent-warning: #9a4708;
   --ds-intent-danger: #c81e1e;
+  --ds-syntax-keyword: #a21657;
+  --ds-syntax-string: #8a5a00;
+  --ds-syntax-number: #6b21a8;
+  --ds-syntax-function: #1e40af;
+  --ds-syntax-type: #0e7490;
+  --ds-syntax-variable: #18181b;
+  --ds-syntax-comment: #8b8a80;
+  --ds-syntax-punctuation: #77756c;
+  --ds-syntax-keyword-weight: 700;
+  --ds-syntax-type-weight: 600;
+  --ds-syntax-comment-style: italic;
   --ds-shadow-color: #18181b;
   --ds-polarity: light;
 
@@ -345,6 +413,14 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-syntax-keyword: var(--ds-syntax-keyword);
+  --color-syntax-string: var(--ds-syntax-string);
+  --color-syntax-number: var(--ds-syntax-number);
+  --color-syntax-function: var(--ds-syntax-function);
+  --color-syntax-type: var(--ds-syntax-type);
+  --color-syntax-variable: var(--ds-syntax-variable);
+  --color-syntax-comment: var(--ds-syntax-comment);
+  --color-syntax-punctuation: var(--ds-syntax-punctuation);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -408,6 +484,17 @@
   --ds-intent-success: #146c34;
   --ds-intent-warning: #9a4708;
   --ds-intent-danger: #b91c1c;
+  --ds-syntax-keyword: #a4123f;
+  --ds-syntax-string: #7a4a06;
+  --ds-syntax-number: #5b21b6;
+  --ds-syntax-function: #1e3a8a;
+  --ds-syntax-type: #115e59;
+  --ds-syntax-variable: #0b0b0d;
+  --ds-syntax-comment: #85898f;
+  --ds-syntax-punctuation: #6a6e75;
+  --ds-syntax-keyword-weight: 700;
+  --ds-syntax-type-weight: 600;
+  --ds-syntax-comment-style: italic;
   --ds-shadow-color: #0b0b0d;
   --ds-polarity: light;
 
@@ -430,6 +517,14 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-syntax-keyword: var(--ds-syntax-keyword);
+  --color-syntax-string: var(--ds-syntax-string);
+  --color-syntax-number: var(--ds-syntax-number);
+  --color-syntax-function: var(--ds-syntax-function);
+  --color-syntax-type: var(--ds-syntax-type);
+  --color-syntax-variable: var(--ds-syntax-variable);
+  --color-syntax-comment: var(--ds-syntax-comment);
+  --color-syntax-punctuation: var(--ds-syntax-punctuation);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
