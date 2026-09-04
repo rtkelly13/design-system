@@ -247,6 +247,32 @@ goes through `cn` or `recipe`: the alternatives are invisible to the check.
 
 ---
 
+## 🎯 Selection State
+
+**A selected item is marked with an accent `fill` or a 4px accent `edge`. Never
+with one surface against another.**
+
+The surfaces exist to *layer* — a strip behind its tabs, a panel over a page —
+so they are deliberately close in lightness: `surface.raised` against
+`surface.base` is under 1.1:1 on every rung, and on `bright` it is 1.03:1. A
+widget that marks its chosen tab `bg-surface-base` among `bg-surface-raised`
+siblings therefore reads on `midnight`, where the reviewer usually is, and is
+invisible on the light rungs. That is exactly how it shipped once, in the blog.
+
+`pnpm check:contrast` now carries the rule as arithmetic
+(`auditSelectionDevices` in `src/theme/contrast.ts`): every accent fill and edge
+must clear 3:1 against `base` and `raised` on every level, and the surface pairs
+are printed in the report so the number that rules them out is in the output
+rather than in someone's memory. `src/theme/contrast.test.ts` asserts both
+halves. `CodeTabs` is the worked example — three variants, each selecting by
+fill or edge, none by surface.
+
+Pair either device with a text change (`text-content-muted` →
+`text-content-primary`, or `text-content-inverse` on a fill) so the state reads
+at a glance and not only in colour.
+
+---
+
 ## 🪜 The Theme Ladder
 
 **`src/theme/levels.ts` is the only place a level name or a level colour is written.**

@@ -131,6 +131,12 @@ export const MINIMUM_RATIO = {
    * threshold — an assertion that the scrim does the one job it exists for.
    */
   overlaySeparation: 3,
+  /**
+   * A selection device — the accent `fill` behind a chosen tab, or the 4px
+   * accent `edge` beside it — against the surface it sits on. WCAG 1.4.11's
+   * non-text bar: the device is a UI component boundary, not text.
+   */
+  stateDevice: 3,
 } as const;
 
 export interface ContrastCheck {
@@ -238,6 +244,89 @@ export function auditContrast(
       minimum: MINIMUM_RATIO.overlaySeparation,
       passes: separation >= MINIMUM_RATIO.overlaySeparation,
     });
+  }
+
+  return results;
+}
+
+/** How a component may mark a selected item. */
+export type SelectionDevice = 'fill' | 'edge' | 'surface pair';
+
+export interface SelectionDeviceCheck {
+  level: ThemeLevel;
+  device: SelectionDevice;
+  /** e.g. `accent.primary on surface.raised`. */
+  pair: string;
+  foreground: string;
+  background: string;
+  ratio: number;
+  minimum: number;
+  /** For `fill` and `edge`: the device is usable. For `surface pair`: it would be, and that is the trap. */
+  passes: boolean;
+}
+
+/**
+ * The state rule, as arithmetic.
+ *
+ * Selected state is carried by an accent **fill** or an accent **edge**, never
+ * by swapping one surface for another. The reason is not taste: the surfaces
+ * exist to *layer* — a strip behind its tabs, a panel over a page — so they
+ * are deliberately close in lightness, and on the light rungs they are a few
+ * percent apart. A widget that marks its chosen tab `surface.base` among
+ * `surface.raised` siblings reads acceptably on `midnight` and is invisible on
+ * `bright`. That is how the bug ships: it passes review on the dark rung the
+ * reviewer happens to be on.
+ *
+ * So this audits both halves. The fill and edge devices — the accent against
+ * every surface a tab can sit on — must clear the non-text bar on every level,
+ * which is what makes the rule safe to follow. The surface pairs are measured
+ * too, and reported, so the number that makes them unusable is in the gate's
+ * output rather than in someone's memory. They are not expected to pass; a
+ * level on which they *did* would be the one where a surface-pair widget
+ * slips through.
+ */
+export function auditSelectionDevices(
+  ladder: Readonly<Record<ThemeLevel, LevelDefinition>>,
+): SelectionDeviceCheck[] {
+  const results: SelectionDeviceCheck[] = [];
+
+  for (const [level, def] of Object.entries(ladder) as [ThemeLevel, LevelDefinition][]) {
+    const grounds = [
+      ['surface.base', def.surface.base],
+      ['surface.raised', def.surface.raised],
+    ] as const;
+
+    const check = (
+      device: SelectionDevice,
+      pair: string,
+      foreground: string,
+      background: string,
+    ) => {
+      const ratio = contrastRatio(foreground, background);
+      results.push({
+        level,
+        device,
+        pair,
+        foreground,
+        background,
+        ratio,
+        minimum: MINIMUM_RATIO.stateDevice,
+        passes: ratio >= MINIMUM_RATIO.stateDevice,
+      });
+    };
+
+    for (const [groundName, ground] of grounds) {
+      // `quiet` is the de-emphasised step, not a fifth colour — a tab it
+      // marks is meant to recede, so it is not a selection device.
+      for (const tone of ['primary', 'secondary', 'tertiary'] as const satisfies readonly Emphasis[]) {
+        check('fill', `accent.${tone} fill on ${groundName}`, def.accent[tone], ground);
+        check('edge', `accent.${tone} edge on ${groundName}`, def.accent[tone], ground);
+      }
+    }
+
+    check('surface pair', 'surface.raised against surface.base', def.surface.raised, def.surface.base);
+    check('surface pair', 'surface.sunken against surface.base', def.surface.sunken, def.surface.base);
+    check('surface pair', 'surface.sunken against surface.raised', def.surface.sunken, def.surface.raised);
   }
 
   return results;
