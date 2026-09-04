@@ -2,6 +2,7 @@ import { isValidElement } from 'react';
 import type { AnchorHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 import { AnchorHeading, createAnchorHeading } from './AnchorHeading';
 import { CodeBlock } from './CodeBlock';
+import { CodeTab, CodeTabs } from './CodeTabs';
 import { DocsLink } from './DocsLinkProvider';
 import { NoteBlock } from '../NoteBlock';
 import { TLDR } from '../TLDR';
@@ -75,6 +76,8 @@ export const mdxComponents = {
   Tag,
   AsciiDivider,
   CodeBlock,
+  CodeTabs,
+  CodeTab,
 };
 
 export type MdxComponents = typeof mdxComponents;

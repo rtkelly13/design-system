@@ -1,5 +1,5 @@
-import { useCallback, useRef } from 'react';
-import type { HTMLAttributes, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useRef } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 
@@ -11,7 +11,29 @@ export interface CodeBlockProps extends HTMLAttributes<HTMLPreElement> {
   language?: string;
   /** Hide the copy button (e.g. for output-only samples). */
   copyable?: boolean;
+  /**
+   * Sit flush under a control that draws the top edge — a {@link CodeTabs}
+   * strip. Drops the block's own top margin and top rule so the seam between
+   * strip and block is one 2px line rather than two stacked ones. Defaults to
+   * whatever the nearest {@link CodeBlockAttachment} says, so a fenced block
+   * inside a tab panel attaches without the author knowing the prop exists.
+   */
+  attached?: boolean;
 }
+
+/**
+ * Tells every `CodeBlock` underneath that it is sitting inside a control that
+ * already draws its top edge. Provided by `CodeTabs`; read by `CodeBlock`.
+ */
+export const CodeBlockAttachment = createContext(false);
+
+/**
+ * `.docs-codeblock` is still plain CSS in `prose.css`, and plain CSS is
+ * unlayered — it beats every Tailwind utility regardless of source order, so
+ * `mt-0 border-t-0` on the wrapper would do nothing. Until the block migrates
+ * to a `recipe`, the override has to be inline. Delete this with the migration.
+ */
+const ATTACHED_STYLE: CSSProperties = { marginTop: 0, borderTopWidth: 0 };
 
 /**
  * Fenced code block with a copy button and an optional filename bar.
@@ -29,9 +51,12 @@ export function CodeBlock({
   title,
   language,
   copyable = true,
+  attached,
   className = '',
   ...rest
 }: CodeBlockProps) {
+  const attachedByContext = useContext(CodeBlockAttachment);
+  const isAttached = attached ?? attachedByContext;
   const preRef = useRef<HTMLPreElement>(null);
   const { copied, copy } = useCopyToClipboard();
 
@@ -41,7 +66,11 @@ export function CodeBlock({
   }, [copy]);
 
   return (
-    <div className={`docs-codeblock ${className}`.trim()}>
+    <div
+      className={`docs-codeblock ${className}`.trim()}
+      style={isAttached ? ATTACHED_STYLE : undefined}
+      data-attached={isAttached ? 'true' : undefined}
+    >
       {(title || language) && (
         <div className="docs-codeblock-bar">
           {title && <span className="docs-codeblock-title">{title}</span>}

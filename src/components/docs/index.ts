@@ -3,6 +3,7 @@
 export * from './AnchorHeading';
 export * from './Breadcrumbs';
 export * from './CodeBlock';
+export * from './CodeTabs';
 export * from './DocPager';
 export * from './DocsHeader';
 export * from './DocsLayout';

@@ -67,6 +67,7 @@ const CASES: readonly VisualCase[] = [
 
   { id: 'docs-breadcrumbs--default', snapshot: 'breadcrumbs-default.png' },
   { id: 'docs-codeblock--with-title-and-language', snapshot: 'codeblock-with-title-and-language.png' },
+  { id: 'docs-codetabs--merged', snapshot: 'codetabs-merged.png' },
   { id: 'docs-prose--default', snapshot: 'prose-default.png', fullPage: true },
   { id: 'docs-anchorheading--levels', snapshot: 'anchorheading-levels.png' },
   { id: 'docs-tableofcontents--default', snapshot: 'tableofcontents-default.png' },
