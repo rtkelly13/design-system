@@ -314,5 +314,3 @@ export function CodeTabs({
     </div>
   );
 }
-
-export default CodeTabs;
