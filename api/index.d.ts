@@ -144,6 +144,8 @@ declare const MINIMUM_RATIO: {
     readonly borderSubtle: 1.4;
 
     readonly overlaySeparation: 3;
+
+    readonly stateDevice: 3;
 };
 interface ContrastCheck {
     level: ThemeLevel;
@@ -157,6 +159,22 @@ interface ContrastCheck {
 }
 
 declare function auditContrast(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): ContrastCheck[];
+
+type SelectionDevice = 'fill' | 'edge' | 'surface pair';
+interface SelectionDeviceCheck {
+    level: ThemeLevel;
+    device: SelectionDevice;
+
+    pair: string;
+    foreground: string;
+    background: string;
+    ratio: number;
+    minimum: number;
+
+    passes: boolean;
+}
+
+declare function auditSelectionDevices(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): SelectionDeviceCheck[];
 
 type ClassInput = string | number | null | undefined | false | ClassInput[];
 
@@ -695,9 +713,37 @@ interface CodeBlockProps extends HTMLAttributes<HTMLPreElement> {
     language?: string;
 
     copyable?: boolean;
+
+    attached?: boolean;
 }
 
-declare function CodeBlock({ children, title, language, copyable, className, ...rest }: CodeBlockProps): react.JSX.Element;
+declare const CodeBlockAttachment: react.Context<boolean>;
+
+declare function CodeBlock({ children, title, language, copyable, attached, className, ...rest }: CodeBlockProps): react.JSX.Element;
+
+type CodeTabsVariant = 'merged' | 'underline' | 'segmented';
+interface CodeTabProps {
+
+    label: string;
+
+    language?: string;
+    children: ReactNode;
+}
+
+declare function CodeTab({ children }: CodeTabProps): react.JSX.Element;
+interface CodeTabsProps {
+
+    children: ReactNode;
+
+    group?: string;
+    variant?: CodeTabsVariant;
+
+    accent?: AccentToken;
+
+    label?: string;
+    className?: string;
+}
+declare function CodeTabs({ children, group, variant, accent, label, className, }: CodeTabsProps): react.JSX.Element;
 
 interface DocPagerTarget {
     label: string;
@@ -866,6 +912,8 @@ declare const mdxComponents: {
     Tag: typeof Tag;
     AsciiDivider: react.FC<DividerProps>;
     CodeBlock: typeof CodeBlock;
+    CodeTabs: typeof CodeTabs;
+    CodeTab: typeof CodeTab;
 };
 type MdxComponents = typeof mdxComponents;
 
@@ -900,7 +948,13 @@ export {
   type CardProps,
   type ClassInput,
   CodeBlock,
+  CodeBlockAttachment,
   type CodeBlockProps,
+  CodeTab,
+  type CodeTabProps,
+  CodeTabs,
+  type CodeTabsProps,
+  type CodeTabsVariant,
   type Column,
   type ContrastCheck,
   type Crumb,
@@ -978,6 +1032,8 @@ export {
   Select,
   type SelectOption,
   type SelectProps,
+  type SelectionDevice,
+  type SelectionDeviceCheck,
   Slide,
   SlideDeck,
   type SlideDeckProps,
@@ -1018,6 +1074,7 @@ export {
   accentVar,
   assertNever,
   auditContrast,
+  auditSelectionDevices,
   borderVar,
   brutalistTokens,
   childrenToText,
