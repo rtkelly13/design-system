@@ -101,6 +101,14 @@ const CASES: readonly VisualCase[] = [
   // surfaces are meant to be read at.
   { id: 'saas-admindashboardlayout--dim-mode', snapshot: 'admin-dashboard-dim.png', fullPage: true },
   { id: 'saas-landingpage--dim-mode', snapshot: 'saas-landing-dim.png', fullPage: true },
+
+  // `Composed` rather than a single part: the compound is the component, and
+  // the borders between header, body and footer are the thing a regression
+  // here would break.
+  { id: 'foundations-table--composed', snapshot: 'table-composed.png' },
+  // ASCII marks rather than font glyphs — the case where a font or metric
+  // change shows up first, because these are text rather than icons.
+  { id: 'foundations-glyph--ascii-marks', snapshot: 'glyph-ascii-marks.png' },
 ];
 
 test.describe('Design System Visual Regression - Components', () => {
