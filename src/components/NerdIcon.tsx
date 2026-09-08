@@ -169,5 +169,3 @@ export function NerdIcon({
     </span>
   );
 }
-
-export default NerdIcon;
