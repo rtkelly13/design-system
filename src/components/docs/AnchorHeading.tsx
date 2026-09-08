@@ -5,6 +5,7 @@ import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { childrenToText, slugify } from '../../lib/slug';
 import { HEADING_EMPHASIS, accentVar } from '../../lib/theme';
 import type { AccentToken } from '../../lib/theme';
+import { cn } from '../../lib/recipe';
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -85,7 +86,7 @@ export function AnchorHeading({
   return (
     <Tag
       id={headingId}
-      className={`docs-anchor-heading group ${className}`.trim()}
+      className={cn('docs-anchor-heading group', className)}
       {...rest}
     >
       {children}

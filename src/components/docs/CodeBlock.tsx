@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useRef } from 'react';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
+import { cn } from '../../lib/recipe';
 
 export interface CodeBlockProps extends HTMLAttributes<HTMLPreElement> {
   children: ReactNode;
@@ -67,7 +68,7 @@ export function CodeBlock({
 
   return (
     <div
-      className={`docs-codeblock ${className}`.trim()}
+      className={cn('docs-codeblock', className)}
       style={isAttached ? ATTACHED_STYLE : undefined}
       data-attached={isAttached ? 'true' : undefined}
     >
