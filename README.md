@@ -158,7 +158,7 @@ A complete chrome kit for MDX documentation sites.
 ```tsx
 import {
   DocsLayout, DocsHeader, DocsSidebar, TableOfContents,
-  Breadcrumbs, DocPager, Prose, CodeBlock, AnchorHeading,
+  Breadcrumbs, DocPager, Prose, CodeBlock, CodeTabs, CodeTab, AnchorHeading,
   DocsLinkProvider, mdxComponents,
 } from '@rtkelly13/design-system';
 import '@rtkelly13/design-system/prose.css';
@@ -183,6 +183,11 @@ import { Link } from 'react-router-dom';
   <App />
 </DocsLinkProvider>
 ```
+
+**Code tabs switch together.** `CodeTabs` is the language / package-manager
+switcher: a real `tablist` with arrow-key traversal. Blocks sharing a `group`
+switch as one and the choice persists across pages, so a reader picks `pnpm`
+once. Fenced blocks inside a `CodeTab` attach to the strip automatically.
 
 **One MDX mapping.** `mdxComponents` maps `h1`–`h6` → anchored headings, `pre` →
 `CodeBlock`, `a` → router-aware links, and exposes `NoteBlock` / `TLDR` / `Card` /
