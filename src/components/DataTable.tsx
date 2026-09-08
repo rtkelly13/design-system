@@ -64,7 +64,9 @@ export type DataTableProps<T> =
        * at an empty system or an over-narrow filter, where the default cannot.
        */
       emptyText?: string;
+      /** Extra classes on the `<table>` itself. */
       className?: string;
+      /** Extra classes on the scroll container that wraps the table. */
       containerClassName?: string;
     }
   | {
@@ -77,10 +79,20 @@ export type DataTableProps<T> =
       keyExtractor?: (row: T, index: number) => string | number;
       /** Shown in place of the body when `data` is empty. */
       emptyText?: string;
-      /** Extra classes on the scroll container that wraps the table. */
+      /** Extra classes on the `<table>` itself. */
       className?: string;
+      /** Extra classes on the scroll container that wraps the table. */
       containerClassName?: string;
+      /**
+       * Make column headers clickable to sort. Off by default: a table that
+       * sorts on click but does not say so is a surprise, and most tables here
+       * are short enough not to need it.
+       */
       enableSorting?: boolean;
+      /**
+       * Rows per page. Omitted renders every row — pagination is opt-in
+       * because a table that silently truncates is worse than a long one.
+       */
       pageSize?: number;
     };
 

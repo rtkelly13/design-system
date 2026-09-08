@@ -1,0 +1,775 @@
+<!doctype html>
+<meta charset="utf-8"><title>Book of Shapes - reference contact sheet</title>
+<style>
+  :root { --accent:#22d3ee; --bg:#000; --occ:#0a0a1a; }
+  * { box-sizing:border-box; border-radius:0 !important; }
+  body { margin:0; background:var(--bg); color:#e4e4e7;
+         font:14px/1.5 "IBM Plex Mono", ui-monospace, monospace; }
+  header { position:sticky; top:0; z-index:10; background:#18181b;
+            border-bottom:2px solid #fff; padding:16px 24px; }
+  h1 { margin:0 0 4px; font-size:20px; text-transform:uppercase; letter-spacing:.05em; }
+  .note { color:#a1a1aa; font-size:12px; margin:0 0 12px; max-width:70ch; }
+  .note b { color:#facc15; }
+  .controls { display:flex; gap:24px; flex-wrap:wrap; align-items:center; }
+  .sw { width:26px; height:26px; border:2px solid #52525b; cursor:pointer; }
+  .sw:hover, .sw.on { border-color:#fff; }
+  .f { background:#000; color:#e4e4e7; border:2px solid #52525b; padding:4px 10px;
+        font:inherit; font-size:12px; text-transform:uppercase; cursor:pointer; }
+  .f:hover, .f.on { border-color:#fff; color:#fff; }
+  label { font-size:12px; color:#a1a1aa; display:flex; gap:8px; align-items:center; }
+  main { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+          gap:2px; background:#27272a; padding:2px; }
+  .fam { grid-column:1/-1; margin:18px 0 0; padding:10px 14px; background:#000;
+          border-left:4px solid #52525b; font-size:14px; text-transform:uppercase;
+          letter-spacing:.06em; color:#fff; }
+  .fam[hidden] { display:none; }
+  .fam span { display:block; margin-top:4px; font-size:11px; text-transform:none;
+               letter-spacing:0; color:#a1a1aa; }
+  .card { margin:0; background:#000; display:flex; flex-direction:column; }
+  .card[hidden] { display:none; }
+  .stage { aspect-ratio:1; display:grid; place-items:center; overflow:hidden;
+            padding:14px; background:var(--bg); }
+  .stage svg { width:100%; height:100%;
+      --fill-color:var(--accent); --stroke-color:var(--accent);
+      --background-color:transparent; --occlusion-color:var(--occ); }
+  figcaption { border-top:2px solid #27272a; padding:10px 12px; }
+  .row { display:flex; justify-content:space-between; gap:8px; align-items:baseline; }
+  .badge { color:var(--c); border:1px solid var(--c); padding:0 6px;
+            font-size:10px; text-transform:uppercase; }
+  .meta { color:#71717a; font-size:11px; margin-top:2px; }
+  .why { color:#a1a1aa; font-size:12px; margin:8px 0 6px; }
+  a { color:var(--accent); font-size:11px; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+</style>
+<header>
+  <h1>[ Book of Shapes &mdash; reference contact sheet ]</h1>
+  <p class="note">
+    57 patterns by Nikolaj Sokolowski, recoloured in our accents to judge fit.
+    <b>Reference only &mdash; the source site publishes no licence, so none of this artwork ships.</b>
+    Verdicts are ours: what to build, not what to copy.
+  </p>
+  <div class="controls">
+    <div><button class="sw" style="background:#22d3ee" data-accent="#22d3ee" title="cyan"></button><button class="sw" style="background:#ec4899" data-accent="#ec4899" title="pink"></button><button class="sw" style="background:#facc15" data-accent="#facc15" title="yellow"></button><button class="sw" style="background:#39ff14" data-accent="#39ff14" title="neonGreen"></button><button class="sw" style="background:#ffffff" data-accent="#ffffff" title="white"></button><button class="sw" style="background:#23262e" data-accent="#23262e" title="ink"></button></div>
+    <div><button class="f" data-filter="all">all</button><button class="f" data-filter="port">port</button><button class="f" data-filter="variation">variation</button><button class="f" data-filter="covered">covered</button><button class="f" data-filter="skip">skip</button></div>
+    <label>bg <input type="color" id="bg" value="#000000"></label>
+    <label>occlusion <input type="color" id="occ" value="#0a0a1a"></label>
+  </div>
+</header>
+<main><h2 class="fam" data-verdict="port">distinct &middot; 4<span>a mechanism nothing in the set has</span></h2>
+    <figure class="card" data-verdict="port" data-tags="grid">
+      <div class="stage" data-src="svg/rect_field_void.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Rectangle Field Void</strong>
+          <span class="badge" style="--c:#39ff14">port</span>
+        </div>
+        <div class="meta">rect_field_void &middot; grid &middot; 441 KB</div>
+        <p class="why">The void is the composition. Wants a cross-cutting mask, not a generator.</p>
+        <a href="https://bookofshapes.com/patterns/rect_field_void/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="port" data-tags="organic radial">
+      <div class="stage" data-src="svg/phyllotaxis-bloom.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Phyllotaxis Bloom</strong>
+          <span class="badge" style="--c:#39ff14">port</span>
+        </div>
+        <div class="meta">phyllotaxis-bloom &middot; organic, radial &middot; 221 KB</div>
+        <p class="why">Golden-angle placement. Every generator we have places by lattice, scatter or ring.</p>
+        <a href="https://bookofshapes.com/patterns/phyllotaxis-bloom/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="port" data-tags="flow physics">
+      <div class="stage" data-src="svg/lissajous_field.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Lissajous Field</strong>
+          <span class="badge" style="--c:#39ff14">port</span>
+        </div>
+        <div class="meta">lissajous_field &middot; flow, physics &middot; 83 KB</div>
+        <p class="why">Parametric curve family whose integer frequency ratios close the loop natively.</p>
+        <a href="https://bookofshapes.com/patterns/lissajous_field/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="port" data-tags="organic radial">
+      <div class="stage" data-src="svg/spiral_dot_field.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Spiral Dot Field</strong>
+          <span class="badge" style="--c:#39ff14">port</span>
+        </div>
+        <div class="meta">spiral_dot_field &middot; organic, radial &middot; 50 KB</div>
+        <p class="why">Same placement family as phyllotaxis; build one, get both.</p>
+        <a href="https://bookofshapes.com/patterns/spiral_dot_field/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="variation">iso-cubes &middot; 11<span>iso-cubes + a height-field source, a carve mask, or a face treatment</span></h2>
+    <figure class="card" data-verdict="variation" data-tags="isometric radial">
+      <div class="stage" data-src="svg/iso-sphere.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Iso Sphere</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">iso-sphere &middot; isometric, radial &middot; 1758 KB</div>
+        <p class="why">Carving a solid out of the cube lattice — the mask param, at 1.76 MB.</p>
+        <a href="https://bookofshapes.com/patterns/iso-sphere/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="distortion isometric noise">
+      <div class="stage" data-src="svg/scattered-cube-grid-v3.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Scattered Cube Grid v3</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">scattered-cube-grid-v3 &middot; distortion, isometric, noise &middot; 1347 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/scattered-cube-grid-v3/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="isometric">
+      <div class="stage" data-src="svg/iso-cube-wireframe.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Iso Cube Wireframe</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">iso-cube-wireframe &middot; isometric &middot; 977 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/iso-cube-wireframe/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="distortion isometric noise">
+      <div class="stage" data-src="svg/scattered-cube-grid.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Scattered Cube Grid</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">scattered-cube-grid &middot; distortion, isometric, noise &middot; 968 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/scattered-cube-grid/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="isometric noise">
+      <div class="stage" data-src="svg/iso_test_noise_field.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Isometric Noise Field</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">iso_test_noise_field &middot; isometric, noise &middot; 617 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/iso_test_noise_field/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="isometric">
+      <div class="stage" data-src="svg/iso-cross.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Iso Cross</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">iso-cross &middot; isometric &middot; 388 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/iso-cross/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="flow isometric">
+      <div class="stage" data-src="svg/dna_helix.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Cube Helix</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">dna_helix &middot; flow, isometric &middot; 331 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/dna_helix/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="isometric noise">
+      <div class="stage" data-src="svg/iso_test_noise_field_2.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Isometric Noise Field II</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">iso_test_noise_field_2 &middot; isometric, noise &middot; 213 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/iso_test_noise_field_2/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="flow isometric">
+      <div class="stage" data-src="svg/sine-cube.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Sine Cube</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">sine-cube &middot; flow, isometric &middot; 202 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/sine-cube/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="isometric">
+      <div class="stage" data-src="svg/isometric_cubes.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Isometric Cubes</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">isometric_cubes &middot; isometric &middot; 102 KB</div>
+        <p class="why">iso-cubes + a height-field source, a carve mask, or a face treatment</p>
+        <a href="https://bookofshapes.com/patterns/isometric_cubes/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="grid isometric">
+      <div class="stage" data-src="svg/chevron_blocks.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Chevron Blocks</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">chevron_blocks &middot; grid, isometric &middot; 94 KB</div>
+        <p class="why">Corrected: not 'ruled hexagons' but striped-face isometric cubes. Face treatment on iso-cubes.</p>
+        <a href="https://bookofshapes.com/patterns/chevron_blocks/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="variation">mesh-mode &middot; 8<span>any lattice, drawn as a connected wireframe instead of as marks</span></h2>
+    <figure class="card" data-verdict="variation" data-tags="distortion grid noise">
+      <div class="stage" data-src="svg/deformed_grid_mesh_2.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Deformed Grid Mesh II</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">deformed_grid_mesh_2 &middot; distortion, grid, noise &middot; 1330 KB</div>
+        <p class="why">any lattice, drawn as a connected wireframe instead of as marks</p>
+        <a href="https://bookofshapes.com/patterns/deformed_grid_mesh_2/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="grid noise">
+      <div class="stage" data-src="svg/joy_division_mesh.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Joy Division Mesh</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">joy_division_mesh &middot; grid, noise &middot; 584 KB</div>
+        <p class="why">any lattice, drawn as a connected wireframe instead of as marks</p>
+        <a href="https://bookofshapes.com/patterns/joy_division_mesh/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="flow radial">
+      <div class="stage" data-src="svg/spiral_mesh.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Spiral Mesh</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">spiral_mesh &middot; flow, radial &middot; 427 KB</div>
+        <p class="why">any lattice, drawn as a connected wireframe instead of as marks</p>
+        <a href="https://bookofshapes.com/patterns/spiral_mesh/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="distortion grid noise">
+      <div class="stage" data-src="svg/deformed_grid_mesh.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Deformed Grid Mesh</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">deformed_grid_mesh &middot; distortion, grid, noise &middot; 307 KB</div>
+        <p class="why">any lattice, drawn as a connected wireframe instead of as marks</p>
+        <a href="https://bookofshapes.com/patterns/deformed_grid_mesh/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="grid isometric noise">
+      <div class="stage" data-src="svg/isometric_ribbon_grid.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Isometric Ribbon Grid</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">isometric_ribbon_grid &middot; grid, isometric, noise &middot; 248 KB</div>
+        <p class="why">any lattice, drawn as a connected wireframe instead of as marks</p>
+        <a href="https://bookofshapes.com/patterns/isometric_ribbon_grid/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="organic radial">
+      <div class="stage" data-src="svg/rose_mesh.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Rose Mesh</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">rose_mesh &middot; organic, radial &middot; 173 KB</div>
+        <p class="why">any lattice, drawn as a connected wireframe instead of as marks</p>
+        <a href="https://bookofshapes.com/patterns/rose_mesh/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="grid radial">
+      <div class="stage" data-src="svg/polar_mesh.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Polar Mesh</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">polar_mesh &middot; grid, radial &middot; 97 KB</div>
+        <p class="why">The clearest case for mesh mode: a polar lattice with its neighbours joined.</p>
+        <a href="https://bookofshapes.com/patterns/polar_mesh/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="flow grid">
+      <div class="stage" data-src="svg/wavy_fabric.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Wavy Fabric</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">wavy_fabric &middot; flow, grid &middot; 81 KB</div>
+        <p class="why">Corrected: not over/under weaving but a quad mesh under wave displacement.</p>
+        <a href="https://bookofshapes.com/patterns/wavy_fabric/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="variation">radial-ring &middot; 5<span>radial-spokes / broken-ring / modular-circle with different cell counts and weights</span></h2>
+    <figure class="card" data-verdict="variation" data-tags="noise radial">
+      <div class="stage" data-src="svg/concentric_noise_rings.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Concentric Noise Rings</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">concentric_noise_rings &middot; noise, radial &middot; 197 KB</div>
+        <p class="why">radial-spokes / broken-ring / modular-circle with different cell counts and weights</p>
+        <a href="https://bookofshapes.com/patterns/concentric_noise_rings/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="radial">
+      <div class="stage" data-src="svg/line_based_circles.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Line-Based Circles</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">line_based_circles &middot; radial &middot; 80 KB</div>
+        <p class="why">radial-spokes / broken-ring / modular-circle with different cell counts and weights</p>
+        <a href="https://bookofshapes.com/patterns/line_based_circles/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="radial">
+      <div class="stage" data-src="svg/nested_polygons.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Nested Polygons</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">nested_polygons &middot; radial &middot; 54 KB</div>
+        <p class="why">Concentric polygons joined by swept parallel lines; the moire between them is the effect.</p>
+        <a href="https://bookofshapes.com/patterns/nested_polygons/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="radial">
+      <div class="stage" data-src="svg/radial_harmony.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Radial Harmony</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">radial_harmony &middot; radial &middot; 34 KB</div>
+        <p class="why">Corrected: not circles+divisions but a ring of short radial dashes — radial-spokes with a high inner radius.</p>
+        <a href="https://bookofshapes.com/patterns/radial_harmony/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="radial">
+      <div class="stage" data-src="svg/brockmann_arcs.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Brockmann Beethoven Arcs</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">brockmann_arcs &middot; radial &middot; 2 KB</div>
+        <p class="why">Corrected: a few very thick concentric arc segments — broken-ring with 3-4 cells per band.</p>
+        <a href="https://bookofshapes.com/patterns/brockmann_arcs/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="variation">truchet &middot; 3<span>truchet-arcs + arcs-per-tile</span></h2>
+    <figure class="card" data-verdict="variation" data-tags="flow grid">
+      <div class="stage" data-src="svg/concentric_arc_truchet_2.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Quarter Arc Truchet</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">concentric_arc_truchet_2 &middot; flow, grid &middot; 171 KB</div>
+        <p class="why">truchet-arcs + arcs-per-tile</p>
+        <a href="https://bookofshapes.com/patterns/concentric_arc_truchet_2/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="flow grid">
+      <div class="stage" data-src="svg/concentric_arc_truchet_3.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Arc Truchet Butterfly</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">concentric_arc_truchet_3 &middot; flow, grid &middot; 66 KB</div>
+        <p class="why">truchet-arcs + arcs-per-tile</p>
+        <a href="https://bookofshapes.com/patterns/concentric_arc_truchet_3/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="grid">
+      <div class="stage" data-src="svg/arcs_1.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Rotating Arc Grid</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">arcs_1 &middot; grid &middot; 27 KB</div>
+        <p class="why">truchet-arcs + arcs-per-tile</p>
+        <a href="https://bookofshapes.com/patterns/arcs_1/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="variation">wave-envelope &middot; 2<span>contour + an amplitude/frequency envelope across the frame</span></h2>
+    <figure class="card" data-verdict="variation" data-tags="flow">
+      <div class="stage" data-src="svg/signal_decay.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Signal Decay</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">signal_decay &middot; flow &middot; 483 KB</div>
+        <p class="why">Stacked oscillating rules under a lens-shaped envelope. contour already stacks them.</p>
+        <a href="https://bookofshapes.com/patterns/signal_decay/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="flow organic">
+      <div class="stage" data-src="svg/wavy_lines_converging.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Wavy Lines Converging</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">wavy_lines_converging &middot; flow, organic &middot; 72 KB</div>
+        <p class="why">contour + an amplitude/frequency envelope across the frame</p>
+        <a href="https://bookofshapes.com/patterns/wavy_lines_converging/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="variation">interference &middot; 2<span>interference + mark type and source count</span></h2>
+    <figure class="card" data-verdict="variation" data-tags="distortion flow physics">
+      <div class="stage" data-src="svg/resonance_field.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Resonance Field</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">resonance_field &middot; distortion, flow, physics &middot; 1018 KB</div>
+        <p class="why">interference + mark type and source count</p>
+        <a href="https://bookofshapes.com/patterns/resonance_field/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="flow grid physics">
+      <div class="stage" data-src="svg/ripple_grid.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Ripple Grid</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">ripple_grid &middot; flow, grid, physics &middot; 335 KB</div>
+        <p class="why">A dot grid displaced by concentric waves — interference's mechanism, drawn as marks.</p>
+        <a href="https://bookofshapes.com/patterns/ripple_grid/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="variation">field-source &middot; 1<span>flow-field / flow-lines + a field built from poles instead of a formula</span></h2>
+    <figure class="card" data-verdict="variation" data-tags="flow radial">
+      <div class="stage" data-src="svg/flow_poles.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Flow Poles</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">flow_poles &middot; flow, radial &middot; 231 KB</div>
+        <p class="why">Vortices and sinks rather than crossed sines. The field is the only difference.</p>
+        <a href="https://bookofshapes.com/patterns/flow_poles/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="variation">disorder &middot; 4<span>already covered — the disorder ramp on an existing lattice generator</span></h2>
+    <figure class="card" data-verdict="variation" data-tags="flow grid">
+      <div class="stage" data-src="svg/flow_dots.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Flow Dots</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">flow_dots &middot; flow, grid &middot; 433 KB</div>
+        <p class="why">already covered — the disorder ramp on an existing lattice generator</p>
+        <a href="https://bookofshapes.com/patterns/flow_dots/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="grid noise">
+      <div class="stage" data-src="svg/hiding-squares.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Hiding Squares</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">hiding-squares &middot; grid, noise &middot; 143 KB</div>
+        <p class="why">already covered — the disorder ramp on an existing lattice generator</p>
+        <a href="https://bookofshapes.com/patterns/hiding-squares/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="distortion grid noise">
+      <div class="stage" data-src="svg/jittery_squares_grid.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Jittery Squares Grid</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">jittery_squares_grid &middot; distortion, grid, noise &middot; 82 KB</div>
+        <p class="why">already covered — the disorder ramp on an existing lattice generator</p>
+        <a href="https://bookofshapes.com/patterns/jittery_squares_grid/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="variation" data-tags="distortion grid">
+      <div class="stage" data-src="svg/spiral_morph.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Spiral Morph</strong>
+          <span class="badge" style="--c:#facc15">variation</span>
+        </div>
+        <div class="meta">spiral_morph &middot; distortion, grid &middot; 58 KB</div>
+        <p class="why">already covered — the disorder ramp on an existing lattice generator</p>
+        <a href="https://bookofshapes.com/patterns/spiral_morph/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="covered">built &middot; 12<span>already shipped</span></h2>
+    <figure class="card" data-verdict="covered" data-tags="noise radial">
+      <div class="stage" data-src="svg/nested_polygons_filled.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Broken Ring</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">nested_polygons_filled &middot; noise, radial &middot; 694 KB</div>
+        <p class="why">Shipped as `broken-ring`.</p>
+        <a href="https://bookofshapes.com/patterns/nested_polygons_filled/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="grid noise">
+      <div class="stage" data-src="svg/triangular_mosaic.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Triangular Mosaic</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">triangular_mosaic &middot; grid, noise &middot; 365 KB</div>
+        <p class="why">Shipped as `triangle-grid`.</p>
+        <a href="https://bookofshapes.com/patterns/triangular_mosaic/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="grid physics">
+      <div class="stage" data-src="svg/interference-mesh.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Interference Mesh</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">interference-mesh &middot; grid, physics &middot; 301 KB</div>
+        <p class="why">Shipped as `interference`.</p>
+        <a href="https://bookofshapes.com/patterns/interference-mesh/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="flow noise organic">
+      <div class="stage" data-src="svg/wave-field.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Wave Field</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">wave-field &middot; flow, noise, organic &middot; 297 KB</div>
+        <p class="why">Shipped as `flow-field`.</p>
+        <a href="https://bookofshapes.com/patterns/wave-field/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="grid isometric">
+      <div class="stage" data-src="svg/isometric-cube-grid.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Isometric Cube Grid</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">isometric-cube-grid &middot; grid, isometric &middot; 133 KB</div>
+        <p class="why">Shipped as `iso-cubes`.</p>
+        <a href="https://bookofshapes.com/patterns/isometric-cube-grid/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="noise organic">
+      <div class="stage" data-src="svg/node_garden.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Node Garden</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">node_garden &middot; noise, organic &middot; 114 KB</div>
+        <p class="why">Shipped as `node-network`.</p>
+        <a href="https://bookofshapes.com/patterns/node_garden/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="flow physics">
+      <div class="stage" data-src="svg/flow_lines.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Flow Lines</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">flow_lines &middot; flow, physics &middot; 99 KB</div>
+        <p class="why">Shipped as `flow-lines`.</p>
+        <a href="https://bookofshapes.com/patterns/flow_lines/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="grid">
+      <div class="stage" data-src="svg/quarter_circles_grid.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Quarter Circles Grid</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">quarter_circles_grid &middot; grid &middot; 83 KB</div>
+        <p class="why">Shipped as `truchet-arcs`.</p>
+        <a href="https://bookofshapes.com/patterns/quarter_circles_grid/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="flow noise">
+      <div class="stage" data-src="svg/joy_division.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Joy Division</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">joy_division &middot; flow, noise &middot; 62 KB</div>
+        <p class="why">Shipped as `ridgeline`.</p>
+        <a href="https://bookofshapes.com/patterns/joy_division/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="radial">
+      <div class="stage" data-src="svg/radial_spokes.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Radial Spokes</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">radial_spokes &middot; radial &middot; 24 KB</div>
+        <p class="why">Shipped as `radial-spokes`.</p>
+        <a href="https://bookofshapes.com/patterns/radial_spokes/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="radial">
+      <div class="stage" data-src="svg/modular_circle.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Modular Circle</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">modular_circle &middot; radial &middot; 23 KB</div>
+        <p class="why">Shipped as `modular-circle`.</p>
+        <a href="https://bookofshapes.com/patterns/modular_circle/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="covered" data-tags="flow noise">
+      <div class="stage" data-src="svg/noise_landscape_1.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Noise Landscape</strong>
+          <span class="badge" style="--c:#22d3ee">covered</span>
+        </div>
+        <div class="meta">noise_landscape_1 &middot; flow, noise &middot; 22 KB</div>
+        <p class="why">Shipped as `contour`.</p>
+        <a href="https://bookofshapes.com/patterns/noise_landscape_1/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure><h2 class="fam" data-verdict="skip">reject &middot; 5<span>aesthetic or technical mismatch</span></h2>
+    <figure class="card" data-verdict="skip" data-tags="radial">
+      <div class="stage" data-src="svg/halftone_sphere.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Halftone Sphere</strong>
+          <span class="badge" style="--c:#71717a">skip</span>
+        </div>
+        <div class="meta">halftone_sphere &middot; radial &middot; 415 KB</div>
+        <p class="why">aesthetic or technical mismatch</p>
+        <a href="https://bookofshapes.com/patterns/halftone_sphere/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="skip" data-tags="organic radial">
+      <div class="stage" data-src="svg/chaos_circles.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Chaos Circles</strong>
+          <span class="badge" style="--c:#71717a">skip</span>
+        </div>
+        <div class="meta">chaos_circles &middot; organic, radial &middot; 159 KB</div>
+        <p class="why">aesthetic or technical mismatch</p>
+        <a href="https://bookofshapes.com/patterns/chaos_circles/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="skip" data-tags="noise organic radial">
+      <div class="stage" data-src="svg/noise_circle_1.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Noise Circle</strong>
+          <span class="badge" style="--c:#71717a">skip</span>
+        </div>
+        <div class="meta">noise_circle_1 &middot; noise, organic, radial &middot; 133 KB</div>
+        <p class="why">aesthetic or technical mismatch</p>
+        <a href="https://bookofshapes.com/patterns/noise_circle_1/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="skip" data-tags="distortion grid">
+      <div class="stage" data-src="svg/masked_letter_grid.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Masked Letter Grid</strong>
+          <span class="badge" style="--c:#71717a">skip</span>
+        </div>
+        <div class="meta">masked_letter_grid &middot; distortion, grid &middot; 96 KB</div>
+        <p class="why">Needs font metrics a pure-string generator cannot get.</p>
+        <a href="https://bookofshapes.com/patterns/masked_letter_grid/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure>
+    <figure class="card" data-verdict="skip" data-tags="grid organic">
+      <div class="stage" data-src="svg/backpack-grid.svg"></div>
+      <figcaption>
+        <div class="row">
+          <strong>Backpack Grid</strong>
+          <span class="badge" style="--c:#71717a">skip</span>
+        </div>
+        <div class="meta">backpack-grid &middot; grid, organic &middot; 47 KB</div>
+        <p class="why">aesthetic or technical mismatch</p>
+        <a href="https://bookofshapes.com/patterns/backpack-grid/" target="_blank" rel="noopener">source &rarr;</a>
+      </figcaption>
+    </figure></main>
+<script>
+  const root = document.documentElement;
+  document.querySelectorAll('.sw').forEach(b => b.onclick = () => {
+    root.style.setProperty('--accent', b.dataset.accent);
+    document.querySelectorAll('.sw').forEach(x => x.classList.toggle('on', x === b));
+  });
+  document.querySelectorAll('.f').forEach(b => b.onclick = () => {
+    const f = b.dataset.filter;
+    document.querySelectorAll('.card, .fam').forEach(c => {
+      c.hidden = f !== 'all' && c.dataset.verdict !== f;
+    });
+    document.querySelectorAll('.f').forEach(x => x.classList.toggle('on', x === b));
+  });
+  document.getElementById('bg').oninput = e => root.style.setProperty('--bg', e.target.value);
+  document.getElementById('occ').oninput = e => root.style.setProperty('--occ', e.target.value);
+
+  // Inline on scroll. <img> would be simpler and completely unthemeable:
+  // custom properties do not cross into an image-referenced SVG document.
+  const io = new IntersectionObserver((entries) => {
+    for (const en of entries) {
+      if (!en.isIntersecting) continue;
+      const el = en.target;
+      io.unobserve(el);
+      fetch(el.dataset.src)
+        .then(r => r.ok ? r.text() : Promise.reject(r.status))
+        .then(svg => { el.innerHTML = svg; })
+        .catch(err => { el.textContent = 'missing - run fetch.py (' + err + ')'; });
+    }
+  }, { rootMargin: '400px' });
+  document.querySelectorAll('.stage').forEach(el => io.observe(el));
+  document.querySelector('.sw').classList.add('on');
+  document.querySelector('.f').classList.add('on');
+</script>

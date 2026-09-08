@@ -20,11 +20,32 @@ const tableStyles = recipe({
   },
 });
 
+export interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
+  /**
+   * Extra classes on the scroll container that wraps the table — the element
+   * that owns the overflow, not the `<table>` itself. Use `className` for that.
+   */
+  containerClassName?: string;
+}
+
+/**
+ * A table, as eight composable parts rather than one configured component.
+ *
+ * `DataTable` takes columns and data and decides the markup for you, which is
+ * right until a cell needs to be a link, a row needs a colspan, or a footer
+ * needs to total a column. These parts are the escape hatch: each is a thin
+ * wrapper over the corresponding HTML element carrying the system's borders and
+ * type and nothing else, so the caller writes real table markup and keeps the
+ * semantics browsers and screen readers depend on.
+ *
+ * `Table` renders the scroll container as well as the `<table>`, because a
+ * table overflowing its column is the most common way one breaks a page.
+ */
 export function Table({
   className,
   containerClassName,
   ...props
-}: TableHTMLAttributes<HTMLTableElement> & { containerClassName?: string }) {
+}: TableProps) {
   const styles = tableStyles();
   return (
     <div className={styles.container({ class: containerClassName })}>

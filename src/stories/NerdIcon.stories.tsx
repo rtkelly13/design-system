@@ -13,6 +13,11 @@ const meta: Meta<typeof NerdIcon> = {
 export default meta;
 type Story = StoryObj<typeof NerdIcon>;
 
+/**
+ * The glyphs a developer tool actually reaches for — version control, containers,
+ * runtime, storage — shown together so the set can be judged as a set. Nerd Fonts
+ * carries thousands; these are the ones worth having an opinion about.
+ */
 export const DeveloperGlyphs: Story = {
   render: () => {
     const devIcons: NerdIconName[] = [
@@ -52,6 +57,11 @@ export const DeveloperGlyphs: Story = {
   },
 };
 
+/**
+ * Icons inside real controls rather than on a swatch sheet. `bracketed` wraps the
+ * glyph in the same `[ ]` the rest of the system uses, so an icon reads as part of
+ * the typography instead of pasted on top of it.
+ */
 export const BracketedInUI: Story = {
   render: () => (
     <div className="p-8 space-y-6 max-w-2xl font-mono">
@@ -88,6 +98,11 @@ export const BracketedInUI: Story = {
   ),
 };
 
+/**
+ * Sort affordances in a monospace table header. The hard case for an icon font:
+ * the glyph has to sit on the same baseline and advance width as the text beside
+ * it, or the column headers stop lining up.
+ */
 export const TableSortDemo: Story = {
   render: () => (
     <div className="p-8 max-w-xl font-mono">
@@ -126,6 +141,11 @@ export const TableSortDemo: Story = {
   ),
 };
 
+/**
+ * `Glyph` and `NerdIcon` in one row. `Glyph` renders literal ASCII sequences and
+ * `NerdIcon` renders font glyphs, and the point of this story is that at the same
+ * size and accent the two are hard to tell apart — which is the intent.
+ */
 export const TypographicAsciiMix: Story = {
   render: () => (
     <div className="p-8 space-y-4 font-mono">
