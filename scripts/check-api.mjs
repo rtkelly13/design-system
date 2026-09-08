@@ -39,7 +39,14 @@
  *   node scripts/check-api.mjs --update   accept the current surface
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -157,6 +164,32 @@ if (!existsSync(GENERATED)) {
   console.error(`Generated types not found at ${path.relative(ROOT, GENERATED)}.`);
   console.error('Run `pnpm build` first — this check reads the real emitted surface.');
   process.exit(1);
+}
+
+// A *stale* dist is more dangerous than a missing one, and only in `--update`.
+// Missing fails loudly; stale succeeds quietly, and writes a baseline recording
+// a surface the package no longer has. Doing that in update mode cements the
+// wrong answer behind a green check — the next run compares against it and
+// agrees. So refuse when anything under src/ is newer than what was emitted.
+if (update) {
+  const emitted = statSync(GENERATED).mtimeMs;
+  const newer = [];
+  const walk = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (statSync(full).mtimeMs > emitted) newer.push(path.relative(ROOT, full));
+    }
+  };
+  walk(path.join(ROOT, 'src'));
+  if (newer.length > 0) {
+    console.error(
+      `${path.relative(ROOT, GENERATED)} is older than ${newer.length} source file(s), e.g. ${newer[0]}.`,
+    );
+    console.error('Run `pnpm build` first — a baseline written from a stale build');
+    console.error('records a public surface the package does not have.');
+    process.exit(1);
+  }
 }
 
 const actual = normalise(readFileSync(GENERATED, 'utf8'));

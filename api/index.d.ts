@@ -1,5 +1,6 @@
 import * as react from 'react';
-import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
+import { Table as Table$1, ColumnDef } from '@tanstack/react-table';
 
 type Emphasis = 'primary' | 'secondary' | 'tertiary' | 'quiet';
 
@@ -414,19 +415,46 @@ interface StatCardProps {
 }
 declare function StatCard({ title, value, change, changeType, subtitle, icon: Icon, accent, className, }: StatCardProps): react.JSX.Element;
 
+declare function Table({ className, containerClassName, ...props }: TableHTMLAttributes<HTMLTableElement> & {
+    containerClassName?: string;
+}): react.JSX.Element;
+declare function TableHeader({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
+declare function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
+declare function TableFooter({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
+declare function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>): react.JSX.Element;
+declare function TableHead({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>): react.JSX.Element;
+declare function TableCell({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>): react.JSX.Element;
+declare function TableCaption({ className, ...props }: HTMLAttributes<HTMLTableCaptionElement>): react.JSX.Element;
+
 interface Column<T> {
     header: string;
     accessor: keyof T | ((row: T) => ReactNode);
     className?: string;
+    enableSorting?: boolean;
+    sortValue?: (row: T) => any;
 }
-interface DataTableProps<T> {
-    columns: Column<T>[];
-    data: T[];
-    keyExtractor: (row: T, index: number) => string | number;
+type DataTableProps<T> = {
+
+    table: Table$1<T>;
+    columns?: never;
+    data?: never;
+    keyExtractor?: (row: T, index: number) => string | number;
     emptyText?: string;
     className?: string;
-}
-declare function DataTable<T>({ columns, data, keyExtractor, emptyText, className, }: DataTableProps<T>): react.JSX.Element;
+    containerClassName?: string;
+} | {
+    table?: never;
+
+    columns: Column<T>[] | ColumnDef<T, any>[];
+    data: T[];
+    keyExtractor?: (row: T, index: number) => string | number;
+    emptyText?: string;
+    className?: string;
+    containerClassName?: string;
+    enableSorting?: boolean;
+    pageSize?: number;
+};
+declare function DataTable<T>({ table: providedTable, columns, data, keyExtractor, emptyText, className, containerClassName, ...rest }: DataTableProps<T>): react.JSX.Element;
 
 interface ModalProps {
     isOpen: boolean;
@@ -440,6 +468,98 @@ interface ModalProps {
 }
 
 declare function Modal({ isOpen, onClose, title, children, footer, closeOnBackdropClick, className, }: ModalProps): react.ReactPortal | null;
+
+declare const NERD_GLYPHS: {
+    readonly sort: "";
+    readonly 'sort-asc': "";
+    readonly 'sort-desc': "";
+    readonly 'chevron-right': "";
+    readonly 'chevron-left': "";
+    readonly 'chevron-up': "";
+    readonly 'chevron-down': "";
+    readonly 'arrow-right': "";
+    readonly 'arrow-left': "";
+    readonly 'arrow-up': "";
+    readonly 'arrow-down': "";
+    readonly expand: "";
+    readonly compress: "";
+    readonly 'git-branch': "";
+    readonly 'git-commit': "";
+    readonly 'git-merge': "";
+    readonly 'git-pull-request': "";
+    readonly docker: "";
+    readonly kubernetes: "󱀹";
+    readonly aws: "󰍝";
+    readonly linux: "";
+    readonly apple: "";
+    readonly windows: "";
+    readonly database: "";
+    readonly server: "";
+    readonly terminal: "";
+    readonly code: "";
+    readonly bug: "";
+    readonly cpu: "󰌢";
+    readonly ram: "󰌣";
+    readonly search: "";
+    readonly settings: "";
+    readonly check: "";
+    readonly close: "";
+    readonly alert: "";
+    readonly info: "";
+    readonly help: "";
+    readonly refresh: "";
+    readonly sync: "";
+    readonly copy: "";
+    readonly 'external-link': "";
+    readonly trash: "";
+    readonly edit: "";
+    readonly plus: "";
+    readonly minus: "";
+    readonly filter: "";
+    readonly folder: "";
+    readonly 'folder-open': "";
+    readonly file: "";
+    readonly 'file-code': "";
+    readonly lock: "";
+    readonly unlock: "";
+    readonly link: "";
+    readonly play: "";
+    readonly pause: "";
+    readonly stop: "";
+};
+type NerdIconName = keyof typeof NERD_GLYPHS;
+type NerdIconAccent = 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'info' | 'muted';
+interface NerdIconProps extends HTMLAttributes<HTMLSpanElement> {
+
+    name: NerdIconName;
+
+    accent?: NerdIconAccent;
+
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+    bracketed?: boolean;
+
+    label?: string;
+}
+
+declare function NerdIcon({ name, accent, size, bracketed, label, className, ...props }: NerdIconProps): react.JSX.Element;
+
+interface GlyphProps extends HTMLAttributes<HTMLSpanElement> {
+
+    name?: NerdIconName;
+
+    accent?: NerdIconAccent;
+
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+    bracketed?: boolean;
+
+    children?: ReactNode;
+
+    label?: string;
+}
+
+declare function Glyph({ name, accent, size, bracketed, children, label, className, ...props }: GlyphProps): react.JSX.Element;
 
 interface SlideProps {
     title?: string;
@@ -816,6 +936,8 @@ export {
   type ExperimentItem,
   ExperimentsView,
   type ExperimentsViewProps,
+  Glyph,
+  type GlyphProps,
   HEADING_EMPHASIS,
   type HeadingLevel,
   Input,
@@ -829,6 +951,11 @@ export {
   type MdxComponents,
   Modal,
   type ModalProps,
+  NERD_GLYPHS,
+  NerdIcon,
+  type NerdIconAccent,
+  type NerdIconName,
+  type NerdIconProps,
   NoteBlock,
   type NoteBlockProps,
   PageHeader,
@@ -865,8 +992,16 @@ export {
   THEME_STORAGE_KEY,
   TLDR,
   type TLDRProps,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
   TableOfContents,
   type TableOfContentsProps,
+  TableRow,
   Tag,
   type TagAccent,
   type TagProps,
