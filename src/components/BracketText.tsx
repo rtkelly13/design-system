@@ -44,5 +44,3 @@ export function BracketText({
     </span>
   );
 }
-
-export default BracketText;

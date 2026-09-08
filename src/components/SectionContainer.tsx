@@ -12,5 +12,3 @@ export function SectionContainer({ children, className = '' }: SectionContainerP
     </section>
   );
 }
-
-export default SectionContainer;

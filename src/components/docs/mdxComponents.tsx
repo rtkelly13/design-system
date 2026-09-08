@@ -81,5 +81,3 @@ export const mdxComponents = {
 };
 
 export type MdxComponents = typeof mdxComponents;
-
-export default mdxComponents;

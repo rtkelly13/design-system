@@ -63,5 +63,3 @@ export function Tag({
     </span>
   );
 }
-
-export default Tag;

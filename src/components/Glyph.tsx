@@ -80,5 +80,3 @@ export function Glyph({
     </span>
   );
 }
-
-export default Glyph;
