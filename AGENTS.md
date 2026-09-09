@@ -61,8 +61,10 @@ Load these when the task is in them, not before.
 
 Standing analysis, written once and still true:
 [`docs/surface-readiness.md`](./docs/surface-readiness.md),
-[`docs/evaluation.md`](./docs/evaluation.md) and
-[`docs/gap-analysis.md`](./docs/gap-analysis.md).
+[`docs/evaluation.md`](./docs/evaluation.md),
+[`docs/gap-analysis.md`](./docs/gap-analysis.md) and
+[`docs/storybook-benchmarks.md`](./docs/storybook-benchmarks.md) — the published
+Storybook measured against seven public design systems, with the plan it produced.
 
 ---
 
