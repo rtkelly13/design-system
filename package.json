@@ -16,7 +16,7 @@
     "./theme.css": "./dist/theme.css",
     "./prose.css": "./dist/prose.css",
     "./tokens/midnight.tokens.json": "./tokens/palette.midnight.tokens.json",
-    "./tokens/light.tokens.json": "./tokens/palette.light.tokens.json"
+    "./tokens/sketch.tokens.json": "./tokens/palette.sketch.tokens.json"
   },
   "files": [
     "dist",

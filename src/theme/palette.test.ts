@@ -57,14 +57,14 @@ describe('fixed colours', () => {
   });
 
   it('is what `--color-black` is not', () => {
-    // The compat alias tracks `surface.base`, so on `light` it resolves to
+    // The compat alias tracks `surface.base`, so on `sketch` it resolves to
     // #f5f3ec — `--color-black` holding warm paper. The `white` level, which
     // held pure white in `surface.base` and made the inversion starkest, is
     // gone with the collapse; the alias is still the wrong shape.
-    expect(LEVELS.light.surface.base).not.toBe(FIXED_COLOURS.black);
-    // And the light level does use pure white — legitimately now, as a
+    expect(LEVELS.sketch.surface.base).not.toBe(FIXED_COLOURS.black);
+    // And the sketch level does use pure white — legitimately now, as a
     // reference to the fixed group rather than a literal nobody declared.
-    expect(LEVELS.light.surface.raised).toBe(FIXED_COLOURS.white);
+    expect(LEVELS.sketch.surface.raised).toBe(FIXED_COLOURS.white);
   });
 });
 

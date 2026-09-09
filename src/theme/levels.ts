@@ -17,16 +17,19 @@
  *
  * Polarity nevertheless stays a *declared property of a level* rather than the
  * axis, and this is worth stating because the collapse is usually assumed to
- * end it. It does not, because **the levels are not named for their
- * polarities**: `midnight` has polarity `dark`. So {@link SYSTEM_LEVEL} still
- * has a job — mapping two media states onto two names that are not those
- * states — and a `Record<Polarity, T>` is still a different type from a
- * `Record<ThemeLevel, T>`. Had the levels been called `dark` and `light` the
- * two would have become the same thing and polarity could have gone.
+ * end it. It does not, because **neither level is named for its polarity**:
+ * `midnight` has polarity `dark`, `sketch` has polarity `light`. So
+ * {@link SYSTEM_LEVEL} still has a real job — mapping two media states onto two
+ * names that are neither of them — and a `Record<Polarity, T>` remains a
+ * different type from a `Record<ThemeLevel, T>`. Had the levels been called
+ * `dark` and `light` the two would have collapsed into one thing and polarity
+ * could have gone with them.
  *
- * The `dark:` variant therefore survives as a polarity variant. `light:` does
- * not: a level named `light` already declares it, and the two rules would be
- * identical. `scripts/build-tokens.mjs` skips it rather than shadowing it.
+ * Both polarity variants therefore survive: `dark:` and `light:` each span a
+ * polarity rather than naming a level, so neither collides with a level
+ * variant. `midnight` names a ground; `sketch` names a surface and a way of
+ * drawing on it. Neither is a synonym for its polarity, which is the property
+ * that keeps a third level cheap.
  *
  * ## Why every value is a literal
  *
@@ -49,7 +52,7 @@ import type { BorderTone, Emphasis, Hue, Intent, Surface, TextTone } from '../li
  * `cycleLevel` steps through and what the Storybook toolbar and walkthrough
  * matrix render in.
  */
-export const THEME_LEVELS = ['midnight', 'light'] as const;
+export const THEME_LEVELS = ['midnight', 'sketch'] as const;
 
 /** A level of the ladder. */
 export type ThemeLevel = (typeof THEME_LEVELS)[number];
@@ -213,9 +216,9 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
     shadow: '#ffffff',
   },
 
-  light: {
-    label: 'Light',
-    description: 'Sketch — warm paper and pen ink. The light half of the pair.',
+  sketch: {
+    label: 'Sketch',
+    description: 'Warm paper and pen ink. The light half of the pair.',
     polarity: 'light',
     surface: {
       base: '#f5f3ec', // sketch paper
@@ -285,7 +288,7 @@ export const DEFAULT_LEVEL: ThemeLevel = 'midnight';
  */
 export const SYSTEM_LEVEL: Readonly<Record<Polarity, ThemeLevel>> = {
   dark: 'midnight',
-  light: 'light',
+  light: 'sketch',
 };
 
 /** Type guard for values arriving from `localStorage`, URLs, or props. */

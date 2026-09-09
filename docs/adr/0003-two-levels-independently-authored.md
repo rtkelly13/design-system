@@ -18,14 +18,18 @@ But collapsing to two is not the interesting part of the decision. The interesti
 what the two *are*. Six years of authored colour across this repo and the blog contain exactly
 **two identities**, and they are not variations of one theme:
 
-- **Dark — neon on ink.** A near-black ground with high-chroma accents. The character the
-  README leads with.
-- **Light — sketch, paper and pen.** Warm paper, graphite ink, pen-coloured accents. Not the
-  dark theme lightened; a different drawing.
+- **`midnight` — neon on ink.** A blue-black `#0a0a1a` ground with high-chroma accents. The
+  character the README leads with.
+- **`sketch` — paper and pen.** Warm paper, graphite ink, pen-coloured accents. Not the dark
+  theme lightened; a different drawing.
 
-**The decision: the ladder is exactly two Levels, `dark` and `light`. Each is an independently
-authored identity that declares its own complete set of Groups, including its own `palette`.
-Neither Level is derived from the other, by inversion, rotation or any other formula.**
+**The decision: the ladder is exactly two Levels, `midnight` and `sketch`. Each is an
+independently authored identity that declares its own complete set of Groups, including its own
+`palette`. Neither Level is derived from the other, by inversion, rotation or any other
+formula.**
+
+They are named for what they are rather than for their polarity, and that is load-bearing
+rather than decorative — see the last consequence below.
 
 This ADR records no colour values. Per 0002 a colour originates exactly once — in
 `src/theme/levels.ts` — so naming values here would create a second origin and contradict the
@@ -61,10 +65,15 @@ wanted, the discipline below keeps it cheap.
 
 ## Consequences
 
-- **`Polarity` stops being a declared field and becomes the axis.** At two Levels
-  `SYSTEM_LEVEL` degenerates to an identity map, so `Polarity`, `SYSTEM_LEVEL` and
-  `levelsByPolarity` all come out, and `readSystemLevel` becomes a one-liner. This is a
-  **breaking change**, landing in `0.5.0`; the `api/index.d.ts` diff is where it is reviewed.
+- **`Polarity` survives, and this reverses what #116 predicted.** That issue argues polarity
+  becomes the axis at two Levels, so `Polarity`, `SYSTEM_LEVEL` and `levelsByPolarity` all come
+  out. The reasoning holds only if the Levels are *named* for their polarities — at
+  `['dark', 'light']`, `SYSTEM_LEVEL` degenerates to an identity map and
+  `Record<Polarity, T>` becomes `Record<ThemeLevel, T>`. Naming them `midnight` and `sketch`
+  keeps the two vocabularies distinct, so `SYSTEM_LEVEL` still maps two media states onto two
+  names that are neither of them. Only `levelsByPolarity` comes out, and only for having had
+  zero callers since it was written. Still a **breaking change** in `0.5.0` — `THEME_LEVELS`
+  changes shape — and the `api/index.d.ts` diff is where it is reviewed.
 - **`palette` is a per-Level Group**, exactly like `surface`, `text` and `accent`. It is not a
   global constant with per-Level overrides, because that shape is the rejected third option.
 - **Every hue is authored twice**, once per Level, and this is the accepted cost. It is the
@@ -81,3 +90,9 @@ wanted, the discipline below keeps it cheap.
   nested-panel substitution blocks are generated into `theme.css` and consumed from
   `node_modules`, so the rename must land in the package before any consumer moves. The
   ordering is not optional.
+- **`sketch` is the name the consumer already uses.** `rtkelly13/blog` has shipped a `.sketch`
+  light theme since 2026-07-14, with thirteen hand-tuned prose and component rules scoped to it.
+  Choosing `sketch` over `light` means those keep their selector instead of needing re-scoping,
+  which removes the largest mechanical part of the blog migration. Naming the package's Level
+  after the consumer's is the opposite of the usual direction, and it is worth it here because
+  the consumer's name was the better one.

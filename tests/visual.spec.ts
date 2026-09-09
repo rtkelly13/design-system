@@ -101,9 +101,9 @@ const CASES: readonly VisualCase[] = [
   // rendered exactly what `DarkMode` renders, so asserting both was asserting
   // the same pixels twice under two names.
   { id: 'saas-admindashboardlayout--dark-mode', snapshot: 'admin-dashboard-midnight.png', fullPage: true },
-  { id: 'saas-admindashboardlayout--light-mode', snapshot: 'admin-dashboard-light.png', fullPage: true },
+  { id: 'saas-admindashboardlayout--sketch-mode', snapshot: 'admin-dashboard-sketch.png', fullPage: true },
   { id: 'saas-landingpage--dark-mode', snapshot: 'saas-landing-midnight.png', fullPage: true },
-  { id: 'saas-landingpage--light-mode', snapshot: 'saas-landing-light.png', fullPage: true },
+  { id: 'saas-landingpage--sketch-mode', snapshot: 'saas-landing-sketch.png', fullPage: true },
 ];
 
 test.describe('Design System Visual Regression - Components', () => {

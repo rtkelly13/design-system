@@ -33,11 +33,16 @@ There are exactly two, and **neither is derived from the other** — see
 | Level | `data-theme` | Character |
 |---|---|---|
 | **Midnight** | `midnight` | Neon on blue-black `#0a0a1a`. High-chroma accents. The signature, and the default. |
-| **Light** | `light` | Sketch — warm paper `#f5f3ec`, graphite ink, pen-coloured accents. Not the dark theme lightened; a different drawing. |
+| **Sketch** | `sketch` | Warm paper `#f5f3ec`, graphite ink, pen-coloured accents. Not the dark theme lightened; a different drawing. |
 
-The levels are deliberately **not** named `dark` and `light`. `midnight` is a name for a
-specific ground, and keeping it means `polarity` stays a real declared property rather than
-collapsing into the level name — which is what keeps a third level cheap to add.
+The levels are deliberately **not** named `dark` and `light`. `midnight` names a ground and
+`sketch` names a surface and a way of drawing on it; neither is a synonym for its polarity. That
+keeps `polarity` a real declared property rather than collapsing into the level name — which is
+what keeps a third level cheap to add — and it means both the `dark:` and `light:` variants
+survive alongside `midnight:` and `sketch:`.
+
+`sketch` is also the name `rtkelly13/blog` has used for its light theme since 2026-07-14, so the
+consumer's existing `.sketch` rules keep their selector.
 
 An inversion of neon-on-ink is neon-on-white, which is a third thing nobody wants. The two
 themes also have opposite tightest grounds — dark's is its `raised` surface, light's is its
@@ -137,15 +142,13 @@ Four grounds per theme, each answering a different question. Not decoration.
 
 Two things that are not obvious:
 
-**Elevation is carried by the shadow, not the background.** The light theme's `base → raised`
-step is ΔE 0.037 — barely visible on its own. That is correct by idiom: a `6px 6px 0` offset
+**Elevation is carried by the shadow, not the background.** `sketch`'s `base → raised` step is ΔE 0.037 — barely visible on its own. That is correct by idiom: a `6px 6px 0` offset
 shadow and a 2px border do the work a subtle fill does in a soft design. Do not widen the ramp
 or invent a fourth surface.
 
-**The light scrim inverts which ink applies.** `surface.overlay` composited over the light
-theme's page becomes a mid-grey, on which `text.primary` scores 2.3–2.5:1 and *fails*, while
-`text.inverse` scores 5.4–5.9:1. So anything painted on the light scrim uses `text.inverse` —
-the opposite of the dark theme. No gate can currently see this; it is tracked in #81.
+**The light scrim inverts which ink applies.** `surface.overlay` composited over `sketch`'s page becomes a mid-grey, on which `text.primary` scores 2.3–2.5:1 and *fails*, while
+`text.inverse` scores 5.4–5.9:1. So anything painted on `sketch`'s scrim uses `text.inverse` —
+the opposite of `midnight`. No gate can currently see this; it is tracked in #81.
 
 ## 6. Form
 
@@ -186,7 +189,7 @@ Bracketed section headings. No exclamation marks, no marketing adjectives, no "s
 1. Read the token files, not this prose, for values — `tokens/palette.<theme>.tokens.json`.
 2. Address Roles. If you find yourself writing a hue name in a component, stop.
 3. Zero radius, hard offset shadows, 2px borders.
-4. Both themes, always. Test the light one; it is the one that breaks.
+4. Both themes, always. Test `sketch`; it is the one that breaks.
 5. Never use pure black as a page ground. `surface.base` is `#121316` on dark, and the darkest
    declared value anywhere is `#0c0d0f`.
 6. Contrast is a gate, not a guideline. If `pnpm check:contrast` fails, the colour is wrong —

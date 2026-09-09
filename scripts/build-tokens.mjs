@@ -272,12 +272,15 @@ ${THEME_LEVELS.map((level) => `@custom-variant ${level} (${levelVariant(level)})
  * for colour, which the tokens already handle. */
 ${(['dark', 'light'])
   .filter((polarity) => {
-    // A level may be *named* for its polarity — `light` is, since the collapse.
-    // The per-level variant above already emitted `@custom-variant light`, and
-    // emitting it again here is a duplicate declaration. Today the two bodies
-    // are byte-identical, because that polarity has exactly one level; the
-    // moment a second one is added they would silently diverge, with the later
-    // definition winning. Skip rather than shadow.
+    // A level may be *named* for its polarity, in which case the per-level
+    // variant above has already emitted this exact rule and emitting it again
+    // is a duplicate declaration — harmless while that polarity has one level,
+    // and silently divergent the moment it has two, with the later definition
+    // winning.
+    //
+    // Inert as it stands: the levels are `midnight` and `sketch`, so neither
+    // takes `dark` or `light`. Kept because it costs one array filter and the
+    // alternative is a footgun armed by a rename.
     const clash = THEME_LEVELS.includes(polarity);
     return !clash;
   })

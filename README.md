@@ -2,8 +2,8 @@
 
 The foundational visual design system for **ryankelly.dev** and every personal surface that has
 to look like it. Built around a **brutalist / neon-terminal** aesthetic: hard edges, zero
-border-radius, offset shadows, and two themes — `midnight`, neon on blue-black, and `light`,
-sketch paper and pen ink.
+border-radius, offset shadows, and two themes — `midnight`, neon on blue-black, and `sketch`,
+warm paper and pen ink.
 
 ## This is a multi-surface system, and that is the foundational decision
 
@@ -26,8 +26,8 @@ Two decisions carry this, and they are worth reading before changing anything ab
   The root decision. Why per-surface palettes, manual ports and a runtime theming service were
   all rejected, and why the source is TypeScript rather than JSON.
 - [**ADR 0003 — Two Levels, each independently authored**](./docs/adr/0003-two-levels-independently-authored.md).
-  `midnight` and `light`, neither derived from the other. The levels are deliberately not named
-  for their polarities.
+  `midnight` and `sketch`, neither derived from the other. Neither is named for its polarity,
+  which is what keeps `Polarity` a real declared property.
 - [**ADR 0001 — Hues are declared below Roles**](./docs/adr/0001-hues-declared-below-roles.md).
   Components address a colour by its **job** (`accent.primary`), never its appearance (`cyan`).
   But a terminal has sixteen positions named by colour and no concept of a keyword — so a hue

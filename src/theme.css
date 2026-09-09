@@ -41,13 +41,14 @@
    a different border weight on one level. */
 
 @custom-variant midnight (&:where([data-theme="midnight"], [data-theme="midnight"] *):not(:where([data-theme]:not([data-theme="midnight"]), [data-theme]:not([data-theme="midnight"]) *)));
-@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *):not(:where([data-theme]:not([data-theme="light"]), [data-theme]:not([data-theme="light"]) *)));
+@custom-variant sketch (&:where([data-theme="sketch"], [data-theme="sketch"] *):not(:where([data-theme]:not([data-theme="sketch"]), [data-theme]:not([data-theme="sketch"]) *)));
 
 /* Polarity is a declared property of a level, so these are derived rather than
  * being the axis the system hangs off. Use them for non-colour utilities that
  * genuinely depend on light-vs-dark — a shadow spread, an image filter — never
  * for colour, which the tokens already handle. */
 @custom-variant dark (&:where([data-theme="midnight"], [data-theme="midnight"] *):not(:where([data-theme]:not([data-theme="midnight"]), [data-theme]:not([data-theme="midnight"]) *)));
+@custom-variant light (&:where([data-theme="sketch"], [data-theme="sketch"] *):not(:where([data-theme]:not([data-theme="sketch"]), [data-theme]:not([data-theme="sketch"]) *)));
 
 /* `light:` is not declared here: a level named `light` already declares it
  * above, and the two would be the same rule. `dark:` still spans polarity
@@ -298,8 +299,8 @@
   --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
 }
 
-/* Light — Sketch — warm paper and pen ink. The light half of the pair. */
-[data-theme="light"] {
+/* Sketch — Warm paper and pen ink. The light half of the pair. */
+[data-theme="sketch"] {
   color-scheme: light;
 
   --ds-surface-base: #f5f3ec;

@@ -25,12 +25,12 @@ export const DarkMode: Story = {
 };
 
 /**
- * The light half of the pair — sketch paper and pen ink. Since the collapse
- * this is the only light level, so it is also the light baseline.
+ * The light half of the pair — warm paper and pen ink. Since the collapse this
+ * is the only light level, so it is also the light baseline.
  */
-export const LightMode: Story = {
+export const SketchMode: Story = {
   render: () => (
-    <ThemeProvider defaultLevel="light" scoped persist={false} followSystem={false} className="min-h-screen bg-surface-base text-content-primary">
+    <ThemeProvider defaultLevel="sketch" scoped persist={false} followSystem={false} className="min-h-screen bg-surface-base text-content-primary">
       <div>
         <SaasLandingPage />
       </div>

@@ -1,9 +1,9 @@
 {
   "$schema": "https://www.designtokens.org/schema.json",
-  "$description": "Light — Sketch — warm paper and pen ink. The light half of the pair. Generated from src/theme/levels.ts; do not edit. DTCG 2025.10. Token paths are identical across every level file.",
+  "$description": "Sketch — Warm paper and pen ink. The light half of the pair. Generated from src/theme/levels.ts; do not edit. DTCG 2025.10. Token paths are identical across every level file.",
   "$extensions": {
     "dev.ryankelly.design-system": {
-      "level": "light",
+      "level": "sketch",
       "polarity": "light",
       "specVersion": "2025.10",
       "generatedFrom": "src/theme/levels.ts",

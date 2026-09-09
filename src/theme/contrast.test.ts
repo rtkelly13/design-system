@@ -37,10 +37,10 @@ describe('selection devices', () => {
   it('measures the light level where the trap actually bites', () => {
     // The concrete number behind the rule: on a light level the raised surface
     // is barely off the page, so elevation cannot be carried by the ground.
-    // `light` goes base #f5f3ec -> raised #ffffff, which is the whole available
+    // `sketch` goes base #f5f3ec -> raised #ffffff, which is the whole available
     // headroom above warm paper — and it is still only a 1.11:1 step. That is
     // why the offset shadow and the 2px border do the work; see DESIGN.md § 5.
-    const ratio = contrastRatio(LEVELS.light.surface.raised, LEVELS.light.surface.base);
+    const ratio = contrastRatio(LEVELS.sketch.surface.raised, LEVELS.sketch.surface.base);
     expect(ratio).toBeLessThan(1.3);
   });
 });

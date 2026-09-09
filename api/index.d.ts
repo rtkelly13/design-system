@@ -48,7 +48,7 @@ declare const semanticTokens: {
     readonly shadowColor: "var(--ds-shadow-color)";
 };
 
-declare const THEME_LEVELS: readonly ["midnight", "light"];
+declare const THEME_LEVELS: readonly ["midnight", "sketch"];
 
 type ThemeLevel = (typeof THEME_LEVELS)[number];
 
