@@ -23,7 +23,16 @@ Those three ask *"is the system sound?"*. This one asks *"does the published cat
 hold up next to the ones people actually cite as good?"* — a different axis, and the one
 nothing here had measured.
 
-Measured against `main` at `4eda777` (2026-09-09), Storybook `10.5.5`.
+Measured against `main` at `eb81ca2` (2026-09-09), package `0.5.0`, Storybook `10.5.5`.
+
+> [!NOTE]
+> An earlier draft of this document was measured against `4eda777`, when the ladder had
+> four rungs. #123 landed in between, collapsing it to `midnight` + `sketch` and
+> repalletting the light end. Every number below has been re-derived on `eb81ca2`. One
+> finding did not survive that — a composited-contrast failure on the deleted `bright`
+> rung, filed and then closed as #126 — and its replacement is a live one of the same
+> class, #135. Nothing else moved: the structural findings are ladder-independent and
+> re-measured identically.
 
 ---
 
@@ -147,7 +156,7 @@ failing — Polaris's blanks are choices.
 8. `@etchteam/storybook-addon-status`.
 9. `storybook-addon-pseudo-states`.
 10. `@storybook/addon-mcp` plus `features: { componentsManifest: true }`.
-11. `✅✅` because `maxDiffPixels: 0` across 38 baselines covering every component in the index is stricter than
+11. `✅✅` because `maxDiffPixels: 0` across 40 baselines covering every component in the index is stricter than
     anything else in the column, and `check:visual-coverage` makes the breadth a rule
     rather than a habit.
 
@@ -183,7 +192,7 @@ consumer.
 ### What is actually there
 
 The claim is usually left as a risk. It does not have to be. Running axe-core over the
-built Storybook — 112 stories × all four rungs of the ladder, 448 scans — gives this:
+built Storybook — 110 stories × both rungs of the ladder, 220 scans — gives this:
 
 ```bash
 pnpm build-storybook
@@ -193,72 +202,100 @@ npx serve storybook-static -p 6006 --config ../serve.json
 
 | Rule | Impact | Stories | Rungs it fires on |
 |---|---|---|---|
-| `button-name` | **critical** | 1 | all four |
-| `color-contrast` | **serious** | 7 | **`bright` only** |
-| `heading-order` | moderate | 6 | all four |
-| `landmark-unique` | moderate | 2 | all four |
+| `button-name` | **critical** | 1 | both |
+| `color-contrast` | **serious** | 1 | both |
+| `heading-order` | moderate | 6 | both |
+| `landmark-unique` | moderate | 2 | both |
 
-Three page-level rules are excluded from that table and it matters that the exclusion is
-deliberate: `landmark-one-main` (103 stories), `page-has-heading-one` (87) and `region`
-(70) fire on almost everything, because **a story is not a page** — an isolated `Badge`
-has no `<main>` and should not. Any a11y setup here has to turn those three off, or the
-signal is 96% noise. That decision belongs in `preview.ts` with the reason written next to
-it, which is this repo's habit anyway.
+Three page-level rules are excluded from that table, and it matters that the exclusion is
+deliberate: `landmark-one-main` (102 stories), `page-has-heading-one` (87) and `region`
+(69) fire on almost everything, because **a story is not a page** — an isolated `Badge`
+has no `<main>` and should not. They were **258 of the 278 story-rule findings**. Any a11y
+setup here has to turn those three off, or the signal is 93% noise. That decision belongs
+in `preview.ts` with the reason written beside it, which is this repo's habit anyway.
 
-What is left is sixteen findings across four rules, and the honest reading is **not** that
-the catalogue is riddled with problems. It is not — the contrast gate has already done the
-work that usually dominates an axe report, and four rules across a 42-component catalogue is a good
-result. The finding is narrower and much more interesting.
+What is left is ten findings across four rules, and the honest reading is **not** that the
+catalogue is riddled with problems. It is not — `check:contrast` has already done the work
+that usually dominates an axe report, and four rules across a 42-component catalogue is a
+good result. Two of the four are already tracked: `button-name` is the unlabelled
+`SlideDeck` control that #45 found by reading the code and #58 already fixes, and
+`heading-order` is mostly story fixtures that open at `<h4>`. `landmark-unique` is
+`DocsLayout` rendering two unlabelled `<nav>`s — a real component bug, and a one-line
+`aria-label`.
 
-### The `bright`-only contrast failure is the one that matters
+The `serious` one is the interesting finding, and it is not the sort of thing a code read
+would have found.
 
-`color-contrast` fires on seven stories, on exactly one rung, and always on the same
-element — the docs sidebar's current item:
+### The one failure the gate is structurally unable to see
+
+`check:contrast` passes, and it is not wrong:
 
 ```
-bright  docs-docssidebar--default   color-contrast  a[href$="semantic-tokens"]
-        ratio=4.24  fg=#2563eb  bg=#e2e9f7  expected=4.5:1
+Contrast OK — 220 pairs across 2 levels, all at or above minimum;
+24 selection devices clear 3:1; 16 Roles agree with their declared Hue.
 ```
 
-`#2563eb` is `bright.accent.primary`, declared in `src/theme/levels.ts:183`. **`#e2e9f7`
-is declared nowhere**, because it is not a colour anyone chose. It is what
-`src/prose.css:575` renders:
+axe disagrees, on a colour that is in no palette:
 
-```css
-.docs-sidebar-link[data-active='true'] {
-  color: var(--ds-accent-primary);
-  border-left-color: var(--ds-accent-primary);
-  background-color: color-mix(in oklab, var(--ds-accent-primary) 12%, transparent);
-}
+```
+serious  color-contrast  saas-landingpage--sketch-mode
+         ratio=3.98  fg=#77787a  bg=#f5f3ec
 ```
 
-Accent-coloured text, on a 12%-accent band, over the light surface. Run the arithmetic
-against what `check:contrast` actually audits:
+`#77787a` appears nowhere in `levels.ts` or `theme.css`. It is `sketch.text.primary`
+(`#23262e`) at 60% over `sketch.surface.base`, rendered by
+`src/components/saas/SaasLandingPage.tsx:288`:
 
-| Pair | Ratio | Gate |
+```tsx
+color: 'var(--ds-text-primary)',
+opacity: 0.6,
+```
+
+**`opacity` changes the foreground after the gate has read it.** The role was addressed
+correctly — this is not a hardcoded hex, and `pnpm lint` has nothing to complain about.
+The token is right and the rendering is wrong, which is the one combination no rule in this
+repo can currently express:
+
+| | Ratio | `check:contrast` |
 |---|---|---|
-| `accent.primary` on `bright.surface.base` | 5.00 | ✅ passes |
-| `accent.primary` on `bright.surface.raised` | 5.17 | ✅ passes |
-| `accent.primary` on the **rendered** `#e2e9f7` | **4.24** | ❌ below AA, unaudited |
+| `text.primary` on `sketch.surface.base`, as declared | 13.63 | ✅ passes |
+| the same pair as **rendered**, at `opacity: 0.6` | **3.98** | ❌ not audited |
 
-**This repo has a word for this, and the word is why the gate cannot see it.**
+And it is not one site. `opacity` is applied to text at seventeen places across
+`prose.css`, `SaasLandingPage`, `Card`, `AdminDashboardLayout` and `ExperimentsView`. The
+floor, computed rather than guessed:
+
+```
+minimum opacity at which text.primary still clears 4.5:1 on surface.base
+  midnight  45%
+  sketch    64%
+```
+
+Three sites sit at or below `sketch`'s floor, and two more — `.docs-toc-link` and
+`.docs-breadcrumbs-link` at `opacity: 0.65` — clear it by 0.09. Filed as **#135**, with
+the full site table.
+
+**This repo has a word for the class, and the word is why the gate cannot see it.**
 [`CONTEXT.md`](../CONTEXT.md) defines:
 
 > **Composited contrast**: The ratio between a foreground and a background that is itself
 > translucent over another background — a keyword over a selection band over a code well.
 > Neither Contrast nor Separation can express it.
 
-That is exactly this failure, named in advance, by this repository, as the thing its own
-gates structurally cannot measure. It also sits on a **Selection device** — the same
-`CONTEXT.md` concept that `auditSelectionDevices` exists to police — and
-`auditSelectionDevices` checks that the device is an accent fill or a 4px accent edge,
-which it is. Nothing checks what the fill does to the text on top of it.
+Named in advance, by this repository, as the thing its own gates structurally cannot
+measure — with the translucency on the background. What shipped has it on the
+*foreground*, which the definition does not quite cover and should.
 
-An axe run in Storybook expresses it for free, because axe reads composited pixels rather
-than declared pairs. That is the strongest argument in this document for finding 1: it is
-not "a11y hygiene", it is **the only cheap instrument that closes the hole this repo
-already documented and could not otherwise close**. And it explains why the failure is
-`bright`-only: the same 12% band over the dark rungs lands well clear of the threshold.
+An axe run in Storybook expresses both directions for free, because axe reads composited
+pixels rather than declared pairs. That is the strongest argument in this document for
+finding 1. It is not "a11y hygiene": it is **the only cheap instrument that closes a hole
+this repo had already identified and documented and could not otherwise close.**
+
+One caution about how much the scan proves. `.docs-sidebar-link-static` computes to
+**3.45:1** on `sketch` and axe never reported it, because every node in
+`DocsSidebar.stories.tsx` has an `href` and the static branch therefore never renders. A
+scan sees what the stories render — so it is bounded by story coverage, which is finding
+9's argument, not a reason to distrust the ten findings above.
 
 The other three are ordinary and small. `button-name` is a `SlideDeck` control with no
 accessible name — a real bug in a shipped composition, invisible to a pixel baseline
@@ -280,8 +317,8 @@ addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
 a11y: {
   test: 'error',
   // A story is not a page: these three fire on nearly every isolated component
-  // and measure the fixture, not the system. They were 260 of the 276
-  // story-rule findings in the first full scan.
+  // and measure the fixture, not the system. They were 258 of the 278
+  // story-rule findings in the full scan.
   config: {
     rules: [
       { id: 'landmark-one-main', enabled: false },
@@ -293,24 +330,27 @@ a11y: {
 ```
 
 `test: 'error'` fails on violation rather than reporting it. `'todo'` reports without
-failing — and note that `'todo'` is what the blog chose, and the blog's violations have
-not been triaged since. A `'todo'` with no scheduled end is a permanent `'off'`. Since the
-backlog here is sixteen findings and one of them is the composited-contrast bug, going
-straight to `'error'` after fixing them is the better trade.
+failing — and note that `'todo'` is what the blog chose, and the blog's violations have not
+been triaged since. A `'todo'` with no scheduled end is a permanent `'off'`. The backlog
+here is ten findings, two of which are already covered by #58, so going straight to
+`'error'` once #135 lands is the better trade.
 
 Then, because this repo's whole thesis is that a rule which is not a Gate is a convention,
 the a11y run belongs in the `gates` job of `ci.yml` beside `check:contrast` — where it
 covers, empirically, the case `check:contrast` cannot. It needs finding 2 to have a
 runner.
 
-One thing worth doing at the same time: **scan all four rungs, not one.** The
-composited-contrast failure appears on `bright` alone. A single-level a11y run would have
-found nothing, and the same argument already exists in this repo for the screenshot
-walkthrough — a token change that reads fine on `midnight` can be unusable on `white`.
+One thing worth doing at the same time: **scan both rungs, not one.** The opacity floor is
+45% on `midnight` and 64% on `sketch`, so every finding of this class lives on the light
+rung and a `midnight`-only run understates the risk by a factor of about 1.4 in alpha. The
+same argument already exists in this repo for the screenshot walkthrough — a token change
+that reads fine on `midnight` can be unusable on `sketch`. It is also the argument for
+scanning *each new rung* as the ladder grows: this class of failure is a property of a
+level's headroom, not of a component.
 
-**Cost:** one addon, one parameter block, and sixteen fixes — of which `heading-order`'s
-six are story fixtures, `landmark-unique`'s two are one `aria-label`, `button-name` is one
-label, and `color-contrast`'s seven are a single `color-mix` percentage on one CSS rule.
+**Cost:** one addon, one parameter block, and ten fixes — of which `heading-order`'s six
+are story fixtures, `landmark-unique`'s two are one `aria-label`, `button-name` is already
+fixed in #58, and `color-contrast`'s one is #135's first item.
 
 ---
 
@@ -502,7 +542,7 @@ find . -name "*.mdx" -not -path "./node_modules/*"   # no output
 
 `.storybook/main.ts` globs `../src/**/*.stories.@(js|jsx|mjs|ts|tsx)` and nothing else.
 So a consumer arriving at `design-system.ryankelly.dev` gets a component list and no
-answer to *why colours are addressed by role*, *what the four rungs are for*, or *how to
+answer to *why colours are addressed by role*, *what the two rungs are for*, or *how to
 add a level* — all of which are written, at length, and only readable on GitHub.
 
 **Five of the seven put prose in the sidebar**, and Grafana's is the closest model:
@@ -537,7 +577,7 @@ Four pages, aimed at a consumer rather than a maintainer:
 | Page | Drawn from | Answers |
 |---|---|---|
 | `Intro` | README's opening | what this is, and the install |
-| `The theme ladder` | `docs/theming.md`, `docs/theme-taxonomy.md` | what the four rungs are and how to select one |
+| `The theme ladder` | `docs/theming.md`, `docs/theme-taxonomy.md` | what the two rungs are and how to select one |
 | `Colour is addressed by role` | ADR 0001, ADR 0002 | why `accent.primary` and never `cyan` |
 | `Accessibility` | `check:contrast`, and finding 1's results | what is measured, and what is not |
 
@@ -556,7 +596,7 @@ twice will drift, and this repo's whole architecture is an argument against exac
 
 ## 5. Nothing in the sidebar says what is stable, experimental, or deprecated
 
-The package is at `0.4.0`, publishes 70 symbols, and has real maturity differences inside
+The package is at `0.5.0`, publishes 104 symbols, and has real maturity differences inside
 it that a consumer cannot see:
 
 - `Button`'s `variant` values (`cyan | pink | yellow | white | default`) are documented
@@ -603,7 +643,7 @@ item on this list that a consumer would actually notice.
 This is the finding with the best cost-to-yield ratio here, because the expensive half is
 already built.
 
-The visual suite is strict — `maxDiffPixels: 0`, 38 baselines, a coverage gate. It
+The visual suite is strict — `maxDiffPixels: 0`, 40 baselines, a coverage gate. It
 asserts every component in exactly **one interaction state: at rest.** But the aesthetic
 this package is *for* is an interaction one. From `Button.tsx`:
 
@@ -628,12 +668,16 @@ declared role pairs, not the ring as rendered on the rung in effect; the pixel g
 focuses anything.
 
 **Finding 1 is the proof that this matters, and it is proof by accident.** The
-composited-contrast failure was caught only because `DocsSidebar`'s stories render an
-active item *statically*, via a `data-active` attribute — so axe saw the selection band
-without anything having to interact. The focus ring is the same class of bug on the same
-kind of translucent device, and axe will never see it, because no story is ever focused.
-Adding pseudo-states does not just add baselines; it puts the remaining states **within
-reach of the a11y scan**, which is where the two findings compound.
+composited-contrast failure was caught only because `SaasLandingPage` renders its dimmed
+text unconditionally — axe saw it because nothing had to interact first. Two results from
+the same scan mark the limit: `.docs-sidebar-link-static` computes to 3.45:1 on `sketch`
+and was **not** reported, because no story renders that branch; and #44's suppressed focus
+ring is the same class of bug on the same kind of undeclared colour, and will never be
+reported, because no story is ever focused.
+
+So pseudo-states do not just add baselines. They put the remaining component states
+**within reach of the a11y scan** — and `:focus-visible` is exactly where a substituted or
+dimmed colour is least affordable. That is where findings 1 and 6 compound.
 
 **Orbit is the model:** `storybook-addon-pseudo-states` forces `:hover`, `:focus`,
 `:focus-visible` and `:active` as rendered states, which makes them screenshottable.
@@ -690,10 +734,15 @@ agent-driven, and it is the repo where a manifest pays off most.** `AGENTS.md` i
 hierarchical knowledge base with nineteen linked topic docs, each one introduced with
 *when* to load it; `CONTEXT.md` exists specifically to give an agent the domain
 vocabulary; `api/index.d.ts` is a committed machine-readable baseline of the public
-surface, gated by `check:api`. The sibling `the-vault-system` repo takes the same instinct
-further with a whole doctrine of machine-readable command discovery. A queryable component
-catalogue is the missing member of that set — an agent writing a consumer app today has to
-read `api/index.d.ts` and infer usage from story source.
+surface, gated by `check:api`; and `tokens/palette.<level>.tokens.json` is a DTCG export
+of the palette, gated by `tokens:design:check`. The sibling `the-vault-system` repo takes
+the same instinct further with a whole doctrine of machine-readable command discovery.
+
+That last one is the sharpest version of the argument. **The palette is already
+queryable and the components are not.** An agent can read every colour decision as
+structured data and still has to read `api/index.d.ts` for the component names and infer
+usage from story source. The manifest is the missing half of a decision this repo has
+already made twice.
 
 There is a caveat worth stating plainly: a manifest built by prop extraction inherits
 finding 3. With `Button`'s props missing from docgen, they would be missing from the
@@ -800,8 +849,8 @@ Ordered by dependency and by cost, not by severity.
 
 | | Work | Closes | Rough cost |
 |---|---|---|---|
-| 1 | Fix the `color-mix` percentage on `.docs-sidebar-link[data-active]` so the composited ratio clears 4.5 on `bright` | the one shipped AA failure | minutes |
-| 2 | `@storybook/addon-a11y` + `@storybook/addon-vitest` + `vitest.setup.ts`, the three page-rule exclusions, a11y at `'error'`, all four rungs, wired into the `gates` job | findings 1 and 2; a11y becomes a Gate, and item 1 stays fixed | half a day, then the 9 fixes item 1 does not cover |
+| 1 | Replace `opacity` on text with a declared text role at the sites below `sketch`'s 64% floor (#135) | the one shipped AA failure | an hour |
+| 2 | `@storybook/addon-a11y` + `@storybook/addon-vitest` + `vitest.setup.ts`, the three page-rule exclusions, a11y at `'error'`, both rungs, wired into the `gates` job | findings 1 and 2; a11y becomes a Gate, and item 1 stays fixed | half a day, then the 8 fixes item 1 does not cover |
 | 3 | `reactDocgen: 'react-docgen-typescript'` + a `propFilter`, verified against the eight | finding 3; prerequisite for 7 | an hour, plus a slower build |
 | 4 | A docgen coverage gate shaped like `check:visual-coverage` | keeps finding 3 fixed | an afternoon |
 | 5 | `storybook-addon-pseudo-states` + 5–6 baselines | finding 6; makes the `Input` token migration reviewable | an hour |
@@ -810,8 +859,9 @@ Ordered by dependency and by cost, not by severity.
 | 8 | Four MDX pages through this package's own `mdxComponents` | finding 4; dogfoods the docs kit | a day of writing |
 | 9 | `features.componentsManifest` + `@storybook/addon-mcp` | finding 7 | ten minutes, after 3 |
 
-Item 1 is first only because it is a live AA failure on a shipped component and the fix is
-one number. Everything after it is ordered by dependency and cost. Item 2 is two findings
+Item 1 is first only because it is a live AA failure on a shipped component, and because
+the fix — address a text role instead of dimming one — removes the whole class rather than
+patching an instance. Everything after it is ordered by dependency and cost. Item 2 is two findings
 in one row because they share a single `vitest.setup.ts` — that file is simultaneously how
 stories become tests *and* how the a11y check reaches CI, which is most of why they are
 ranked together.
@@ -853,7 +903,7 @@ nothing here and breaks the thing that works: the Storybook compiles from `src/`
 
 Right now it is both, and the two roles pull in opposite directions. The workbench wants
 every state of every primitive, including `Showcase/DesignSandbox` and the two SaaS
-screenshots. The documentation surface wants a curated path through four rungs and six
+screenshots. The documentation surface wants a curated path through two rungs and six
 role groups, with the 25%-readiness product mockups nowhere near it.
 
 Finding 4 assumes Storybook stays the documentation surface, and its four MDX pages are
