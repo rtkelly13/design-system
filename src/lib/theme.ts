@@ -76,6 +76,18 @@ export type Hue =
  */
 export type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan'>;
 
+/**
+ * What a Role points at in the Hue vocabulary.
+ *
+ * `'neutral'` is not a cop-out: some Roles genuinely are not hues.
+ * `accent.quiet` is a warm or cool grey by design, and the palette has no
+ * neutral ramp to point it at. Saying so explicitly keeps the map exhaustive —
+ * a new Emphasis is still a compile error — while letting the gate distinguish
+ * "declared as not-a-hue" from "forgot to wire it up", which a `Partial` could
+ * not.
+ */
+export type HueRef = Hue | 'neutral';
+
 export type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 /** Anything a component's `accent`-style prop will take. */

@@ -421,39 +421,15 @@
   },
   "accent": {
     "$type": "color",
-    "$description": "Emphasis Roles. Literals until `levels.ts` declares the Role -> Hue map; see #79.",
+    "$description": "Emphasis Roles, aliased onto Hues by the declared `accentHue` map.",
     "primary": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.7971,
-          0.1339,
-          211.53
-        ],
-        "hex": "#22d3ee"
-      }
+      "$value": "{palette.cyan}"
     },
     "secondary": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.8606,
-          0.1731,
-          91.94
-        ],
-        "hex": "#facc15"
-      }
+      "$value": "{palette.yellow}"
     },
     "tertiary": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.6559,
-          0.2118,
-          354.31
-        ],
-        "hex": "#ec4899"
-      }
+      "$value": "{palette.pink}"
     },
     "quiet": {
       "$value": {
@@ -469,50 +445,18 @@
   },
   "intent": {
     "$type": "color",
-    "$description": "Meaning Roles. Literals until the Role -> Hue map is declared; see #79.",
+    "$description": "Meaning Roles, aliased onto Hues by the declared `intentHue` map.",
     "info": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.7971,
-          0.1339,
-          211.53
-        ],
-        "hex": "#22d3ee"
-      }
+      "$value": "{palette.cyan}"
     },
     "success": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.8714,
-          0.286,
-          141.53
-        ],
-        "hex": "#39ff14"
-      }
+      "$value": "{palette.green}"
     },
     "warning": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.8606,
-          0.1731,
-          91.94
-        ],
-        "hex": "#facc15"
-      }
+      "$value": "{palette.yellow}"
     },
     "danger": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.6559,
-          0.2118,
-          354.31
-        ],
-        "hex": "#ec4899"
-      }
+      "$value": "{palette.pink}"
     }
   },
   "shadow": {

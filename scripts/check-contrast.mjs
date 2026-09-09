@@ -12,7 +12,7 @@
  *   node scripts/check-contrast.mjs --report   print the full matrix, always exit 0
  */
 
-import { auditContrast, auditSelectionDevices } from '../src/theme/contrast.ts';
+import { auditContrast, auditHueAgreement, auditSelectionDevices } from '../src/theme/contrast.ts';
 import { LEVELS, THEME_LEVELS } from '../src/theme/levels.ts';
 
 const report = process.argv.includes('--report');
@@ -24,6 +24,13 @@ const failures = results.filter((r) => !r.passes);
 // the surface pairs are printed so the reason they are not a device is in the
 // output, not in someone's memory.
 const devices = auditSelectionDevices(LEVELS);
+
+// Whether each Role holds the value of the Hue it declares itself to be. Not a
+// contrast question — both sides clear their own floors — but the drift ADR 0001
+// rejects its third option over, and the one this repo actually shipped for a
+// commit. See `auditHueAgreement`.
+const agreement = auditHueAgreement(LEVELS);
+const agreementFailures = agreement.filter((r) => !r.passes);
 const deviceFailures = devices.filter((r) => r.device !== 'surface pair' && !r.passes);
 const surfacePairs = devices.filter((r) => r.device === 'surface pair');
 const surfacePairPasses = surfacePairs.filter((r) => r.passes);
@@ -45,6 +52,11 @@ if (report) {
     const forLevel = devices.filter((r) => r.level === level && r.device !== 'surface pair');
     const worst = Math.min(...forLevel.map((r) => r.ratio));
     console.log(`  ${level}  worst ${worst.toFixed(2)}:1`);
+  }
+  console.log('\nRole -> Hue agreement — a Role must hold its declared Hue\'s value');
+  for (const r of agreement) {
+    const shown = r.expected === null ? r.detail : `${r.value} vs ${r.expected}`;
+    console.log(`  ${r.passes ? ' ' : '!'} ${r.level.padEnd(9)} ${r.role.padEnd(18)} -> ${String(r.declared).padEnd(8)} ${shown}`);
   }
   console.log('\nsurface pairs — NOT a selection device (shown so nobody has to rediscover why)');
   for (const r of surfacePairs) {
@@ -73,6 +85,27 @@ if (surfacePairPasses.length > 0) {
   for (const r of surfacePairPasses) console.warn(`  ${r.level.padEnd(9)} ${fmt(r)}`);
 }
 
+if (agreementFailures.length > 0) {
+  console.error(
+    `Role -> Hue agreement failed — ${agreementFailures.length} of ${agreement.length} Roles disagree with the Hue they declare:\n`,
+  );
+  for (const r of agreementFailures) {
+    if (r.expected === null) {
+      console.error(`  ${r.level.padEnd(9)} ${r.role} is declared 'neutral' but ${r.detail}`);
+    } else {
+      console.error(`  ${r.level.padEnd(9)} ${r.role} is ${r.value}, but ${r.detail}`);
+    }
+  }
+  console.error(
+    '\nA Role and its Hue must be the same colour. Two values for one colour drift silently —',
+  );
+  console.error(
+    'they can each clear their own floor, and if they are close they are invisible to a screenshot.',
+  );
+  console.error('Fix the Role in src/theme/levels.ts, or change what its `accentHue`/`intentHue` says.');
+  process.exit(1);
+}
+
 if (failures.length > 0) {
   console.error(`Contrast check failed — ${failures.length} of ${results.length} pairs below minimum:\n`);
   for (const level of THEME_LEVELS) {
@@ -89,5 +122,6 @@ if (failures.length > 0) {
 
 console.log(
   `Contrast OK — ${results.length} pairs across ${THEME_LEVELS.length} levels, all at or above minimum; ` +
-    `${devices.length - surfacePairs.length} selection devices clear ${devices[0].minimum}:1.`,
+    `${devices.length - surfacePairs.length} selection devices clear ${devices[0].minimum}:1; ` +
+    `${agreement.length} Roles agree with their declared Hue.`,
 );

@@ -57,10 +57,15 @@ There are two vocabularies and they point one way:
 
 ```
 Components  ──►  Roles  ──►  Hues
-                        (declared lookup, never a guess)
+                        via accentHue / intentHue — declared, never inferred
 
 Components  ──✗──►  Hues        a Hue in component code is a defect
 ```
+
+The lookup is a real map in `levels.ts`, not a coincidence of shared hex. `check:contrast`
+asserts every Role holds its declared Hue's value, so the two vocabularies cannot drift — and
+a Role declared `neutral` (only `accent.quiet`) is checked to measurably *be* neutral rather
+than skipped.
 
 ### Roles — what a component may address
 

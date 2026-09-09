@@ -191,12 +191,12 @@
   --ds-border-subtle: #33334d;
   --ds-accent-primary: #22d3ee;
   --ds-accent-secondary: #facc15;
-  --ds-accent-tertiary: #ec4899;
+  --ds-accent-tertiary: #f955a4;
   --ds-accent-quiet: #8b8ba3;
   --ds-intent-info: #22d3ee;
   --ds-intent-success: #39ff14;
   --ds-intent-warning: #facc15;
-  --ds-intent-danger: #ec4899;
+  --ds-intent-danger: #f955a4;
   --ds-palette-red: #ff586e;
   --ds-palette-orange: #ff8c00;
   --ds-palette-yellow: #facc15;
@@ -278,7 +278,7 @@
   --border-color: #ffffff;
   --brutalist-cyan: #22d3ee;
   --brutalist-neonCyan: #22d3ee;
-  --brutalist-pink: #ec4899;
+  --brutalist-pink: #f955a4;
   --brutalist-yellow: #facc15;
   --brutalist-cyberOrange: #facc15;
   --brutalist-neonGreen: #39ff14;

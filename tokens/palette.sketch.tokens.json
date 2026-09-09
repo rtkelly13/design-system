@@ -421,39 +421,15 @@
   },
   "accent": {
     "$type": "color",
-    "$description": "Emphasis Roles. Literals until `levels.ts` declares the Role -> Hue map; see #79.",
+    "$description": "Emphasis Roles, aliased onto Hues by the declared `accentHue` map.",
     "primary": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.489,
-          0.2151,
-          262.97
-        ],
-        "hex": "#1450d7"
-      }
+      "$value": "{palette.blue}"
     },
     "secondary": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.4612,
-          0.1274,
-          149.87
-        ],
-        "hex": "#006b2e"
-      }
+      "$value": "{palette.green}"
     },
     "tertiary": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.502,
-          0.2048,
-          27.42
-        ],
-        "hex": "#bd0010"
-      }
+      "$value": "{palette.red}"
     },
     "quiet": {
       "$value": {
@@ -469,50 +445,18 @@
   },
   "intent": {
     "$type": "color",
-    "$description": "Meaning Roles. Literals until the Role -> Hue map is declared; see #79.",
+    "$description": "Meaning Roles, aliased onto Hues by the declared `intentHue` map.",
     "info": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.489,
-          0.2151,
-          262.97
-        ],
-        "hex": "#1450d7"
-      }
+      "$value": "{palette.blue}"
     },
     "success": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.4612,
-          0.1274,
-          149.87
-        ],
-        "hex": "#006b2e"
-      }
+      "$value": "{palette.green}"
     },
     "warning": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.4885,
-          0.128,
-          49.81
-        ],
-        "hex": "#974503"
-      }
+      "$value": "{palette.orange}"
     },
     "danger": {
-      "$value": {
-        "colorSpace": "oklch",
-        "components": [
-          0.502,
-          0.2048,
-          27.42
-        ],
-        "hex": "#bd0010"
-      }
+      "$value": "{palette.red}"
     }
   },
   "shadow": {

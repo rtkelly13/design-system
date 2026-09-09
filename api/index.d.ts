@@ -15,6 +15,8 @@ type BorderTone = 'strong' | 'default' | 'subtle';
 type Hue = 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'cyan' | 'blue' | 'violet' | 'magenta' | 'pink';
 
 type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan'>;
+
+type HueRef = Hue | 'neutral';
 type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 type AccentToken = Emphasis | Intent | LegacyAccent;
@@ -78,6 +80,10 @@ interface LevelDefinition {
     readonly palette: Readonly<Record<Hue, string>>;
 
     readonly paletteBright: Readonly<Record<Hue, string>>;
+
+    readonly accentHue: Readonly<Record<Emphasis, HueRef>>;
+
+    readonly intentHue: Readonly<Record<Intent, HueRef>>;
 
     readonly shadow: string;
 }
@@ -146,6 +152,18 @@ declare function composite(foreground: Rgb, backdrop: Rgb): Rgb;
 declare function relativeLuminance(color: Rgb): number;
 
 declare function contrastRatio(foreground: string, background: string): number;
+
+declare const MAXIMUM_NEUTRAL_CHROMA = 0.045;
+interface HueAgreementCheck {
+    readonly level: ThemeLevel;
+    readonly role: string;
+    readonly declared: HueRef;
+    readonly value: string;
+
+    readonly expected: string | null;
+    readonly passes: boolean;
+    readonly detail: string;
+}
 declare const MINIMUM_RATIO: {
     readonly text: 4.5;
 
@@ -175,6 +193,7 @@ interface ContrastCheck {
     passes: boolean;
 }
 
+declare function auditHueAgreement(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): HueAgreementCheck[];
 declare function auditContrast(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): ContrastCheck[];
 
 type SelectionDevice = 'fill' | 'edge' | 'surface pair';
@@ -1015,6 +1034,8 @@ export {
   HEADING_EMPHASIS,
   type HeadingLevel,
   type Hue,
+  type HueAgreementCheck,
+  type HueRef,
   Input,
   type InputProps,
   type Intent,
@@ -1022,6 +1043,7 @@ export {
   type LegacyAccent,
   type LevelDefinition,
   LoremIpsumPost,
+  MAXIMUM_NEUTRAL_CHROMA,
   MINIMUM_RATIO,
   type MdxComponents,
   Modal,
@@ -1096,6 +1118,7 @@ export {
   accentVar,
   assertNever,
   auditContrast,
+  auditHueAgreement,
   auditSelectionDevices,
   borderVar,
   brutalistTokens,

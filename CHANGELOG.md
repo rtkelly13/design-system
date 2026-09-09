@@ -74,12 +74,25 @@ semantic one. **Breaking.** Migration is at the bottom.
   failed WCAG AA against a warm sunken ground: red at 4.03:1, green 4.18:1, blue 4.31:1.
   `border.subtle` also moved, from `#d8d3c4` to `#c8c3b4`, which was 1.25:1 against a
   pure-white `raised`.
+- **`accentHue` and `intentHue` — the declared Role → Hue lookup.** ADR 0001 requires the
+  direction to be declared rather than inferred, and this is it. `auditHueAgreement` asserts
+  each Role holds its declared Hue's value, and that a Role declared `'neutral'` measurably
+  *is* one rather than being skipped. Wired into `check:contrast`, so it fails CI. The DTCG
+  export now emits real aliases — `"$value": "{palette.cyan}"` — read from the map rather than
+  guessed by matching hex, which is the option the ADR rejects as ambiguous when two Roles
+  share a value.
 - **`Polarity` stays a declared field**, which reverses what #116 predicted. That reasoning
   holds only if the levels are *named* for their polarities; `midnight` and `sketch` are not,
   so `SYSTEM_LEVEL` still maps two media states onto two names that are neither of them.
 
 ### Fixed
 
+- **`midnight`'s `accent.tertiary` and `intent.danger` were a second pink.** They held
+  `#ec4899` while `palette.pink` held `#f955a4` — two values for one colour in one level,
+  0.036 apart in OKLab and therefore invisible. Both cleared their own floor (5.12:1 against a
+  4.5 Role floor; 5.90:1 against a 5.5 Hue floor), so neither gate caught it and no screenshot
+  could. Exactly the silent drift ADR 0001 rejects its *"both, independently declared"* option
+  over. Both Roles now hold the Hue's value.
 - **`playwright install-deps` no longer fails on a third-party apt index.** GitHub's Ubuntu
   images ship a Google Chrome apt source that Playwright does not use; a corrupt index on it
   failed the required check even though apt reported having ignored it. Vendor source lists are

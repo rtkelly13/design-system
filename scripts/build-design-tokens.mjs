@@ -104,22 +104,20 @@ function colour(value, description) {
 const desc = (description) => (description ? { $description: description } : {});
 
 /**
- * Roles are emitted as literals, deliberately, and this is worth explaining
- * because the alias form looks like the obvious win.
+ * A Role emits as an alias to its Hue — `{palette.cyan}` — which is ADR 0001
+ * expressed in the format's own syntax.
  *
- * ADR 0001 wants `accent.primary` to reference `{palette.cyan}` — but only as a
- * **declared** lookup. Inferring the alias by matching hex is precisely the
- * option that ADR rejects: it is ambiguous when two Roles share a value, and
- * lossy when no Hue sits on a Role's value. On the current levels the Roles
- * genuinely do not equal the Hues, because `palette` was added additively
- * without moving any Role, so hex-matching would alias one accent and leave
- * three as literals — a file that looks half-migrated because the emitter
- * guessed.
+ * Read from `accentHue` / `intentHue` in `levels.ts`, never inferred by
+ * matching hex. That distinction is the ADR: hex-matching is ambiguous when two
+ * Roles share a value (`midnight`'s `accent.secondary` and `intent.warning` are
+ * both yellow) and lossy when no Hue sits on a Role's value. `check:contrast`
+ * asserts the declared map agrees with the values, so the alias is guaranteed
+ * to resolve to the same colour the literal would have carried.
  *
- * The alias direction lands when `levels.ts` carries an explicit
- * `Record<Emphasis, Hue>` map, which is #79's work. Until then a literal is the
- * honest output, and the fallback hex is identical either way.
+ * A Role declared `'neutral'` emits its literal, because there is no Hue to
+ * point at — `accent.quiet` is a grey by design.
  */
+const alias = (hue) => ({ $value: `{palette.${hue}}` });
 
 const HUE_NOTES = {
   red: 'Danger and ANSI red.',
@@ -183,16 +181,22 @@ function levelDocument(level) {
     },
     accent: {
       $type: 'color',
-      $description: 'Emphasis Roles. Literals until `levels.ts` declares the Role -> Hue map; see #79.',
+      $description: 'Emphasis Roles, aliased onto Hues by the declared `accentHue` map.',
       ...Object.fromEntries(
-        Object.entries(def.accent).map(([key, value]) => [key, colour(value)]),
+        Object.entries(def.accent).map(([key, value]) => {
+          const ref = def.accentHue[key];
+          return [key, ref === 'neutral' ? colour(value) : alias(ref)];
+        }),
       ),
     },
     intent: {
       $type: 'color',
-      $description: 'Meaning Roles. Literals until the Role -> Hue map is declared; see #79.',
+      $description: 'Meaning Roles, aliased onto Hues by the declared `intentHue` map.',
       ...Object.fromEntries(
-        Object.entries(def.intent).map(([key, value]) => [key, colour(value)]),
+        Object.entries(def.intent).map(([key, value]) => {
+          const ref = def.intentHue[key];
+          return [key, ref === 'neutral' ? colour(value) : alias(ref)];
+        }),
       ),
     },
     shadow: { $type: 'color', color: colour(def.shadow, 'Colour of the hard offset shadows.') },

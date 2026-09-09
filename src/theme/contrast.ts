@@ -12,7 +12,7 @@
  * stable; WCAG ratios are what an audit will be run against.
  */
 
-import type { Emphasis, Hue, Intent, TextTone } from '../lib/theme';
+import type { Emphasis, Hue, HueRef, Intent, TextTone } from '../lib/theme';
 import type { LevelDefinition, ThemeLevel } from './levels';
 
 export interface Rgb {
@@ -123,6 +123,36 @@ export function contrastRatio(foreground: string, background: string): number {
  * extension — and `satisfies` still makes a missing or misspelled Hue a
  * compile error, which is the property that matters.
  */
+/**
+ * Above this, a colour declared `'neutral'` is not one. `accent.quiet` measures
+ * 0.036 on `midnight` and 0.027 on `sketch` — both warm or cool greys with a
+ * deliberate tint, which is why the bar is not zero.
+ */
+export const MAXIMUM_NEUTRAL_CHROMA = 0.045;
+
+export interface HueAgreementCheck {
+  readonly level: ThemeLevel;
+  readonly role: string;
+  readonly declared: HueRef;
+  readonly value: string;
+  /** The Hue's value, or null when the Role is declared `'neutral'`. */
+  readonly expected: string | null;
+  readonly passes: boolean;
+  readonly detail: string;
+}
+
+/** OKLab chroma. Only used to prove a `'neutral'` really is one. */
+function oklabChroma(hex: string): number {
+  const decode = (v: number) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const [r, g, b] = [1, 3, 5].map((i) => decode(Number.parseInt(hex.slice(i, i + 2), 16) / 255));
+  const l = Math.cbrt(0.4122214708 * r! + 0.5363325363 * g! + 0.0514459929 * b!);
+  const m = Math.cbrt(0.2119034982 * r! + 0.6806995451 * g! + 0.1073969566 * b!);
+  const s = Math.cbrt(0.0883024619 * r! + 0.2817188376 * g! + 0.6299787005 * b!);
+  const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const bb = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  return Math.hypot(a, bb);
+}
+
 const PALETTE_HUES_ORDER = [
   'red',
   'orange',
@@ -190,6 +220,73 @@ export interface ContrastCheck {
  * arithmetic over data — it can audit a consumer's own overrides, and it stays
  * runnable from a plain Node script with no bundler in the path.
  */
+/**
+ * Does every Role actually hold the value of the Hue it says it is?
+ *
+ * `check:contrast` cannot answer this, and that is not an oversight in it — a
+ * Role and a Hue are both foregrounds, both clear their own floors, and a
+ * mismatch between them is not a contrast fault. It is a *drift* fault, and it
+ * is the one ADR 0001 rejects its third option over:
+ *
+ *   > the two sets then drift silently, and there is no arithmetic that can
+ *   > catch a `palette.cyan` that no longer matches the `accent.primary` it is
+ *   > supposed to be.
+ *
+ * This is that arithmetic. It exists because the repo shipped the fault: after
+ * `palette` landed, `midnight`'s `accent.tertiary` sat at `#ec4899` (5.12:1,
+ * clearing the 4.5 Role floor) while `palette.pink` sat at `#f955a4` (5.90:1,
+ * clearing the 5.5 Hue floor). Both gates passed. The two values are 0.036
+ * apart in OKLab — indistinguishable, so no screenshot would have caught it
+ * either.
+ *
+ * A Role declared `'neutral'` is asserted to *be* neutral rather than skipped,
+ * because "declared as not-a-hue" and "quietly wrong" must not look the same.
+ */
+export function auditHueAgreement(
+  ladder: Readonly<Record<ThemeLevel, LevelDefinition>>,
+): HueAgreementCheck[] {
+  const results: HueAgreementCheck[] = [];
+
+  for (const level of Object.keys(ladder) as ThemeLevel[]) {
+    const def = ladder[level];
+
+    const check = (role: string, value: string, ref: HueRef) => {
+      if (ref === 'neutral') {
+        const chroma = oklabChroma(value);
+        results.push({
+          level,
+          role,
+          declared: ref,
+          value,
+          expected: null,
+          passes: chroma <= MAXIMUM_NEUTRAL_CHROMA,
+          detail: `chroma ${chroma.toFixed(3)} (max ${MAXIMUM_NEUTRAL_CHROMA})`,
+        });
+        return;
+      }
+      const expected = def.palette[ref];
+      results.push({
+        level,
+        role,
+        declared: ref,
+        value,
+        expected,
+        passes: value.toLowerCase() === expected.toLowerCase(),
+        detail: `palette.${ref} is ${expected}`,
+      });
+    };
+
+    for (const [role, ref] of Object.entries(def.accentHue)) {
+      check(`accent.${role}`, def.accent[role as Emphasis], ref);
+    }
+    for (const [role, ref] of Object.entries(def.intentHue)) {
+      check(`intent.${role}`, def.intent[role as Intent], ref);
+    }
+  }
+
+  return results;
+}
+
 export function auditContrast(
   ladder: Readonly<Record<ThemeLevel, LevelDefinition>>,
 ): ContrastCheck[] {

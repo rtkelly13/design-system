@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Hue } from '../lib/theme';
-import { auditContrast, MINIMUM_RATIO } from './contrast';
+import { auditContrast, auditHueAgreement, MAXIMUM_NEUTRAL_CHROMA, MINIMUM_RATIO } from './contrast';
 import { FIXED_COLOURS, LEVELS, PALETTE_HUES, THEME_LEVELS } from './levels';
 
 describe('the Hue vocabulary', () => {
@@ -105,5 +105,59 @@ describe('hue separation', () => {
       }
       expect(tight).toEqual([]);
     }
+  });
+});
+
+describe('Role -> Hue agreement', () => {
+  // This is the arithmetic ADR 0001 rejects its third option for lacking. The
+  // repo shipped without it for one commit and immediately grew the fault:
+  // midnight's accent.tertiary was #ec4899 while palette.pink was #f955a4 —
+  // both clearing their own floors, 0.036 apart in OKLab, so invisible to a
+  // screenshot as well as to both gates.
+  it('has every Role holding the value of the Hue it declares', () => {
+    const failures = auditHueAgreement(LEVELS)
+      .filter((r) => !r.passes)
+      .map((r) => `${r.level} ${r.role} = ${r.value}, ${r.detail}`);
+    expect(failures).toEqual([]);
+  });
+
+  it('declares a Hue or `neutral` for every accent and intent Role, on every level', () => {
+    for (const level of THEME_LEVELS) {
+      const def = LEVELS[level];
+      expect(Object.keys(def.accentHue).sort()).toEqual(Object.keys(def.accent).sort());
+      expect(Object.keys(def.intentHue).sort()).toEqual(Object.keys(def.intent).sort());
+      for (const ref of [...Object.values(def.accentHue), ...Object.values(def.intentHue)]) {
+        if (ref === 'neutral') continue;
+        expect(PALETTE_HUES).toContain(ref);
+      }
+    }
+  });
+
+  it('proves a `neutral` Role really is neutral rather than skipping it', () => {
+    const neutrals = auditHueAgreement(LEVELS).filter((r) => r.declared === 'neutral');
+    // Both levels declare exactly one: accent.quiet.
+    expect(neutrals).toHaveLength(THEME_LEVELS.length);
+    for (const r of neutrals) {
+      expect(r.expected).toBeNull();
+      expect(r.passes, `${r.level} ${r.role}: ${r.detail}`).toBe(true);
+    }
+    expect(MAXIMUM_NEUTRAL_CHROMA).toBeLessThan(0.05);
+  });
+
+  it('catches a Role that drifts from its Hue', () => {
+    // The regression test for the shipped fault. Reintroduce it against a copy
+    // and assert the audit names it, so nobody can quietly widen the check.
+    const drifted = {
+      ...LEVELS,
+      midnight: {
+        ...LEVELS.midnight,
+        accent: { ...LEVELS.midnight.accent, tertiary: '#ec4899' },
+      },
+    };
+    const failures = auditHueAgreement(drifted).filter((r) => !r.passes);
+    expect(failures).toHaveLength(1);
+    expect(failures[0]?.role).toBe('accent.tertiary');
+    expect(failures[0]?.value).toBe('#ec4899');
+    expect(failures[0]?.expected).toBe(LEVELS.midnight.palette.pink);
   });
 });

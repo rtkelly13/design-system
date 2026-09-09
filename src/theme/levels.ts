@@ -45,7 +45,7 @@
  * The one exception is `surface.overlay`, which is a scrim and needs alpha.
  */
 
-import type { BorderTone, Emphasis, Hue, Intent, Surface, TextTone } from '../lib/theme';
+import type { BorderTone, Emphasis, Hue, HueRef, Intent, Surface, TextTone } from '../lib/theme';
 
 /**
  * The ladder, ordered from darkest to lightest. Order is meaningful: it is what
@@ -139,6 +139,20 @@ export interface LevelDefinition {
   readonly palette: Readonly<Record<Hue, string>>;
   /** The `bright` half of each Hue. ANSI's upper eight, and nothing else yet. */
   readonly paletteBright: Readonly<Record<Hue, string>>;
+  /**
+   * Which Hue each Role is. **The declared lookup ADR 0001 requires.**
+   *
+   * The ADR rejects deriving this by inspecting hex — ambiguous when two Roles
+   * share a value, lossy when no Hue sits on a Role's. So it is declared, and
+   * `check:contrast` asserts the Role's value actually equals the Hue's. That
+   * assertion is the point: without it the two vocabularies drift silently,
+   * which is the failure the ADR's rejected "both, independently declared"
+   * option was rejected for — and which this repo shipped for exactly one
+   * commit, with two pinks on `midnight` 0.036 apart.
+   */
+  readonly accentHue: Readonly<Record<Emphasis, HueRef>>;
+  /** As `accentHue`, for the meaning Roles. */
+  readonly intentHue: Readonly<Record<Intent, HueRef>>;
   /** Colour of the hard offset shadows. Normally tracks `border.strong`. */
   readonly shadow: string;
 }
@@ -180,14 +194,30 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
     accent: {
       primary: '#22d3ee',
       secondary: '#facc15',
-      tertiary: '#ec4899',
+      // Was #ec4899 — the brand pink, and 5.12:1, which cleared the 4.5 Role
+      // floor while `palette.pink` sat at 5.90:1. Two pinks 0.036 apart in one
+      // level, invisibly different and therefore worse than visibly. Now the
+      // Hue's value, per `accentHue` below.
+      tertiary: '#f955a4',
       quiet: '#8b8ba3',
     },
     intent: {
       info: '#22d3ee',
       success: '#39ff14',
       warning: '#facc15',
-      danger: '#ec4899',
+      danger: '#f955a4',
+    },
+    accentHue: {
+      primary: 'cyan',
+      secondary: 'yellow',
+      tertiary: 'pink',
+      quiet: 'neutral',
+    },
+    intentHue: {
+      info: 'cyan',
+      success: 'green',
+      warning: 'yellow',
+      danger: 'pink',
     },
     palette: {
       red: '#ff586e', // 16deg — lifted from #f43f5e (dim accent.tertiary), 4.59:1
@@ -248,6 +278,18 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       success: '#006b2e',
       warning: '#974503',
       danger: '#bd0010',
+    },
+    accentHue: {
+      primary: 'blue',
+      secondary: 'green',
+      tertiary: 'red',
+      quiet: 'neutral',
+    },
+    intentHue: {
+      info: 'blue',
+      success: 'green',
+      warning: 'orange',
+      danger: 'red',
     },
     palette: {
       red: '#bd0010', // 16deg — was #dc2626, 4.03:1 — failed WCAG AA
