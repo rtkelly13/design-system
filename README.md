@@ -1,6 +1,37 @@
 # 🎨 @rtkelly13/design-system
 
-The foundational visual design system for **ryankelly.dev** and all personal web applications. Built around a **brutalist / neon-terminal** aesthetic: hard edges, zero border-radius, offset shadows, and a four-rung theme ladder — `midnight` → `dim` → `bright` → `white` — from neon-on-blue-black to print-safe white.
+The foundational visual design system for **ryankelly.dev** and every personal surface that has
+to look like it. Built around a **brutalist / neon-terminal** aesthetic: hard edges, zero
+border-radius, offset shadows, and a theme ladder — `midnight` → `dim` → `bright` → `white` —
+from neon-on-blue-black to print-safe white.
+
+## This is a multi-surface system, and that is the foundational decision
+
+**A colour originates exactly once**, as a literal in
+[`src/theme/levels.ts`](./src/theme/levels.ts). Every consumable form is *generated* from it
+and verified against it in CI. Nothing else may hold a colour literal — not a website, not a
+video composition, not a graphic generator, not an editor theme.
+
+| Surface | Form | State |
+|---|---|---|
+| **Websites** | Tailwind v4 tokens via generated `theme.css` | ships today |
+| **Developer themes** | VS Code · Zed · Shiki · Neovim · JetBrains, and a terminal's 16 ANSI slots | designed, blocked on a hue vocabulary |
+| **Graphics** | generated diagrams, charts, ASCII-art panels | forked in the consumer — to be reclaimed |
+| **Video** | Remotion frames at 1080p, where a 16px web type scale is wrong | groundwork only |
+
+Two decisions carry this, and they are worth reading before changing anything about colour:
+
+- [**ADR 0002 — One source of colour decisions, many emitted surfaces**](./docs/adr/0002-one-source-many-emitted-surfaces.md).
+  The root decision. Why per-surface palettes, manual ports and a runtime theming service were
+  all rejected, and why the source is TypeScript rather than JSON.
+- [**ADR 0001 — Hues are declared below Roles**](./docs/adr/0001-hues-declared-below-roles.md).
+  Components address a colour by its **job** (`accent.primary`), never its appearance (`cyan`).
+  But a terminal has sixteen positions named by colour and no concept of a keyword — so a hue
+  vocabulary is declared *underneath* the role vocabulary. Half the surfaces above cannot exist
+  without it.
+
+[`docs/theme-taxonomy.md`](./docs/theme-taxonomy.md) is the full matrix: what every Level must
+declare, which target needs which group, what is generated, and which gate covers each.
 
 Published to the public **npm registry** as `@rtkelly13/design-system` (via npm trusted publishing — see `.github/workflows/publish-package.yml`).
 
