@@ -80,4 +80,6 @@ good *Emitted* form — #117 emits it — and a poor source.
 - **Type, spacing and motion are in scope, not only colour.** A 1080p frame and a 16px page
   disagree about the type scale, which is #49's subject. This decision is the reason #49 is
   foundational rather than a nice-to-have: a surface that has to invent its own type scale
-  will invent its own colours next.
+  will invent its own colours next. The shape those tokens take is
+  [`0004`](./0004-two-axes-level-and-medium.md): they vary by Medium rather than by Level, on a
+  second axis this ADR implies and does not name.

@@ -22,6 +22,16 @@ makes a third Level cheap and what keeps the `dark:`/`light:` variants meaningfu
 `midnight:`/`sketch:`.
 _Avoid_: mode, scheme
 
+**Medium**:
+The class of surface a token is measured *for*. It fixes the unit system — a CSS pixel, a
+video frame, a `viewBox` unit — and the time base — wall clock, frame clock, none. `web`,
+`video` and `graphic` are the three. Orthogonal to both Level and Polarity: a Level is
+selected at runtime and carries colour, a Medium is selected at build time and carries
+geometry and time. Developer themes are not a Medium — the host owns their geometry and their
+clock, so they consume colour only. See
+[`docs/adr/0004`](./docs/adr/0004-two-axes-level-and-medium.md).
+_Avoid_: surface (that is a Group), platform, context, output mode
+
 **Group**:
 A named record of colours inside a Level, gathering the ones that answer the same
 question — `surface` for elevation, `intent` for meaning, `syntax` for code tokens.
@@ -44,6 +54,14 @@ A name for a colour's appearance, independent of any job — `cyan`, `violet`. W
 target addresses when it has no notion of jobs. Declared once per Level and referenced by
 Roles; never addressed by a component.
 _Avoid_: palette name, colour name, raw colour
+
+**Categorical scale**:
+An *ordered sequence* of Hues, of which a caller takes the first N, chosen so that any two
+members read as different from each other rather than as steps of one hierarchy. What a chart,
+a diagram or an ASCII panel addresses. Ordered because the guarantee has to survive
+truncation: dropping members must not create a collision among the ones that remain. `chart` is
+the Group; unlike every other Group it is a sequence and not a record.
+_Avoid_: chart palette, series colours, qualitative palette
 
 **Slot**:
 A fixed, named position in a Target's format that must be filled for the output to be
@@ -94,6 +112,11 @@ well against the ground and still be indistinguishable from one another.
 _Not luma_: solving a set of hues to the same Contrast against the same ground equalises
 their luma by construction, so a luma test rates an entire palette as identical. See
 `docs/palette-provenance.md`.
+
+**Pairwise separation**:
+Separation measured across *every* pair of a set rather than across pairs someone has judged
+adjacent, and re-measured at every length the set may be truncated to. What a Categorical
+scale needs and what no current Gate has the shape of.
 
 **Composited contrast**:
 The ratio between a foreground and a background that is itself translucent over another

@@ -4,12 +4,18 @@
 **Tracking:** #77
 
 This is the reference for *which Groups a Level has to declare before a given Target can be
-emitted*. It exists because the answer is not obvious: three of the six plausible Targets are
-blocked on a Group that does not exist yet, and one of them is blocked on a Group that cannot
-be built until a contrast finding is resolved.
+emitted*. It exists because the answer is not obvious: of the eleven plausible Targets, five
+are blocked on a Group that does not exist yet, two of those on a Group nothing has claimed,
+and one is blocked on a Group that cannot be built until a contrast finding is resolved.
 
 Terms used here — Level, Group, Role, Hue, Slot, Target, Emitter, Declared, Derived — are
 defined in [`CONTEXT.md`](../CONTEXT.md) and used in that sense throughout.
+
+**This file covers one of the two axes.** Everything below varies by Level, which per
+[`adr/0004`](./adr/0004-two-axes-level-and-medium.md) means it is colour. Type scale, spacing,
+border width, shadow offset, radius, motion and z-index vary by **Medium** — `web`, `video`,
+`graphic` — and are not in these tables. The two Targets added in §3 are here because of what
+colour they need, not because they carry scales.
 
 ---
 
@@ -50,6 +56,7 @@ collapse, so after that release a hue name has one meaning in this repo and it i
 | Group | Vocabulary | Origin | Alpha | Gate | Status |
 |---|---|---|---|---|---|
 | `palette` | **Hue** | Declared | no | contrast + separation, once per Hue | **#79 — does not exist** |
+| `chart` | **Hue**, ordered | → `palette` | no | pairwise separation across the whole sequence | **does not exist — unowned** |
 | `surface` | Role — elevation | Declared | `overlay` only | contrast (as ground); surface pairs reported, never a device | ships |
 | `text` | Role — prominence | Declared | no | contrast ≥ 4.5 on every surface | ships |
 | `border` | Role — weight | Declared | no | contrast ≥ 3 (`strong`, `default`), ≥ 1.4 (`subtle`) | ships |
@@ -60,11 +67,21 @@ collapse, so after that release a hue name has one meaning in this repo and it i
 | `editor` | Role — chrome | Declared `#rrggbbaa` | **yes** | composited contrast; background-pair separation | **#80 — blocked by #78** |
 | `shadow` | single value | Declared | no | none — tracks `border.strong` | ships |
 
-Three observations that fall out of the table.
+Four observations that fall out of the table.
 
-**`palette` is the only Hue Group, and only two Targets need it.** Everything else is
-role-addressable. So #79's value is precise rather than general: it unlocks terminals and half
-of JetBrains, and elsewhere it clarifies without unblocking.
+**The two Hue Groups are the two that serve a Target with no notion of jobs.** Everything else
+is role-addressable, which is why #79's value is precise rather than general: it unlocks
+terminals and half of JetBrains, and elsewhere it clarifies without unblocking.
+
+**`chart` is a sequence, not a record, and that is the whole difficulty.** Every other Group is
+a set of named members answering a fixed question — four accents, three borders. A chart, a
+diagram or an ASCII panel needs *N* colours that are mutually distinguishable, where the caller
+picks N at use time and the only contract is that any two members read as different. So its
+Gate is not "each member against a ground" but **every pair against every other pair**, which
+is a check no existing Gate has the shape of. `adr/0002` names the requirement — "N mutually
+distinguishable colours rather than four levels of emphasis" — and nothing has owned it since.
+It is the reason the graphics surfaces reach for raw primaries: `palette` will give them hue
+names, and still will not tell them which six to use in one figure.
 
 **`editor` is the only Group with meaningful alpha**, and that is why #81 exists. Both current
 Gates measure a foreground against an opaque, Declared background. "Keyword over selection
@@ -83,16 +100,19 @@ arithmetic to check.
 
 ✓ required · ~ partial · – not used
 
-| Target | palette | surface | text | border | accent | intent | syntax | syntaxEmphasis | editor | Blocked on |
-|---|---|---|---|---|---|---|---|---|---|---|
-| **Web / Tailwind** `theme.css` | – | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | – | nothing — ships today |
-| **Shiki** | – | ~ `sunken` | ~ `primary` | – | – | – | ✓ | ✓ | – | #76 merging |
-| **OpenDesign package** | – | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – | nothing — see #117 |
-| **VS Code** | – | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | #80 → #78 |
-| **Zed** | – | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | #80 → #78 |
-| **Neovim** | – | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ | ~ flattened | capture fan-out; #80 |
-| **Terminal / ANSI** | **✓** | ~ `base`, `sunken` | ~ `primary` | – | – | – | – | – | ~ selection only | **#79** |
-| **JetBrains** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | everything above |
+| Target | Medium | palette | chart | surface | text | border | accent | intent | syntax | syntaxEmphasis | editor | Blocked on |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Web / Tailwind** `theme.css` | `web` | – | – | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | – | nothing — ships today |
+| **Shiki** | `web` | – | – | ~ `sunken` | ~ `primary` | – | – | – | ✓ | ✓ | – | #76 merging |
+| **OpenDesign package** | `web` | – | – | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – | nothing — see #117 |
+| **Remotion compositions** | `video` | – | – | ✓ | ✓ | ✓ | ✓ | ✓ | ~ via Shiki | ~ via Shiki | – | the `video` Medium — #49, `adr/0004` |
+| **SVG / diagram generators** | `graphic` | ✓ | **✓** | ~ ground only | ~ `primary` | ~ `strong` | – | ~ good/warn/bad | – | – | – | **#79, and `chart` is unowned** |
+| **Mermaid theme** | `graphic` | ✓ | **✓** | ✓ | ✓ | ✓ | ~ | ✓ | – | – | – | **#79, `chart`; ~40 Slots, fan-out unwritten** |
+| **VS Code** | — host | – | – | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | #80 → #78 |
+| **Zed** | — host | – | – | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | #80 → #78 |
+| **Neovim** | — host | – | – | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ | ~ flattened | capture fan-out; #80 |
+| **Terminal / ANSI** | — host | **✓** | – | ~ `base`, `sunken` | ~ `primary` | – | – | – | – | – | ~ selection only | **#79** |
+| **JetBrains** | — host | ✓ | – | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | everything above |
 
 **Shiki is the keystone**, and it is worth being explicit about why: Shiki consumes VS Code
 theme JSON directly. The file that themes the editor is the file that highlights the blog, the
@@ -105,6 +125,26 @@ selection. It is blocked entirely on `palette` not existing. That asymmetry is t
 for #79 landing before any editor work: one Group unlocks a whole Target, and four encodings
 of it (iTerm2, Windows Terminal, Alacritty, Ghostty) are the same sixteen values written four
 ways.
+
+**The three rows below `OpenDesign` are the ones `adr/0002` says were missing**, and adding
+them changes what the table says about priority. Two of the four surface classes had no row at
+all, so the eight Targets listed were all web or editor — and the estate does not look like
+that. `blog/css/tailwind.css` declares 35 `--diagram-*` properties across ten names,
+`blog/components/graphics/palette.ts` holds two hue-keyed records, `blog/video/src` hardcodes a
+retired ground, `mermaid-toolkit` hand-authors four presets of roughly forty Slots each, and
+`shared-utilities/image_drift` has independently reinvented the Role vocabulary in Python under
+different names — `ink`, `panel`, `edge`, `sunken`, `accent`, `good`, `warn`, `bad`. Five
+forks, and only one of them is the one 0002 names.
+
+**The graphics Targets are blocked twice, and the second block is the interesting one.** #79
+gives them hue *names*; it does not tell a figure which six hues to use together, which is
+`chart` and which nothing owns. So `palette` unblocks Terminal / ANSI completely and the
+graphics rows only halfway — worth knowing before #79 is scoped, because the same solve could
+produce the ordered sequence while the separation arithmetic is already loaded.
+
+**The `graphic` and `video` rows also need a Medium**, per `adr/0004`, and the `— host` rows do
+not. That column is not decoration: it is what says a Mermaid theme needs a type scale from us
+and a VS Code theme must never receive one.
 
 ---
 
@@ -148,7 +188,7 @@ Shiki. Emit both maps from one source, and say so in the Emitter's header.
 
 ---
 
-## 5. Gate coverage, and the two holes
+## 5. Gate coverage, and the holes
 
 | Gate | Measures | Covers | Exists |
 |---|---|---|---|
@@ -157,24 +197,44 @@ Shiki. Emit both maps from one source, and say so in the Emitter's header.
 | `auditSelectionDevices` | accent fill / edge vs two grounds | `accent` | yes |
 | **composited contrast** | foreground vs translucent-over-ground | `editor`, flattened `editor` | **#81 — no** |
 | **background-pair separation** | ground vs ground, ΔLuma | `editor` diff and merge bands | **#81 — no** |
+| **pairwise separation** | every member against every other member, ΔE | `chart`, at each N | **no** |
 | **slot coverage** | Slots that map to nothing | every fan-out map | **no** |
 | **fixture diff** | emitted Slots vs a committed expectation | ANSI 16, and later scope maps | **no** |
 
-The last two are the ones a purely Derived pipeline needs and does not have. A fan-out map
-that is wrong emits confidently: an inverted ANSI map, or a scope that resolves to no Role,
-produces a valid file full of wrong colours. `check:visual-coverage` already does this shape
-of bookkeeping for stories against snapshots; slot coverage is the same idea aimed at Slots,
-and the fixture diff is `api/index.d.ts`'s trick — commit the emitted shape, and make the diff
-the review.
+Slot coverage and the fixture diff are the two a purely Derived pipeline needs and does not
+have. A fan-out map that is wrong emits confidently: an inverted ANSI map, or a scope that
+resolves to no Role, produces a valid file full of wrong colours. `check:visual-coverage`
+already does this shape of bookkeeping for stories against snapshots; slot coverage is the same
+idea aimed at Slots, and the fixture diff is `api/index.d.ts`'s trick — commit the emitted
+shape, and make the diff the review.
+
+Two further notes on this table, both from `adr/0004`.
+
+**Pairwise separation is a different arithmetic, not a wider loop.** Every other separation
+Gate walks a list of pairs someone decided are adjacent. `chart` has no adjacency: any two
+members can end up next to each other in a figure, so the Gate is the full N×N and it has to
+hold *at every N* the sequence is truncated to — a six-colour chart that separates cleanly can
+collide at four if the members are dropped from the wrong end. That is why the sequence is
+ordered rather than a set.
+
+**The floors in this table are one global record, and they should be per Medium.**
+`MINIMUM_RATIO` in `src/theme/contrast.ts` holds a single number per Role for every surface the
+system emits to. `palette-provenance.md` solves the palette to 5.5:1 while the Gate enforces
+4.5:1, so the floor the values were actually chosen against is not the floor anything checks.
+A projected 1080p frame and an unantialiased terminal cell are not the browser's problem
+either. Nothing here needs a new Gate — it needs the number it reads to be indexed.
 
 ---
 
 ## 6. Sequence this implies
 
-1. **#79 — `palette`.** Unlocks a whole Target on its own, and is the layer every later
-   Emitter names its colours through. Retire `LegacyAccent` in the same release so a Hue name
-   has one meaning. Do #48 first: it collapses four accent-to-class maps into one, which turns
-   widening `Emphasis` from a four-site change into a one-site change.
+1. **#79 — `palette`, with `chart` in the same solve.** Unlocks a whole Target on its own, and
+   is the layer every later Emitter names its colours through. Retire `LegacyAccent` in the
+   same release so a Hue name has one meaning. Do #48 first: it collapses four accent-to-class
+   maps into one, which turns widening `Emphasis` from a four-site change into a one-site
+   change. `chart` belongs here rather than later because the separation arithmetic is already
+   loaded at this point and the five forked graphics palettes have nowhere to migrate to
+   without it.
 2. **#78 — re-solve the light Level.** Before anything external pins a value. Note this is now
    larger than #78 states: the Level collapse replaced `bright` with `sketch` values that do
    not clear the 4.5:1 floor they already have, let alone the 5.5:1 floor #78 proposes.
@@ -190,3 +250,10 @@ the review.
 The ordering is not by appeal. #79 comes first because it is the only item that unblocks a
 Target by itself; #78 comes second because it is the only item that gets more expensive the
 longer it waits.
+
+**The Medium axis runs alongside this list, not inside it.** `adr/0004` is a decision rather
+than an implementation, and #49 is the implementation of it; neither blocks nor is blocked by
+`palette`. It does have one ordering constraint of its own: it gets more expensive after #49
+starts, because a spacing scale authored on the wrong axis has to be re-authored rather than
+extended. So it wants settling before the first non-colour token is written, and nothing about
+it needs to wait for a Level to be re-solved.
