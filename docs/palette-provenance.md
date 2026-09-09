@@ -100,8 +100,8 @@ Module](https://www.designtokens.org/tr/drafts/format/) files, one per Level wit
 token paths:
 
 ```
-tokens/palette.dark.tokens.json
-tokens/palette.light.tokens.json
+tokens/palette.midnight.tokens.json
+tokens/palette.sketch.tokens.json
 ```
 
 Three reasons this is the right target rather than an invented shape:
