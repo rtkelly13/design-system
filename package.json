@@ -1,6 +1,6 @@
 {
   "name": "@rtkelly13/design-system",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Brutalist design system with a four-level theme ladder, slide deck system, and experiments foundation for Ryan Kelly websites",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -16,9 +16,7 @@
     "./theme.css": "./dist/theme.css",
     "./prose.css": "./dist/prose.css",
     "./tokens/midnight.tokens.json": "./tokens/palette.midnight.tokens.json",
-    "./tokens/dim.tokens.json": "./tokens/palette.dim.tokens.json",
-    "./tokens/bright.tokens.json": "./tokens/palette.bright.tokens.json",
-    "./tokens/white.tokens.json": "./tokens/palette.white.tokens.json"
+    "./tokens/light.tokens.json": "./tokens/palette.light.tokens.json"
   },
   "files": [
     "dist",

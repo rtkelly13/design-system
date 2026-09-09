@@ -17,7 +17,7 @@ describe('the Hue vocabulary', () => {
   // needs a test — the gate silently skipping a hue is exactly the failure the
   // generated-CSS gate exists to prevent one layer up.
   it('gates every declared hue — the audit covers all ten, on every level', () => {
-    const results = auditContrast(LEVELS, THEME_LEVELS);
+    const results = auditContrast(LEVELS);
     for (const level of THEME_LEVELS) {
       for (const hue of PALETTE_HUES) {
         const seen = results.filter((r) => r.level === level && r.pair.startsWith(`palette.${hue} on `));
@@ -31,7 +31,7 @@ describe('the Hue vocabulary', () => {
   });
 
   it('clears 5.5:1 for every hue and 4.5:1 for every bright variant', () => {
-    const failures = auditContrast(LEVELS, THEME_LEVELS)
+    const failures = auditContrast(LEVELS)
       .filter((r) => r.pair.startsWith('palette.') && !r.passes)
       .map((r) => `${r.level} ${r.pair} ${r.ratio.toFixed(2)}:1 < ${r.minimum}`);
     expect(failures).toEqual([]);
@@ -57,11 +57,14 @@ describe('fixed colours', () => {
   });
 
   it('is what `--color-black` is not', () => {
-    // The compat alias tracks `surface.base`, so on `white` it resolves to
-    // #ffffff — a token named for an appearance holding the opposite one. This
-    // asserts the situation the fixed group exists to fix, so that deleting the
-    // alias later has a test to delete alongside it.
-    expect(LEVELS.white.surface.base).toBe(FIXED_COLOURS.white);
+    // The compat alias tracks `surface.base`, so on `light` it resolves to
+    // #f5f3ec — `--color-black` holding warm paper. The `white` level, which
+    // held pure white in `surface.base` and made the inversion starkest, is
+    // gone with the collapse; the alias is still the wrong shape.
+    expect(LEVELS.light.surface.base).not.toBe(FIXED_COLOURS.black);
+    // And the light level does use pure white — legitimately now, as a
+    // reference to the fixed group rather than a literal nobody declared.
+    expect(LEVELS.light.surface.raised).toBe(FIXED_COLOURS.white);
   });
 });
 

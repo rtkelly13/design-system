@@ -12,6 +12,8 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 |---|---|
 | `pnpm tokens:build` | regenerate `src/theme.css` from `src/theme/levels.ts` — **required after any colour change** |
 | `pnpm tokens:check` | fail if that generated file is stale |
+| `pnpm tokens:design` | regenerate `tokens/palette.<level>.tokens.json` — the DTCG export |
+| `pnpm tokens:design:check` | fail if a token file is stale **or orphaned** |
 | `pnpm check:contrast` | every role pair on every level, as arithmetic |
 | `pnpm check:api` | the built type surface against the committed `api/index.d.ts` |
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |
@@ -39,6 +41,7 @@ Load these when the task is in them, not before.
 
 | Topic | |
 |---|---|
+| **The brand outline — start here** | [`DESIGN.md`](./DESIGN.md) |
 | Domain vocabulary | [`CONTEXT.md`](./CONTEXT.md) |
 | Architectural decisions | [`docs/adr/`](./docs/adr/) |
 | Theming — the ladder, semantic roles, selection state | [`docs/theming.md`](./docs/theming.md) |

@@ -96,12 +96,14 @@ const CASES: readonly VisualCase[] = [
   // gap its own § *Screenshot Walkthrough* calls out.
   { id: 'foundations-theme-ladder--all-levels', snapshot: 'theme-ladder-all-levels.png', fullPage: true },
 
-  // The two page-level shells. Their baselines will churn when the remaining
-  // token migration reaches them, which is the intended behaviour and not a
-  // reason to leave them unasserted — `dim` because it is the rung these
-  // surfaces are meant to be read at.
-  { id: 'saas-admindashboardlayout--dim-mode', snapshot: 'admin-dashboard-dim.png', fullPage: true },
-  { id: 'saas-landingpage--dim-mode', snapshot: 'saas-landing-dim.png', fullPage: true },
+  // The two page-level shells, on both levels now that there are two rather
+  // than four. `DimMode` is gone: with `dim` collapsed into `midnight` it
+  // rendered exactly what `DarkMode` renders, so asserting both was asserting
+  // the same pixels twice under two names.
+  { id: 'saas-admindashboardlayout--dark-mode', snapshot: 'admin-dashboard-midnight.png', fullPage: true },
+  { id: 'saas-admindashboardlayout--light-mode', snapshot: 'admin-dashboard-light.png', fullPage: true },
+  { id: 'saas-landingpage--dark-mode', snapshot: 'saas-landing-midnight.png', fullPage: true },
+  { id: 'saas-landingpage--light-mode', snapshot: 'saas-landing-light.png', fullPage: true },
 ];
 
 test.describe('Design System Visual Regression - Components', () => {

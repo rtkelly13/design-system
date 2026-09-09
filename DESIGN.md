@@ -30,10 +30,14 @@ has regressed to the mean and is wrong.
 There are exactly two, and **neither is derived from the other** — see
 [`docs/adr/0003`](./docs/adr/0003-two-levels-independently-authored.md).
 
-| | Character |
-|---|---|
-| **Dark** | Neon on ink. A near-black ground, high-chroma accents. The signature. |
-| **Light** | Sketch — paper and pen. Warm paper, graphite ink, pen-coloured accents. Not the dark theme lightened; a different drawing. |
+| Level | `data-theme` | Character |
+|---|---|---|
+| **Midnight** | `midnight` | Neon on blue-black `#0a0a1a`. High-chroma accents. The signature, and the default. |
+| **Light** | `light` | Sketch — warm paper `#f5f3ec`, graphite ink, pen-coloured accents. Not the dark theme lightened; a different drawing. |
+
+The levels are deliberately **not** named `dark` and `light`. `midnight` is a name for a
+specific ground, and keeping it means `polarity` stays a real declared property rather than
+collapsing into the level name — which is what keeps a third level cheap to add.
 
 An inversion of neon-on-ink is neon-on-white, which is a third thing nobody wants. The two
 themes also have opposite tightest grounds — dark's is its `raised` surface, light's is its
@@ -106,7 +110,7 @@ tracking `surface.base` and `text.primary`, so `--color-black` resolves to `#fff
 ## 4. Contrast is arithmetic, and it is a gate
 
 Colour is the one axis with a machine-checkable definition of correct, so it is checked.
-`pnpm check:contrast` audits **440 pairs across four themes** on every build and fails CI.
+`pnpm check:contrast` audits **440 pairs across both themes** on every build and fails CI.
 
 | | Floor | Why |
 |---|---|---|

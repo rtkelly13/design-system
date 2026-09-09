@@ -27,7 +27,7 @@
  * No build dependency: Node 22 strips TypeScript types natively.
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -224,7 +224,25 @@ for (const level of THEME_LEVELS) {
   written.push(`palette.${level}.tokens.json`);
 }
 
+/**
+ * Remove files for levels that no longer exist.
+ *
+ * Writing without pruning is a silent failure mode with teeth here: a deleted
+ * level leaves its token file on disk, `--check` passes because every *current*
+ * level matches, and the dead file keeps shipping through `exports` in
+ * package.json. A consumer then installs a palette for a theme the package no
+ * longer has.
+ */
+const expected = new Set(THEME_LEVELS.map((level) => `palette.${level}.tokens.json`));
+const orphans = readdirSync(OUT_DIR).filter(
+  (name) => name.endsWith('.tokens.json') && !expected.has(name),
+);
+
 if (check) {
+  for (const name of orphans) {
+    console.error(`orphaned: tokens/${name} — no such level`);
+    stale += 1;
+  }
   if (stale > 0) {
     console.error(
       `\n${stale} token file(s) do not match src/theme/levels.ts. Run \`pnpm tokens:design\`.`,
@@ -233,5 +251,7 @@ if (check) {
   }
   console.log(`Design tokens up to date — ${written.length} files, DTCG ${SPEC}.`);
 } else {
-  console.log(`Wrote tokens/ — ${written.join(', ')} (DTCG ${SPEC}).`);
+  for (const name of orphans) unlinkSync(path.join(OUT_DIR, name));
+  const pruned = orphans.length > 0 ? `; pruned ${orphans.join(', ')}` : '';
+  console.log(`Wrote tokens/ — ${written.join(', ')} (DTCG ${SPEC})${pruned}.`);
 }

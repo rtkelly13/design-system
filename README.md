@@ -2,8 +2,8 @@
 
 The foundational visual design system for **ryankelly.dev** and every personal surface that has
 to look like it. Built around a **brutalist / neon-terminal** aesthetic: hard edges, zero
-border-radius, offset shadows, and a theme ladder — `midnight` → `dim` → `bright` → `white` —
-from neon-on-blue-black to print-safe white.
+border-radius, offset shadows, and two themes — `midnight`, neon on blue-black, and `light`,
+sketch paper and pen ink.
 
 ## This is a multi-surface system, and that is the foundational decision
 
@@ -15,6 +15,7 @@ video composition, not a graphic generator, not an editor theme.
 | Surface | Form | State |
 |---|---|---|
 | **Websites** | Tailwind v4 tokens via generated `theme.css` | ships today |
+| **Design tokens** | `tokens/palette.<level>.tokens.json`, DTCG 2025.10, OKLCH | ships today |
 | **Developer themes** | VS Code · Zed · Shiki · Neovim · JetBrains, and a terminal's 16 ANSI slots | designed, blocked on a hue vocabulary |
 | **Graphics** | generated diagrams, charts, ASCII-art panels | forked in the consumer — to be reclaimed |
 | **Video** | Remotion frames at 1080p, where a 16px web type scale is wrong | groundwork only |
@@ -24,6 +25,9 @@ Two decisions carry this, and they are worth reading before changing anything ab
 - [**ADR 0002 — One source of colour decisions, many emitted surfaces**](./docs/adr/0002-one-source-many-emitted-surfaces.md).
   The root decision. Why per-surface palettes, manual ports and a runtime theming service were
   all rejected, and why the source is TypeScript rather than JSON.
+- [**ADR 0003 — Two Levels, each independently authored**](./docs/adr/0003-two-levels-independently-authored.md).
+  `midnight` and `light`, neither derived from the other. The levels are deliberately not named
+  for their polarities.
 - [**ADR 0001 — Hues are declared below Roles**](./docs/adr/0001-hues-declared-below-roles.md).
   Components address a colour by its **job** (`accent.primary`), never its appearance (`cyan`).
   But a terminal has sixteen positions named by colour and no concept of a keyword — so a hue

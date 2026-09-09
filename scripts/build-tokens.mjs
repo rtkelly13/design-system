@@ -270,8 +270,23 @@ ${THEME_LEVELS.map((level) => `@custom-variant ${level} (${levelVariant(level)})
  * being the axis the system hangs off. Use them for non-colour utilities that
  * genuinely depend on light-vs-dark — a shadow spread, an image filter — never
  * for colour, which the tokens already handle. */
-@custom-variant dark (${polarityVariant(byPolarity('dark'))});
-@custom-variant light (${polarityVariant(byPolarity('light'))});`);
+${(['dark', 'light'])
+  .filter((polarity) => {
+    // A level may be *named* for its polarity — `light` is, since the collapse.
+    // The per-level variant above already emitted `@custom-variant light`, and
+    // emitting it again here is a duplicate declaration. Today the two bodies
+    // are byte-identical, because that polarity has exactly one level; the
+    // moment a second one is added they would silently diverge, with the later
+    // definition winning. Skip rather than shadow.
+    const clash = THEME_LEVELS.includes(polarity);
+    return !clash;
+  })
+  .map((polarity) => `@custom-variant ${polarity} (${polarityVariant(byPolarity(polarity))});`)
+  .join('\n')}
+
+/* \`light:\` is not declared here: a level named \`light\` already declares it
+ * above, and the two would be the same rule. \`dark:\` still spans polarity
+ * rather than naming a level, which is why it survives the collapse. */`);
 
   sections.push(`
 /* ==========================================================================

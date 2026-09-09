@@ -48,7 +48,7 @@ declare const semanticTokens: {
     readonly shadowColor: "var(--ds-shadow-color)";
 };
 
-declare const THEME_LEVELS: readonly ["midnight", "dim", "bright", "white"];
+declare const THEME_LEVELS: readonly ["midnight", "light"];
 
 type ThemeLevel = (typeof THEME_LEVELS)[number];
 
@@ -91,8 +91,6 @@ declare const SYSTEM_LEVEL: Readonly<Record<Polarity, ThemeLevel>>;
 declare function isThemeLevel(value: unknown): value is ThemeLevel;
 
 declare function nextLevel(level: ThemeLevel): ThemeLevel;
-
-declare function levelsByPolarity(polarity: Polarity): ThemeLevel[];
 
 declare function assertNever(value: never, message?: string): never;
 
@@ -1111,7 +1109,6 @@ export {
   getThemeInitScript,
   isExternalHref,
   isThemeLevel,
-  levelsByPolarity,
   mdxComponents,
   nextLevel,
   parseColor,
