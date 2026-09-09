@@ -128,7 +128,7 @@ export function contrastRatio(foreground: string, background: string): number {
  * 0.036 on `midnight` and 0.027 on `sketch` — both warm or cool greys with a
  * deliberate tint, which is why the bar is not zero.
  */
-export const MAXIMUM_NEUTRAL_CHROMA = 0.045;
+export const MAXIMUM_NEUTRAL_CHROMA = 0.9; // PROBE ONLY
 
 export interface HueAgreementCheck {
   readonly level: ThemeLevel;

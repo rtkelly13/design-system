@@ -205,7 +205,7 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       info: '#22d3ee',
       success: '#39ff14',
       warning: '#facc15',
-      danger: '#f955a4',
+      danger: '#00ff00',
     },
     accentHue: {
       primary: 'cyan',
@@ -217,7 +217,7 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       info: 'cyan',
       success: 'green',
       warning: 'yellow',
-      danger: 'pink',
+      danger: 'neutral',
     },
     palette: {
       red: '#ff586e', // 16deg — lifted from #f43f5e (dim accent.tertiary), 4.59:1
