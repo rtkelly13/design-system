@@ -124,11 +124,17 @@ object** — `{"colorSpace": "srgb", "components": [r, g, b]}`, components norma
 an optional `hex` alongside — not the bare hex string most examples still show. And `$type`
 inherits from the enclosing group, so a `palette` group declares `"$type": "color"` once.
 
-**Whether `oklch` is a permitted `colorSpace` I could not confirm from the published draft** —
-the colour-space enumeration was not in the section retrieved. It matters because the
-derivation is done in OKLCH and storing it there would keep the working space and the artifact
-in agreement. Worth settling before the emitter is written; the fallback is sRGB components
-with the OKLCH triple under `$extensions`.
+**`oklch` is a permitted `colorSpace`**, confirmed against the 2025.10 Color module, which
+enumerates `srgb`, `srgb-linear`, `hsl`, `hwb`, `lab`, `lch`, `oklab`, `oklch`, `display-p3`,
+`a98-rgb`, `prophoto-rgb`, `rec2020`, `xyz-d65` and `xyz-d50`. Its components are
+`[L, chroma, hue]` with L in `[0, 1]`, chroma in `[0, ∞)` and hue in `[0, 360)`. The `hex`
+property is **optional**, and the spec describes it as a fallback value.
+
+So the emitter should write **OKLCH components with an sRGB `hex` fallback**. That keeps the
+artifact in the space the derivation was done in — the hue angle, which is the part anchored on
+six years of history, survives as a first-class number rather than something a consumer has to
+recover from three bytes. The `hex` fallback covers any tool that has not implemented the
+colour module.
 
 Because these files are Derived, they are generated and drift-checked exactly as
 `src/theme.css` is — never hand-edited. That work is #117, which already proposes emitting
