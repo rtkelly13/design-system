@@ -10,7 +10,7 @@ The Level system's rules. Vocabulary is in [`CONTEXT.md`](../CONTEXT.md); the Gr
 
 - **Zero Border-Radius**: `0px` globally enforced.
 - **Hard Offset Shadows**: `shadow-hard-*` utilities (2px, 4px, 6px offset, no blur).
-- **A Four-Rung Theme Ladder**: `midnight` → `dim` → `bright` → `white`, selected by a `data-theme` attribute. Not a light/dark flip — see Theme Ladder below.
+- **Two Themes**: `midnight` and `sketch`, selected by a `data-theme` attribute. Independently authored, neither derived from the other — see Theme Ladder below.
 - **Bracketed Display Typography**: Headings render in Space Grotesk enclosed in `[ BRACKETED ]` display type.
 - **Semantic Roles Over Hues**: Components address roles, never colours. See below.
 - **Styling Lives in TSX**: Tailwind utilities on the element. CSS files declare variables and nothing else. See below.
@@ -24,19 +24,23 @@ Storybook toolbar, the walkthrough matrix, and the contrast gate.
 
 | Level | Polarity | Ground | For |
 |---|---|---|---|
-| `midnight` | dark | `#0a0a1a` | Neon on blue-black — the maximal end |
-| `dim` | dark | `#121316` | Desaturated, softer inks, long reading |
-| `bright` | light | `#fcfbf9` | Warm sketch paper and pen ink |
-| `white` | light | `#ffffff` | Neutral, print-safe, dense UI |
+| `midnight` | dark | `#0a0a1a` | Neon on blue-black — the signature, and the default |
+| `sketch` | light | `#f5f3ec` | Warm paper and pen ink |
 
-Four rules follow from that, and they are what keep four levels maintainable:
+The ladder ran to four rungs — `midnight`, `dim`, `bright`, `white` — until `0.5.0`. The
+argument for four was sound: two themes can share a polarity and still want different grounds.
+The assumption under it was not, which is that four were *used*. Nothing consumed the fourth
+and nothing reached the second. See [`adr/0003`](./adr/0003-two-levels-independently-authored.md)
+for the collapse and [`colour-heritage.md`](./colour-heritage.md) for what the retired rungs held.
+
+Four rules follow from that, and they are what keep hand-authored levels maintainable:
 
 1. **`theme.css` is generated — never edit it.** Change `levels.ts`, run `pnpm tokens:build`,
    commit both. `pnpm tokens:check` fails CI on drift. TypeScript covers the TS half of the
    ladder; this covers the CSS half, which is where the drift used to live.
    `src/theme.css.test.ts` covers a third thing neither reaches: the *shape* the
    generator has to emit. Every `@theme` token that indirects through a
-   per-level variable is repeated inside all four level blocks, because a custom
+   per-level variable is repeated inside every level block, because a custom
    property substitutes where it is **declared**, not where it is used — so an
    alias left only in `@theme` resolves against the root level and a nested
    `<ThemeProvider scoped>` panel keeps the wrong colour. `tokens:check` would
@@ -46,15 +50,22 @@ Four rules follow from that, and they are what keep four levels maintainable:
 2. **Never branch on a level with an if-chain.** Use a `Record<ThemeLevel, T>` — adding a rung
    is then a compile error until every branch answers it — or end a `switch` with
    `assertNever(level)`. Map over `THEME_LEVELS`; never re-list the names.
-3. **Polarity is a declared field, not the axis.** `LEVELS[x].polarity` drives `color-scheme`,
-   the `dark:`/`light:` variants, and the `prefers-color-scheme` mapping in `SYSTEM_LEVEL`.
-   `dark:` now means "midnight or dim" and is only for non-colour utilities.
+3. **Polarity is a declared field, not the axis** — and it stays one at two levels, which is
+   the opposite of what the collapse is usually assumed to do. `LEVELS[x].polarity` drives
+   `color-scheme`, the `dark:`/`light:` variants, and the `prefers-color-scheme` mapping in
+   `SYSTEM_LEVEL`. That survives because **neither level is named for its polarity**:
+   `midnight` names a ground, `sketch` names a surface. Had they been called `dark` and
+   `light`, `SYSTEM_LEVEL` would have degenerated to an identity map and
+   `Record<Polarity, T>` would have become `Record<ThemeLevel, T>`. `dark:` now means
+   `midnight` and `light:` means `sketch`, and both remain for non-colour utilities.
 4. **Every level colour is a literal.** No `color-mix` derivation, because percentages tuned
    against near-black do not hold at the light end — and because literals make
-   `pnpm check:contrast` able to audit all 200 role pairs without a browser.
+   `pnpm check:contrast` able to audit all 220 pairs without a browser — including every
+   Hue in `palette` against every ground, at a 5.5:1 floor rather than 4.5:1, so an editor
+   still has headroom to tint the ground behind a token.
 
 Selection is `data-theme="<level>"` on the root (the level class is mirrored for consumers
-whose own CSS selects on it). `<ThemeProvider scoped>` themes a subtree instead — a `bright`
+whose own CSS selects on it). `<ThemeProvider scoped>` themes a subtree instead — a `sketch`
 panel inside a `midnight` page resolves correctly at any depth. For SSR, render
 `getThemeInitScript()` in an inline `<script>` in `<head>`: it sets the attribute before
 first paint, which React cannot do without either a flash or a hydration mismatch.
@@ -110,7 +121,7 @@ with one surface against another.**
 
 The surfaces exist to *layer* — a strip behind its tabs, a panel over a page —
 so they are deliberately close in lightness: `surface.raised` against
-`surface.base` is under 1.1:1 on every rung, and on `bright` it is 1.03:1. A
+`surface.base` is under 1.1:1 on both levels, and on `sketch` it is 1.11:1. A
 widget that marks its chosen tab `bg-surface-base` among `bg-surface-raised`
 siblings therefore reads on `midnight`, where the reviewer usually is, and is
 invisible on the light rungs. That is exactly how it shipped once, in the blog.

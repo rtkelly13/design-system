@@ -443,7 +443,7 @@ Revisit when one of these becomes true:
   (`Showcase/DesignSandbox`, with a reason).
 - `Foundations/Theme Ladder → AllLevels` is asserted, so all four rungs are
   compared in one screenshot. That closes the gap where a token change could
-  read well on `midnight` and be unusable on `white` while passing everything.
+  read well on `midnight` and be unusable on `sketch` while passing everything.
 - Open, in rough priority order:
   1. Containerise the render environment
      (`mcr.microsoft.com/playwright:v1.62.1-noble` for both CI and local), so a

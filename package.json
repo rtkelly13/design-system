@@ -21,6 +21,7 @@
   "files": [
     "dist",
     "tokens",
+    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],

@@ -10,8 +10,17 @@ stylesheet, an editor theme, a terminal scheme — is generated rather than writ
 
 **Level**:
 One complete set of colour decisions, selected at runtime by a `data-theme` attribute.
-`dark` and `light` are the two.
+`midnight` and `sketch` are the two. Deliberately not named for their Polarity — see
+[`docs/adr/0003`](./docs/adr/0003-two-levels-independently-authored.md).
 _Avoid_: rung, tier, mode, variant
+
+**Polarity**:
+Whether a Level is fundamentally dark or light — a declared property *of* a Level, not the
+axis Levels hang off. `midnight` has Polarity `dark`; `sketch` has `light`. The two
+vocabularies stay separate because neither Level is named for its Polarity, which is what
+makes a third Level cheap and what keeps the `dark:`/`light:` variants meaningful alongside
+`midnight:`/`sketch:`.
+_Avoid_: mode, scheme
 
 **Group**:
 A named record of colours inside a Level, gathering the ones that answer the same

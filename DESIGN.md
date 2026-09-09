@@ -9,7 +9,7 @@ generated from or verified against `src/theme/levels.ts`, which is the only plac
 originates — see [`docs/adr/0002`](./docs/adr/0002-one-source-many-emitted-surfaces.md).
 
 Machine-readable form: [`tokens/palette.<level>.tokens.json`](./tokens), Design Tokens Format
-Module 2025.10, installable as `@rtkelly13/design-system/tokens/dim.tokens.json`.
+Module 2025.10, installable as `@rtkelly13/design-system/tokens/midnight.tokens.json`.
 
 ---
 
@@ -81,7 +81,7 @@ A terminal has sixteen positions named by colour and no concept of a keyword. So
 vocabulary is declared *underneath* the Roles, referenced by them, and **never addressed by a
 component**.
 
-| Hue | Dark | Dark bright | Light | Light bright | Angle | Note |
+| Hue | Midnight | Midnight bright | Sketch | Sketch bright | Angle | Note |
 |---|---|---|---|---|---|---|
 | `red` | `#ff586e` | `#ff939b` | `#bd0010` | `#8f002a` | 17° | Danger and ANSI red.
 | `orange` | `#ff8c00` | `#ffba85` | `#974503` | `#6c3700` | 58° | Warning, and the ANSI slot between red and yellow.
@@ -110,7 +110,9 @@ held to 4.5:1 where the base hues are held to 5.5:1.
 
 **Do not use `--color-black` or `--color-white` for this.** They are deprecated compat aliases
 tracking `surface.base` and `text.primary`, so `--color-black` resolves to `#ffffff` on the
-`white` theme — a token named for an appearance holding the opposite one.
+`sketch` theme — a token named for an appearance holding warm paper. The `white` level, where
+it resolved to literal `#ffffff` and the inversion was starkest, is gone with the collapse; the
+alias is still the wrong shape.
 
 ## 4. Contrast is arithmetic, and it is a gate
 
