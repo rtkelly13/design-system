@@ -22,7 +22,11 @@ can be expressed on the axis the system has.
 There is no word for that axis, which is why #49 has nowhere to land: it asks for spacing,
 type, motion and z-index tokens and then has to guess whether they are fields on
 `LevelDefinition` or a flat sibling record. Both answers are wrong, and the reason is that
-they are answers about one axis to a question about two.
+they are answers about one axis to a question about two. § 7 of
+[`DESIGN.md`](../../DESIGN.md) states the gap in the terms a consumer meets it in — "there is
+no type scale, spacing scale, motion or z-index in the token layer yet … a 1080p video frame
+and a 16px page disagree about the scale" — and that is the sentence this ADR gives a shape
+to.
 
 **The decision: a token declares which of exactly two orthogonal axes it varies on, and no
 token varies on both.**
@@ -51,8 +55,11 @@ the taxonomy's Target table. This is what stops the two axes collapsing into one
 Medium carries: type scale, leading, tracking, font weight, spacing, border width, shadow
 offset, radius, motion duration, easing, z-index layers, focus-ring geometry, and the
 contrast floor a Gate enforces. Level carries colour. A token that varies on neither axis is
-**invariant** and declared once — pure black and white per #122, and the hue angles that
+**invariant** and declared once: the `fixed` Group — `fixed.black`, `fixed.white`,
+`fixed.transparent` — is that class and already ships, as does the set of hue angles
 [`palette-provenance.md`](../palette-provenance.md) anchors on six years of authored colour.
+Three variance classes, then, and `fixed` is the evidence that the third is real rather than a
+tidy corner of the model.
 
 One asymmetry is worth stating because it is the thing most likely to be got wrong later:
 **colour values do not vary by Medium, but the floors they must clear do.** A projected frame,
@@ -117,10 +124,12 @@ not about their scales.
   Emitters. A Medium must never be selectable by a CSS attribute the way a Level is — if a
   future stylesheet needs two Media at once, that is a new decision, not a wider record.
 - **The contrast floor becomes per-Medium data the Gate reads.** `MINIMUM_RATIO` in
-  `src/theme/contrast.ts` is one global record today, and
-  [`palette-provenance.md`](../palette-provenance.md) solves every value to 5.5:1 while the
-  Gate enforces 4.5:1 — so the palette's actual floor currently has nowhere to live. Per
-  Medium it does, and #78 is then retired by arithmetic rather than by prose.
+  `src/theme/contrast.ts` is now indexed by Role and by vocabulary — 4.5:1 for a Role, 5.5:1
+  for a Hue, 4.5:1 for its bright variant — which is what retired #78 by arithmetic. The
+  dimension still missing is this one: those are *one set of numbers for every surface the
+  system emits to*. A projected 1080p frame, a compression-damaged video and an unantialiased
+  terminal cell do not read against the browser's floor. Nothing here needs a new Gate; it
+  needs the number it reads to be indexed twice.
 - **The `graphic` Medium needs a Group that does not exist.** 0002 states it: graphics need "N
   mutually distinguishable colours rather than four levels of emphasis". No Group in
   [`theme-taxonomy.md`](../theme-taxonomy.md) can express an *ordered sequence with a
