@@ -46,6 +46,7 @@ Load these when the task is in them, not before.
 | Styling in TSX, and the CSS ratchet | [`docs/styling.md`](./docs/styling.md) |
 | Visual regression — determinism contract, operating instructions | [`docs/visual-regression.md`](./docs/visual-regression.md) |
 | CI shape, and the screenshot walkthrough | [`docs/ci.md`](./docs/ci.md) |
+| Evidence on a PR — design, not yet built | [`docs/evidence-pipeline.md`](./docs/evidence-pipeline.md) |
 | Unit tests | [`docs/testing.md`](./docs/testing.md) |
 | The published API surface | [`docs/api-surface.md`](./docs/api-surface.md) |
 | Dependencies, and the ones held back | [`docs/dependencies.md`](./docs/dependencies.md) |
