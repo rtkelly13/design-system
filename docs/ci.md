@@ -100,7 +100,7 @@ where the gated suite captures one representative per component.
 The cross-level gap the gated suite used to have is closed —
 `Foundations/Theme Ladder → AllLevels` renders all four rungs in one screenshot
 and is now a `CASES` row, so a token change that reads fine on `midnight` and is
-unusable on `white` fails a required check rather than merely showing up in a
+unusable on `sketch` fails a required check rather than merely showing up in a
 report nobody opened.
 
 Two structural choices worth keeping:

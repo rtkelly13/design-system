@@ -1,6 +1,6 @@
 {
   "name": "@rtkelly13/design-system",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Brutalist design system with a four-level theme ladder, slide deck system, and experiments foundation for Ryan Kelly websites",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -14,10 +14,14 @@
     },
     "./styles.css": "./dist/styles.css",
     "./theme.css": "./dist/theme.css",
-    "./prose.css": "./dist/prose.css"
+    "./prose.css": "./dist/prose.css",
+    "./tokens/midnight.tokens.json": "./tokens/palette.midnight.tokens.json",
+    "./tokens/sketch.tokens.json": "./tokens/palette.sketch.tokens.json"
   },
   "files": [
     "dist",
+    "tokens",
+    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],
@@ -31,6 +35,8 @@
     "build": "pnpm tokens:build && tsup",
     "tokens:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs",
     "tokens:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs --check",
+    "tokens:design": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-design-tokens.mjs",
+    "tokens:design:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-design-tokens.mjs --check",
     "check:contrast": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs",
     "contrast:report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs --report",
     "lint": "eslint src",

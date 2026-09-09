@@ -12,6 +12,11 @@ type TextTone = 'primary' | 'secondary' | 'muted' | 'inverse';
 
 type BorderTone = 'strong' | 'default' | 'subtle';
 
+type Hue = 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'cyan' | 'blue' | 'violet' | 'magenta' | 'pink';
+
+type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan'>;
+
+type HueRef = Hue | 'neutral';
 type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 type AccentToken = Emphasis | Intent | LegacyAccent;
@@ -45,11 +50,20 @@ declare const semanticTokens: {
     readonly shadowColor: "var(--ds-shadow-color)";
 };
 
-declare const THEME_LEVELS: readonly ["midnight", "dim", "bright", "white"];
+declare const THEME_LEVELS: readonly ["midnight", "sketch"];
 
 type ThemeLevel = (typeof THEME_LEVELS)[number];
 
 type Polarity = 'dark' | 'light';
+
+declare const FIXED_COLOURS: {
+    readonly black: "#000000";
+    readonly white: "#ffffff";
+    readonly transparent: "transparent";
+};
+type FixedColour = keyof typeof FIXED_COLOURS;
+
+declare const PALETTE_HUES: readonly ["red", "orange", "yellow", "green", "teal", "cyan", "blue", "violet", "magenta", "pink"];
 
 interface LevelDefinition {
 
@@ -63,6 +77,14 @@ interface LevelDefinition {
     readonly accent: Readonly<Record<Emphasis, string>>;
     readonly intent: Readonly<Record<Intent, string>>;
 
+    readonly palette: Readonly<Record<Hue, string>>;
+
+    readonly paletteBright: Readonly<Record<Hue, string>>;
+
+    readonly accentHue: Readonly<Record<Emphasis, HueRef>>;
+
+    readonly intentHue: Readonly<Record<Intent, HueRef>>;
+
     readonly shadow: string;
 }
 
@@ -75,8 +97,6 @@ declare const SYSTEM_LEVEL: Readonly<Record<Polarity, ThemeLevel>>;
 declare function isThemeLevel(value: unknown): value is ThemeLevel;
 
 declare function nextLevel(level: ThemeLevel): ThemeLevel;
-
-declare function levelsByPolarity(polarity: Polarity): ThemeLevel[];
 
 declare function assertNever(value: never, message?: string): never;
 
@@ -133,12 +153,27 @@ declare function relativeLuminance(color: Rgb): number;
 
 declare function contrastRatio(foreground: string, background: string): number;
 
+declare const MAXIMUM_NEUTRAL_CHROMA = 0.045;
+interface HueAgreementCheck {
+    readonly level: ThemeLevel;
+    readonly role: string;
+    readonly declared: HueRef;
+    readonly value: string;
+
+    readonly expected: string | null;
+    readonly passes: boolean;
+    readonly detail: string;
+}
 declare const MINIMUM_RATIO: {
     readonly text: 4.5;
 
     readonly textInverse: 4.5;
     readonly accent: 4.5;
     readonly intent: 4.5;
+
+    readonly palette: 5.5;
+
+    readonly paletteBright: 4.5;
     readonly borderStrong: 3;
     readonly borderDefault: 3;
     readonly borderSubtle: 1.4;
@@ -158,6 +193,7 @@ interface ContrastCheck {
     passes: boolean;
 }
 
+declare function auditHueAgreement(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): HueAgreementCheck[];
 declare function auditContrast(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): ContrastCheck[];
 
 type SelectionDevice = 'fill' | 'edge' | 'surface pair';
@@ -925,6 +961,7 @@ export {
   type AdminStatusBadge,
   AnchorHeading,
   type AnchorHeadingProps,
+  type AnsiHue,
   AsciiDivider,
   type AsciiDividerProps,
   Avatar,
@@ -990,10 +1027,15 @@ export {
   type ExperimentItem,
   ExperimentsView,
   type ExperimentsViewProps,
+  FIXED_COLOURS,
+  type FixedColour,
   Glyph,
   type GlyphProps,
   HEADING_EMPHASIS,
   type HeadingLevel,
+  type Hue,
+  type HueAgreementCheck,
+  type HueRef,
   Input,
   type InputProps,
   type Intent,
@@ -1001,6 +1043,7 @@ export {
   type LegacyAccent,
   type LevelDefinition,
   LoremIpsumPost,
+  MAXIMUM_NEUTRAL_CHROMA,
   MINIMUM_RATIO,
   type MdxComponents,
   Modal,
@@ -1012,6 +1055,7 @@ export {
   type NerdIconProps,
   NoteBlock,
   type NoteBlockProps,
+  PALETTE_HUES,
   PageHeader,
   type PageHeaderAccent,
   type PageHeaderProps,
@@ -1074,6 +1118,7 @@ export {
   accentVar,
   assertNever,
   auditContrast,
+  auditHueAgreement,
   auditSelectionDevices,
   borderVar,
   brutalistTokens,
@@ -1087,7 +1132,6 @@ export {
   getThemeInitScript,
   isExternalHref,
   isThemeLevel,
-  levelsByPolarity,
   mdxComponents,
   nextLevel,
   parseColor,
