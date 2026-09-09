@@ -98,6 +98,14 @@ semantic one. **Breaking.** Migration is at the bottom.
   failed the required check even though apt reported having ignored it. Vendor source lists are
   removed before `install-deps` runs.
 
+### Known
+
+- **The visual gate does not catch small colour changes.** `maxDiffPixels: 0` bounds how many
+  pixels may count as different; `threshold` stays at Playwright's default `0.2` and decides
+  whether a pixel counts at all. The `#ec4899` → `#f955a4` fix above scores 0.0023 in YIQ and
+  moved no baseline. Found by probing, tracked in #125, and the reason `auditHueAgreement`
+  exists as arithmetic rather than a screenshot.
+
 ### Migration
 
 ```diff

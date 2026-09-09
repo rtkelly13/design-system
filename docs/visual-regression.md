@@ -222,6 +222,8 @@ Two things follow.
 Playwright's reported number can differ by three orders of magnitude on the same
 pair of images. When triaging, say which one you measured.
 
+**A small colour change is a blind spot, and a measured one.** `maxDiffPixels: 0` reads as zero allowance and is not: `threshold` stays at Playwright's default `0.2`, so a pixel only counts as different once it moves that far in YIQ. `midnight`'s `accent.tertiary` shifting from `#ec4899` to `#f955a4` scores **0.0023** and is invisible to every asserted case, including one whose baseline holds 36 pixels of the old value. A `#00ff00` probe scored 0.3784 and failed four. Tracked in #125.
+
 **Uniform near-black and near-white shifts are the blind spot.** Exactly where a
 four-rung dark-to-light ladder does most of its work. Anti-aliasing is what
 `threshold` is for and is a real need, so the fix is not simply `threshold: 0` —
