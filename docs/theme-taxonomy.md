@@ -153,7 +153,7 @@ Shiki. Emit both maps from one source, and say so in the Emitter's header.
 | Gate | Measures | Covers | Exists |
 |---|---|---|---|
 | `check:contrast` | foreground vs Declared ground | `text`, `border`, `accent`, `intent`, `syntax` | yes |
-| `check:separation` | foreground vs adjacent foreground, ΔLuma | `syntax` measured-adjacent pairs | #76 |
+| `check:separation` | foreground vs adjacent foreground, **OKLab ΔE** | `syntax` measured-adjacent pairs | #76 |
 | `auditSelectionDevices` | accent fill / edge vs two grounds | `accent` | yes |
 | **composited contrast** | foreground vs translucent-over-ground | `editor`, flattened `editor` | **#81 — no** |
 | **background-pair separation** | ground vs ground, ΔLuma | `editor` diff and merge bands | **#81 — no** |

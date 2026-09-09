@@ -43,6 +43,8 @@ Load these when the task is in them, not before.
 | Architectural decisions | [`docs/adr/`](./docs/adr/) |
 | Theming — the ladder, semantic roles, selection state | [`docs/theming.md`](./docs/theming.md) |
 | What a theme declares, and what it can emit | [`docs/theme-taxonomy.md`](./docs/theme-taxonomy.md) |
+| Where the base palette came from, and how it was solved | [`docs/palette-provenance.md`](./docs/palette-provenance.md) |
+| Retired colours, and the five design eras | [`docs/colour-heritage.md`](./docs/colour-heritage.md) |
 | Styling in TSX, and the CSS ratchet | [`docs/styling.md`](./docs/styling.md) |
 | Visual regression — determinism contract, operating instructions | [`docs/visual-regression.md`](./docs/visual-regression.md) |
 | CI shape, and the screenshot walkthrough | [`docs/ci.md`](./docs/ci.md) |

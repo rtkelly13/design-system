@@ -4,6 +4,10 @@ status: proposed
 
 # Hues are declared below Roles, not derived from them
 
+Sits under [`0002`](./0002-one-source-many-emitted-surfaces.md), which is the root decision and
+logically prior to this one: two of that ADR's four surface classes address colour by
+appearance, so the vocabulary below is a precondition of it rather than an enhancement to it.
+
 The system's whole thesis is that a colour is addressed by its job and not its appearance —
 `accent.primary`, not `cyan` — and #90, #91 and #96 are the migration onto that. But Targets
 exist that have no notion of jobs: a terminal has sixteen positions named by colour, and no
