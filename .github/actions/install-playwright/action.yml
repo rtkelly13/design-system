@@ -63,6 +63,62 @@ runs:
         path: ~/.cache/ms-playwright
         key: playwright-${{ runner.os }}-${{ inputs.browser }}-${{ hashFiles('pnpm-lock.yaml') }}
 
+    # Third-party apt sources are removed before `install-deps` runs, and this
+    # is not defensive tidying — it is the fix for a specific outage.
+    #
+    # On 9 Sep every run of this step failed, twice per run, with:
+    #
+    #   E: Failed to fetch https://dl.google.com/linux/chrome-stable/deb/dists/
+    #      stable/main/binary-amd64/Packages.gz  Hash Sum mismatch
+    #   E: Some index files failed to download. They have been ignored, or old
+    #      ones used instead.
+    #   Failed to install browser dependencies
+    #   Error: Installation process exited with code: 100
+    #
+    # Read the second line carefully: apt says it *ignored* the broken index and
+    # carried on. Nothing we need was missing. But `apt-get update` still exits
+    # non-zero, and Playwright's `install-deps` treats any non-zero as fatal —
+    # so a corrupt index on a repository we do not use failed the required
+    # check, and the retry loop above could not help because the fault was
+    # upstream and persistent rather than a stall.
+    #
+    # GitHub's Ubuntu images ship `google-chrome.list` because the image also
+    # ships Google Chrome. Playwright does not use it: `install-deps` installs
+    # shared libraries — libnss3, libatk-bridge2.0-0, libasound2 and friends —
+    # all of which come from Ubuntu's own archives. Google's repository is
+    # collateral on every run, and a liability on a bad one.
+    #
+    # Scoped deliberately narrowly. It removes only source *lists* under
+    # sources.list.d, never `/etc/apt/sources.list` itself, so the Ubuntu
+    # archives this step actually depends on are untouched. It is a no-op on a
+    # runner that carries none of them, and it does not fail the step if a file
+    # cannot be removed.
+    - name: Drop apt sources Playwright does not need
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        set -uo pipefail
+
+        # Anything matching these is a vendor repository the browser libraries
+        # do not come from. Extend the list rather than widening the glob.
+        for name in google-chrome microsoft-prod azure-cli docker mongodb-org \
+                    yarn nodesource helm-stable-debian git-core-ubuntu; do
+          for ext in list sources; do
+            file="/etc/apt/sources.list.d/${name}.${ext}"
+            if [ -e "${file}" ]; then
+              echo "Removing ${file}"
+              sudo rm -f "${file}" || echo "::warning::Could not remove ${file}; continuing."
+            fi
+          done
+        done
+
+        # Refresh the index now, with the vendor lists gone, so `install-deps`
+        # finds a clean cache rather than re-running an update that might still
+        # be carrying a stale failure. Advisory only — `install-deps` runs its
+        # own update, and this one failing is not a reason to fail the step
+        # before Playwright has had its own attempt and its retry.
+        sudo apt-get update -qq || echo "::warning::apt-get update was not clean; letting install-deps try anyway."
+
     # `pnpm exec`, not `npx`: npx silently falls back to fetching the latest
     # published CLI when the local bin is missing, and a Playwright other than
     # the lockfile's installs a different Chromium build. Under
