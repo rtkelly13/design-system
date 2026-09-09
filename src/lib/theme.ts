@@ -45,6 +45,37 @@ export type BorderTone = 'strong' | 'default' | 'subtle';
  * accepted so existing consumers keep compiling, and they resolve to the same
  * values, but they defeat the point of the abstraction.
  */
+/**
+ * A colour's *appearance*, independent of any job — the vocabulary a Target
+ * addresses when it has no notion of jobs. A terminal has sixteen positions
+ * named by colour and no concept of a keyword.
+ *
+ * Declared below the Role vocabulary and referenced by it, never the reverse:
+ * Hue -> Role is a declared lookup, Role -> Hue is a guess. See
+ * `docs/adr/0001-hues-declared-below-roles.md`.
+ *
+ * **A Hue in component code is a defect.** Components address Roles only.
+ * Ten is the ceiling rather than a comfortable middle — the tightest pair
+ * already sits at deltaE 0.049. See `docs/palette-provenance.md`.
+ */
+export type Hue =
+  | 'red'
+  | 'orange'
+  | 'yellow'
+  | 'green'
+  | 'teal'
+  | 'cyan'
+  | 'blue'
+  | 'violet'
+  | 'magenta'
+  | 'pink';
+
+/**
+ * The eight ANSI base slots a terminal needs, beyond which `bright` variants
+ * fill the upper eight. `black` and `white` come from `FIXED_COLOURS`.
+ */
+export type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan'>;
+
 export type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 /** Anything a component's `accent`-style prop will take. */

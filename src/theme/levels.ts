@@ -32,7 +32,7 @@
  * The one exception is `surface.overlay`, which is a scrim and needs alpha.
  */
 
-import type { BorderTone, Emphasis, Intent, Surface, TextTone } from '../lib/theme';
+import type { BorderTone, Emphasis, Hue, Intent, Surface, TextTone } from '../lib/theme';
 
 /**
  * The ladder, ordered from darkest to lightest. Order is meaningful: it is what
@@ -54,6 +54,49 @@ export type ThemeLevel = (typeof THEME_LEVELS)[number];
 export type Polarity = 'dark' | 'light';
 
 /**
+ * The three colours that do **not** vary by level.
+ *
+ * Every other colour in this module is declared once per level and swaps with
+ * it. These do not, and that invariance is the whole point: `#ffffff` means
+ * *white*, not "whatever this level calls its lightest ground". The
+ * `--color-black` / `--color-white` compat aliases are the counter-example —
+ * they track `surface.base` and `text.primary`, so `--color-black` resolves to
+ * `#ffffff` on the `white` level. A token named for an appearance, holding the
+ * opposite appearance.
+ *
+ * Use these when true black or true white is genuinely meant: a print surface,
+ * an SVG fill, a scrim. Not as a page ground — that is `surface.base`.
+ */
+export const FIXED_COLOURS = {
+  black: '#000000',
+  white: '#ffffff',
+  transparent: 'transparent',
+} as const;
+
+export type FixedColour = keyof typeof FIXED_COLOURS;
+
+/**
+ * The Hue vocabulary, in wheel order starting at red.
+ *
+ * Ten is the ceiling, not a comfortable middle: the tightest pair already sits
+ * at deltaE 0.049 on the light levels, and an eleventh candidate was dropped
+ * during derivation for landing 13 degrees from the measured blue at deltaE
+ * 0.024. Adding one means checking the separation gate, not just this array.
+ */
+export const PALETTE_HUES = [
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'teal',
+  'cyan',
+  'blue',
+  'violet',
+  'magenta',
+  'pink',
+] as const satisfies readonly Hue[];
+
+/**
  * Every colour a level must define. Adding a field here is a compile error in
  * all four levels until each one answers it — the property that a bare string
  * union cannot provide.
@@ -69,6 +112,20 @@ export interface LevelDefinition {
   readonly border: Readonly<Record<BorderTone, string>>;
   readonly accent: Readonly<Record<Emphasis, string>>;
   readonly intent: Readonly<Record<Intent, string>>;
+  /**
+   * The Hue vocabulary — appearance, not job. Declared *below* the Roles above
+   * and referenced by them, never derived from them. Only a Target with no
+   * notion of jobs addresses these: a terminal's sixteen ANSI slots, half a
+   * JetBrains scheme, a generated diagram needing N distinguishable colours.
+   *
+   * Every entry clears 5.5:1 against the tightest of this level's three
+   * grounds — above WCAG AA, so an editor still has room to tint the ground
+   * behind it. `bright` fills the upper eight ANSI slots at a 4.5:1 floor,
+   * since those carry emphasis rather than body text.
+   */
+  readonly palette: Readonly<Record<Hue, string>>;
+  /** The `bright` half of each Hue. ANSI's upper eight, and nothing else yet. */
+  readonly paletteBright: Readonly<Record<Hue, string>>;
   /** Colour of the hard offset shadows. Normally tracks `border.strong`. */
   readonly shadow: string;
 }
@@ -119,6 +176,30 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       warning: '#facc15',
       danger: '#ec4899',
     },
+    palette: {
+      red: '#ff586e', // 16deg — lifted from #f43f5e (dim accent.tertiary), 4.59:1
+      orange: '#ff8c00', // 58deg — kept — 410 commits
+      yellow: '#facc15', // 92deg — kept — 533 commits, brand
+      green: '#39ff14', // 142deg — kept — 533 commits, brand
+      teal: '#34d399', // 163deg — kept — 364 commits
+      cyan: '#22d3ee', // 212deg — kept — 534 commits, brand
+      blue: '#38bdf8', // 233deg — kept — dim accent.primary, 233deg (a sky blue by heritage)
+      violet: '#c3afff', // 295deg — new — 57 tried across six years, none canonical
+      magenta: '#ff1cff', // 328deg — lifted from #ff00ff, 5.37:1
+      pink: '#f955a4', // 354deg — lifted from #ec4899 (brand), 4.77:1 — deltaE 0.036
+    },
+    paletteBright: {
+      red: '#ff939b',
+      orange: '#ffba85',
+      yellow: '#ffeaab',
+      green: '#c0ffb8',
+      teal: '#00f7ae',
+      cyan: '#88ebff',
+      blue: '#8cd7ff',
+      violet: '#ddd4ff',
+      magenta: '#ff88fd',
+      pink: '#ff8ebe',
+    },
     shadow: '#ffffff',
   },
 
@@ -154,6 +235,30 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       success: '#4ade80',
       warning: '#fbbf24',
       danger: '#f43f5e',
+    },
+    palette: {
+      red: '#ff586e', // 16deg — lifted from #f43f5e (dim accent.tertiary), 4.59:1
+      orange: '#ff8c00', // 58deg — kept — 410 commits
+      yellow: '#facc15', // 92deg — kept — 533 commits, brand
+      green: '#39ff14', // 142deg — kept — 533 commits, brand
+      teal: '#34d399', // 163deg — kept — 364 commits
+      cyan: '#22d3ee', // 212deg — kept — 534 commits, brand
+      blue: '#38bdf8', // 233deg — kept — dim accent.primary, 233deg (a sky blue by heritage)
+      violet: '#c3afff', // 295deg — new — 57 tried across six years, none canonical
+      magenta: '#ff1cff', // 328deg — lifted from #ff00ff, 5.37:1
+      pink: '#f955a4', // 354deg — lifted from #ec4899 (brand), 4.77:1 — deltaE 0.036
+    },
+    paletteBright: {
+      red: '#ff939b',
+      orange: '#ffba85',
+      yellow: '#ffeaab',
+      green: '#c0ffb8',
+      teal: '#00f7ae',
+      cyan: '#88ebff',
+      blue: '#8cd7ff',
+      violet: '#ddd4ff',
+      magenta: '#ff88fd',
+      pink: '#ff8ebe',
     },
     shadow: '#e4e4e7',
   },
@@ -191,6 +296,30 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       warning: '#9a4708',
       danger: '#c81e1e',
     },
+    palette: {
+      red: '#bd0010', // 16deg — was #dc2626, 4.03:1 — failed WCAG AA
+      orange: '#974503', // 58deg — was #9a4708, 5.34:1
+      yellow: '#705a00', // 92deg — new — no light yellow was ever authored
+      green: '#006b2e', // 142deg — was #15803d, 4.18:1 — failed
+      teal: '#006859', // 163deg — new
+      cyan: '#006675', // 212deg — new
+      blue: '#1450d7', // 233deg — was #2563eb, 4.31:1 — failed
+      violet: '#7d00f4', // 295deg — new
+      magenta: '#a300ad', // 328deg — new
+      pink: '#b4006c', // 354deg — new
+    },
+    paletteBright: {
+      red: '#8f002a',
+      orange: '#6c3700',
+      yellow: '#534200',
+      green: '#024f00',
+      teal: '#004d34',
+      cyan: '#004b56',
+      blue: '#004e6d',
+      violet: '#6000bd',
+      magenta: '#7f0080',
+      pink: '#8a0052',
+    },
     shadow: '#18181b',
   },
 
@@ -226,6 +355,30 @@ export const LEVELS: Readonly<Record<ThemeLevel, LevelDefinition>> = {
       success: '#146c34',
       warning: '#9a4708',
       danger: '#b91c1c',
+    },
+    palette: {
+      red: '#bd0010', // 16deg — was #dc2626, 4.03:1 — failed WCAG AA
+      orange: '#974503', // 58deg — was #9a4708, 5.34:1
+      yellow: '#705a00', // 92deg — new — no light yellow was ever authored
+      green: '#006b2e', // 142deg — was #15803d, 4.18:1 — failed
+      teal: '#006859', // 163deg — new
+      cyan: '#006675', // 212deg — new
+      blue: '#1450d7', // 233deg — was #2563eb, 4.31:1 — failed
+      violet: '#7d00f4', // 295deg — new
+      magenta: '#a300ad', // 328deg — new
+      pink: '#b4006c', // 354deg — new
+    },
+    paletteBright: {
+      red: '#8f002a',
+      orange: '#6c3700',
+      yellow: '#534200',
+      green: '#024f00',
+      teal: '#004d34',
+      cyan: '#004b56',
+      blue: '#004e6d',
+      violet: '#6000bd',
+      magenta: '#7f0080',
+      pink: '#8a0052',
     },
     shadow: '#0b0b0d',
   },

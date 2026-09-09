@@ -80,6 +80,26 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -108,6 +128,28 @@
   --font-display: var(--ds-font-display);
   --font-mono: var(--ds-font-mono);
   --font-pixel: var(--ds-font-pixel);
+}
+
+/* ==========================================================================
+   Fixed colours — level-independent, and that is the point
+   ==========================================================================
+
+   These three do not swap with the level. `--color-black` and
+   `--color-white` below DO — they are compat aliases tracking
+   `surface.base` and `text.primary`, which is why `--color-black`
+   resolves to #ffffff on the `white` level. Use these when true black or
+   true white is meant; use `surface.base` for a page ground. */
+
+:root {
+  --ds-fixed-black: #000000;
+  --ds-fixed-white: #ffffff;
+  --ds-fixed-transparent: transparent;
+}
+
+@theme {
+  --color-fixed-black: var(--ds-fixed-black);
+  --color-fixed-white: var(--ds-fixed-white);
+  --color-fixed-transparent: var(--ds-fixed-transparent);
 }
 
 /* ==========================================================================
@@ -153,6 +195,26 @@
   --ds-intent-success: #39ff14;
   --ds-intent-warning: #facc15;
   --ds-intent-danger: #ec4899;
+  --ds-palette-red: #ff586e;
+  --ds-palette-orange: #ff8c00;
+  --ds-palette-yellow: #facc15;
+  --ds-palette-green: #39ff14;
+  --ds-palette-teal: #34d399;
+  --ds-palette-cyan: #22d3ee;
+  --ds-palette-blue: #38bdf8;
+  --ds-palette-violet: #c3afff;
+  --ds-palette-magenta: #ff1cff;
+  --ds-palette-pink: #f955a4;
+  --ds-palette-bright-red: #ff939b;
+  --ds-palette-bright-orange: #ffba85;
+  --ds-palette-bright-yellow: #ffeaab;
+  --ds-palette-bright-green: #c0ffb8;
+  --ds-palette-bright-teal: #00f7ae;
+  --ds-palette-bright-cyan: #88ebff;
+  --ds-palette-bright-blue: #8cd7ff;
+  --ds-palette-bright-violet: #ddd4ff;
+  --ds-palette-bright-magenta: #ff88fd;
+  --ds-palette-bright-pink: #ff8ebe;
   --ds-shadow-color: #ffffff;
   --ds-polarity: dark;
 
@@ -175,6 +237,26 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -238,6 +320,26 @@
   --ds-intent-success: #4ade80;
   --ds-intent-warning: #fbbf24;
   --ds-intent-danger: #f43f5e;
+  --ds-palette-red: #ff586e;
+  --ds-palette-orange: #ff8c00;
+  --ds-palette-yellow: #facc15;
+  --ds-palette-green: #39ff14;
+  --ds-palette-teal: #34d399;
+  --ds-palette-cyan: #22d3ee;
+  --ds-palette-blue: #38bdf8;
+  --ds-palette-violet: #c3afff;
+  --ds-palette-magenta: #ff1cff;
+  --ds-palette-pink: #f955a4;
+  --ds-palette-bright-red: #ff939b;
+  --ds-palette-bright-orange: #ffba85;
+  --ds-palette-bright-yellow: #ffeaab;
+  --ds-palette-bright-green: #c0ffb8;
+  --ds-palette-bright-teal: #00f7ae;
+  --ds-palette-bright-cyan: #88ebff;
+  --ds-palette-bright-blue: #8cd7ff;
+  --ds-palette-bright-violet: #ddd4ff;
+  --ds-palette-bright-magenta: #ff88fd;
+  --ds-palette-bright-pink: #ff8ebe;
   --ds-shadow-color: #e4e4e7;
   --ds-polarity: dark;
 
@@ -260,6 +362,26 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -323,6 +445,26 @@
   --ds-intent-success: #146c34;
   --ds-intent-warning: #9a4708;
   --ds-intent-danger: #c81e1e;
+  --ds-palette-red: #bd0010;
+  --ds-palette-orange: #974503;
+  --ds-palette-yellow: #705a00;
+  --ds-palette-green: #006b2e;
+  --ds-palette-teal: #006859;
+  --ds-palette-cyan: #006675;
+  --ds-palette-blue: #1450d7;
+  --ds-palette-violet: #7d00f4;
+  --ds-palette-magenta: #a300ad;
+  --ds-palette-pink: #b4006c;
+  --ds-palette-bright-red: #8f002a;
+  --ds-palette-bright-orange: #6c3700;
+  --ds-palette-bright-yellow: #534200;
+  --ds-palette-bright-green: #024f00;
+  --ds-palette-bright-teal: #004d34;
+  --ds-palette-bright-cyan: #004b56;
+  --ds-palette-bright-blue: #004e6d;
+  --ds-palette-bright-violet: #6000bd;
+  --ds-palette-bright-magenta: #7f0080;
+  --ds-palette-bright-pink: #8a0052;
   --ds-shadow-color: #18181b;
   --ds-polarity: light;
 
@@ -345,6 +487,26 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -408,6 +570,26 @@
   --ds-intent-success: #146c34;
   --ds-intent-warning: #9a4708;
   --ds-intent-danger: #b91c1c;
+  --ds-palette-red: #bd0010;
+  --ds-palette-orange: #974503;
+  --ds-palette-yellow: #705a00;
+  --ds-palette-green: #006b2e;
+  --ds-palette-teal: #006859;
+  --ds-palette-cyan: #006675;
+  --ds-palette-blue: #1450d7;
+  --ds-palette-violet: #7d00f4;
+  --ds-palette-magenta: #a300ad;
+  --ds-palette-pink: #b4006c;
+  --ds-palette-bright-red: #8f002a;
+  --ds-palette-bright-orange: #6c3700;
+  --ds-palette-bright-yellow: #534200;
+  --ds-palette-bright-green: #024f00;
+  --ds-palette-bright-teal: #004d34;
+  --ds-palette-bright-cyan: #004b56;
+  --ds-palette-bright-blue: #004e6d;
+  --ds-palette-bright-violet: #6000bd;
+  --ds-palette-bright-magenta: #7f0080;
+  --ds-palette-bright-pink: #8a0052;
   --ds-shadow-color: #0b0b0d;
   --ds-polarity: light;
 
@@ -430,6 +612,26 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);

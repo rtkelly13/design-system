@@ -19,7 +19,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { LEVELS, THEME_LEVELS } from '../src/theme/levels.ts';
+import { LEVELS, THEME_LEVELS, FIXED_COLOURS } from '../src/theme/levels.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // Generated straight into the file consumers already import, rather than into a
@@ -65,6 +65,13 @@ function levelVariables(definition) {
   for (const [key, value] of Object.entries(definition.border)) push(`border-${key}`, value);
   for (const [key, value] of Object.entries(definition.accent)) push(`accent-${key}`, value);
   for (const [key, value] of Object.entries(definition.intent)) push(`intent-${key}`, value);
+  // The Hue vocabulary, declared below the Roles above. A component may not
+  // read these — see `docs/adr/0001-hues-declared-below-roles.md`. They exist
+  // for Targets with no notion of jobs: ANSI's sixteen slots, a diagram
+  // needing N distinguishable colours, half a JetBrains scheme.
+  for (const [key, value] of Object.entries(definition.palette)) push(`palette-${key}`, value);
+  for (const [key, value] of Object.entries(definition.paletteBright))
+    push(`palette-bright-${key}`, value);
   push('shadow-color', definition.shadow);
   push('polarity', definition.polarity);
 
@@ -126,6 +133,26 @@ const TAILWIND_ALIASES = `  --color-surface-base: var(--ds-surface-base);
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
   --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
@@ -264,6 +291,29 @@ ${COMPAT_THEME}
   --font-display: var(--ds-font-display);
   --font-mono: var(--ds-font-mono);
   --font-pixel: var(--ds-font-pixel);
+}`);
+
+  sections.push(`
+/* ==========================================================================
+   Fixed colours — level-independent, and that is the point
+   ==========================================================================
+
+   These three do not swap with the level. \`--color-black\` and
+   \`--color-white\` below DO — they are compat aliases tracking
+   \`surface.base\` and \`text.primary\`, which is why \`--color-black\`
+   resolves to #ffffff on the \`white\` level. Use these when true black or
+   true white is meant; use \`surface.base\` for a page ground. */
+
+:root {
+${Object.entries(FIXED_COLOURS)
+  .map(([key, value]) => `  --ds-fixed-${key}: ${value};`)
+  .join('\n')}
+}
+
+@theme {
+${Object.keys(FIXED_COLOURS)
+  .map((key) => `  --color-fixed-${key}: var(--ds-fixed-${key});`)
+  .join('\n')}
 }`);
 
   sections.push(`

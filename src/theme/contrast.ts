@@ -12,7 +12,7 @@
  * stable; WCAG ratios are what an audit will be run against.
  */
 
-import type { Emphasis, Intent, TextTone } from '../lib/theme';
+import type { Emphasis, Hue, Intent, TextTone } from '../lib/theme';
 import type { LevelDefinition, ThemeLevel } from './levels';
 
 export interface Rgb {
@@ -117,12 +117,41 @@ export function contrastRatio(foreground: string, background: string): number {
  * is only that it must be *visible* rather than accessible as a control.
  * Setting it to AA would force every hairline in the system to read as a rule.
  */
+/**
+ * The Hue vocabulary, in wheel order. Declared here rather than imported so the
+ * gate stays runnable by `scripts/check-contrast.mjs` without a `.ts` import
+ * extension — and `satisfies` still makes a missing or misspelled Hue a
+ * compile error, which is the property that matters.
+ */
+const PALETTE_HUES_ORDER = [
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'teal',
+  'cyan',
+  'blue',
+  'violet',
+  'magenta',
+  'pink',
+] as const satisfies readonly Hue[];
+
 export const MINIMUM_RATIO = {
   text: 4.5,
   /** `text.inverse` sits on an accent fill, not on a surface. */
   textInverse: 4.5,
   accent: 4.5,
   intent: 4.5,
+  /**
+   * A Hue, above WCAG AA deliberately. An editor draws selection, current-line,
+   * find-match and diff backgrounds *behind* the same tokens, so a palette
+   * solved to exactly 4.5:1 has no room left to tint the ground. At 4.5 the
+   * light palette has one sRGB step of headroom; at 5.5 it has twenty-two.
+   * See `docs/palette-provenance.md` and #78.
+   */
+  palette: 5.5,
+  /** `bright` Hues carry emphasis, not body text, so AA is the right bar. */
+  paletteBright: 4.5,
   borderStrong: 3,
   borderDefault: 3,
   borderSubtle: 1.4,
@@ -195,6 +224,17 @@ export function auditContrast(
       }
       for (const tone of ['info', 'success', 'warning', 'danger'] as const satisfies readonly Intent[]) {
         check(`intent.${tone} on ${groundName}`, def.intent[tone], ground, MINIMUM_RATIO.intent);
+      }
+      // ADR 0001: gate `palette` once per Hue rather than once per Role that
+      // consumes it. Separate the palette, not each of its consumers.
+      for (const hue of PALETTE_HUES_ORDER) {
+        check(`palette.${hue} on ${groundName}`, def.palette[hue], ground, MINIMUM_RATIO.palette);
+        check(
+          `palette.bright.${hue} on ${groundName}`,
+          def.paletteBright[hue],
+          ground,
+          MINIMUM_RATIO.paletteBright,
+        );
       }
       check(`border.strong on ${groundName}`, def.border.strong, ground, MINIMUM_RATIO.borderStrong);
       check(`border.default on ${groundName}`, def.border.default, ground, MINIMUM_RATIO.borderDefault);

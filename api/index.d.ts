@@ -12,6 +12,9 @@ type TextTone = 'primary' | 'secondary' | 'muted' | 'inverse';
 
 type BorderTone = 'strong' | 'default' | 'subtle';
 
+type Hue = 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'cyan' | 'blue' | 'violet' | 'magenta' | 'pink';
+
+type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan'>;
 type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 type AccentToken = Emphasis | Intent | LegacyAccent;
@@ -51,6 +54,15 @@ type ThemeLevel = (typeof THEME_LEVELS)[number];
 
 type Polarity = 'dark' | 'light';
 
+declare const FIXED_COLOURS: {
+    readonly black: "#000000";
+    readonly white: "#ffffff";
+    readonly transparent: "transparent";
+};
+type FixedColour = keyof typeof FIXED_COLOURS;
+
+declare const PALETTE_HUES: readonly ["red", "orange", "yellow", "green", "teal", "cyan", "blue", "violet", "magenta", "pink"];
+
 interface LevelDefinition {
 
     readonly label: string;
@@ -62,6 +74,10 @@ interface LevelDefinition {
     readonly border: Readonly<Record<BorderTone, string>>;
     readonly accent: Readonly<Record<Emphasis, string>>;
     readonly intent: Readonly<Record<Intent, string>>;
+
+    readonly palette: Readonly<Record<Hue, string>>;
+
+    readonly paletteBright: Readonly<Record<Hue, string>>;
 
     readonly shadow: string;
 }
@@ -132,13 +148,16 @@ declare function composite(foreground: Rgb, backdrop: Rgb): Rgb;
 declare function relativeLuminance(color: Rgb): number;
 
 declare function contrastRatio(foreground: string, background: string): number;
-
 declare const MINIMUM_RATIO: {
     readonly text: 4.5;
 
     readonly textInverse: 4.5;
     readonly accent: 4.5;
     readonly intent: 4.5;
+
+    readonly palette: 5.5;
+
+    readonly paletteBright: 4.5;
     readonly borderStrong: 3;
     readonly borderDefault: 3;
     readonly borderSubtle: 1.4;
@@ -925,6 +944,7 @@ export {
   type AdminStatusBadge,
   AnchorHeading,
   type AnchorHeadingProps,
+  type AnsiHue,
   AsciiDivider,
   type AsciiDividerProps,
   Avatar,
@@ -990,10 +1010,13 @@ export {
   type ExperimentItem,
   ExperimentsView,
   type ExperimentsViewProps,
+  FIXED_COLOURS,
+  type FixedColour,
   Glyph,
   type GlyphProps,
   HEADING_EMPHASIS,
   type HeadingLevel,
+  type Hue,
   Input,
   type InputProps,
   type Intent,
@@ -1012,6 +1035,7 @@ export {
   type NerdIconProps,
   NoteBlock,
   type NoteBlockProps,
+  PALETTE_HUES,
   PageHeader,
   type PageHeaderAccent,
   type PageHeaderProps,

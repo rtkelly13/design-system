@@ -14,10 +14,15 @@
     },
     "./styles.css": "./dist/styles.css",
     "./theme.css": "./dist/theme.css",
-    "./prose.css": "./dist/prose.css"
+    "./prose.css": "./dist/prose.css",
+    "./tokens/midnight.tokens.json": "./tokens/palette.midnight.tokens.json",
+    "./tokens/dim.tokens.json": "./tokens/palette.dim.tokens.json",
+    "./tokens/bright.tokens.json": "./tokens/palette.bright.tokens.json",
+    "./tokens/white.tokens.json": "./tokens/palette.white.tokens.json"
   },
   "files": [
     "dist",
+    "tokens",
     "README.md",
     "LICENSE"
   ],
@@ -31,6 +36,8 @@
     "build": "pnpm tokens:build && tsup",
     "tokens:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs",
     "tokens:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-tokens.mjs --check",
+    "tokens:design": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-design-tokens.mjs",
+    "tokens:design:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-design-tokens.mjs --check",
     "check:contrast": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs",
     "contrast:report": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-contrast.mjs --report",
     "lint": "eslint src",
