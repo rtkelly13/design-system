@@ -79,9 +79,12 @@ The ratio between a foreground colour and a Declared background it is painted on
 `check:contrast` measures.
 
 **Separation**:
-The luma distance between two foreground colours that appear next to each other in real
-output. Distinct from Contrast because two colours can each read well against the ground
-and still be indistinguishable from one another. What `check:separation` measures.
+The perceptual distance between two foreground colours that appear next to each other in
+real output, measured as OKLab ΔE. Distinct from Contrast because two colours can each read
+well against the ground and still be indistinguishable from one another.
+_Not luma_: solving a set of hues to the same Contrast against the same ground equalises
+their luma by construction, so a luma test rates an entire palette as identical. See
+`docs/palette-provenance.md`.
 
 **Composited contrast**:
 The ratio between a foreground and a background that is itself translucent over another
