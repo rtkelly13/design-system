@@ -9,7 +9,6 @@ import {
   textVar,
   type Emphasis,
   type Intent,
-  type LegacyAccent,
 } from './theme';
 
 describe('accentVar', () => {
@@ -39,27 +38,7 @@ describe('accentVar', () => {
     expect(new Set(resolved).size).toBe(intents.length);
   });
 
-  // The migration promise in the docstring: renaming `cyan` to `primary` at a
-  // call site must be a no-op visually, or consumers cannot be moved off the
-  // deprecated names incrementally.
-  it.each([
-    ['cyan', 'primary'],
-    ['yellow', 'secondary'],
-    ['pink', 'tertiary'],
-  ] as const)('maps legacy %s to the same variable as %s', (legacy, semantic) => {
-    expect(accentVar(legacy)).toBe(accentVar(semantic));
-  });
 
-  it('maps legacy green onto the success intent', () => {
-    expect(accentVar('green')).toBe(accentVar('success'));
-  });
-
-  it('covers every legacy palette name', () => {
-    const legacy: LegacyAccent[] = ['cyan', 'pink', 'yellow', 'green'];
-    for (const name of legacy) {
-      expect(accentVar(name)).toMatch(/^var\(--ds-(accent|intent)-/);
-    }
-  });
 
   it('falls back to the supplied token when given undefined', () => {
     expect(accentVar(undefined, 'danger')).toBe('var(--ds-intent-danger)');

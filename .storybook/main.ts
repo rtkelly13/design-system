@@ -33,7 +33,14 @@ if (blogStorybookUrl) {
 }
 
 const config: StorybookConfig = {
-  stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  /**
+   * MDX is listed first because `Manifesto.mdx` is the landing page and the
+   * order here is the tiebreak the sidebar falls back on. `storySort` in
+   * `preview.ts` is what actually pins it, but a glob that never matched `.mdx`
+   * at all was the earlier state: an `.mdx` file added to `src/` was ignored
+   * silently, with no error and no sidebar entry.
+   */
+  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   addons: ['@storybook/addon-docs'],
   refs: REFS,
   framework: {

@@ -88,10 +88,9 @@ export type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magent
  */
 export type HueRef = Hue | 'neutral';
 
-export type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 /** Anything a component's `accent`-style prop will take. */
-export type AccentToken = Emphasis | Intent | LegacyAccent;
+export type AccentToken = Emphasis | Intent;
 
 const EMPHASIS_VARS: Record<Emphasis, string> = {
   primary: 'var(--ds-accent-primary)',
@@ -105,17 +104,6 @@ const INTENT_VARS: Record<Intent, string> = {
   success: 'var(--ds-intent-success)',
   warning: 'var(--ds-intent-warning)',
   danger: 'var(--ds-intent-danger)',
-};
-
-/**
- * Legacy palette names map onto the same variables their semantic counterparts
- * use, so migrating a call site is a rename with no visual diff.
- */
-const LEGACY_VARS: Record<LegacyAccent, string> = {
-  cyan: 'var(--ds-accent-primary)',
-  yellow: 'var(--ds-accent-secondary)',
-  pink: 'var(--ds-accent-tertiary)',
-  green: 'var(--ds-intent-success)',
 };
 
 const SURFACE_VARS: Record<Surface, string> = {
@@ -150,7 +138,6 @@ export function accentVar(token: AccentToken | undefined, fallback: AccentToken 
   return (
     EMPHASIS_VARS[resolved as Emphasis] ??
     INTENT_VARS[resolved as Intent] ??
-    LEGACY_VARS[resolved as LegacyAccent] ??
     EMPHASIS_VARS.primary
   );
 }

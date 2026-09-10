@@ -122,7 +122,7 @@ alias is still the wrong shape.
 ## 4. Contrast is arithmetic, and it is a gate
 
 Colour is the one axis with a machine-checkable definition of correct, so it is checked.
-`pnpm check:contrast` audits **440 pairs across both themes** on every build and fails CI.
+`pnpm check:contrast` audits **220 pairs — 110 per theme** on every build and fails CI, plus 24 selection devices and 16 Role→Hue agreement checks. The per-theme figure is the one to reason from: it is what a third theme would add.
 
 | | Floor | Why |
 |---|---|---|
@@ -161,7 +161,7 @@ the opposite of `midnight`. No gate can currently see this; it is tracked in #81
 
 | | |
 |---|---|
-| **Radius** | Zero. Everywhere. Non-negotiable — it is the most recognisable single property. |
+| **Radius** | Zero. Everywhere. Non-negotiable — it is the most recognisable single property. A *token* on the Medium axis, not a reset: `theme.css` redefines Tailwind's whole radius scale to it, so `rounded-lg` is square without this package reaching into your document. |
 | **Shadows** | Hard offsets, never blurred: `2px 2px 0`, `4px 4px 0`, `6px 6px 0`, in `--ds-shadow-color`. Per-role variants exist so a card can lift in its own accent without naming a hue. |
 | **Borders** | 2px is the load-bearing weight. Edges are drawn, not implied. |
 | **Glow** | `--shadow-glow-accent` exists and is for the neon surfaces only. Not for UI chrome. |
@@ -181,9 +181,27 @@ metrics, and a different fallback reflows the page.
 **The mono face is latin-only.** Box-drawing and block characters fall through to Symbols Nerd
 Font Mono — which is why ASCII art needs testing rather than assuming.
 
-**There is no type scale, spacing scale, motion or z-index in the token layer yet.** Tailwind
-silently supplies all of those for the web, so the gap is invisible there and total everywhere
-else — a 1080p video frame and a 16px page disagree about the scale. Tracked in #49 and #122.
+**Geometry and time are the second axis, and they are declared.** A Level varies colour and is
+picked at runtime; a **Medium** varies geometry and time and is picked at build time by which
+artifact is being emitted. There are three — `web` (CSS pixels, wall clock), `video` (a fixed
+1920×1080 frame, frame clock) and `graphic` (a fixed `viewBox`, no time base) — and no token
+varies on both axes.
+
+`theme.css` carries exactly one, the web Medium: `--ds-space-*`, `--ds-type-*`,
+`--ds-leading-*`, `--ds-weight-*`, `--ds-stroke-*`, `--ds-elev-*`, `--ds-radius-*`,
+`--ds-duration-*`, `--ds-ease`, `--ds-layer-*` and `--ds-focus-*`. The prefixes deliberately
+do not collide with the colour ones: `--ds-text-primary` is an ink, `--ds-type-body` is a size.
+
+`video` is **not** the web scaled — its type steps are its own, and its motion is measured in
+whole frames because a fractional frame lands a render mid-transition. See
+[`docs/adr/0004`](./docs/adr/0004-two-axes-level-and-medium.md).
+
+**The contrast floor is Medium-keyed too**, which is the part most easily got wrong: colour
+values do not vary by Medium, but the floors they must clear do. `pnpm check:contrast` defaults
+to the web floors; `--medium=video` and `--medium=graphic` enforce the stricter 7:1 frame floors
+and report **45 of 220 pairs below minimum**. That is deliberate, not a regression — no video or
+graphic artifact is emitted yet, and only the `web` run gates CI. If palette values ever move,
+those 45 are the number that moves first.
 
 ## 8. Voice
 

@@ -19,7 +19,7 @@ export const SystemHealth: Story = {
     changeType: 'positive',
     subtitle: '42 Nodes Healthy',
     icon: Activity,
-    accent: 'cyan',
+    accent: 'primary',
   },
 };
 
@@ -31,7 +31,7 @@ export const ComputeLatency: Story = {
     changeType: 'positive',
     subtitle: 'Sub-20ms SLA MET',
     icon: Cpu,
-    accent: 'pink',
+    accent: 'tertiary',
   },
 };
 
@@ -42,7 +42,7 @@ export const SecurityAudit: Story = {
     change: 'PASSED',
     changeType: 'positive',
     icon: ShieldCheck,
-    accent: 'green',
+    accent: 'success',
     subtitle: '0 Critical Alerts',
   },
 };

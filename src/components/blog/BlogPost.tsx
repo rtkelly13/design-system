@@ -71,7 +71,7 @@ export const BlogPost: React.FC<BlogPostProps> = ({
 
           <div style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
             {tags.map((t) => (
-              <Badge key={t} accent="cyan">
+              <Badge key={t} accent="primary">
                 #{t}
               </Badge>
             ))}

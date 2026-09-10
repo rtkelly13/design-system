@@ -22,7 +22,7 @@ export const DefaultDeck: Story = {
             Use [LEFT] / [RIGHT] Arrow Keys or Spacebar to Navigate
           </p>
           <div style={{ marginTop: '2rem' }}>
-            <Badge accent="green">FULLSCREEN SUPPORT (Press 'F')</Badge>
+            <Badge accent="success">FULLSCREEN SUPPORT (Press 'F')</Badge>
           </div>
         </div>
       </Slide>

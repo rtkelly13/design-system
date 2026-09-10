@@ -180,6 +180,20 @@ export const MINIMUM_RATIO = {
    * See `docs/palette-provenance.md` and #78.
    */
   palette: 5.5,
+  /**
+   * These numbers are the **web** Medium's, and that indexing is the point.
+   *
+   * ADR 0004 names this the asymmetry most likely to be got wrong later:
+   * *colour values do not vary by Medium, but the floors they must clear do.* A
+   * projected 1080p frame, a compression-damaged video and an unantialiased
+   * terminal cell are not the browser's legibility problem, and until now this
+   * was one set of numbers for every surface the system emits to.
+   *
+   * `MEDIA_DEFINITIONS[medium].contrastFloor` carries the per-Medium values;
+   * `auditContrast` takes a Medium and reads them. The constants here remain as
+   * the web Medium's, so nothing moves on merge and a caller that does not care
+   * about Media keeps working.
+   */
   /** `bright` Hues carry emphasis, not body text, so AA is the right bar. */
   paletteBright: 4.5,
   borderStrong: 3,
@@ -287,8 +301,29 @@ export function auditHueAgreement(
   return results;
 }
 
+/** The three floors a Medium supplies. See `MediumDefinition.contrastFloor`. */
+export interface ContrastFloor {
+  readonly role: number;
+  readonly hue: number;
+  readonly hueBright: number;
+}
+
+/** The web Medium's floors, restated so the default call is unchanged. */
+export const WEB_FLOOR: ContrastFloor = {
+  role: MINIMUM_RATIO.text,
+  hue: MINIMUM_RATIO.palette,
+  hueBright: MINIMUM_RATIO.paletteBright,
+};
+
 export function auditContrast(
   ladder: Readonly<Record<ThemeLevel, LevelDefinition>>,
+  /**
+   * The Medium's floors. Passed in rather than read from `media.ts`, because
+   * this module has to stay importable by `scripts/check-contrast.mjs`, and a
+   * runtime import there needs a `.ts` extension that `tsc` rejects. The script
+   * owns the Medium; this module owns the arithmetic.
+   */
+  floor: ContrastFloor = WEB_FLOOR,
 ): ContrastCheck[] {
   const results: ContrastCheck[] = [];
 
@@ -314,23 +349,23 @@ export function auditContrast(
 
     for (const [groundName, ground] of grounds) {
       for (const tone of ['primary', 'secondary', 'muted'] as const satisfies readonly TextTone[]) {
-        check(`text.${tone} on ${groundName}`, def.text[tone], ground, MINIMUM_RATIO.text);
+        check(`text.${tone} on ${groundName}`, def.text[tone], ground, floor.role);
       }
       for (const tone of ['primary', 'secondary', 'tertiary', 'quiet'] as const satisfies readonly Emphasis[]) {
-        check(`accent.${tone} on ${groundName}`, def.accent[tone], ground, MINIMUM_RATIO.accent);
+        check(`accent.${tone} on ${groundName}`, def.accent[tone], ground, floor.role);
       }
       for (const tone of ['info', 'success', 'warning', 'danger'] as const satisfies readonly Intent[]) {
-        check(`intent.${tone} on ${groundName}`, def.intent[tone], ground, MINIMUM_RATIO.intent);
+        check(`intent.${tone} on ${groundName}`, def.intent[tone], ground, floor.role);
       }
       // ADR 0001: gate `palette` once per Hue rather than once per Role that
       // consumes it. Separate the palette, not each of its consumers.
       for (const hue of PALETTE_HUES_ORDER) {
-        check(`palette.${hue} on ${groundName}`, def.palette[hue], ground, MINIMUM_RATIO.palette);
+        check(`palette.${hue} on ${groundName}`, def.palette[hue], ground, floor.hue);
         check(
           `palette.bright.${hue} on ${groundName}`,
           def.paletteBright[hue],
           ground,
-          MINIMUM_RATIO.paletteBright,
+          floor.hueBright,
         );
       }
       check(`border.strong on ${groundName}`, def.border.strong, ground, MINIMUM_RATIO.borderStrong);
@@ -345,7 +380,7 @@ export function auditContrast(
         `text.inverse on accent.${tone}`,
         def.text.inverse,
         def.accent[tone],
-        MINIMUM_RATIO.textInverse,
+        floor.role,
       );
     }
     for (const tone of ['info', 'success', 'warning', 'danger'] as const satisfies readonly Intent[]) {
@@ -353,7 +388,7 @@ export function auditContrast(
         `text.inverse on intent.${tone}`,
         def.text.inverse,
         def.intent[tone],
-        MINIMUM_RATIO.textInverse,
+        floor.role,
       );
     }
     // A scrim's job is to separate the dialog from the page behind it. Nothing
