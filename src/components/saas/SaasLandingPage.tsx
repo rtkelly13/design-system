@@ -285,8 +285,14 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
                       style={{
                         fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
                         fontSize: '0.85rem',
-                        color: 'var(--ds-text-primary)',
-                        opacity: 0.6,
+                        // `text.muted` at full strength, not `text.primary` dimmed.
+                        // An opacity on text is an undeclared colour: it moves the
+                        // foreground after `check:contrast` has read the pair, and
+                        // `text.primary` at 0.6 renders 3.98:1 on `sketch` against a
+                        // declared 13.63. `text.muted` is the role this was
+                        // approximating, and it is audited — 5.43:1 there, 5.90 on
+                        // `midnight`.
+                        color: 'var(--ds-text-muted)',
                       }}
                     >
                       {tier.period}
