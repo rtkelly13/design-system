@@ -58,35 +58,49 @@ export default defineConfig({
       //
       maxDiffPixels: 0,
 
-      // `threshold: 0` — and this number is measured, not chosen.
-      //
-      // The previous comment here said `threshold` was "deliberately absent
-      // rather than written out as its default of 0.2", and that it "still
-      // applies, absorbing sub-pixel anti-aliasing noise". Both true. What it
-      // understated is how much 0.2 absorbs.
+      // `threshold` is Playwright's default 0.2, written out rather than
+      // absent — because the absence read as "no allowance" and there is one,
+      // and because the alternative was measured and does not exist.
       //
       // `maxDiffPixels` bounds how many pixels may *count* as different;
       // `threshold` decides whether a pixel counts at all, as a normalised YIQ
-      // distance. So `maxDiffPixels: 0` read as zero tolerance and was not.
+      // distance. So the two are not the same knob and 0 on one does not imply
+      // 0 on the other.
       //
-      // Measured on the change that exposed it — `midnight`'s accent.tertiary
-      // moving #ec4899 -> #f955a4, a brand accent shifting across every
-      // component that draws it:
+      // ## Why not `threshold: 0`
       //
-      //   #ec4899 vs #f955a4   YIQ delta 0.0023   87x below the bar
-      //   #f955a4 vs #00ff00   YIQ delta 0.3784   caught
+      // Tried, on a branch, which is the only way to know. **21 snapshots
+      // failed on unchanged code**, from 10 differing pixels to 11,274. So
+      // anti-aliasing does produce differing pixels on a pinned Chromium — the
+      // comment this replaces was right to be wary of tightening it.
       //
-      // All 40 cases passed, including one whose baseline holds 36 pixels of
-      // the old value. A deliberate #00ff00 probe failed four, which is how the
-      // comparison was shown to be wired correctly rather than broken.
+      // ## Why no other number works either
       //
-      // At zero, a pixel counts as different if any channel differs at all.
-      // That is only sustainable because rendering is pinned to one Chromium
-      // build on one OS, which the determinism contract in
-      // `docs/visual-regression.md` already relies on for `maxDiffPixels: 0` —
-      // this makes the two settings agree instead of one quietly undoing the
-      // other. See #125.
-      threshold: 0,
+      // The interesting part. To catch a real regression — `midnight`'s
+      // accent.tertiary moving #ec4899 -> #f955a4, a brand accent shifting
+      // across every component that draws it — the threshold must be below
+      // **0.0023**. To absorb a 10% anti-aliasing shift on a high-contrast edge
+      // (neon green on near-black, ink on paper) it must be above **0.0042**.
+      //
+      // Those overlap. **No threshold separates anti-aliasing noise from a
+      // small colour change**, because an AA pixel on a high-contrast edge
+      // travels further in YIQ than a subtle recolour does. This is not a
+      // tuning problem with a better answer somewhere.
+      //
+      // ## What follows from that
+      //
+      // The visual suite is structurally unable to police colour, and must not
+      // be relied on for it. That is why `auditHueAgreement` in
+      // `src/theme/contrast.ts` exists as arithmetic and runs inside
+      // `check:contrast`: a Role drifting from its Hue is caught by comparing
+      // values, not by comparing pixels.
+      //
+      // The division of labour, stated so nobody re-litigates it: **arithmetic
+      // gates colour; this suite gates structure** — an element moving,
+      // disappearing, changing size, or a layout reflowing. It catches a large
+      // colour change too (a #00ff00 probe failed four snapshots), but that is
+      // a bonus and not the contract. See #125.
+      threshold: 0.2,
     },
   },
   use: {
