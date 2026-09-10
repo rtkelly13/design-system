@@ -16,11 +16,20 @@
     "./theme.css": "./dist/theme.css",
     "./prose.css": "./dist/prose.css",
     "./tokens/midnight.tokens.json": "./tokens/palette.midnight.tokens.json",
-    "./tokens/sketch.tokens.json": "./tokens/palette.sketch.tokens.json"
+    "./tokens/sketch.tokens.json": "./tokens/palette.sketch.tokens.json",
+    "./terminal/midnight.itermcolors": "./terminal/rtk-midnight.itermcolors",
+    "./terminal/midnight.windows-terminal.json": "./terminal/rtk-midnight.windows-terminal.json",
+    "./terminal/midnight.alacritty.toml": "./terminal/rtk-midnight.alacritty.toml",
+    "./terminal/midnight.ghostty.conf": "./terminal/rtk-midnight.ghostty.conf",
+    "./terminal/sketch.itermcolors": "./terminal/rtk-sketch.itermcolors",
+    "./terminal/sketch.windows-terminal.json": "./terminal/rtk-sketch.windows-terminal.json",
+    "./terminal/sketch.alacritty.toml": "./terminal/rtk-sketch.alacritty.toml",
+    "./terminal/sketch.ghostty.conf": "./terminal/rtk-sketch.ghostty.conf"
   },
   "files": [
     "dist",
     "tokens",
+    "terminal",
     "CHANGELOG.md",
     "README.md",
     "LICENSE"
@@ -66,7 +75,9 @@
     "check:fonts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-fonts.mjs",
     "check:fonts:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-fonts.mjs --list",
     "check:tokens": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs",
-    "check:tokens:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs --list"
+    "check:tokens:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs --list",
+    "ansi:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-ansi.mjs",
+    "ansi:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-ansi.mjs --check"
   },
   "publishConfig": {
     "access": "public"

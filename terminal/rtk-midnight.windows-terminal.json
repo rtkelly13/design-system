@@ -1,0 +1,23 @@
+{
+  "name": "RTK Midnight",
+  "background": "#0a0a1a",
+  "foreground": "#ffffff",
+  "cursorColor": "#22d3ee",
+  "selectionBackground": "#14142a",
+  "black": "#050510",
+  "red": "#ff586e",
+  "green": "#39ff14",
+  "yellow": "#facc15",
+  "blue": "#38bdf8",
+  "magenta": "#ff1cff",
+  "cyan": "#22d3ee",
+  "white": "#c3c3d4",
+  "brightBlack": "#14142a",
+  "brightRed": "#ff939b",
+  "brightGreen": "#c0ffb8",
+  "brightYellow": "#ffeaab",
+  "brightBlue": "#8cd7ff",
+  "brightMagenta": "#ff88fd",
+  "brightCyan": "#88ebff",
+  "brightWhite": "#ffffff"
+}
