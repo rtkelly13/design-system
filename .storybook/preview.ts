@@ -57,6 +57,21 @@ const preview: Preview = {
   ],
 
   parameters: {
+    /**
+     * The landing page is whichever entry sorts first, so the manifesto is
+     * pinned rather than left to the alphabet. Before this, Storybook opened on
+     * `SaaS/AdminDashboardLayout` — first by title, and the least
+     * system-shaped thing in the sidebar.
+     *
+     * Everything after the pinned entry keeps its existing order: `order` only
+     * constrains the titles it names, and an unlisted title sorts after them.
+     */
+    options: {
+      storySort: {
+        order: ['Manifesto', '*'],
+      },
+    },
+
     controls: {
       matchers: {
         color: /(background|color)$/i,
