@@ -104,6 +104,12 @@ const EXCLUDED = {
     'Sixteen slots from `ansiScheme`. `ansi:check` asserts slot coverage and diffs the committed terminal fixtures.',
   'manifesto--voice':
     'Composes PageTitle, Badge and BracketText, each asserted by its own baseline.',
+  'manifesto--graphic':
+    'An SVG palette card in `viewBox` units. Its colours are gated by `check:contrast --medium=graphic` and its layout is arithmetic over `MEDIA_DEFINITIONS.graphic`; a raster diff of vector output would churn on font metrics alone.',
+  'manifesto--motion':
+    'A transition. Its resting state is the only deterministic frame, and what the specimen exists to show — the durations — is exactly what a still cannot capture.',
+  'manifesto--usage':
+    'Code samples in `CodeTabs` and `CodeBlock`, both asserted by their own baselines (`codetabs-merged`, `codeblock-with-title-and-language`).',
 };
 
 /**

@@ -10,6 +10,9 @@ import {
   TypeSpecimen,
   MediumTable,
   AnsiTarget,
+  GraphicTarget,
+  MotionSpecimen,
+  UsageTabs,
   VoiceSpecimen,
 } from './manifesto';
 
@@ -59,3 +62,6 @@ export const Type: Story = { tags: ['!dev'], render: () => <TypeSpecimen /> };
 export const Media: Story = { tags: ['!dev'], render: () => <MediumTable /> };
 export const Ansi: Story = { tags: ['!dev'], render: () => <AnsiTarget /> };
 export const Voice: Story = { tags: ['!dev'], render: () => <VoiceSpecimen /> };
+export const Graphic: Story = { tags: ['!dev'], render: () => <GraphicTarget /> };
+export const Motion: Story = { tags: ['!dev'], render: () => <MotionSpecimen /> };
+export const Usage: Story = { tags: ['!dev'], render: () => <UsageTabs /> };

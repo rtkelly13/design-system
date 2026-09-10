@@ -169,6 +169,18 @@ problem.
   <Story of={Manifesto.Media} />
 </Specimen>
 
+Time is the half of a Medium that a table cannot show. The web Medium's three durations are
+below as a thing you can watch, driven by the shipped `--ds-duration-*` properties rather than
+by numbers copied out of `media.ts` — so if the emitted token and the declared Medium ever
+disagree, the specimen stops matching the figure printed beside it.
+
+<Specimen
+  label="three durations, and what video calls them instead"
+  caption="Triggered rather than looping: a specimen that animates on its own is one the screenshot walkthrough catches mid-transition."
+>
+  <Story of={Manifesto.Motion} />
+</Specimen>
+
 ## One origin, many targets
 
 This is what the Hue layer is for. A **Target** is anything the system emits to, and some Targets
@@ -188,6 +200,24 @@ go.
   <Story of={Manifesto.Ansi} />
 </Specimen>
 
+A second Target, and a different kind of one: a drawing has no runtime, so it cannot read a
+CSS variable either. It gets the same values through a fixed `viewBox`, laid out in the
+`graphic` Medium's own units — its border widths, its shadow offsets, its type steps. Nothing
+in the card below is a CSS pixel, which is why the full-width card and the thumbnail are the
+same drawing rather than two layouts.
+
+It is also where the Medium-keyed contrast floor stops being an abstraction. A diagram gets
+reproduced in print and at thumbnail size and cannot use motion to carry meaning, so `graphic`
+asks 7:1 of a Hue where `web` asks 5.5 — and the hues that miss it are marked from the live
+measurement.
+
+<Specimen
+  label="a palette card, in viewBox units"
+  caption="Laid out from MEDIA_DEFINITIONS.graphic. The offset shadow is a second rect rather than a filter: the mark is hard-edged in every Medium, and a blur is the first thing that would look wrong."
+>
+  <Story of={Manifesto.Graphic} />
+</Specimen>
+
 ## Voice
 
 Terse. Technical. Lowercase in code contexts, `UPPERCASE_SNAKE` for terminal-flavoured labels.
@@ -196,6 +226,20 @@ what happens: `PUBLISH`, then `PUBLISHED`.
 
 <Specimen label="voice, as controls" caption="The label is the specimen.">
   <Story of={Manifesto.Voice} />
+</Specimen>
+
+## Using it
+
+Two stylesheets and one provider. `styles.css` is the opinionated whole — tokens, the web
+fonts and the global resets; `theme.css` alone is the tokens and nothing else, for a consumer
+bringing its own. The inline init script matters more than it looks: it runs before first
+paint, so a reader who chose `sketch` never sees `midnight` flash and correct itself.
+
+<Specimen
+  label="getting the system into a project"
+  caption="Rendered by this package's own CodeTabs and CodeBlock — the docs surface documenting itself. Every path here is an entry in the package's exports map."
+>
+  <Story of={Manifesto.Usage} />
 </Specimen>
 
 ## If you are building on this

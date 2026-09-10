@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '../../components/ThemeProvider';
 import { Button } from '../../components/Button';
@@ -10,12 +10,14 @@ import { Divider } from '../../components/Divider';
 import { NoteBlock } from '../../components/NoteBlock';
 import { StatCard } from '../../components/StatCard';
 import { BracketText } from '../../components/BracketText';
+import { CodeTab, CodeTabs } from '../../components/docs/CodeTabs';
 import { PageTitle } from '../../components/PageTitle';
 import { LEVELS, PALETTE_HUES, THEME_LEVELS } from '../../theme/levels';
 import type { LevelDefinition, ThemeLevel } from '../../theme/levels';
 import { auditContrast, contrastRatio, MINIMUM_RATIO } from '../../theme/contrast';
 import { ANSI_SLOTS, ansiScheme } from '../../theme/ansi';
 import { MEDIA, MEDIA_DEFINITIONS } from '../../theme/media';
+import type { Medium } from '../../theme/media';
 import { semanticTokens } from '../../lib/theme';
 import type { Emphasis, HueRef, Intent, Surface } from '../../lib/theme';
 
@@ -228,6 +230,17 @@ export function HueLadder() {
  */
 const AUDIT = auditContrast(LEVELS);
 
+/**
+ * How many pairs miss a given Medium's floors. `web` clears all of them; `video`
+ * and `graphic` do not, deliberately — no artifact is emitted for either, and
+ * the numbers are here rather than in prose so they cannot quietly become wrong.
+ */
+function mediumFailures(medium: Medium): number {
+  return auditContrast(LEVELS, MEDIA_DEFINITIONS[medium].contrastFloor).filter(
+    (check) => !check.passes,
+  ).length;
+}
+
 export function ContrastGate() {
   const failures = AUDIT.filter((check) => !check.passes);
   const tightest = AUDIT.reduce((worst, check) =>
@@ -420,6 +433,18 @@ export function MediumTable() {
             <span className="mt-1 text-caption text-accent-secondary">
               {isCss ? 'carried by theme.css' : 'declared, not emitted'}
             </span>
+            {/* The asymmetry ADR 0004 calls the one most likely to be got wrong
+                later: colour values do not vary by Medium, but the floors they
+                must clear do. Measured here, per Medium, on the same ladder. */}
+            <span
+              className={
+                mediumFailures(medium) === 0 ? 'text-caption text-intent-success' : 'text-caption text-intent-warning'
+              }
+            >
+              {mediumFailures(medium) === 0
+                ? `${AUDIT.length}/${AUDIT.length} pairs clear`
+                : `${mediumFailures(medium)}/${AUDIT.length} pairs below floor`}
+            </span>
           </div>
         );
       })}
@@ -484,6 +509,297 @@ export function VoiceSpecimen() {
         Terse. Technical. Lowercase in code contexts, <code style={MONO}>UPPERCASE_SNAKE</code> for
         terminal-flavoured labels. No exclamation marks, no marketing adjectives, no
         &ldquo;seamlessly&rdquo;.
+      </NoteBlock>
+    </div>
+  );
+}
+
+/**
+ * Usage, in the docs surface's own components.
+ *
+ * The code here is the one part of the page that cannot be derived, so it is
+ * held to the next best thing: every path in it is an entry in `package.json`'s
+ * `exports` map, and every class name is one the token lint rule would accept.
+ */
+const INSTALL = `pnpm add @rtkelly13/design-system
+
+# Published to public npm from main via npm Trusted Publishing.
+# Node >=22, and pnpm is the package manager here.`;
+
+const MOUNT = `// One stylesheet, one import. \`styles.css\` is the opinionated whole;
+// \`theme.css\` alone is the tokens and nothing else, for a consumer
+// bringing its own resets and fonts.
+import '@rtkelly13/design-system/styles.css';
+
+import { ThemeProvider, getThemeInitScript } from '@rtkelly13/design-system';
+
+// The inline script runs before first paint, so the page never
+// flashes the default level and then corrects itself. React
+// cannot do this job — anything it renders is already too late.
+<script dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
+
+<ThemeProvider>
+  <App />
+</ThemeProvider>`;
+
+/*
+ * The counter-example is assembled rather than written out.
+ *
+ * `pnpm lint` scans this file like any other under `src/stories/**`, and a
+ * literal `bg-cyan-400` here is precisely the defect the token rule exists to
+ * catch — it failed the build on first write, which is the rule working. Naming
+ * the halves keeps the sample honest without silencing the gate to show it.
+ */
+const HUE_DEFECT = `bg-${'cyan'}-400 text-${'zinc'}-900`;
+
+const ROLES_CODE = `// Address the job, never the appearance.
+<article className="bg-surface-raised border-2 border-edge-strong p-6">
+  <h2 className="font-display uppercase text-content-primary">Title</h2>
+  <p className="text-content-secondary">Body copy.</p>
+  <span className="text-intent-danger">Something is wrong</span>
+</article>
+
+// A hue in component code is a defect. \`pnpm lint\` reports it
+// at the site that wrote it, and \`check:tokens\` gates it at 0.
+<div className="${HUE_DEFECT}" />  // ✗`;
+
+const TOKENS_CODE = `// Design Tokens Format Module 2025.10, for anything that
+// cannot read CSS — a diagram generator, an editor scheme.
+import midnight from '@rtkelly13/design-system/tokens/midnight.tokens.json';
+
+// Or take the terminal straight out of the box:
+//   @rtkelly13/design-system/terminal/midnight.ghostty.conf
+//   @rtkelly13/design-system/terminal/sketch.alacritty.toml`;
+
+export function UsageTabs() {
+  return (
+    <CodeTabs group="manifesto-usage" label="Getting the system into a project" accent="primary">
+      <CodeTab label="install" language="bash">
+        {INSTALL}
+      </CodeTab>
+      <CodeTab label="mount" language="tsx">
+        {MOUNT}
+      </CodeTab>
+      <CodeTab label="address roles" language="tsx">
+        {ROLES_CODE}
+      </CodeTab>
+      <CodeTab label="read tokens" language="ts">
+        {TOKENS_CODE}
+      </CodeTab>
+    </CodeTabs>
+  );
+}
+
+/**
+ * The `graphic` Medium, drawn.
+ *
+ * A palette card in a fixed `viewBox`, laid out entirely in
+ * `MEDIA_DEFINITIONS.graphic` units — its `borderWidth`, its `shadowOffset`, its
+ * type steps. Nothing here is a CSS pixel, which is the point: this Medium has
+ * no reflow and no time base, so the same drawing is the full-width card and the
+ * thumbnail beside it with no second layout.
+ *
+ * It also shows why the Medium's contrast floor is its own. A diagram is
+ * reproduced in print and at thumbnail size and cannot use motion to carry
+ * meaning, so `graphic` demands 7:1 of a Hue where `web` demands 5.5 — and the
+ * chips that do not clear it are marked from the live measurement rather than
+ * from a claim.
+ */
+const G = MEDIA_DEFINITIONS.graphic;
+
+/*
+ * Card geometry, entirely in this Medium's units.
+ *
+ * The width is solved rather than picked: a label is up to nine mono characters
+ * (`magenta !`) at the caption step, and a mono glyph is ~0.6em, so a chip needs
+ * ~9 * 0.6 * caption.size units or the labels collide — which they did at 200
+ * wide. The head block is laid out line by line for the same reason: folding it
+ * into one expression is what put the title's descenders through the subtitle.
+ */
+const COLS = 5;
+const PAD = G.spacing[6]!;
+const GAP = G.spacing[2]!;
+const LONGEST_LABEL = Math.max(...PALETTE_HUES.map((hue) => hue.length)) + 2;
+const CHIP_W = Math.ceil(LONGEST_LABEL * 0.6 * G.type.caption.size);
+const CHIP_H = G.spacing[6]!;
+const CARD_W = PAD * 2 + COLS * CHIP_W + GAP * (COLS - 1);
+const TITLE_BASE = PAD + G.type.title.size;
+const SUB_BASE = TITLE_BASE + G.type.caption.size + GAP;
+const HEAD_H = SUB_BASE + G.spacing[4]!;
+const ROW_H = CHIP_H + G.type.caption.size + GAP;
+
+function PaletteCard({ level, width }: { level: ThemeLevel; width: number | string }) {
+  const def = LEVELS[level];
+  const rows = Math.ceil(PALETTE_HUES.length / COLS);
+  const cardH = HEAD_H + rows * ROW_H + PAD;
+
+  return (
+    <svg
+      viewBox={`0 0 ${CARD_W + G.shadowOffset.lg} ${cardH + G.shadowOffset.lg}`}
+      width={width}
+      role="img"
+      aria-label={`${def.label} palette card, ${PALETTE_HUES.length} hues`}
+      style={{ display: 'block', maxWidth: '100%' }}
+    >
+      {/* The offset shadow is a second rect, not a filter — the mark is hard-edged
+          in every Medium, and a blur is the first thing to look wrong here. */}
+      <rect
+        x={G.shadowOffset.lg}
+        y={G.shadowOffset.lg}
+        width={CARD_W}
+        height={cardH}
+        fill={def.border.strong}
+      />
+      <rect
+        x={0}
+        y={0}
+        width={CARD_W}
+        height={cardH}
+        fill={def.surface.base}
+        stroke={def.border.strong}
+        strokeWidth={G.borderWidth.heavy}
+      />
+
+      <text
+        x={PAD}
+        y={TITLE_BASE}
+        fill={def.accent.primary}
+        style={{
+          fontFamily: semanticTokens.font.display,
+          fontSize: G.type.title.size,
+          fontWeight: G.weight.black,
+        }}
+      >
+        [ PALETTE ]
+      </text>
+      <text
+        x={PAD}
+        y={SUB_BASE}
+        fill={def.text.muted}
+        style={{ fontFamily: semanticTokens.font.mono, fontSize: G.type.caption.size }}
+      >
+        {def.label.toUpperCase()} · GRAPHIC MEDIUM · {G.unit.toUpperCase()} UNITS
+      </text>
+
+      {PALETTE_HUES.map((hue, index) => {
+        const x = PAD + (index % COLS) * (CHIP_W + GAP);
+        const y = HEAD_H + Math.floor(index / COLS) * ROW_H;
+        const clears = tightestRatio(def.palette[hue], def) >= G.contrastFloor.hue;
+        return (
+          <g key={hue}>
+            <rect
+              x={x}
+              y={y}
+              width={CHIP_W}
+              height={CHIP_H}
+              fill={def.palette[hue]}
+              stroke={def.border.strong}
+              strokeWidth={G.borderWidth.edge}
+            />
+            <text
+              x={x}
+              y={y + CHIP_H + G.type.caption.size}
+              fill={clears ? def.text.secondary : def.intent.warning}
+              style={{ fontFamily: semanticTokens.font.mono, fontSize: G.type.caption.size }}
+            >
+              {hue}
+              {clears ? '' : ' !'}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+export function GraphicTarget() {
+  return (
+    <LevelColumns
+      render={(level) => (
+        <div className="flex flex-col gap-4">
+          <PaletteCard level={level} width="100%" />
+          <div className="flex items-end gap-3">
+            <PaletteCard level={level} width={112} />
+            <span className="text-caption text-content-muted" style={MONO}>
+              the same drawing at 112px — no reflow, no second layout.
+              <br />! marks a hue below this Medium&apos;s {G.contrastFloor.hue}:1 floor.
+            </span>
+          </div>
+        </div>
+      )}
+    />
+  );
+}
+
+/**
+ * Motion, which is the other half of what a Medium varies.
+ *
+ * User-triggered rather than looping: a specimen that animates on its own is a
+ * specimen the screenshot walkthrough catches mid-transition. The durations are
+ * the shipped custom properties, not numbers copied out of `media.ts` — if the
+ * emitted token and the declared Medium ever disagree, this stops matching the
+ * figure printed beside it.
+ */
+const MOTION_STEPS = [
+  ['instant', 'var(--ds-duration-instant)'],
+  ['quick', 'var(--ds-duration-quick)'],
+  ['considered', 'var(--ds-duration-considered)'],
+] as const;
+
+const FRAME_RATE = 30;
+
+export function MotionSpecimen() {
+  const [shifted, setShifted] = useState(false);
+  const web = MEDIA_DEFINITIONS.web.motion;
+  const video = MEDIA_DEFINITIONS.video.motion;
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-3">
+        {MOTION_STEPS.map(([step, duration]) => (
+          <div key={step} className="flex items-center gap-4">
+            <span className="w-28 flex-none text-caption text-accent-primary uppercase" style={MONO}>
+              {step}
+            </span>
+            <div className="relative h-8 flex-1 border-2 border-edge-subtle bg-surface-sunken">
+              <div
+                className="absolute top-0 left-0 h-full w-8 border-2 border-edge-strong bg-accent-primary"
+                /*
+                 * `left` rather than a transform: the travel has to be the
+                 * track's width minus the chip's, and a transform's percentages
+                 * resolve against the chip — `translateX(100%)` moves it one
+                 * chip width and the specimen showed almost no motion at all.
+                 */
+                style={{
+                  left: shifted ? 'calc(100% - 2rem)' : '0',
+                  transitionProperty: 'left',
+                  transitionDuration: duration,
+                  transitionTimingFunction: 'var(--ds-ease)',
+                }}
+              />
+            </div>
+            <span className="w-40 flex-none text-caption text-content-muted" style={MONO}>
+              {web[step]}ms · {video[step]} {video[step] === 1 ? 'frame' : 'frames'}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <Button size="sm" bracketed onClick={() => setShifted((previous) => !previous)}>
+          {shifted ? 'RETURN' : 'RUN'}
+        </Button>
+        <span className="text-caption text-content-secondary" style={MONO}>
+          web easing {web.easing} · video easing {video.easing}
+        </span>
+      </div>
+
+      <NoteBlock type="note" title="WHY VIDEO COUNTS FRAMES">
+        A fractional frame lands a render mid-transition and the still is a smear, so the video
+        Medium&apos;s durations are whole frames — {video.quick} and {video.considered}, which at{' '}
+        {FRAME_RATE}fps is {Math.round((video.quick / FRAME_RATE) * 1000)}ms and{' '}
+        {Math.round((video.considered / FRAME_RATE) * 1000)}ms. Close to the web&apos;s numbers,
+        and deliberately not derived from them.
       </NoteBlock>
     </div>
   );

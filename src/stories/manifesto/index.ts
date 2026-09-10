@@ -13,5 +13,8 @@ export {
   TypeSpecimen,
   MediumTable,
   AnsiTarget,
+  GraphicTarget,
+  MotionSpecimen,
+  UsageTabs,
   VoiceSpecimen,
 } from './specimens';
