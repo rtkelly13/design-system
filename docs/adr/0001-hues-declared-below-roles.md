@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # Hues are declared below Roles, not derived from them
@@ -44,16 +44,14 @@ whatever happened to be closest. Hue → Role is a declared lookup; Role → Hue
   alive means a hue name with two meanings in one repo, one foundational and one deprecated,
   which is how a component ends up addressing the wrong one.
 
-  **This did not happen in 0.5.0, and the ADR said it would.** Recorded rather than quietly
-  amended, because the reason matters: the retirement is 49 call sites across component
-  source, and it belongs to #90 and #91, whose pull requests (#97, #98) sat unrebased under a
-  seven-deep stack while the Level collapse and the palette landed. `palette` shipped first
-  because it is additive and the retirement is not.
+  **Done in 0.6.0.** It slipped 0.5.0 — `palette` shipped first because it is additive and the
+  retirement is not — and the intervening release did carry both vocabularies claiming the same
+  four words. Removed outright rather than deprecated for a further minor: this package's only
+  consumers are in the same estate and migrate in the same change, so a compatibility window
+  between 0.x versions has no beneficiary.
 
-  The overlap is real but narrow while it lasts: `LegacyAccent` is a *Role* argument
-  (`<Avatar accent="cyan">`), `palette` is a *token namespace* (`--ds-palette-cyan`), and no
-  component reads the latter. The hazard is a reader assuming the two are connected, not a
-  wrong colour rendering. It should still be closed in `0.6.0`.
+  `brutalistTokens` and the `--color-brutalist-*` / `--color-black` / `--color-white` aliases
+  went with it. Nothing in the component API now names an appearance.
 - **A Hue in component code is a defect**, of exactly the kind #96 describes. `token-rules.mjs`
   already reports colour literals at the site that wrote them; it is the natural place for the
   rule, and the rule is what keeps this decision from decaying into the previous state.

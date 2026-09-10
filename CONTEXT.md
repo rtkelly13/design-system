@@ -4,6 +4,11 @@ The visual language for ryankelly.dev and its sibling applications: a set of col
 type decisions held in one TypeScript module, from which every consumable form — a
 stylesheet, an editor theme, a terminal scheme — is generated rather than written.
 
+This file defines each term in the vocabulary it defines, which is what a glossary is for and
+not much use as an introduction. If these read as jargon, start with
+[`docs/orientation.md`](./docs/orientation.md) — the same concepts in plain terms, with what
+each one is *for* — and come back here for the precise wording.
+
 ## Language
 
 ### Structure
@@ -14,6 +19,19 @@ One complete set of colour decisions, selected at runtime by a `data-theme` attr
 [`docs/adr/0003`](./docs/adr/0003-two-levels-independently-authored.md).
 _Avoid_: rung, tier, mode, variant
 
+**Medium**:
+The class of surface a token is measured *for* — a unit system and a time base. `web` (CSS
+pixels, wall clock), `video` (a fixed 1920×1080 frame, frame clock), `graphic` (a fixed
+`viewBox`, no time base). Selected at build time by which artifact is being emitted, never at
+runtime. Carries geometry and time; never colour.
+_Avoid_: platform (that is a Target), surface, format, output
+
+**Axis**:
+Which of the two orthogonal things a token varies on. A Level varies colour; a Medium varies
+geometry and time; **no token varies on both**, and one that varies on neither is _invariant_.
+The distinction is load-bearing: it is why `--ds-text-primary` (a colour, Level axis) and
+`--ds-type-body` (a size, Medium axis) do not share a prefix.
+
 **Polarity**:
 Whether a Level is fundamentally dark or light — a declared property *of* a Level, not the
 axis Levels hang off. `midnight` has Polarity `dark`; `sketch` has `light`. The two
@@ -21,6 +39,16 @@ vocabularies stay separate because neither Level is named for its Polarity, whic
 makes a third Level cheap and what keeps the `dark:`/`light:` variants meaningful alongside
 `midnight:`/`sketch:`.
 _Avoid_: mode, scheme
+
+**Medium**:
+The class of surface a token is measured *for*. It fixes the unit system — a CSS pixel, a
+video frame, a `viewBox` unit — and the time base — wall clock, frame clock, none. `web`,
+`video` and `graphic` are the three. Orthogonal to both Level and Polarity: a Level is
+selected at runtime and carries colour, a Medium is selected at build time and carries
+geometry and time. Developer themes are not a Medium — the host owns their geometry and their
+clock, so they consume colour only. See
+[`docs/adr/0004`](./docs/adr/0004-two-axes-level-and-medium.md).
+_Avoid_: surface (that is a Group), platform, context, output mode
 
 **Group**:
 A named record of colours inside a Level, gathering the ones that answer the same
@@ -45,6 +73,14 @@ target addresses when it has no notion of jobs. Declared once per Level and refe
 Roles; never addressed by a component.
 _Avoid_: palette name, colour name, raw colour
 
+**Categorical scale**:
+An *ordered sequence* of Hues, of which a caller takes the first N, chosen so that any two
+members read as different from each other rather than as steps of one hierarchy. What a chart,
+a diagram or an ASCII panel addresses. Ordered because the guarantee has to survive
+truncation: dropping members must not create a collision among the ones that remain. `chart` is
+the Group; unlike every other Group it is a sequence and not a record.
+_Avoid_: chart palette, series colours, qualitative palette
+
 **Slot**:
 A fixed, named position in a Target's format that must be filled for the output to be
 valid — one of a terminal's sixteen ANSI positions, one of VS Code's workbench keys.
@@ -54,8 +90,10 @@ Belongs to the Target, not to the Level.
 
 **Target**:
 A format some other tool consumes — Tailwind CSS, a Shiki theme, a VS Code colour theme,
-an iTerm2 scheme, a Neovim colorscheme.
-_Avoid_: platform, consumer, integration
+an iTerm2 scheme, a Neovim colorscheme. Distinct from a Medium and not a synonym for it: four
+Targets (VS Code, Zed, Shiki, a terminal) share one host geometry and declare no scale at all,
+while one Medium (`graphic`) is emitted to several formats.
+_Avoid_: platform, consumer, integration, medium
 
 **Emitter**:
 The script that writes one or more Targets from the Levels. `build-tokens.mjs` is the
@@ -94,6 +132,11 @@ well against the ground and still be indistinguishable from one another.
 _Not luma_: solving a set of hues to the same Contrast against the same ground equalises
 their luma by construction, so a luma test rates an entire palette as identical. See
 `docs/palette-provenance.md`.
+
+**Pairwise separation**:
+Separation measured across *every* pair of a set rather than across pairs someone has judged
+adjacent, and re-measured at every length the set may be truncated to. What a Categorical
+scale needs and what no current Gate has the shape of.
 
 **Composited contrast**:
 The ratio between a foreground and a background that is itself translucent over another

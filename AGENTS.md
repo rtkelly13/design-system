@@ -15,22 +15,30 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm tokens:design` | regenerate `tokens/palette.<level>.tokens.json` — the DTCG export |
 | `pnpm tokens:design:check` | fail if a token file is stale **or orphaned** |
 | `pnpm check:contrast` | every role pair on every level, as arithmetic |
+| `pnpm check:docs` | figures written in prose against the source they describe — `--list` for the census |
 | `pnpm check:api` | the built type surface against the committed `api/index.d.ts` |
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |
+| `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |
+| `pnpm ansi:check` | terminal slot coverage **and** the committed fixture diff |
 | `pnpm test:visual` | Playwright snapshots — **Linux only**, see [`docs/visual-regression.md`](./docs/visual-regression.md) |
 | `pnpm walkthrough` | screenshot every story on every level, for review rather than assertion |
 
 `pnpm lint` reports colour literals at the site that wrote them. `pnpm check:deps`,
 `pnpm check:css` and `pnpm check:fonts` are ratchets with stated budgets.
 
-## The two rules that are not discoverable
+## The three rules that are not discoverable
 
-Everything else here you can find by reading the code. These two you cannot, and both have
+Everything else here you can find by reading the code. These three you cannot, and each has
 cost real time:
 
 1. **`src/theme.css` is generated.** `src/theme/levels.ts` is the only place a level name or a
    level colour is written. Edit that, run `pnpm tokens:build`, commit both.
-2. **Colours are addressed by role, never by hue.** A component says `bg-surface-raised` or
+2. **A token varies by Level or by Medium, never both.** Colour varies by Level and is picked at
+   runtime; geometry and time vary by Medium and are picked at build time. `src/theme/media.ts`
+   is the second axis, `theme.css` carries only the `web` Medium, and the prefixes do not
+   overlap — `--ds-text-primary` is an ink, `--ds-type-body` is a size. See
+   [`docs/adr/0004-two-axes-level-and-medium.md`](./docs/adr/0004-two-axes-level-and-medium.md).
+3. **Colours are addressed by role, never by hue.** A component says `bg-surface-raised` or
    `text-intent-danger`, not `cyan`. See
    [`docs/adr/0001-hues-declared-below-roles.md`](./docs/adr/0001-hues-declared-below-roles.md)
    for why a hue layer exists anyway, and why components still may not touch it.
@@ -42,6 +50,7 @@ Load these when the task is in them, not before.
 | Topic | |
 |---|---|
 | **The brand outline — start here** | [`DESIGN.md`](./DESIGN.md) |
+| The vocabulary in plain terms, if the glossary reads as jargon | [`docs/orientation.md`](./docs/orientation.md) |
 | Domain vocabulary | [`CONTEXT.md`](./CONTEXT.md) |
 | Architectural decisions | [`docs/adr/`](./docs/adr/) |
 | Theming — the ladder, semantic roles, selection state | [`docs/theming.md`](./docs/theming.md) |

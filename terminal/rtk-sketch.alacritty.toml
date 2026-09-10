@@ -1,0 +1,33 @@
+# GENERATED from src/theme/ansi.ts — do not edit. Regenerate: pnpm ansi:build
+
+[colors.primary]
+background = "#f5f3ec"
+foreground = "#23262e"
+
+[colors.cursor]
+text = "#f5f3ec"
+cursor = "#1450d7"
+
+[colors.selection]
+text = "#23262e"
+background = "#ffffff"
+
+[colors.normal]
+black = "#23262e"
+red = "#bd0010"
+green = "#006b2e"
+yellow = "#705a00"
+blue = "#1450d7"
+magenta = "#a300ad"
+cyan = "#006675"
+white = "#efeadf"
+
+[colors.bright]
+black = "#33373f"
+red = "#8f002a"
+green = "#024f00"
+yellow = "#534200"
+blue = "#004e6d"
+magenta = "#7f0080"
+cyan = "#004b56"
+white = "#ffffff"

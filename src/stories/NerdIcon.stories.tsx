@@ -64,7 +64,7 @@ export const BracketedInUI: Story = {
           <NerdIcon name="terminal" accent="primary" className="mr-1.5" />
           DEPLOY REPLICA
         </Button>
-        <Button variant="pink" bracketed>
+        <Button variant="tertiary" bracketed>
           <NerdIcon name="trash" accent="danger" className="mr-1.5" />
           PURGE POD
         </Button>

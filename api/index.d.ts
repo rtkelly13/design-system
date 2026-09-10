@@ -17,9 +17,8 @@ type Hue = 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'cyan' | 'blue' | 'v
 type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan'>;
 
 type HueRef = Hue | 'neutral';
-type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
-type AccentToken = Emphasis | Intent | LegacyAccent;
+type AccentToken = Emphasis | Intent;
 
 declare function accentVar(token: AccentToken | undefined, fallback?: AccentToken): string;
 declare function surfaceVar(token?: Surface): string;
@@ -100,42 +99,57 @@ declare function nextLevel(level: ThemeLevel): ThemeLevel;
 
 declare function assertNever(value: never, message?: string): never;
 
-declare const brutalistTokens: {
-    readonly colors: {
-        readonly cyan: "var(--ds-accent-primary)";
-        readonly pink: "var(--ds-accent-tertiary)";
-        readonly yellow: "var(--ds-accent-secondary)";
-        readonly neonGreen: "var(--ds-intent-success)";
-        readonly neonCyan: "var(--ds-accent-primary)";
-        readonly cyberOrange: "var(--ds-accent-secondary)";
-        readonly darkBg: "var(--ds-surface-base)";
-        readonly black: "var(--ds-surface-base)";
-        readonly white: "var(--ds-text-primary)";
-    };
-    readonly fonts: {
-        readonly display: readonly ["var(--ds-font-display)"];
-        readonly sans: readonly ["var(--ds-font-body)"];
-        readonly mono: readonly ["var(--ds-font-mono)"];
-        readonly pixel: readonly ["var(--ds-font-pixel)"];
-    };
-    readonly shadows: {
-        readonly hardSm: "2px 2px 0px 0px var(--ds-shadow-color)";
-        readonly hardMd: "4px 4px 0px 0px var(--ds-shadow-color)";
-        readonly hardLg: "6px 6px 0px 0px var(--ds-shadow-color)";
-        readonly hardCyan: "4px 4px 0px 0px var(--ds-accent-primary)";
-        readonly hardPink: "4px 4px 0px 0px var(--ds-accent-tertiary)";
-        readonly hardYellow: "4px 4px 0px 0px var(--ds-accent-secondary)";
-        readonly glowCyan: "0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent)";
-        readonly glowPink: "0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent)";
-        readonly glowOrange: "0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent)";
-    };
-    readonly borders: {
-        readonly standard: "2px solid var(--ds-border-strong)";
-        readonly radius: "0px";
-    };
-};
-
 type BrutalistTheme = ThemeLevel;
+
+declare const MEDIA: readonly ["web", "video", "graphic"];
+type Medium = (typeof MEDIA)[number];
+
+declare const CSS_MEDIUM: Medium;
+
+interface TypeStep {
+    readonly size: number;
+    readonly lineHeight: number;
+}
+
+type TypeStepName = 'caption' | 'body' | 'lead' | 'title' | 'display' | 'hero';
+
+interface Motion {
+
+    readonly instant: number;
+    readonly quick: number;
+    readonly considered: number;
+
+    readonly easing: string;
+}
+
+interface MediumDefinition {
+    readonly label: string;
+    readonly description: string;
+
+    readonly unit: 'rem' | 'px' | 'viewBox';
+
+    readonly spacing: readonly number[];
+    readonly type: Readonly<Record<TypeStepName, TypeStep>>;
+
+    readonly weight: Readonly<Record<'regular' | 'bold' | 'black', number>>;
+
+    readonly borderWidth: Readonly<Record<'hairline' | 'edge' | 'heavy', number>>;
+
+    readonly shadowOffset: Readonly<Record<'sm' | 'md' | 'lg', number>>;
+
+    readonly radius: Readonly<Record<'none' | 'soft', number>>;
+    readonly motion: Motion;
+
+    readonly layer: Readonly<Record<'base' | 'raised' | 'overlay' | 'top', number>>;
+
+    readonly focusRing: Readonly<Record<'width' | 'offset', number>>;
+
+    readonly contrastFloor: Readonly<Record<'role' | 'hue' | 'hueBright', number>>;
+}
+
+declare const MEDIA_DEFINITIONS: Readonly<Record<Medium, MediumDefinition>>;
+
+declare function isMedium(value: unknown): value is Medium;
 
 interface Rgb {
     r: number;
@@ -194,7 +208,17 @@ interface ContrastCheck {
 }
 
 declare function auditHueAgreement(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): HueAgreementCheck[];
-declare function auditContrast(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): ContrastCheck[];
+
+interface ContrastFloor {
+    readonly role: number;
+    readonly hue: number;
+    readonly hueBright: number;
+}
+
+declare const WEB_FLOOR: ContrastFloor;
+declare function auditContrast(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>,
+
+floor?: ContrastFloor): ContrastCheck[];
 
 type SelectionDevice = 'fill' | 'edge' | 'surface pair';
 interface SelectionDeviceCheck {
@@ -211,6 +235,37 @@ interface SelectionDeviceCheck {
 }
 
 declare function auditSelectionDevices(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): SelectionDeviceCheck[];
+
+declare const ANSI_SLOTS: readonly ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "brightBlack", "brightRed", "brightGreen", "brightYellow", "brightBlue", "brightMagenta", "brightCyan", "brightWhite"];
+type AnsiSlot = (typeof ANSI_SLOTS)[number];
+
+type SlotSource = {
+    readonly kind: 'hue';
+    readonly hue: (typeof PALETTE_HUES)[number];
+    readonly bright: boolean;
+} | {
+    readonly kind: 'role';
+    readonly read: (level: LevelDefinition) => string;
+} | {
+    readonly kind: 'fixed';
+    readonly read: () => string;
+};
+
+declare const SLOTS: Readonly<Record<AnsiSlot, SlotSource>>;
+
+interface AnsiChrome {
+    readonly background: string;
+    readonly foreground: string;
+    readonly cursor: string;
+    readonly selectionBackground: string;
+}
+interface AnsiScheme {
+    readonly level: ThemeLevel;
+    readonly slots: Readonly<Record<AnsiSlot, string>>;
+    readonly chrome: AnsiChrome;
+}
+
+declare function ansiScheme(level: ThemeLevel): AnsiScheme;
 
 type ClassInput = string | number | null | undefined | false | ClassInput[];
 
@@ -248,11 +303,13 @@ declare function useActiveHeading(ids: readonly string[], { offset, enabled }?: 
 interface ButtonOwnProps {
     children: ReactNode;
 
-    variant?: 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
+    variant?: ButtonVariant;
     size?: 'sm' | 'md' | 'lg';
     bracketed?: boolean;
     className?: string;
 }
+
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'default';
 
 type ButtonElementProps = ButtonOwnProps & DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
     href?: never;
@@ -265,7 +322,6 @@ type ButtonProps = ButtonElementProps | ButtonLinkProps;
 
 declare function Button(props: ButtonProps): react.JSX.Element;
 
-type CardAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
     title?: string;
     description?: string;
@@ -296,7 +352,8 @@ interface AvatarProps extends react__default.HTMLAttributes<HTMLDivElement> {
     alt?: string;
     fallback?: string;
     size?: 'sm' | 'md' | 'lg';
-    accent?: 'cyan' | 'pink' | 'yellow' | 'green';
+
+    accent?: AccentToken;
 }
 declare const Avatar: react__default.FC<AvatarProps>;
 
@@ -308,7 +365,6 @@ interface PageTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 }
 declare function PageTitle({ children, subtitle, bracketed, className, ...props }: PageTitleProps): react.JSX.Element;
 
-type PageHeaderAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 interface PageHeaderProps {
 
     title: string;
@@ -327,7 +383,6 @@ interface PageHeaderProps {
 }
 declare function PageHeader({ title, subtitle, icon: Icon, accent, children, className, }: PageHeaderProps): react.JSX.Element;
 
-type TagAccent = 'yellow' | 'cyan' | 'pink' | 'green';
 interface TagProps {
 
     text: string;
@@ -665,7 +720,8 @@ interface PricingTier {
     period?: string;
     description: string;
     features: string[];
-    accent: 'cyan' | 'pink' | 'yellow' | 'green';
+
+    accent: 'primary' | 'secondary' | 'tertiary';
     highlighted?: boolean;
     ctaText?: string;
 }
@@ -692,7 +748,7 @@ declare const DEFAULT_ADMIN_NAV: AdminNavItem[];
 interface AdminStatusBadge {
     id: string;
     label: string;
-    accent?: 'green' | 'cyan' | 'pink' | 'yellow';
+    accent?: AccentToken;
     icon?: react__default.ReactNode;
 }
 
@@ -954,6 +1010,7 @@ declare const mdxComponents: {
 type MdxComponents = typeof mdxComponents;
 
 export {
+  ANSI_SLOTS,
   type AccentToken,
   AdminDashboardLayout,
   type AdminDashboardLayoutProps,
@@ -961,7 +1018,10 @@ export {
   type AdminStatusBadge,
   AnchorHeading,
   type AnchorHeadingProps,
+  type AnsiChrome,
   type AnsiHue,
+  type AnsiScheme,
+  type AnsiSlot,
   AsciiDivider,
   type AsciiDividerProps,
   Avatar,
@@ -980,8 +1040,9 @@ export {
   type ButtonElementProps,
   type ButtonLinkProps,
   type ButtonProps,
+  type ButtonVariant,
+  CSS_MEDIUM,
   Card,
-  type CardAccent,
   type CardProps,
   type ClassInput,
   CodeBlock,
@@ -994,6 +1055,7 @@ export {
   type CodeTabsVariant,
   type Column,
   type ContrastCheck,
+  type ContrastFloor,
   type Crumb,
   DEFAULT_ADMIN_NAV,
   DEFAULT_ADMIN_STATUS,
@@ -1040,14 +1102,18 @@ export {
   type InputProps,
   type Intent,
   LEVELS,
-  type LegacyAccent,
   type LevelDefinition,
   LoremIpsumPost,
   MAXIMUM_NEUTRAL_CHROMA,
+  MEDIA,
+  MEDIA_DEFINITIONS,
   MINIMUM_RATIO,
   type MdxComponents,
+  type Medium,
+  type MediumDefinition,
   Modal,
   type ModalProps,
+  type Motion,
   NERD_GLYPHS,
   NerdIcon,
   type NerdIconAccent,
@@ -1057,7 +1123,6 @@ export {
   type NoteBlockProps,
   PALETTE_HUES,
   PageHeader,
-  type PageHeaderAccent,
   type PageHeaderProps,
   PageTitle,
   type PageTitleProps,
@@ -1068,6 +1133,7 @@ export {
   Prose,
   type ProseProps,
   type Rgb,
+  SLOTS,
   SYSTEM_LEVEL,
   SaasLandingPage,
   type SaasLandingPageProps,
@@ -1103,7 +1169,6 @@ export {
   type TableOfContentsProps,
   TableRow,
   Tag,
-  type TagAccent,
   type TagProps,
   TextArea,
   type TextAreaProps,
@@ -1113,15 +1178,18 @@ export {
   ThemeProvider,
   type ThemeProviderProps,
   type TocEntry,
+  type TypeStep,
+  type TypeStepName,
   type UseActiveHeadingOptions,
   type UseCopyToClipboardResult,
+  WEB_FLOOR,
   accentVar,
+  ansiScheme,
   assertNever,
   auditContrast,
   auditHueAgreement,
   auditSelectionDevices,
   borderVar,
-  brutalistTokens,
   childrenToText,
   cn,
   collectHeadings,
@@ -1131,6 +1199,7 @@ export {
   fontVar,
   getThemeInitScript,
   isExternalHref,
+  isMedium,
   isThemeLevel,
   mdxComponents,
   nextLevel,

@@ -1,6 +1,6 @@
 {
   "name": "@rtkelly13/design-system",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Brutalist design system with a four-level theme ladder, slide deck system, and experiments foundation for Ryan Kelly websites",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -16,11 +16,20 @@
     "./theme.css": "./dist/theme.css",
     "./prose.css": "./dist/prose.css",
     "./tokens/midnight.tokens.json": "./tokens/palette.midnight.tokens.json",
-    "./tokens/sketch.tokens.json": "./tokens/palette.sketch.tokens.json"
+    "./tokens/sketch.tokens.json": "./tokens/palette.sketch.tokens.json",
+    "./terminal/midnight.itermcolors": "./terminal/rtk-midnight.itermcolors",
+    "./terminal/midnight.windows-terminal.json": "./terminal/rtk-midnight.windows-terminal.json",
+    "./terminal/midnight.alacritty.toml": "./terminal/rtk-midnight.alacritty.toml",
+    "./terminal/midnight.ghostty.conf": "./terminal/rtk-midnight.ghostty.conf",
+    "./terminal/sketch.itermcolors": "./terminal/rtk-sketch.itermcolors",
+    "./terminal/sketch.windows-terminal.json": "./terminal/rtk-sketch.windows-terminal.json",
+    "./terminal/sketch.alacritty.toml": "./terminal/rtk-sketch.alacritty.toml",
+    "./terminal/sketch.ghostty.conf": "./terminal/rtk-sketch.ghostty.conf"
   },
   "files": [
     "dist",
     "tokens",
+    "terminal",
     "CHANGELOG.md",
     "README.md",
     "LICENSE"
@@ -43,6 +52,8 @@
     "lint:fix": "eslint src --fix",
     "check:css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs",
     "check:css:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs --list",
+    "check:docs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-docs.mjs",
+    "check:docs:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-docs.mjs --list",
     "check:visual-coverage": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-visual-coverage.mjs",
     "check:visual-coverage:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-visual-coverage.mjs --list",
     "check:deps": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deps.mjs && knip --no-progress --include dependencies,unlisted,unresolved,duplicates",
@@ -64,7 +75,11 @@
     "check:api": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-api.mjs",
     "api:update": "pnpm build && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-api.mjs --update",
     "check:fonts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-fonts.mjs",
-    "check:fonts:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-fonts.mjs --list"
+    "check:fonts:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-fonts.mjs --list",
+    "check:tokens": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs",
+    "check:tokens:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-tokens.mjs --list",
+    "ansi:build": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-ansi.mjs",
+    "ansi:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build-ansi.mjs --check"
   },
   "publishConfig": {
     "access": "public"

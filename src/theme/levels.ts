@@ -38,9 +38,11 @@
  * hold at the light end — `border-subtle` at 28% is a visible hairline on
  * black and invisible on paper. Literals also make the ladder *checkable*:
  * `pnpm check:contrast` can compute every text-on-surface ratio without a
- * browser — 440 pairs across the pair, including every Hue against every
+ * browser — 220 pairs, 110 per Level, including every Hue against every
  * ground, which is what makes hand-tuned literals sustainable rather than
- * twenty times the manual review.
+ * twenty times the manual review. Stated per Level deliberately: 440 was
+ * written here in the commit that collapsed four Levels to two, so the total
+ * was stale the moment it was typed.
  *
  * The one exception is `surface.overlay`, which is a scrim and needs alpha.
  */
