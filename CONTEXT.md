@@ -4,6 +4,11 @@ The visual language for ryankelly.dev and its sibling applications: a set of col
 type decisions held in one TypeScript module, from which every consumable form — a
 stylesheet, an editor theme, a terminal scheme — is generated rather than written.
 
+This file defines each term in the vocabulary it defines, which is what a glossary is for and
+not much use as an introduction. If these read as jargon, start with
+[`docs/orientation.md`](./docs/orientation.md) — the same concepts in plain terms, with what
+each one is *for* — and come back here for the precise wording.
+
 ## Language
 
 ### Structure
