@@ -113,6 +113,14 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
   --font-sans: var(--ds-font-body);
@@ -259,6 +267,14 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
 }
@@ -359,6 +375,14 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
 }

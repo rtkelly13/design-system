@@ -27,6 +27,13 @@ its appearance any more.
 - CSS variables: `var(--brutalist-cyan)` → `var(--ds-accent-primary)`. Do not
   keep a hue-named fallback — it will be a dark value applied on a light theme.
 - `PageHeaderAccent`, `CardAccent`, `TagAccent` deleted; use `AccentToken`.
+- **Added** a glow per role — `--shadow-glow-accent-tertiary` and friends —
+  because the compat layer's `glow-cyan` / `glow-pink` / `glow-orange` had no
+  role-named equivalent. `shadow-glow-cyan` → `shadow-glow-accent-primary`,
+  `shadow-glow-pink` → `shadow-glow-accent-tertiary`,
+  `shadow-glow-orange` → `shadow-glow-accent-secondary`. Hard shadows were
+  already role-named; the glows being hue-only was a symptom of the layer being
+  removed.
 
 ## 0.5.0
 

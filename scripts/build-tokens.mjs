@@ -106,6 +106,21 @@ const ACCENT_ROLES = [
  * Deliberately 4px, matching `hard-md`: the palette-named three are 4px too, so
  * swapping one for the other cannot move a layout.
  */
+/**
+ * A glow per accent/intent role, matching `ROLE_SHADOWS`.
+ *
+ * There used to be exactly one glow (`--shadow-glow-accent`, pinned to
+ * `accent.primary`) plus three hue-named ones in the compat layer —
+ * `glow-cyan`, `glow-pink`, `glow-orange`. Removing the compat layer left a
+ * consumer with a pink glow and nowhere to put it, which is a gap rather than a
+ * migration: the asymmetry between hard shadows (role-named, complete) and
+ * glows (one role, three hues) was itself a symptom of the hue layer.
+ */
+const ROLE_GLOWS = ACCENT_ROLES.map(
+  (role) =>
+    `  --shadow-glow-${role}: 0 0 10px color-mix(in oklab, var(--ds-${role}) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-${role}) 30%, transparent);`,
+).join('\n');
+
 const ROLE_SHADOWS = ACCENT_ROLES.map(
   (role) => `  --shadow-hard-${role}: 4px 4px 0px 0px var(--ds-${role});`,
 ).join('\n');
@@ -157,6 +172,7 @@ const TAILWIND_ALIASES = `  --color-surface-base: var(--ds-surface-base);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
 ${ROLE_SHADOWS}
+${ROLE_GLOWS}
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);`;
 
 
