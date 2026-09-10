@@ -56,11 +56,37 @@ export default defineConfig({
       // grants the tall images a much larger budget — exactly backwards, since
       // the big compositions are where a small regression hides.
       //
-      // `threshold` is deliberately absent rather than written out as its
-      // default of 0.2. A default restated in config reads as a tuned value and
-      // invites tuning. It still applies, absorbing sub-pixel anti-aliasing
-      // noise; tightening it is a separate change worth measuring on its own.
       maxDiffPixels: 0,
+
+      // `threshold: 0` — and this number is measured, not chosen.
+      //
+      // The previous comment here said `threshold` was "deliberately absent
+      // rather than written out as its default of 0.2", and that it "still
+      // applies, absorbing sub-pixel anti-aliasing noise". Both true. What it
+      // understated is how much 0.2 absorbs.
+      //
+      // `maxDiffPixels` bounds how many pixels may *count* as different;
+      // `threshold` decides whether a pixel counts at all, as a normalised YIQ
+      // distance. So `maxDiffPixels: 0` read as zero tolerance and was not.
+      //
+      // Measured on the change that exposed it — `midnight`'s accent.tertiary
+      // moving #ec4899 -> #f955a4, a brand accent shifting across every
+      // component that draws it:
+      //
+      //   #ec4899 vs #f955a4   YIQ delta 0.0023   87x below the bar
+      //   #f955a4 vs #00ff00   YIQ delta 0.3784   caught
+      //
+      // All 40 cases passed, including one whose baseline holds 36 pixels of
+      // the old value. A deliberate #00ff00 probe failed four, which is how the
+      // comparison was shown to be wired correctly rather than broken.
+      //
+      // At zero, a pixel counts as different if any channel differs at all.
+      // That is only sustainable because rendering is pinned to one Chromium
+      // build on one OS, which the determinism contract in
+      // `docs/visual-regression.md` already relies on for `maxDiffPixels: 0` —
+      // this makes the two settings agree instead of one quietly undoing the
+      // other. See #125.
+      threshold: 0,
     },
   },
   use: {
