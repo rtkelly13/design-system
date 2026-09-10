@@ -15,6 +15,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm tokens:design` | regenerate `tokens/palette.<level>.tokens.json` — the DTCG export |
 | `pnpm tokens:design:check` | fail if a token file is stale **or orphaned** |
 | `pnpm check:contrast` | every role pair on every level, as arithmetic |
+| `pnpm check:docs` | figures written in prose against the source they describe — `--list` for the census |
 | `pnpm check:api` | the built type surface against the committed `api/index.d.ts` |
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |
