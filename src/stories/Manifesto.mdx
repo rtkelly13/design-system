@@ -1,0 +1,226 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  ManifestoPage,
+  Specimen,
+  FactRow,
+  LevelDiptych,
+  RoleLookup,
+  HueLadder,
+  ContrastGate,
+  SurfaceRamp,
+  FormSpecimen,
+  TypeSpecimen,
+  MediumTable,
+  AnsiTarget,
+  VoiceSpecimen,
+} from './manifesto';
+
+{/*
+  The landing page.
+
+  Unattached — no `of={}` — so it owns a top-level sidebar slot rather than
+  documenting one component, and `storySort` in `.storybook/preview.ts` pins it
+  first, which is what makes it the page Storybook opens on.
+
+  `sb-unstyled` is Storybook's own opt-out: every selector its docs typography
+  emits excludes that subtree. Without it the docs stylesheet and `prose-ladder`
+  both style the same bare `h2`, and Storybook's near-black-on-white wins on a
+  midnight ground. Inside it, this system's own `Prose` scope does the
+  typography — the page is set in the thing it documents.
+
+  Every specimen below reads `src/theme/levels.ts` at render time. Nothing is
+  transcribed from DESIGN.md, so a colour that changes shows up here as a
+  changed page rather than as prose that has quietly gone stale.
+*/}
+
+<Meta title="Manifesto" />
+
+<div className="sb-unstyled">
+<ManifestoPage>
+
+# Brutalist neon terminal
+
+Hard edges and no rounding at all. Offset shadows that sit beside an element rather than
+blurring under it. Monospace and condensed display type. Bracketed labels. High-chroma accents
+on a near-black ground, or ink on warm paper. It should read as a CRT and a drafting table, not
+as a SaaS dashboard.
+
+**What it is not:** soft shadows, gradients, rounded cards, Inter-on-white, an indigo accent,
+glassmorphism, emoji as section markers. If a generated design drifts toward any of those, it
+has regressed to the mean and is wrong.
+
+<Specimen
+  label="the system in one number set"
+  caption="Read from the ladder and the audit at render time, not quoted from a build log."
+>
+  <FactRow
+    facts={[
+      ['origin', 'src/theme/levels.ts — the only place a colour is written'],
+      ['levels', 'two, independently authored; neither derived from the other'],
+      ['roles', 'surface · text · border · accent · intent'],
+      ['hues', 'ten, declared beneath the roles and never addressed by a component'],
+      ['media', 'web · video · graphic — geometry and time, picked at build time'],
+      ['emitted', 'CSS custom properties · DTCG token files · sixteen ANSI slots'],
+    ]}
+  />
+</Specimen>
+
+## Two themes, not a light-and-dark pair
+
+There are exactly two, and neither is derived from the other. The levels are deliberately not
+named `dark` and `light`: `midnight` names a ground, `sketch` names a surface and a way of
+drawing on it, and neither is a synonym for its polarity. That keeps polarity a real declared
+property rather than something collapsed into the level name — which is what keeps a third level
+cheap to add.
+
+An inversion of neon-on-ink is neon-on-white, which is a third thing nobody wants. The two
+themes also have opposite tightest grounds, so no single transform produces one from the other.
+
+<Specimen
+  label="the pair, rendered against itself"
+  caption="The same components under two scoped providers. Nothing in this specimen names a level — both come from THEME_LEVELS, so a third rung would appear here untouched."
+>
+  <LevelDiptych />
+</Specimen>
+
+## Colour is addressed by job, never by appearance
+
+The single most important rule. A component says `bg-surface-raised` or `text-intent-danger`. It
+never says `cyan`. There are two vocabularies and they point one way: components address Roles,
+Roles declare which Hue they are, and a Hue in component code is a defect.
+
+The lookup is a real map, not a coincidence of shared hex. Deriving it by inspecting colour was
+rejected — ambiguous when two Roles share a value, lossy when no Hue sits on a Role's. So it is
+declared, and the contrast gate asserts the Role's value actually equals the Hue's. That
+assertion is the point: without it the two vocabularies drift silently, which this repo shipped
+for exactly one commit with two pinks 0.036 apart.
+
+<Specimen
+  label="roles → hues, as a declared lookup"
+  caption="Each row is a Role, its own value, and the Hue it declares. accent.quiet declares neutral — not a cop-out: some roles genuinely are not hues, and saying so keeps the map exhaustive."
+>
+  <RoleLookup />
+</Specimen>
+
+`accent` and `intent` are separate on purpose. Emphasis is not meaning: a red *accent* is a
+visual choice, a red *intent* says something is wrong.
+
+## Contrast is arithmetic, and it is a gate
+
+Colour is the one axis with a machine-checkable definition of correct, so it is checked on every
+build. The Hue floor sits above WCAG AA deliberately — an editor draws selection, diff and
+find-match backgrounds behind the same tokens, and a palette solved to exactly 4.5 has no room
+left to tint the ground.
+
+Separation is measured in OKLab ΔE, not luma. Solving a set of hues to the same contrast against
+one ground equalises their luma by construction, so a luma test rates the entire palette as
+identical.
+
+<Specimen
+  label="the gate, run in the browser"
+  caption="These counts come from calling auditContrast on the live ladder — the same arithmetic CI runs. The page cannot claim a pass the numbers do not give it."
+>
+  <ContrastGate />
+</Specimen>
+
+<Specimen
+  label="ten hues, and the contrast each actually holds"
+  caption="Base and bright, against the tightest of the three grounds its level offers. Ten is the ceiling, not a comfortable middle: the tightest pair already sits at ΔE 0.049, and an eleventh candidate was dropped for landing 13° from the measured blue."
+>
+  <HueLadder />
+</Specimen>
+
+## Background hierarchy
+
+Four grounds per level, each answering a different question. Not decoration.
+
+Two things are not obvious. **Elevation is carried by the shadow, not the background** — the
+light level's `base → raised` step is ΔE 0.037, barely visible on its own, and that is correct by
+idiom: a `6px 6px 0` offset and a 2px border do the work a subtle fill does in a soft design.
+And **the light scrim inverts which ink applies**, because the overlay composited over warm paper
+becomes a mid-grey on which the primary ink fails and the inverse ink passes.
+
+<Specimen label="four grounds, per level" caption="Ordered as declared. The overlay is the only value carrying alpha.">
+  <SurfaceRamp />
+</Specimen>
+
+## Form
+
+Radius is zero everywhere, and it is the most recognisable single property of the system. It is a
+*token* on the Medium axis rather than a reset, so a consumer cannot round a corner by reaching
+for a utility.
+
+<Specimen
+  label="hard offsets, 2px edges, zero radius"
+  caption="Three shadow steps read from the web Medium's own offsets. The fourth panel asks for rounded-lg and renders square."
+>
+  <FormSpecimen />
+</Specimen>
+
+## Type
+
+<Specimen
+  label="four roles, four stacks"
+  caption="Set in the actual faces, through the same font role variables a component resolves."
+>
+  <TypeSpecimen />
+</Specimen>
+
+## Geometry and time are the second axis
+
+A **Level** varies colour and is picked at runtime. A **Medium** varies geometry and time and is
+picked at build time by which artifact is being emitted. No token varies on both, and the
+prefixes do not collide: `--ds-text-primary` is an ink, `--ds-type-body` is a size.
+
+The contrast floor is Medium-keyed too, which is the part most easily got wrong: colour values do
+not vary by Medium, but the floors they must clear do. A projected 1080p frame, a
+compression-damaged video and an unantialiased terminal cell are not the browser's legibility
+problem.
+
+<Specimen
+  label="three media, one of them emitted"
+  caption="video is not the web scaled — its type steps are its own, and its motion is measured in whole frames because a fractional frame lands a render mid-transition."
+>
+  <MediumTable />
+</Specimen>
+
+## One origin, many targets
+
+This is what the Hue layer is for. A **Target** is anything the system emits to, and some Targets
+have no notion of jobs at all: a terminal has sixteen positions named by colour and no concept of
+a keyword. It cannot address a Role, so it addresses Hues — which is why they are declared
+beneath the Roles rather than left out.
+
+A slot is never a literal. A terminal's `black` is the darkest ground the theme *has*, because a
+cell painted true black inside a themed window reads as a hole; its `white` is the theme's ink.
+Only `brightWhite` reaches for the invariant, because "brighter than the ink" has nowhere else to
+go.
+
+<Specimen
+  label="sixteen ANSI slots, resolved from the same ladder"
+  caption="Rendered by ansiScheme — the same function that writes the four committed terminal configs for iTerm, Windows Terminal, Alacritty and Ghostty."
+>
+  <AnsiTarget />
+</Specimen>
+
+## Voice
+
+Terse. Technical. Lowercase in code contexts, `UPPERCASE_SNAKE` for terminal-flavoured labels.
+Bracketed section headings. No exclamation marks, no marketing adjectives. A control says exactly
+what happens: `PUBLISH`, then `PUBLISHED`.
+
+<Specimen label="voice, as controls" caption="The label is the specimen.">
+  <VoiceSpecimen />
+</Specimen>
+
+## If you are building on this
+
+1. Read the token files, not this prose, for values.
+2. Address Roles. If you find yourself writing a hue name in a component, stop.
+3. Zero radius, hard offset shadows, 2px borders.
+4. Both levels, always. Test `sketch`; it is the one that breaks.
+5. Never use pure black as a page ground.
+6. Contrast is a gate, not a guideline. If the check fails, the colour is wrong — not the gate.
+
+</ManifestoPage>
+</div>
