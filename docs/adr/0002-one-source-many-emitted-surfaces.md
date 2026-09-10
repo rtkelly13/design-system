@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # One source of colour decisions, many emitted surfaces

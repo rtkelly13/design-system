@@ -19,6 +19,19 @@ One complete set of colour decisions, selected at runtime by a `data-theme` attr
 [`docs/adr/0003`](./docs/adr/0003-two-levels-independently-authored.md).
 _Avoid_: rung, tier, mode, variant
 
+**Medium**:
+The class of surface a token is measured *for* — a unit system and a time base. `web` (CSS
+pixels, wall clock), `video` (a fixed 1920×1080 frame, frame clock), `graphic` (a fixed
+`viewBox`, no time base). Selected at build time by which artifact is being emitted, never at
+runtime. Carries geometry and time; never colour.
+_Avoid_: platform (that is a Target), surface, format, output
+
+**Axis**:
+Which of the two orthogonal things a token varies on. A Level varies colour; a Medium varies
+geometry and time; **no token varies on both**, and one that varies on neither is _invariant_.
+The distinction is load-bearing: it is why `--ds-text-primary` (a colour, Level axis) and
+`--ds-type-body` (a size, Medium axis) do not share a prefix.
+
 **Polarity**:
 Whether a Level is fundamentally dark or light — a declared property *of* a Level, not the
 axis Levels hang off. `midnight` has Polarity `dark`; `sketch` has `light`. The two
@@ -77,8 +90,10 @@ Belongs to the Target, not to the Level.
 
 **Target**:
 A format some other tool consumes — Tailwind CSS, a Shiki theme, a VS Code colour theme,
-an iTerm2 scheme, a Neovim colorscheme.
-_Avoid_: platform, consumer, integration
+an iTerm2 scheme, a Neovim colorscheme. Distinct from a Medium and not a synonym for it: four
+Targets (VS Code, Zed, Shiki, a terminal) share one host geometry and declare no scale at all,
+while one Medium (`graphic`) is emitted to several formats.
+_Avoid_: platform, consumer, integration, medium
 
 **Emitter**:
 The script that writes one or more Targets from the Levels. `build-tokens.mjs` is the

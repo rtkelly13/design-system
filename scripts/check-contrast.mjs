@@ -14,9 +14,17 @@
 
 import { auditContrast, auditHueAgreement, auditSelectionDevices } from '../src/theme/contrast.ts';
 import { LEVELS, THEME_LEVELS } from '../src/theme/levels.ts';
+import { CSS_MEDIUM, MEDIA_DEFINITIONS, isMedium } from '../src/theme/media.ts';
 
 const report = process.argv.includes('--report');
-const results = auditContrast(LEVELS);
+// Which Medium's floors to enforce. The gate defaults to `web` — the Medium
+// `theme.css` carries — and `--medium=video` audits the stricter frame floors.
+// ADR 0004: colour values do not vary by Medium, but the floors they clear do.
+const mediumArg = process.argv.find((a) => a.startsWith('--medium='))?.split('=')[1];
+const medium = isMedium(mediumArg) ? mediumArg : CSS_MEDIUM;
+const floor = MEDIA_DEFINITIONS[medium].contrastFloor;
+
+const results = auditContrast(LEVELS, floor);
 const failures = results.filter((r) => !r.passes);
 
 // The state rule: a selected tab is marked with an accent fill or edge, never
@@ -121,7 +129,7 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Contrast OK — ${results.length} pairs across ${THEME_LEVELS.length} levels, all at or above minimum; ` +
+  `Contrast OK (${medium}) — ${results.length} pairs across ${THEME_LEVELS.length} levels, all at or above minimum; ` +
     `${devices.length - surfacePairs.length} selection devices clear ${devices[0].minimum}:1; ` +
     `${agreement.length} Roles agree with their declared Hue.`,
 );

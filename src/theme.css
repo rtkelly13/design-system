@@ -152,6 +152,95 @@
 }
 
 /* ==========================================================================
+   The web Medium — geometry and time, level-independent
+   ==========================================================================
+
+   The second axis. A Level varies colour and is selected at runtime; a Medium
+   varies geometry and time and is selected at build time by which artifact is
+   being emitted. Neither varies on the other's axis, so none of this appears
+   inside a level block. See `docs/adr/0004-two-axes-level-and-medium.md`.
+
+   `video` and `graphic` are real Media with their own numbers — a 1080p
+   frame's type scale is not this one scaled — and they are emitted to their own
+   artifacts rather than to a selector here. */
+
+:root {
+  --ds-space-0: 0;
+  --ds-space-1: 0.25rem;
+  --ds-space-2: 0.5rem;
+  --ds-space-3: 0.75rem;
+  --ds-space-4: 1rem;
+  --ds-space-5: 1.5rem;
+  --ds-space-6: 2rem;
+  --ds-space-7: 3rem;
+  --ds-space-8: 4rem;
+  --ds-space-9: 6rem;
+  --ds-space-10: 8rem;
+  --ds-type-caption: 0.75rem;
+  --ds-leading-caption: 1.4;
+  --ds-type-body: 1rem;
+  --ds-leading-body: 1.6;
+  --ds-type-lead: 1.125rem;
+  --ds-leading-lead: 1.55;
+  --ds-type-title: 1.5rem;
+  --ds-leading-title: 1.2;
+  --ds-type-display: 2.25rem;
+  --ds-leading-display: 1.05;
+  --ds-type-hero: 3rem;
+  --ds-leading-hero: 0.95;
+  --ds-weight-regular: 400;
+  --ds-weight-bold: 700;
+  --ds-weight-black: 900;
+  --ds-stroke-hairline: 1px;
+  --ds-stroke-edge: 2px;
+  --ds-stroke-heavy: 4px;
+  --ds-elev-sm: 2px 2px 0px 0px;
+  --ds-elev-md: 4px 4px 0px 0px;
+  --ds-elev-lg: 6px 6px 0px 0px;
+  --ds-radius-none: 0px;
+  --ds-radius-soft: 0px;
+  --ds-duration-instant: 0ms;
+  --ds-duration-quick: 150ms;
+  --ds-duration-considered: 300ms;
+  --ds-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-layer-base: 0;
+  --ds-layer-raised: 10;
+  --ds-layer-overlay: 100;
+  --ds-layer-top: 1000;
+  --ds-focus-width: 2px;
+  --ds-focus-offset: 2px;
+}
+
+@theme {
+  --text-caption: var(--ds-type-caption);
+  --text-caption--line-height: var(--ds-leading-caption);
+  --text-body: var(--ds-type-body);
+  --text-body--line-height: var(--ds-leading-body);
+  --text-lead: var(--ds-type-lead);
+  --text-lead--line-height: var(--ds-leading-lead);
+  --text-title: var(--ds-type-title);
+  --text-title--line-height: var(--ds-leading-title);
+  --text-display: var(--ds-type-display);
+  --text-display--line-height: var(--ds-leading-display);
+  --text-hero: var(--ds-type-hero);
+  --text-hero--line-height: var(--ds-leading-hero);
+  --font-weight-regular: var(--ds-weight-regular);
+  --font-weight-bold: var(--ds-weight-bold);
+  --font-weight-black: var(--ds-weight-black);
+  --radius-none: var(--ds-radius-none);
+  --radius-soft: var(--ds-radius-soft);
+  --radius-xs: var(--ds-radius-none);
+  --radius-sm: var(--ds-radius-none);
+  --radius-md: var(--ds-radius-none);
+  --radius-lg: var(--ds-radius-none);
+  --radius-xl: var(--ds-radius-none);
+  --radius-2xl: var(--ds-radius-none);
+  --radius-3xl: var(--ds-radius-none);
+  --radius-4xl: var(--ds-radius-none);
+  --ease-brutalist: var(--ds-ease);
+}
+
+/* ==========================================================================
    Typography roles — level-independent
    ========================================================================== */
 

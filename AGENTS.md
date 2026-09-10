@@ -24,14 +24,19 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 `pnpm lint` reports colour literals at the site that wrote them. `pnpm check:deps`,
 `pnpm check:css` and `pnpm check:fonts` are ratchets with stated budgets.
 
-## The two rules that are not discoverable
+## The three rules that are not discoverable
 
-Everything else here you can find by reading the code. These two you cannot, and both have
+Everything else here you can find by reading the code. These three you cannot, and each has
 cost real time:
 
 1. **`src/theme.css` is generated.** `src/theme/levels.ts` is the only place a level name or a
    level colour is written. Edit that, run `pnpm tokens:build`, commit both.
-2. **Colours are addressed by role, never by hue.** A component says `bg-surface-raised` or
+2. **A token varies by Level or by Medium, never both.** Colour varies by Level and is picked at
+   runtime; geometry and time vary by Medium and are picked at build time. `src/theme/media.ts`
+   is the second axis, `theme.css` carries only the `web` Medium, and the prefixes do not
+   overlap — `--ds-text-primary` is an ink, `--ds-type-body` is a size. See
+   [`docs/adr/0004-two-axes-level-and-medium.md`](./docs/adr/0004-two-axes-level-and-medium.md).
+3. **Colours are addressed by role, never by hue.** A component says `bg-surface-raised` or
    `text-intent-danger`, not `cyan`. See
    [`docs/adr/0001-hues-declared-below-roles.md`](./docs/adr/0001-hues-declared-below-roles.md)
    for why a hue layer exists anyway, and why components still may not touch it.

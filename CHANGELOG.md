@@ -9,6 +9,27 @@ Proper release notes start at 1.0. Until then this file records only what a
 consumer has to *do*, newest first. The reasoning lives in the pull requests and
 in [`docs/adr/`](./docs/adr/).
 
+## Unreleased
+
+The second axis. Geometry and time are declared for the first time; ADRs 0001–0004 are accepted.
+
+- **`Medium`** — `web`, `video`, `graphic`. A unit system and a time base, chosen at build time
+  by which artifact is being emitted, where a Level is chosen at runtime. **No token varies on
+  both axes.** `src/theme/media.ts`.
+- `theme.css` carries exactly one Medium, `web`: `--ds-space-*`, `--ds-type-*`,
+  `--ds-leading-*`, `--ds-weight-*`, `--ds-stroke-*`, `--ds-elev-*`, `--ds-radius-*`,
+  `--ds-duration-*`, `--ds-ease`, `--ds-layer-*`, `--ds-focus-*`. 274 → 336 properties.
+- **Prefixes do not collide across axes.** `--ds-text-*` is ink and `--ds-type-*` is size;
+  `--ds-border-*` is colour and `--ds-stroke-*` is width. Renamed before shipping, not after.
+- **Radius is a token, not a reset.** `*, *::before, *::after { border-radius: 0 !important }`
+  is gone; Tailwind's whole radius scale is redefined to the Medium's value, so `rounded-lg` is
+  square without this package touching a consumer's document. Closes #54.
+- **The contrast floor is Medium-keyed.** `pnpm check:contrast` defaults to the web floors;
+  `--medium=video` enforces the stricter frame ones, which the current palette does **not**
+  clear — deliberately, since no video artifact is emitted yet.
+- `video` is not the web scaled: its type steps are its own and its motion is whole frames.
+  `graphic` has no time base at all.
+
 ## 0.6.0
 
 The hue vocabulary is gone from the component API. Nothing addresses a colour by
