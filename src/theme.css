@@ -102,9 +102,9 @@
   --color-palette-bright-violet: var(--ds-palette-bright-violet);
   --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
   --color-palette-bright-pink: var(--ds-palette-bright-pink);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-sm: var(--ds-elev-sm) var(--ds-shadow-color);
+  --shadow-hard-md: var(--ds-elev-md) var(--ds-shadow-color);
+  --shadow-hard-lg: var(--ds-elev-lg) var(--ds-shadow-color);
   --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
   --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
   --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
@@ -237,6 +237,13 @@
   --radius-2xl: var(--ds-radius-none);
   --radius-3xl: var(--ds-radius-none);
   --radius-4xl: var(--ds-radius-none);
+  --duration-instant: var(--ds-duration-instant);
+  --duration-quick: var(--ds-duration-quick);
+  --duration-considered: var(--ds-duration-considered);
+  --z-index-base: var(--ds-layer-base);
+  --z-index-raised: var(--ds-layer-raised);
+  --z-index-overlay: var(--ds-layer-overlay);
+  --z-index-top: var(--ds-layer-top);
   --ease-brutalist: var(--ds-ease);
 }
 
@@ -345,9 +352,9 @@
   --color-palette-bright-violet: var(--ds-palette-bright-violet);
   --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
   --color-palette-bright-pink: var(--ds-palette-bright-pink);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-sm: var(--ds-elev-sm) var(--ds-shadow-color);
+  --shadow-hard-md: var(--ds-elev-md) var(--ds-shadow-color);
+  --shadow-hard-lg: var(--ds-elev-lg) var(--ds-shadow-color);
   --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
   --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
   --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
@@ -453,9 +460,9 @@
   --color-palette-bright-violet: var(--ds-palette-bright-violet);
   --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
   --color-palette-bright-pink: var(--ds-palette-bright-pink);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-sm: var(--ds-elev-sm) var(--ds-shadow-color);
+  --shadow-hard-md: var(--ds-elev-md) var(--ds-shadow-color);
+  --shadow-hard-lg: var(--ds-elev-lg) var(--ds-shadow-color);
   --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
   --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
   --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
