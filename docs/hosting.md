@@ -27,6 +27,37 @@ shared stack declares only identity, domains and env vars. Repos own how they bu
 Storybook's asset preloading and yielding an empty preview pane. Storybook is one of
 the few static sites where clean URLs are actively wrong.
 
+### Cache policy — `immutable` needs a content hash in the name
+
+`vercel.json` marks `/assets/` immutable for a year, and that is right: Vite writes
+content hashes into those filenames, so `CodeBlock.stories-C4dJhlws.js` either is the
+byte-for-byte file the build produced or does not exist.
+
+`/sb-manager/` and `/sb-addons/` were marked the same way and must not be. Storybook
+writes those unhashed — `sb-manager/runtime.js`, `sb-addons/docs-1/manager-bundle.js` —
+so a year of `immutable` pins a visitor to whichever manager build they happened to load
+first, with no revalidation and no way to shift it. They are now
+`max-age=0, must-revalidate`: one conditional request each, a 304 in the ordinary case.
+
+Three things are deliberately left alone:
+
+- **`/assets/` stays immutable.** Hashed names, and this is where the bytes are.
+- **HTML needs nothing.** Vercel already serves `/` and `/iframe.html` as
+  `public, max-age=0, must-revalidate`, so the files that map story ids onto hashed
+  chunk names revalidate on their own. Worth checking rather than assuming — it is what
+  decides whether a stale chunk name can survive a reload.
+- **`/sb-common-assets/` stays immutable** even though those names carry no hash. It is
+  the Nunito Sans woff2 files and the favicon; a font's bytes do not change under a
+  fixed filename, and revalidating six of them on every load buys nothing.
+
+The failure this produces is worth recognising, because it reads as a broken build: a
+client holding an old chunk map asks for an `/assets/` filename that the current
+deployment never wrote, and Storybook reports `Failed to fetch dynamically imported
+module` with a configuration hint. Hashes differ per build, so any stale mapping 404s. A hard
+reload clears it. Note that a branch alias — `preview`, or a PR's own URL — repoints to
+each new deployment, so a tab left open across two pushes can hit this with no cache
+misconfiguration involved at all.
+
 `preview` is a long-lived branch, not a per-PR URL. A Vercel branch domain maps to
 exactly one branch; individual PRs still get their own generated `*.vercel.app` URLs.
 To promote work to the preview site, merge it into `preview`.
