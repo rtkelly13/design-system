@@ -5,6 +5,19 @@ export * from './tokens';
 // The theme ladder — the single source for level names, level colours, and the
 // contrast arithmetic that gates them.
 export * from './theme/levels';
+export {
+  MEDIA,
+  CSS_MEDIUM,
+  MEDIA_DEFINITIONS,
+  isMedium,
+} from './theme/media';
+export type {
+  Medium,
+  MediumDefinition,
+  TypeStep,
+  TypeStepName,
+  Motion,
+} from './theme/media';
 export * from './theme/contrast';
 
 // Semantic theming — prefer these over the raw palette in `tokens`.

@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # Two axes: a token varies by Level, or by Medium, and never by both

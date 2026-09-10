@@ -20,6 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { LEVELS, THEME_LEVELS, FIXED_COLOURS } from '../src/theme/levels.ts';
+import { CSS_MEDIUM, MEDIA_DEFINITIONS } from '../src/theme/media.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // Generated straight into the file consumers already import, rather than into a
@@ -202,6 +203,83 @@ function polarityVariant(levels) {
   return `&:where(${inside}):not(:where(${outside}, ${outside} *))`;
 }
 
+/**
+ * The web Medium's geometry and time, as `--ds-*` custom properties.
+ *
+ * On `:root` and **not** inside a level block, which is the whole point of the
+ * second axis: these do not vary by Level, so repeating them per level would
+ * author the same number twice for two Levels that must agree. Colour is the
+ * only thing the level blocks carry.
+ *
+ * Exactly one Medium reaches CSS, per ADR 0004. `video` and `graphic` are
+ * emitted to their own artifacts by their own Emitters — a Medium must never be
+ * selectable by an attribute the way a Level is.
+ */
+function mediumVariables(medium) {
+  const def = MEDIA_DEFINITIONS[medium];
+  const lines = [];
+  const push = (name, value) => lines.push(`  --ds-${name}: ${value};`);
+  const u = def.unit === 'rem' ? 'rem' : 'px';
+
+  def.spacing.forEach((step, i) => push(`space-${i}`, step === 0 ? '0' : `${step}${u}`));
+  for (const [name, step] of Object.entries(def.type)) {
+    // `type-`, not `text-`: `--ds-text-primary` is already a *colour* on the
+    // Level axis. Two axes sharing a prefix is exactly the conflation ADR 0004
+    // exists to prevent, and a reader seeing `--ds-text-body` next to
+    // `--ds-text-muted` has no way to tell a size from an ink.
+    push(`type-${name}`, `${step.size}${u}`);
+    push(`leading-${name}`, `${step.lineHeight}`);
+  }
+  for (const [name, value] of Object.entries(def.weight)) push(`weight-${name}`, `${value}`);
+  // `stroke-`, not `border-`: `--ds-border-strong` is a colour. Same reason.
+  for (const [name, value] of Object.entries(def.borderWidth)) push(`stroke-${name}`, `${value}px`);
+  for (const [name, value] of Object.entries(def.shadowOffset)) {
+    push(`elev-${name}`, `${value}px ${value}px 0px 0px`);
+  }
+  for (const [name, value] of Object.entries(def.radius)) push(`radius-${name}`, `${value}px`);
+  push('duration-instant', `${def.motion.instant}ms`);
+  push('duration-quick', `${def.motion.quick}ms`);
+  push('duration-considered', `${def.motion.considered}ms`);
+  push('ease', def.motion.easing);
+  for (const [name, value] of Object.entries(def.layer)) push(`layer-${name}`, `${value}`);
+  push('focus-width', `${def.focusRing.width}px`);
+  push('focus-offset', `${def.focusRing.offset}px`);
+
+  return lines.join('\n');
+}
+
+/** The same values under the names Tailwind emits utilities from. */
+function mediumTheme(medium) {
+  const def = MEDIA_DEFINITIONS[medium];
+  const lines = [];
+  for (const name of Object.keys(def.type)) {
+    lines.push(`  --text-${name}: var(--ds-type-${name});`);
+    lines.push(`  --text-${name}--line-height: var(--ds-leading-${name});`);
+  }
+  for (const name of Object.keys(def.weight)) {
+    lines.push(`  --font-weight-${name}: var(--ds-weight-${name});`);
+  }
+  for (const name of Object.keys(def.radius)) {
+    lines.push(`  --radius-${name}: var(--ds-radius-${name});`);
+  }
+  // Tailwind's own radius scale, overridden to this Medium's value.
+  //
+  // This is what replaces `*, *::before, *::after { border-radius: 0 !important }`
+  // (#54). That rule reached every element in a consumer's document, including
+  // markup this package has never heard of, and the only way out of it was a
+  // second `!important`. Redefining the scale instead means every `rounded-*`
+  // utility resolves to the Medium's radius while a consumer's own CSS is
+  // untouched — which is the difference between a token and a reset.
+  //
+  // `rounded-full` is deliberately not here: it does not read `--radius-*`, and
+  // a pill is a shape a caller asks for explicitly rather than one they inherit.
+  for (const name of ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl']) {
+    lines.push(`  --radius-${name}: var(--ds-radius-none);`);
+  }
+  lines.push('  --ease-brutalist: var(--ds-ease);');
+  return lines.join('\n');
+}
+
 function render() {
   const [firstLevel] = THEME_LEVELS;
   const byPolarity = (polarity) => THEME_LEVELS.filter((l) => LEVELS[l].polarity === polarity);
@@ -291,6 +369,28 @@ ${Object.entries(FIXED_COLOURS)
 ${Object.keys(FIXED_COLOURS)
   .map((key) => `  --color-fixed-${key}: var(--ds-fixed-${key});`)
   .join('\n')}
+}`);
+
+  sections.push(`
+/* ==========================================================================
+   The web Medium — geometry and time, level-independent
+   ==========================================================================
+
+   The second axis. A Level varies colour and is selected at runtime; a Medium
+   varies geometry and time and is selected at build time by which artifact is
+   being emitted. Neither varies on the other's axis, so none of this appears
+   inside a level block. See \`docs/adr/0004-two-axes-level-and-medium.md\`.
+
+   \`video\` and \`graphic\` are real Media with their own numbers — a 1080p
+   frame's type scale is not this one scaled — and they are emitted to their own
+   artifacts rather than to a selector here. */
+
+:root {
+${mediumVariables(CSS_MEDIUM)}
+}
+
+@theme {
+${mediumTheme(CSS_MEDIUM)}
 }`);
 
   sections.push(`

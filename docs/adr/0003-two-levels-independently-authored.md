@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # Two Levels, each independently authored, neither derived from the other

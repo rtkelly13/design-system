@@ -101,6 +101,56 @@ declare function assertNever(value: never, message?: string): never;
 
 type BrutalistTheme = ThemeLevel;
 
+declare const MEDIA: readonly ["web", "video", "graphic"];
+type Medium = (typeof MEDIA)[number];
+
+declare const CSS_MEDIUM: Medium;
+
+interface TypeStep {
+    readonly size: number;
+    readonly lineHeight: number;
+}
+
+type TypeStepName = 'caption' | 'body' | 'lead' | 'title' | 'display' | 'hero';
+
+interface Motion {
+
+    readonly instant: number;
+    readonly quick: number;
+    readonly considered: number;
+
+    readonly easing: string;
+}
+
+interface MediumDefinition {
+    readonly label: string;
+    readonly description: string;
+
+    readonly unit: 'rem' | 'px' | 'viewBox';
+
+    readonly spacing: readonly number[];
+    readonly type: Readonly<Record<TypeStepName, TypeStep>>;
+
+    readonly weight: Readonly<Record<'regular' | 'bold' | 'black', number>>;
+
+    readonly borderWidth: Readonly<Record<'hairline' | 'edge' | 'heavy', number>>;
+
+    readonly shadowOffset: Readonly<Record<'sm' | 'md' | 'lg', number>>;
+
+    readonly radius: Readonly<Record<'none' | 'soft', number>>;
+    readonly motion: Motion;
+
+    readonly layer: Readonly<Record<'base' | 'raised' | 'overlay' | 'top', number>>;
+
+    readonly focusRing: Readonly<Record<'width' | 'offset', number>>;
+
+    readonly contrastFloor: Readonly<Record<'role' | 'hue' | 'hueBright', number>>;
+}
+
+declare const MEDIA_DEFINITIONS: Readonly<Record<Medium, MediumDefinition>>;
+
+declare function isMedium(value: unknown): value is Medium;
+
 interface Rgb {
     r: number;
     g: number;
@@ -158,7 +208,17 @@ interface ContrastCheck {
 }
 
 declare function auditHueAgreement(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): HueAgreementCheck[];
-declare function auditContrast(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): ContrastCheck[];
+
+interface ContrastFloor {
+    readonly role: number;
+    readonly hue: number;
+    readonly hueBright: number;
+}
+
+declare const WEB_FLOOR: ContrastFloor;
+declare function auditContrast(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>,
+
+floor?: ContrastFloor): ContrastCheck[];
 
 type SelectionDevice = 'fill' | 'edge' | 'surface pair';
 interface SelectionDeviceCheck {
@@ -946,6 +1006,7 @@ export {
   type ButtonLinkProps,
   type ButtonProps,
   type ButtonVariant,
+  CSS_MEDIUM,
   Card,
   type CardProps,
   type ClassInput,
@@ -959,6 +1020,7 @@ export {
   type CodeTabsVariant,
   type Column,
   type ContrastCheck,
+  type ContrastFloor,
   type Crumb,
   DEFAULT_ADMIN_NAV,
   DEFAULT_ADMIN_STATUS,
@@ -1008,10 +1070,15 @@ export {
   type LevelDefinition,
   LoremIpsumPost,
   MAXIMUM_NEUTRAL_CHROMA,
+  MEDIA,
+  MEDIA_DEFINITIONS,
   MINIMUM_RATIO,
   type MdxComponents,
+  type Medium,
+  type MediumDefinition,
   Modal,
   type ModalProps,
+  type Motion,
   NERD_GLYPHS,
   NerdIcon,
   type NerdIconAccent,
@@ -1075,8 +1142,11 @@ export {
   ThemeProvider,
   type ThemeProviderProps,
   type TocEntry,
+  type TypeStep,
+  type TypeStepName,
   type UseActiveHeadingOptions,
   type UseCopyToClipboardResult,
+  WEB_FLOOR,
   accentVar,
   assertNever,
   auditContrast,
@@ -1092,6 +1162,7 @@ export {
   fontVar,
   getThemeInitScript,
   isExternalHref,
+  isMedium,
   isThemeLevel,
   mdxComponents,
   nextLevel,
