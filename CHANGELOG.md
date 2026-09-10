@@ -98,6 +98,31 @@ semantic one. **Breaking.** Migration is at the bottom.
   failed the required check even though apt reported having ignored it. Vendor source lists are
   removed before `install-deps` runs.
 
+### Deprecated
+
+- **`LegacyAccent` — the four hue names — now carries a real migration path and a gate.**
+  `cyan`, `yellow`, `pink` and `green` are `@deprecated` in favour of the Role they already
+  resolve to (`primary`, `secondary`, `tertiary`, `success`). Every call site in the package is
+  migrated, so **nothing renders differently** — the mapping is an exact equivalence, asserted
+  rather than assumed.
+
+  The reason they now mislead rather than merely being old: `palette` exists, so `cyan` is a
+  real and different thing, and on `sketch` the two diverge. `accent="cyan"` renders `#1450d7`
+  while `palette.cyan` is `#006675` — a component asking for cyan gets blue. `yellow` gets
+  green and `pink` gets red.
+- **`pnpm check:tokens` exists, at budget 0.** `build-tokens.mjs` has referenced this command
+  since the compat aliases were written — *"counts the remaining call sites; this block comes
+  out when that reaches zero"* — and it never existed, so that exit condition was
+  unmeasurable. It is now a CI gate, and the count is zero.
+- **`Button.variant` and `Avatar.accent` take the full Role set** (#90, #91). The hue names
+  stay as deprecated aliases resolving to the same constants, so same props produce same
+  pixels. `Avatar` also stops duplicating the resolution in a local `switch` — that duplicate
+  is how a role added to the token layer would have rendered as `primary` in one component and
+  correctly everywhere else.
+- **Three more accent-to-class maps removed** (#48). `SaasLandingPage`'s `ACCENT_COLORS` and
+  the narrow local `accent` unions in `AdminDashboardLayout` and `SaasLandingPage` now go
+  through `accentVar` and `AccentToken`.
+
 ### Known
 
 - **The visual gate does not catch small colour changes.** `maxDiffPixels: 0` bounds how many

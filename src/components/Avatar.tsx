@@ -1,3 +1,5 @@
+import { accentVar } from '../lib/theme';
+import type { AccentToken } from '../lib/theme';
 import React from 'react';
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -5,7 +7,19 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   alt?: string;
   fallback?: string;
   size?: 'sm' | 'md' | 'lg';
-  accent?: 'cyan' | 'pink' | 'yellow' | 'green';
+  /**
+   * Which accent draws the ring and the offset shadow.
+   *
+   * Roles are the vocabulary: `primary`, `secondary`, `tertiary`, `quiet`, and
+   * the four intents. The four hue names are **deprecated aliases** kept so
+   * existing call sites do not break — they resolve to exactly the role they
+   * always did, so nothing renders differently.
+   *
+   * The hue names also mislead now that `palette` exists. On `sketch`,
+   * `accent="cyan"` renders `#1450d7` — blue — because it was never asking for
+   * cyan, it was asking for the primary accent. Use the role.
+   */
+  accent?: AccentToken;
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -26,17 +40,13 @@ export const Avatar: React.FC<AvatarProps> = ({
     }
   };
 
-  const getAccentColor = () => {
-    switch (accent) {
-      case 'pink': return 'var(--ds-accent-tertiary)';
-      case 'yellow': return 'var(--ds-accent-secondary)';
-      case 'green': return 'var(--ds-intent-success)';
-      default: return 'var(--ds-accent-primary)';
-    }
-  };
+  // `accentVar` already owns the role and legacy-alias resolution, including
+  // the deprecated hue names. Duplicating it here as a switch is how the two
+  // drifted before: a role added to the token layer rendered as `primary` in
+  // this component and nowhere else, silently.
+  const accentColor = accentVar(accent);
 
   const sizePx = getSizePx();
-  const accentColor = getAccentColor();
 
   return (
     <div

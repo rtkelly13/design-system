@@ -15,7 +15,7 @@ export const DefaultInput: Story = {
     label: 'API Key',
     placeholder: 'sk-brutalist-...',
     helperText: 'Required for cloud SDK authentication',
-    accent: 'cyan',
+    accent: 'primary',
   },
 };
 
@@ -24,7 +24,7 @@ export const InputWithError: Story = {
     label: 'Workspace Domain',
     value: 'invalid-domain-name',
     error: 'Domain must end with .internal or .dev',
-    accent: 'pink',
+    accent: 'tertiary',
   },
 };
 

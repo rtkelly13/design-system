@@ -115,15 +115,15 @@ export const DesignSandbox: React.FC = () => {
               [ BADGES & BUTTON VARIANTS ]
             </h3>
             <div className="flex gap-3 flex-wrap mb-6">
-              <Badge accent="cyan">CYAN BADGE</Badge>
-              <Badge accent="pink">PINK BADGE</Badge>
-              <Badge accent="yellow">YELLOW BADGE</Badge>
-              <Badge accent="green">NEON GREEN</Badge>
+              <Badge accent="primary">CYAN BADGE</Badge>
+              <Badge accent="tertiary">PINK BADGE</Badge>
+              <Badge accent="secondary">YELLOW BADGE</Badge>
+              <Badge accent="success">NEON GREEN</Badge>
             </div>
             <div className="flex gap-3 flex-wrap">
-              <Button variant="cyan" bracketed>PRIMARY CYAN</Button>
-              <Button variant="pink" bracketed>ACCENT PINK</Button>
-              <Button variant="yellow" bracketed>WARNING YELLOW</Button>
+              <Button variant="primary" bracketed>PRIMARY CYAN</Button>
+              <Button variant="tertiary" bracketed>ACCENT PINK</Button>
+              <Button variant="secondary" bracketed>WARNING YELLOW</Button>
               <Button onClick={cycleLevel} bracketed>CYCLE LEVEL: {LEVELS[level].label.toUpperCase()}</Button>
             </div>
           </Card>
@@ -144,7 +144,7 @@ export const DesignSandbox: React.FC = () => {
                 ]}
               />
             </div>
-            <Button onClick={() => setIsModalOpen(true)} variant="yellow" bracketed size="sm">
+            <Button onClick={() => setIsModalOpen(true)} variant="secondary" bracketed size="sm">
               TRIGGER ACTION DIALOG
             </Button>
           </div>
@@ -174,10 +174,10 @@ export const DesignSandbox: React.FC = () => {
 
           {/* KPI Stat Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard title="SYSTEM HEALTH" value="99.98%" change="+0.04%" changeType="positive" icon={Activity} accent="cyan" subtitle="42 Nodes Healthy" />
-            <StatCard title="COMPUTE LATENCY" value="14.2 ms" change="-3.1 ms" changeType="positive" icon={Cpu} accent="pink" subtitle="Sub-20ms SLA MET" />
-            <StatCard title="SECURITY AUDIT" value="100%" change="PASSED" changeType="positive" icon={ShieldCheck} accent="green" subtitle="0 Critical Alerts" />
-            <StatCard title="EST. CLOUD COST" value="$2,410" change="+$120" changeType="negative" icon={DollarSign} accent="yellow" subtitle="Monthly Budget" />
+            <StatCard title="SYSTEM HEALTH" value="99.98%" change="+0.04%" changeType="positive" icon={Activity} accent="primary" subtitle="42 Nodes Healthy" />
+            <StatCard title="COMPUTE LATENCY" value="14.2 ms" change="-3.1 ms" changeType="positive" icon={Cpu} accent="tertiary" subtitle="Sub-20ms SLA MET" />
+            <StatCard title="SECURITY AUDIT" value="100%" change="PASSED" changeType="positive" icon={ShieldCheck} accent="success" subtitle="0 Critical Alerts" />
+            <StatCard title="EST. CLOUD COST" value="$2,410" change="+$120" changeType="negative" icon={DollarSign} accent="secondary" subtitle="Monthly Budget" />
           </div>
 
           {/* Data Table */}
@@ -210,32 +210,32 @@ export const DesignSandbox: React.FC = () => {
       {/* Tab 3: E-Commerce & Product Showcase */}
       {activeTab === 'ecommerce' && (
         <div className="flex flex-col gap-6">
-          <PageHeader title="BRUTALIST HARDWARE GEAR" subtitle="High-performance developer gear & edge modules" accent="pink" icon={ShoppingBag} />
+          <PageHeader title="BRUTALIST HARDWARE GEAR" subtitle="High-performance developer gear & edge modules" accent="tertiary" icon={ShoppingBag} />
 
           <div className="flex gap-2 flex-wrap mb-4">
-            <Tag text="ALL GEAR" accent="pink" />
-            <Tag text="EDGE NODES" accent="cyan" />
-            <Tag text="TERMINAL HARDWARE" accent="yellow" />
-            <Tag text="SECURITY KEYS" accent="green" />
+            <Tag text="ALL GEAR" accent="tertiary" />
+            <Tag text="EDGE NODES" accent="primary" />
+            <Tag text="TERMINAL HARDWARE" accent="secondary" />
+            <Tag text="SECURITY KEYS" accent="success" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card title="NEON TERMINAL DISPLAY" description="Ultra-wide 4K brutalist developer monitor with anti-glare matte coating." filename="hardware_display.spec">
               <div className="mt-4 flex justify-between items-center">
                 <span className="font-display text-2xl font-bold text-accent-primary">$899.00</span>
-                <Button variant="cyan" size="sm" bracketed>ADD TO CART</Button>
+                <Button variant="primary" size="sm" bracketed>ADD TO CART</Button>
               </div>
             </Card>
             <Card title="CYBERDECK MECHANICAL" description="Hotswappable mechanical keyboard with custom laser-engraved keycaps." filename="keyboard_v2.spec">
               <div className="mt-4 flex justify-between items-center">
                 <span className="font-display text-2xl font-bold text-accent-tertiary">$349.00</span>
-                <Button variant="pink" size="sm" bracketed>ADD TO CART</Button>
+                <Button variant="tertiary" size="sm" bracketed>ADD TO CART</Button>
               </div>
             </Card>
             <Card title="HSM HARDWARE TOKEN" description="FIPS 140-3 Level 4 physical cryptographic key with hardware destruction." filename="hsm_security.spec">
               <div className="mt-4 flex justify-between items-center">
                 <span className="font-display text-2xl font-bold text-accent-secondary">$199.00</span>
-                <Button variant="yellow" size="sm" bracketed>ADD TO CART</Button>
+                <Button variant="secondary" size="sm" bracketed>ADD TO CART</Button>
               </div>
             </Card>
           </div>
@@ -248,11 +248,11 @@ export const DesignSandbox: React.FC = () => {
           <SlideDeck>
             <Slide title="BUILDING SINGULAR DESIGN SURFACES">
               <p className="text-xl text-content-secondary font-mono mb-4">&gt; Dual-Mode Token Remappings across Dark, Dim, and Sketch.</p>
-              <Badge accent="cyan">REUSABLE ENGINE</Badge>
+              <Badge accent="primary">REUSABLE ENGINE</Badge>
             </Slide>
             <Slide title="ZERO TOKEN DRIFT PRINCIPLE">
               <p className="text-xl text-content-secondary font-mono mb-4">&gt; Every downstream app imports @rtkelly13/design-system/tailwind-preset.</p>
-              <Badge accent="pink">SINGLE SOURCE OF TRUTH</Badge>
+              <Badge accent="tertiary">SINGLE SOURCE OF TRUTH</Badge>
             </Slide>
           </SlideDeck>
         </div>

@@ -31,6 +31,6 @@ export const PinkAccent: Story = {
   args: {
     children: 'DELETE RECORD',
     bracketed: true,
-    variant: 'pink',
+    variant: 'tertiary',
   },
 };

@@ -1,4 +1,6 @@
 import React from 'react';
+import { accentVar } from '../../lib/theme';
+import type { AccentToken } from '../../lib/theme';
 import { ArrowRight, Check, Zap, Shield, Cpu } from 'lucide-react';
 import { PageTitle } from '../PageTitle';
 import { Card } from '../Card';
@@ -12,7 +14,7 @@ export interface PricingTier {
   period?: string;
   description: string;
   features: string[];
-  accent: 'cyan' | 'pink' | 'yellow' | 'green';
+  accent: AccentToken;
   highlighted?: boolean;
   ctaText?: string;
 }
@@ -33,7 +35,7 @@ export const DEFAULT_PRICING_TIERS: PricingTier[] = [
     period: '/month',
     description: 'Local-first storage and the core workflow, for a single user',
     features: ['Single Workspace', 'Local-First Storage', 'Core Workflow', 'Community Support'],
-    accent: 'cyan',
+    accent: 'primary',
     ctaText: 'START FREE'
   },
   {
@@ -42,7 +44,7 @@ export const DEFAULT_PRICING_TIERS: PricingTier[] = [
     period: '/month',
     description: 'Automation, scheduled jobs, and versioned backups',
     features: ['Everything in Starter', 'Automation Rules', 'Scheduled Jobs', 'Versioned Backups', 'Usage Analytics'],
-    accent: 'pink',
+    accent: 'tertiary',
     highlighted: true,
     ctaText: 'DEPLOY PRO ENGINE'
   },
@@ -52,7 +54,7 @@ export const DEFAULT_PRICING_TIERS: PricingTier[] = [
     period: '/month',
     description: 'Multi-workspace deployment, SSO, and a custom SLA',
     features: ['Unlimited Workspaces', 'SSO & Audit Log', 'Custom Design System Themes', 'Dedicated Support & SLAs', 'Self-Hosted Options'],
-    accent: 'yellow',
+    accent: 'secondary',
     ctaText: 'CONTACT SALES'
   }
 ];
@@ -69,12 +71,6 @@ export const DEFAULT_DEPLOY_LOG = `$ platform deploy --environment production
 [✓] Versioned backup written to ./backups/2026-01-01/
 [*] Surface ready! Server active on http://localhost:8000`;
 
-const ACCENT_COLORS: Record<string, string> = {
-  cyan: 'var(--ds-accent-primary)',
-  pink: 'var(--ds-accent-tertiary)',
-  yellow: 'var(--ds-accent-secondary)',
-  green: 'var(--ds-intent-success)',
-};
 
 export interface SaasLandingPageProps {
   title?: string;
@@ -102,7 +98,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
     >
       {/* ═══════════ 1. HERO SECTION ═══════════ */}
       <section style={{ textAlign: 'center', marginBottom: '4rem' }}>
-        <Badge accent="cyan" style={{ marginBottom: '1.5rem', display: 'inline-block' }}>
+        <Badge accent="primary" style={{ marginBottom: '1.5rem', display: 'inline-block' }}>
           ⚡ NEXT-GEN SAAS INFRASTRUCTURE
         </Badge>
 
@@ -111,7 +107,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
         </PageTitle>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem', marginTop: '2.5rem', flexWrap: 'wrap' }}>
-          <Button variant="pink" bracketed size="lg">
+          <Button variant="tertiary" bracketed size="lg">
             LAUNCH APPLICATION <ArrowRight size={18} />
           </Button>
           <Button variant="default" bracketed size="lg">
@@ -193,9 +189,9 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
           }}
         >
           {[
-            { title: 'REAL-TIME SYNC', accent: 'cyan' as const, icon: <Cpu size={28} style={{ color: ACCENT_COLORS.cyan }} />, desc: 'Automatic delta reconciliation between live banking APIs and local single-player SQLite databases.' },
-            { title: 'RULE ENGINE', accent: 'pink' as const, icon: <Zap size={28} style={{ color: ACCENT_COLORS.pink }} />, desc: 'Custom automated regex & payee matching rules to categorize statement imports effortlessly.' },
-            { title: 'DRIVE BACKUPS', accent: 'yellow' as const, icon: <Shield size={28} style={{ color: ACCENT_COLORS.yellow }} />, desc: 'Periodic, atomic SQLite file backups synced directly to Google Drive without external vendor lock-in.' },
+            { title: 'REAL-TIME SYNC', accent: 'primary' as const, icon: <Cpu size={28} style={{ color: accentVar('primary') }} />, desc: 'Automatic delta reconciliation between live banking APIs and local single-player SQLite databases.' },
+            { title: 'RULE ENGINE', accent: 'tertiary' as const, icon: <Zap size={28} style={{ color: accentVar('tertiary') }} />, desc: 'Custom automated regex & payee matching rules to categorize statement imports effortlessly.' },
+            { title: 'DRIVE BACKUPS', accent: 'secondary' as const, icon: <Shield size={28} style={{ color: accentVar('secondary') }} />, desc: 'Periodic, atomic SQLite file backups synced directly to Google Drive without external vendor lock-in.' },
           ].map((feature) => (
             <Card key={feature.title} panel accent={feature.accent} title={feature.title}>
               <div style={{ marginTop: '0.5rem' }}>
@@ -274,7 +270,7 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
                       fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
                       fontSize: '3rem',
                       fontWeight: 900,
-                      color: ACCENT_COLORS[tier.accent],
+                      color: accentVar(tier.accent),
                     }}
                   >
                     {tier.price}
