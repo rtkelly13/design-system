@@ -7,6 +7,25 @@ context-driven development, built around the blog's `<Terminal>` component;
 the broader aim is product/explainer videos that look like the rest of the
 estate rather than like a different company made them.
 
+> [!NOTE]
+> **Measured on `ed94dcd` (25 August 2026). Two of its findings have since been fixed,
+> and the ladder has changed.** Recorded as written rather than re-derived, because the
+> document's value is the reasoning that produced those fixes — but read it with these
+> in mind.
+>
+> - **§1, `SlideDeck` owning the presenter's clock — fixed.** Filed as #70, landed as
+>   #72: the deck takes a `slide` prop and `onSlideChange`, and `chrome={false}` drops
+>   the control bar, keyboard listener and fullscreen. The specific complaint that a deck
+>   "could not be screenshotted at a chosen slide" no longer holds.
+> - **§1, `speakerNotes` "it never renders" — fixed.** Filed as #94, landed as #101:
+>   `SlideDeck` reads notes off its children and shows the current slide's in a panel,
+>   toggled with `N`, off by default.
+> - **The ladder is two rungs, not four.** #123 collapsed it to `midnight` + `sketch`,
+>   so "all four rungs" in §5 now means both.
+>
+> **#71 — nothing documents deterministic rendering (§2, §3, §4) — is still open**, and
+> is the live half of this document.
+
 The existing audits ask different questions and are not re-litigated here:
 
 - [`docs/evaluation.md`](./evaluation.md) — the package as a *system*.
