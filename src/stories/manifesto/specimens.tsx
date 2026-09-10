@@ -32,6 +32,36 @@ import type { Emphasis, HueRef, Intent, Surface } from '../../lib/theme';
 const MONO = { fontFamily: semanticTokens.font.mono } as const;
 const DISPLAY = { fontFamily: semanticTokens.font.display } as const;
 
+/**
+ * The orientation block. Kept here rather than in the MDX so it is a story like
+ * every other specimen, and so the vocabulary it lists stays next to the code
+ * that reads it.
+ */
+export function SystemFacts() {
+  return (
+    <dl
+      className="grid gap-x-6 gap-y-2 sm:grid-cols-[max-content_1fr]"
+      style={MONO}
+    >
+      {(
+        [
+          ['origin', 'src/theme/levels.ts — the only place a colour is written'],
+          ['levels', `${THEME_LEVELS.length}, independently authored; neither derived from the other`],
+          ['roles', 'surface · text · border · accent · intent'],
+          ['hues', `${PALETTE_HUES.length}, declared beneath the roles and never addressed by a component`],
+          ['media', `${MEDIA.join(' · ')} — geometry and time, picked at build time`],
+          ['emitted', 'CSS custom properties · DTCG token files · sixteen ANSI slots'],
+        ] as const
+      ).map(([key, value]) => (
+        <div key={key} className="contents">
+          <dt className="text-caption tracking-[0.1em] text-accent-primary uppercase">{key}</dt>
+          <dd className="text-caption text-content-secondary">{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 /** A hue's real floor is the tightest of the three grounds it may sit on. */
 function tightestRatio(colour: string, def: LevelDefinition): number {
   return Math.min(

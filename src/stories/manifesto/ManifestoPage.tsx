@@ -1,38 +1,27 @@
 import type { ReactNode } from 'react';
-import { ThemeProvider, useTheme } from '../../components/ThemeProvider';
-import { Button } from '../../components/Button';
-import { BracketText } from '../../components/BracketText';
 import { Prose } from '../../components/docs/Prose';
-import { LEVELS } from '../../theme/levels';
+import { BracketText } from '../../components/BracketText';
 import { semanticTokens } from '../../lib/theme';
 
 /**
  * The frame the manifesto renders inside.
  *
- * ## Why this mounts its own provider
+ * ## Where the level comes from
  *
- * Storybook's `decorators` wrap *stories*, not the body of an unattached docs
- * page. The `level` toolbar therefore cannot reach this page — nothing on it is
- * a story, so `.storybook/preview.ts`'s decorator never runs and no
- * `data-theme` lands on the iframe's `<html>`. Rather than render at whatever
- * `:root` happens to default to, the page carries a `scoped` provider and its
- * own switch, which is also the honest demonstration: this is the API a
- * consumer mounts, driven by the hook a consumer calls.
+ * The toolbar's `Level` control, and nothing here. That is worth stating because
+ * this page carried its own switch first, and the reason it could is the reason
+ * it should not: Storybook's decorators wrap *stories*, so a docs page with no
+ * story on it is a page the toolbar cannot reach, and a second switch was the
+ * obvious way out.
  *
- * `persist` is off for the same reason the preview decorator turns it off — a
- * documentation surface must not write the reader's stored site preference.
+ * The real fix is that the specimens are stories — see `Manifesto.stories.tsx`.
+ * `.storybook/preview.ts` sets `data-theme` on the preview iframe's own `<html>`
+ * rather than on the story subtree, so one rendered story themes the entire
+ * document, this frame and the surrounding prose included. Every colour below
+ * resolves through those variables, so there is nothing left for a provider here
+ * to do.
  */
 export function ManifestoPage({ children }: { children: ReactNode }) {
-  return (
-    <ThemeProvider scoped defaultLevel="midnight" persist={false} followSystem={false}>
-      <Frame>{children}</Frame>
-    </ThemeProvider>
-  );
-}
-
-function Frame({ children }: { children: ReactNode }) {
-  const { level, levels, setLevel } = useTheme();
-
   return (
     <div
       className="border-2 border-edge-strong bg-surface-base p-6 text-content-primary sm:p-10"
@@ -45,26 +34,12 @@ function Frame({ children }: { children: ReactNode }) {
         >
           @rtkelly13/design-system
         </span>
-        <div className="flex items-center gap-2">
-          <span
-            className="text-caption tracking-[0.16em] text-content-muted uppercase"
-            style={{ fontFamily: semanticTokens.font.mono }}
-          >
-            level
-          </span>
-          {levels.map((candidate) => (
-            <Button
-              key={candidate}
-              size="sm"
-              bracketed
-              variant={candidate === level ? 'primary' : 'inverse'}
-              onClick={() => setLevel(candidate)}
-              aria-pressed={candidate === level}
-            >
-              {LEVELS[candidate].label}
-            </Button>
-          ))}
-        </div>
+        <span
+          className="text-caption tracking-[0.16em] text-content-muted uppercase"
+          style={{ fontFamily: semanticTokens.font.mono }}
+        >
+          level → toolbar
+        </span>
       </div>
 
       {/*
@@ -94,10 +69,12 @@ function Frame({ children }: { children: ReactNode }) {
 }
 
 /**
- * A specimen block. `not-prose` is load-bearing: everything inside is chrome
- * rendered by real components, and the typography plugin's selectors all
- * exclude this class — which is how a component nested in an article escapes
- * the article's list markers and link treatment.
+ * A specimen block: the bracketed label and the caption that frame one story.
+ *
+ * `not-prose` is load-bearing. Everything inside is chrome and rendered
+ * components, and the typography plugin's selectors all exclude this class —
+ * which is how a component nested in an article escapes the article's list
+ * markers and link treatment.
  */
 export function Specimen({
   label,
@@ -126,22 +103,5 @@ export function Specimen({
       )}
       <div className={caption ? '' : 'mt-5'}>{children}</div>
     </section>
-  );
-}
-
-/** A row of monospace key/value facts, ruled like the tables in `Prose`. */
-export function FactRow({ facts }: { facts: readonly (readonly [string, string])[] }) {
-  return (
-    <dl
-      className="grid gap-x-6 gap-y-2 sm:grid-cols-[max-content_1fr]"
-      style={{ fontFamily: semanticTokens.font.mono }}
-    >
-      {facts.map(([key, value]) => (
-        <div key={key} className="contents">
-          <dt className="text-caption tracking-[0.1em] text-accent-primary uppercase">{key}</dt>
-          <dd className="text-caption text-content-secondary">{value}</dd>
-        </div>
-      ))}
-    </dl>
   );
 }

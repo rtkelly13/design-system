@@ -1,26 +1,20 @@
-import { Meta } from '@storybook/addon-docs/blocks';
-import {
-  ManifestoPage,
-  Specimen,
-  FactRow,
-  LevelDiptych,
-  RoleLookup,
-  HueLadder,
-  ContrastGate,
-  SurfaceRamp,
-  FormSpecimen,
-  TypeSpecimen,
-  MediumTable,
-  AnsiTarget,
-  VoiceSpecimen,
-} from './manifesto';
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { ManifestoPage, Specimen } from './manifesto';
+import * as Manifesto from './Manifesto.stories';
 
 {/*
   The landing page.
 
-  Unattached — no `of={}` — so it owns a top-level sidebar slot rather than
-  documenting one component, and `storySort` in `.storybook/preview.ts` pins it
-  first, which is what makes it the page Storybook opens on.
+  Attached to `Manifesto.stories.tsx`, and that is not incidental. Storybook's
+  decorators wrap *stories*, so an unattached docs page — which this was — is one
+  the `Level` toolbar cannot reach, and the page needed a switch of its own to be
+  themable at all. Each specimen is a story now, `.storybook/preview.ts` stamps
+  `data-theme` on the preview iframe's `<html>` rather than on a story subtree,
+  and one rendered story therefore themes the whole document: the frame, the
+  specimens and this prose. The toolbar is the only switcher.
+
+  `storySort` in `preview.ts` pins this entry first, which is what makes it the
+  page Storybook opens on.
 
   `sb-unstyled` is Storybook's own opt-out: every selector its docs typography
   emits excludes that subtree. Without it the docs stylesheet and `prose-ladder`
@@ -28,12 +22,12 @@ import {
   midnight ground. Inside it, this system's own `Prose` scope does the
   typography — the page is set in the thing it documents.
 
-  Every specimen below reads `src/theme/levels.ts` at render time. Nothing is
+  Every specimen reads `src/theme/levels.ts` at render time. Nothing is
   transcribed from DESIGN.md, so a colour that changes shows up here as a
   changed page rather than as prose that has quietly gone stale.
 */}
 
-<Meta title="Manifesto" />
+<Meta of={Manifesto} name="Docs" />
 
 <div className="sb-unstyled">
 <ManifestoPage>
@@ -53,16 +47,7 @@ has regressed to the mean and is wrong.
   label="the system in one number set"
   caption="Read from the ladder and the audit at render time, not quoted from a build log."
 >
-  <FactRow
-    facts={[
-      ['origin', 'src/theme/levels.ts — the only place a colour is written'],
-      ['levels', 'two, independently authored; neither derived from the other'],
-      ['roles', 'surface · text · border · accent · intent'],
-      ['hues', 'ten, declared beneath the roles and never addressed by a component'],
-      ['media', 'web · video · graphic — geometry and time, picked at build time'],
-      ['emitted', 'CSS custom properties · DTCG token files · sixteen ANSI slots'],
-    ]}
-  />
+  <Story of={Manifesto.Facts} />
 </Specimen>
 
 ## Two themes, not a light-and-dark pair
@@ -80,7 +65,7 @@ themes also have opposite tightest grounds, so no single transform produces one 
   label="the pair, rendered against itself"
   caption="The same components under two scoped providers. Nothing in this specimen names a level — both come from THEME_LEVELS, so a third rung would appear here untouched."
 >
-  <LevelDiptych />
+  <Story of={Manifesto.Levels} />
 </Specimen>
 
 ## Colour is addressed by job, never by appearance
@@ -99,7 +84,7 @@ for exactly one commit with two pinks 0.036 apart.
   label="roles → hues, as a declared lookup"
   caption="Each row is a Role, its own value, and the Hue it declares. accent.quiet declares neutral — not a cop-out: some roles genuinely are not hues, and saying so keeps the map exhaustive."
 >
-  <RoleLookup />
+  <Story of={Manifesto.Roles} />
 </Specimen>
 
 `accent` and `intent` are separate on purpose. Emphasis is not meaning: a red *accent* is a
@@ -120,14 +105,14 @@ identical.
   label="the gate, run in the browser"
   caption="These counts come from calling auditContrast on the live ladder — the same arithmetic CI runs. The page cannot claim a pass the numbers do not give it."
 >
-  <ContrastGate />
+  <Story of={Manifesto.Contrast} />
 </Specimen>
 
 <Specimen
   label="ten hues, and the contrast each actually holds"
   caption="Base and bright, against the tightest of the three grounds its level offers. Ten is the ceiling, not a comfortable middle: the tightest pair already sits at ΔE 0.049, and an eleventh candidate was dropped for landing 13° from the measured blue."
 >
-  <HueLadder />
+  <Story of={Manifesto.Hues} />
 </Specimen>
 
 ## Background hierarchy
@@ -141,7 +126,7 @@ And **the light scrim inverts which ink applies**, because the overlay composite
 becomes a mid-grey on which the primary ink fails and the inverse ink passes.
 
 <Specimen label="four grounds, per level" caption="Ordered as declared. The overlay is the only value carrying alpha.">
-  <SurfaceRamp />
+  <Story of={Manifesto.Surfaces} />
 </Specimen>
 
 ## Form
@@ -154,7 +139,7 @@ for a utility.
   label="hard offsets, 2px edges, zero radius"
   caption="Three shadow steps read from the web Medium's own offsets. The fourth panel asks for rounded-lg and renders square."
 >
-  <FormSpecimen />
+  <Story of={Manifesto.Form} />
 </Specimen>
 
 ## Type
@@ -163,7 +148,7 @@ for a utility.
   label="four roles, four stacks"
   caption="Set in the actual faces, through the same font role variables a component resolves."
 >
-  <TypeSpecimen />
+  <Story of={Manifesto.Type} />
 </Specimen>
 
 ## Geometry and time are the second axis
@@ -181,7 +166,7 @@ problem.
   label="three media, one of them emitted"
   caption="video is not the web scaled — its type steps are its own, and its motion is measured in whole frames because a fractional frame lands a render mid-transition."
 >
-  <MediumTable />
+  <Story of={Manifesto.Media} />
 </Specimen>
 
 ## One origin, many targets
@@ -200,7 +185,7 @@ go.
   label="sixteen ANSI slots, resolved from the same ladder"
   caption="Rendered by ansiScheme — the same function that writes the four committed terminal configs for iTerm, Windows Terminal, Alacritty and Ghostty."
 >
-  <AnsiTarget />
+  <Story of={Manifesto.Ansi} />
 </Specimen>
 
 ## Voice
@@ -210,7 +195,7 @@ Bracketed section headings. No exclamation marks, no marketing adjectives. A con
 what happens: `PUBLISH`, then `PUBLISHED`.
 
 <Specimen label="voice, as controls" caption="The label is the specimen.">
-  <VoiceSpecimen />
+  <Story of={Manifesto.Voice} />
 </Specimen>
 
 ## If you are building on this
