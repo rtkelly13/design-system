@@ -11,6 +11,13 @@ in [`docs/adr/`](./docs/adr/).
 
 ## Unreleased
 
+Terminal schemes, and the second axis.
+
+- **Terminal / ANSI ships.** `terminal/rtk-{midnight,sketch}.{itermcolors,windows-terminal.json,alacritty.toml,ghostty.conf}` — eight files, exported and packed. Four encodings of one fan-out, which is why terminal was the cheapest Target left.
+- `pnpm ansi:build` / `ansi:check`. The check is **slot coverage plus a committed fixture diff** — the two gates ADR 0001 says a fan-out map requires, since a wrong map emits confidently: a terminal renders an unfilled slot as the foreground rather than erroring.
+- `ANSI_SLOTS`, `SLOTS`, `ansiScheme` are public. The fan-out is data, so it is unit-tested.
+- `allowImportingTsExtensions` in `tsconfig.json`, so a module can be imported by both `tsc` and a plain `.mjs` emitter without a workaround.
+
 The second axis. Geometry and time are declared for the first time; ADRs 0001–0004 are accepted.
 
 - **`Medium`** — `web`, `video`, `graphic`. A unit system and a time base, chosen at build time

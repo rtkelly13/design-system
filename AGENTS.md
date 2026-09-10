@@ -18,6 +18,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:api` | the built type surface against the committed `api/index.d.ts` |
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |
+| `pnpm ansi:check` | terminal slot coverage **and** the committed fixture diff |
 | `pnpm test:visual` | Playwright snapshots — **Linux only**, see [`docs/visual-regression.md`](./docs/visual-regression.md) |
 | `pnpm walkthrough` | screenshot every story on every level, for review rather than assertion |
 

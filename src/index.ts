@@ -19,6 +19,8 @@ export type {
   Motion,
 } from './theme/media';
 export * from './theme/contrast';
+export { ANSI_SLOTS, SLOTS, ansiScheme } from './theme/ansi';
+export type { AnsiSlot, AnsiScheme, AnsiChrome } from './theme/ansi';
 
 // Semantic theming — prefer these over the raw palette in `tokens`.
 export * from './lib/theme';

@@ -236,6 +236,37 @@ interface SelectionDeviceCheck {
 
 declare function auditSelectionDevices(ladder: Readonly<Record<ThemeLevel, LevelDefinition>>): SelectionDeviceCheck[];
 
+declare const ANSI_SLOTS: readonly ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white", "brightBlack", "brightRed", "brightGreen", "brightYellow", "brightBlue", "brightMagenta", "brightCyan", "brightWhite"];
+type AnsiSlot = (typeof ANSI_SLOTS)[number];
+
+type SlotSource = {
+    readonly kind: 'hue';
+    readonly hue: (typeof PALETTE_HUES)[number];
+    readonly bright: boolean;
+} | {
+    readonly kind: 'role';
+    readonly read: (level: LevelDefinition) => string;
+} | {
+    readonly kind: 'fixed';
+    readonly read: () => string;
+};
+
+declare const SLOTS: Readonly<Record<AnsiSlot, SlotSource>>;
+
+interface AnsiChrome {
+    readonly background: string;
+    readonly foreground: string;
+    readonly cursor: string;
+    readonly selectionBackground: string;
+}
+interface AnsiScheme {
+    readonly level: ThemeLevel;
+    readonly slots: Readonly<Record<AnsiSlot, string>>;
+    readonly chrome: AnsiChrome;
+}
+
+declare function ansiScheme(level: ThemeLevel): AnsiScheme;
+
 type ClassInput = string | number | null | undefined | false | ClassInput[];
 
 declare function cn(...inputs: ClassInput[]): string;
@@ -979,6 +1010,7 @@ declare const mdxComponents: {
 type MdxComponents = typeof mdxComponents;
 
 export {
+  ANSI_SLOTS,
   type AccentToken,
   AdminDashboardLayout,
   type AdminDashboardLayoutProps,
@@ -986,7 +1018,10 @@ export {
   type AdminStatusBadge,
   AnchorHeading,
   type AnchorHeadingProps,
+  type AnsiChrome,
   type AnsiHue,
+  type AnsiScheme,
+  type AnsiSlot,
   AsciiDivider,
   type AsciiDividerProps,
   Avatar,
@@ -1098,6 +1133,7 @@ export {
   Prose,
   type ProseProps,
   type Rgb,
+  SLOTS,
   SYSTEM_LEVEL,
   SaasLandingPage,
   type SaasLandingPageProps,
@@ -1148,6 +1184,7 @@ export {
   type UseCopyToClipboardResult,
   WEB_FLOOR,
   accentVar,
+  ansiScheme,
   assertNever,
   auditContrast,
   auditHueAgreement,
