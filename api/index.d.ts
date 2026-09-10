@@ -701,10 +701,13 @@ interface BlogPostProps {
     subtitle?: string;
     author?: string;
     date: string;
+
     readingTime?: string;
+
     tags?: string[];
     children: react__default.ReactNode;
 }
+
 declare const BlogPost: react__default.FC<BlogPostProps>;
 
 declare const LoremIpsumPost: react__default.FC;
