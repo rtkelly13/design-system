@@ -169,9 +169,9 @@ const TAILWIND_ALIASES = `  --color-surface-base: var(--ds-surface-base);
   --color-palette-bright-violet: var(--ds-palette-bright-violet);
   --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
   --color-palette-bright-pink: var(--ds-palette-bright-pink);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --shadow-hard-sm: var(--ds-elev-sm) var(--ds-shadow-color);
+  --shadow-hard-md: var(--ds-elev-md) var(--ds-shadow-color);
+  --shadow-hard-lg: var(--ds-elev-lg) var(--ds-shadow-color);
 ${ROLE_SHADOWS}
 ${ROLE_GLOWS}
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);`;
@@ -275,6 +275,37 @@ function mediumTheme(medium) {
   // a pill is a shape a caller asks for explicitly rather than one they inherit.
   for (const name of ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl']) {
     lines.push(`  --radius-${name}: var(--ds-radius-none);`);
+  }
+
+  // Tailwind's `--spacing` is deliberately NOT mapped, and this is the
+  // interesting one.
+  //
+  // It is a single multiplier: `p-N` resolves to N x the step. The Medium's
+  // scale is not linear — web runs 0, .25, .5, .75, 1, 1.5, 2, 3, 4, 6, 8 —
+  // so setting `--spacing: 0.25rem` makes `p-4` agree with `--ds-space-4` at
+  // 1rem and then diverge at every rung above it: `p-5` is 1.25rem where
+  // `--ds-space-5` is 1.5rem. Two meanings for the same number, and the sort
+  // of thing that reads as correct in review because the first five agree.
+  //
+  // Video's scale settles it — 0, 8, 16, 24, 32, 48, 64, 96, 128, 192, 256 is
+  // not a multiple of anything, so no multiplier could carry it even if the
+  // web's happened to be linear.
+  //
+  // So `--ds-space-*` stays a vocabulary a caller reads by name, Tailwind keeps
+  // its own scale for utilities, and the two are not pretended to be the same
+  // thing. The index naming invites the confusion and is worth revisiting.
+
+  // Motion, so `duration-quick` and `ease-brutalist` exist as utilities. The
+  // 19 wall-clock transitions the Remotion evaluation measured are exactly what
+  // these are for — a component naming a duration rather than a number is what
+  // lets the `video` Medium give it frames instead of milliseconds.
+  for (const name of ['instant', 'quick', 'considered']) {
+    lines.push(`  --duration-${name}: var(--ds-duration-${name});`);
+  }
+
+  // Stacking, so `z-overlay` is a name rather than a magic number.
+  for (const name of Object.keys(def.layer)) {
+    lines.push(`  --z-index-${name}: var(--ds-layer-${name});`);
   }
   lines.push('  --ease-brutalist: var(--ds-ease);');
   return lines.join('\n');
