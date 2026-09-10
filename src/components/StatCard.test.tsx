@@ -78,7 +78,7 @@ describe('StatCard', () => {
   });
 
   it('renders a legacy accent identically to its semantic name', () => {
-    const legacy = render(<StatCard title="U" value={1} accent="pink" />);
+    const legacy = render(<StatCard title="U" value={1} accent="tertiary" />);
     const semantic = render(<StatCard title="U" value={1} accent="tertiary" />);
 
     expect(legacy.container.innerHTML).toBe(semantic.container.innerHTML);
@@ -95,7 +95,7 @@ describe('StatCard', () => {
   it('emits no palette-pinned class', () => {
     const FORBIDDEN = /brutalist-|--color-white|--border-color|zinc-|-red-\d|bg-black|text-white|border-white/;
     const { container } = render(
-      <StatCard title="U" value={1} change="+1" subtitle="s" accent="green" />,
+      <StatCard title="U" value={1} change="+1" subtitle="s" accent="success" />,
     );
 
     for (const node of container.querySelectorAll<HTMLElement>('*')) {

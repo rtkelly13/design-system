@@ -88,38 +88,9 @@ export type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magent
  */
 export type HueRef = Hue | 'neutral';
 
-/**
- * @deprecated Use a Role — `primary`, `secondary`, `tertiary`, or the intents.
- *
- * These four names predate the Hue vocabulary. When they were written there was
- * nothing else a colour could be called, so `accent="cyan"` could only mean
- * "the primary accent, which happens to be cyan". `LEGACY_VARS` therefore
- * resolves each onto a *role* variable, and that mapping is preserved exactly:
- *
- *     cyan   -> accent.primary      yellow -> accent.secondary
- *     pink   -> accent.tertiary     green  -> intent.success
- *
- * They are deprecated because they now actively mislead. `palette` exists, so
- * `cyan` is a real and different thing — and on `sketch` the two diverge:
- *
- *     accent="cyan"    renders #1450d7   palette.cyan   is #006675
- *     accent="yellow"  renders #006b2e   palette.yellow is #705a00
- *     accent="pink"    renders #bd0010   palette.pink   is #b4006c
- *
- * A component asking for cyan gets blue. Two migrations are available and only
- * one is a refactor: **move to the Role** and the code says what it already
- * does, or move to `--ds-palette-cyan` and it renders something else. Prefer
- * the Role unless you genuinely meant the hue, in which case you want a
- * Target-facing token and probably not a component prop at all.
- *
- * `pnpm check:tokens` counts the remaining call sites and holds the budget at
- * zero. This type and `compatAliases()` in `build-tokens.mjs` come out in
- * `0.6.0`; ADR 0001 records why they did not come out in `0.5.0`.
- */
-export type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 /** Anything a component's `accent`-style prop will take. */
-export type AccentToken = Emphasis | Intent | LegacyAccent;
+export type AccentToken = Emphasis | Intent;
 
 const EMPHASIS_VARS: Record<Emphasis, string> = {
   primary: 'var(--ds-accent-primary)',
@@ -133,17 +104,6 @@ const INTENT_VARS: Record<Intent, string> = {
   success: 'var(--ds-intent-success)',
   warning: 'var(--ds-intent-warning)',
   danger: 'var(--ds-intent-danger)',
-};
-
-/**
- * Legacy palette names map onto the same variables their semantic counterparts
- * use, so migrating a call site is a rename with no visual diff.
- */
-const LEGACY_VARS: Record<LegacyAccent, string> = {
-  cyan: 'var(--ds-accent-primary)',
-  yellow: 'var(--ds-accent-secondary)',
-  pink: 'var(--ds-accent-tertiary)',
-  green: 'var(--ds-intent-success)',
 };
 
 const SURFACE_VARS: Record<Surface, string> = {
@@ -178,7 +138,6 @@ export function accentVar(token: AccentToken | undefined, fallback: AccentToken 
   return (
     EMPHASIS_VARS[resolved as Emphasis] ??
     INTENT_VARS[resolved as Intent] ??
-    LEGACY_VARS[resolved as LegacyAccent] ??
     EMPHASIS_VARS.primary
   );
 }

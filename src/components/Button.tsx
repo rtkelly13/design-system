@@ -41,15 +41,7 @@ export type ButtonVariant =
     | 'secondary'
     | 'tertiary'
     | 'inverse'
-    | 'default'
-    /** @deprecated Use `primary`. Resolves identically. */
-    | 'cyan'
-    /** @deprecated Use `tertiary`. Resolves identically. */
-    | 'pink'
-    /** @deprecated Use `secondary`. Resolves identically. */
-    | 'yellow'
-    /** @deprecated Use `inverse`. Resolves identically. */
-    | 'white';
+    | 'default';
 
 /**
  * The `<button>` form. `href?: never` is what makes the union below
@@ -84,7 +76,7 @@ const PRESS =
  * — a divergence would be a code change, not a drift.
  *
  * The hue names are deprecated because they mislead, not merely because they
- * are old: on `sketch`, `variant="cyan"` paints `bg-accent-primary`, which is
+ * are old: on `sketch`, `variant="primary"` paints `bg-accent-primary`, which is
  * `#1450d7`. Blue. It was never asking for cyan.
  */
 const PRIMARY = `bg-accent-primary text-content-inverse border-edge-strong ${PRESS}`;
@@ -106,11 +98,6 @@ const button = recipe({
       tertiary: TERTIARY,
       inverse: INVERSE,
       default: PRIMARY,
-      // Deprecated hue aliases. Same constants, so same pixels.
-      cyan: PRIMARY,
-      yellow: SECONDARY,
-      pink: TERTIARY,
-      white: INVERSE,
     },
     /**
      * An anchor is not `inline-flex` by default and carries an underline, so the
@@ -152,7 +139,7 @@ const button = recipe({
 export function Button(props: ButtonProps) {
   const {
     children,
-    variant = 'pink',
+    variant = 'tertiary',
     size = 'md',
     bracketed = false,
     className,

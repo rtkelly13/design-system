@@ -29,10 +29,6 @@ const TOKENS: AccentToken[] = [
   'success',
   'warning',
   'danger',
-  'cyan',
-  'yellow',
-  'pink',
-  'green',
 ];
 
 describe('canonicalAccent', () => {
@@ -42,15 +38,6 @@ describe('canonicalAccent', () => {
 
     expect(new Set(roles).size).toBe(8);
     expect(roles).toEqual(ROLES);
-  });
-
-  it.each([
-    ['cyan', 'primary'],
-    ['yellow', 'secondary'],
-    ['pink', 'tertiary'],
-    ['green', 'success'],
-  ] as const)('maps legacy %s to the same role as %s', (legacy, semantic) => {
-    expect(canonicalAccent(legacy)).toBe(canonicalAccent(semantic));
   });
 
   it('defaults to the primary accent', () => {

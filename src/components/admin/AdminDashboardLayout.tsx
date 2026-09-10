@@ -138,7 +138,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
                     <span>{item.label}</span>
                   </div>
                   {item.badgeCount && (
-                    <Badge accent={isActive ? 'pink' : 'cyan'}>{item.badgeCount}</Badge>
+                    <Badge accent={isActive ? 'tertiary' : 'primary'}>{item.badgeCount}</Badge>
                   )}
                 </button>
               );
@@ -180,7 +180,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             {statusBadges.map((badge) => (
-              <Badge key={badge.id} accent={badge.accent ?? 'cyan'}>
+              <Badge key={badge.id} accent={badge.accent ?? 'primary'}>
                 {badge.icon ? (
                   <span style={{ display: 'inline-flex', marginRight: '4px', verticalAlign: 'middle' }}>
                     {badge.icon}

@@ -77,19 +77,19 @@ export const DesignSandbox: React.FC = () => {
 
       {/* Navigation Sub-Tabs */}
       <div className="flex gap-2 mb-8 border-b-2 border-edge-strong pb-4 overflow-x-auto">
-        <Button onClick={() => setActiveTab('components')} variant={activeTab === 'components' ? 'pink' : 'default'} bracketed size="sm">
+        <Button onClick={() => setActiveTab('components')} variant={activeTab === 'components' ? 'tertiary' : 'default'} bracketed size="sm">
           COMPONENTS & THEMES
         </Button>
-        <Button onClick={() => setActiveTab('saas')} variant={activeTab === 'saas' ? 'pink' : 'default'} bracketed size="sm">
+        <Button onClick={() => setActiveTab('saas')} variant={activeTab === 'saas' ? 'tertiary' : 'default'} bracketed size="sm">
           SAAS DASHBOARD
         </Button>
-        <Button onClick={() => setActiveTab('ecommerce')} variant={activeTab === 'ecommerce' ? 'pink' : 'default'} bracketed size="sm">
+        <Button onClick={() => setActiveTab('ecommerce')} variant={activeTab === 'ecommerce' ? 'tertiary' : 'default'} bracketed size="sm">
           E-COMMERCE SHOWCASE
         </Button>
-        <Button onClick={() => setActiveTab('slides')} variant={activeTab === 'slides' ? 'pink' : 'default'} bracketed size="sm">
+        <Button onClick={() => setActiveTab('slides')} variant={activeTab === 'slides' ? 'tertiary' : 'default'} bracketed size="sm">
           PRESENTATION DECK
         </Button>
-        <Button onClick={() => setActiveTab('post')} variant={activeTab === 'post' ? 'pink' : 'default'} bracketed size="sm">
+        <Button onClick={() => setActiveTab('post')} variant={activeTab === 'post' ? 'tertiary' : 'default'} bracketed size="sm">
           EDITORIAL BLOG
         </Button>
       </div>
@@ -194,7 +194,7 @@ export const DesignSandbox: React.FC = () => {
                 {
                   header: 'STATUS',
                   accessor: (r) => (
-                    <Badge accent={r.status === 'active' ? 'green' : r.status === 'pending' ? 'yellow' : 'pink'}>
+                    <Badge accent={r.status === 'active' ? 'success' : r.status === 'pending' ? 'secondary' : 'tertiary'}>
                       {r.status.toUpperCase()}
                     </Badge>
                   ),
