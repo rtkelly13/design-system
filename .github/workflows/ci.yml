@@ -96,6 +96,13 @@ jobs:
       - name: CSS Surface
         run: pnpm check:css
 
+      # A ratchet at zero. The generator has referenced this command since the
+      # compat aliases were written; it did not exist until 0.5.0, so the exit
+      # condition for deleting them was unmeasurable. Now a new hue-named call
+      # site fails the build with the role it should have used.
+      - name: Hue-named call sites
+        run: pnpm check:tokens
+
       # Self-hosted fonts ship as @font-face rules nothing is obliged to
       # reference. This fails if a --ds-font-* stack cannot name a family the
       # installed @fontsource packages declare — the failure mode that otherwise

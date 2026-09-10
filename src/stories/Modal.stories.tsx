@@ -32,7 +32,7 @@ export const WithFooter: Story = {
     footer: (
       <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
         <Button variant="default">CANCEL</Button>
-        <Button bracketed variant="pink">DELETE</Button>
+        <Button bracketed variant="tertiary">DELETE</Button>
       </div>
     ),
   },

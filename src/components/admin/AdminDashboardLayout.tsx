@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { AccentToken } from '../../lib/theme';
 import { LayoutDashboard, FileText, Sliders, LineChart, Database, RefreshCw, ShieldCheck } from 'lucide-react';
 import { Button } from '../Button';
 import { Badge } from '../Badge';
@@ -25,7 +26,7 @@ export const DEFAULT_ADMIN_NAV: AdminNavItem[] = [
 export interface AdminStatusBadge {
   id: string;
   label: string;
-  accent?: 'green' | 'cyan' | 'pink' | 'yellow';
+  accent?: AccentToken;
   icon?: React.ReactNode;
 }
 
@@ -35,8 +36,8 @@ export interface AdminStatusBadge {
  * a consumer rendering `<AdminDashboardLayout />` inherits whatever is here.
  */
 export const DEFAULT_ADMIN_STATUS: AdminStatusBadge[] = [
-  { id: 'health', label: 'SYSTEM HEALTH: 100%', accent: 'green', icon: <ShieldCheck size={14} /> },
-  { id: 'api', label: 'API: CONNECTED', accent: 'cyan' },
+  { id: 'health', label: 'SYSTEM HEALTH: 100%', accent: 'success', icon: <ShieldCheck size={14} /> },
+  { id: 'api', label: 'API: CONNECTED', accent: 'primary' },
 ];
 
 export interface AdminDashboardLayoutProps {
@@ -151,7 +152,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
             LEVEL: {LEVELS[level].label.toUpperCase()}
           </Button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Avatar fallback="RK" size="sm" accent="cyan" />
+            <Avatar fallback="RK" size="sm" accent="primary" />
             <div>
               <div style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '0.85rem', fontWeight: 800 }}>
                 Ryan Kelly
@@ -191,7 +192,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Button bracketed variant="pink" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
+            <Button bracketed variant="tertiary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
               <RefreshCw size={14} /> TRIGGER SYNC
             </Button>
           </div>
@@ -210,19 +211,19 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
                 <Card style={{ boxShadow: '4px 4px 0px 0px var(--ds-accent-primary)' }}>
                   <div style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.8rem', opacity: 0.8 }}>NET CASHFLOW</div>
                   <div style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '2rem', fontWeight: 900, color: 'var(--ds-accent-primary)', margin: '0.4rem 0' }}>+$4,280.00</div>
-                  <Badge accent="green">+12.4% vs last month</Badge>
+                  <Badge accent="success">+12.4% vs last month</Badge>
                 </Card>
 
                 <Card style={{ boxShadow: '4px 4px 0px 0px var(--ds-accent-tertiary)' }}>
                   <div style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.8rem', opacity: 0.8 }}>UNRECONCILED AUDITS</div>
                   <div style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '2rem', fontWeight: 900, color: 'var(--ds-accent-tertiary)', margin: '0.4rem 0' }}>3 VARIANCES</div>
-                  <Badge accent="pink">ACTION REQUIRED</Badge>
+                  <Badge accent="tertiary">ACTION REQUIRED</Badge>
                 </Card>
 
                 <Card style={{ boxShadow: '4px 4px 0px 0px var(--ds-accent-secondary)' }}>
                   <div style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.8rem', opacity: 0.8 }}>DRIVE BACKUP STATUS</div>
                   <div style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', fontSize: '1.4rem', fontWeight: 900, color: 'var(--ds-accent-secondary)', margin: '0.4rem 0' }}>SYNCED 10M AGO</div>
-                  <Badge accent="yellow">~/Google Drive/Backup/</Badge>
+                  <Badge accent="secondary">~/Google Drive/Backup/</Badge>
                 </Card>
               </div>
 
@@ -246,14 +247,14 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
                       <td style={{ padding: '0.75rem' }}>2026-07-26 21:40</td>
                       <td style={{ padding: '0.75rem' }}>Chase_Checking_July.csv</td>
                       <td style={{ padding: '0.75rem' }}>142 items</td>
-                      <td style={{ padding: '0.75rem' }}><Badge accent="green">INGESTED</Badge></td>
+                      <td style={{ padding: '0.75rem' }}><Badge accent="success">INGESTED</Badge></td>
                       <td style={{ padding: '0.75rem' }}><Button bracketed style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>VIEW</Button></td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid var(--ds-border-strong)' }}>
                       <td style={{ padding: '0.75rem' }}>2026-07-25 14:15</td>
                       <td style={{ padding: '0.75rem' }}>Amex_Platinum_Statement.csv</td>
                       <td style={{ padding: '0.75rem' }}>88 items</td>
-                      <td style={{ padding: '0.75rem' }}><Badge accent="cyan">AUDITED</Badge></td>
+                      <td style={{ padding: '0.75rem' }}><Badge accent="primary">AUDITED</Badge></td>
                       <td style={{ padding: '0.75rem' }}><Button bracketed style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>VIEW</Button></td>
                     </tr>
                   </tbody>

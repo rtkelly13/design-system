@@ -22,11 +22,34 @@ interface ButtonOwnProps {
    * equally. Renaming them to the roles they resolve to is a breaking API
    * change and is deliberately not bundled with the token migration.
    */
-  variant?: 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
+  variant?: ButtonVariant;
   size?: 'sm' | 'md' | 'lg';
   bracketed?: boolean;
   className?: string;
 }
+
+/**
+ * The accents a filled Button may take.
+ *
+ * Narrower than `AccentToken` on purpose: `quiet` is missing because
+ * `check:contrast` gates `text.inverse` against `accent.primary`, `secondary`
+ * and `tertiary` only. A quiet fill with inverse text on it is not measured, so
+ * it is not offered.
+ */
+export type ButtonVariant =
+    | 'primary'
+    | 'secondary'
+    | 'tertiary'
+    | 'inverse'
+    | 'default'
+    /** @deprecated Use `primary`. Resolves identically. */
+    | 'cyan'
+    /** @deprecated Use `tertiary`. Resolves identically. */
+    | 'pink'
+    /** @deprecated Use `secondary`. Resolves identically. */
+    | 'yellow'
+    /** @deprecated Use `inverse`. Resolves identically. */
+    | 'white';
 
 /**
  * The `<button>` form. `href?: never` is what makes the union below
@@ -53,8 +76,21 @@ export type ButtonProps = ButtonElementProps | ButtonLinkProps;
 const PRESS =
   'shadow-hard-md hover:shadow-hard-lg active:translate-x-1 active:translate-y-1 active:shadow-none';
 
-/** `default` is an alias for `cyan`; sharing the constant keeps them identical. */
-const CYAN = `bg-accent-primary text-content-inverse border-edge-strong ${PRESS}`;
+/**
+ * One constant per rendered form, aliased by every name that resolves to it.
+ *
+ * `default`, `primary` and the deprecated `cyan` are the same button. Sharing
+ * the constant is what makes "resolves identically" true rather than a comment
+ * — a divergence would be a code change, not a drift.
+ *
+ * The hue names are deprecated because they mislead, not merely because they
+ * are old: on `sketch`, `variant="cyan"` paints `bg-accent-primary`, which is
+ * `#1450d7`. Blue. It was never asking for cyan.
+ */
+const PRIMARY = `bg-accent-primary text-content-inverse border-edge-strong ${PRESS}`;
+const SECONDARY = `bg-accent-secondary text-content-inverse border-edge-strong ${PRESS}`;
+const TERTIARY = `bg-accent-tertiary text-content-inverse border-edge-strong ${PRESS}`;
+const INVERSE = `bg-content-primary text-content-inverse border-content-primary ${PRESS}`;
 
 const button = recipe({
   base: 'font-mono font-bold uppercase border-2 transition-all duration-200',
@@ -65,11 +101,16 @@ const button = recipe({
       lg: 'px-8 py-4 text-lg',
     },
     variant: {
-      cyan: CYAN,
-      pink: `bg-accent-tertiary text-content-inverse border-edge-strong ${PRESS}`,
-      yellow: `bg-accent-secondary text-content-inverse border-edge-strong ${PRESS}`,
-      white: `bg-content-primary text-content-inverse border-content-primary ${PRESS}`,
-      default: CYAN,
+      primary: PRIMARY,
+      secondary: SECONDARY,
+      tertiary: TERTIARY,
+      inverse: INVERSE,
+      default: PRIMARY,
+      // Deprecated hue aliases. Same constants, so same pixels.
+      cyan: PRIMARY,
+      yellow: SECONDARY,
+      pink: TERTIARY,
+      white: INVERSE,
     },
     /**
      * An anchor is not `inline-flex` by default and carries an underline, so the
@@ -82,7 +123,7 @@ const button = recipe({
     },
   },
   defaultVariants: {
-    variant: 'pink',
+    variant: 'tertiary',
     size: 'md',
   },
 });
@@ -105,7 +146,7 @@ const button = recipe({
  *
  * ```tsx
  * <Button onClick={save}>SAVE</Button>
- * <Button href="/pricing" variant="pink" bracketed size="lg">SEE PRICING</Button>
+ * <Button href="/pricing" variant="tertiary" bracketed size="lg">SEE PRICING</Button>
  * ```
  */
 export function Button(props: ButtonProps) {

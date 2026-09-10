@@ -17,6 +17,7 @@ type Hue = 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'cyan' | 'blue' | 'v
 type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan'>;
 
 type HueRef = Hue | 'neutral';
+
 type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 type AccentToken = Emphasis | Intent | LegacyAccent;
@@ -248,11 +249,21 @@ declare function useActiveHeading(ids: readonly string[], { offset, enabled }?: 
 interface ButtonOwnProps {
     children: ReactNode;
 
-    variant?: 'cyan' | 'pink' | 'yellow' | 'white' | 'default';
+    variant?: ButtonVariant;
     size?: 'sm' | 'md' | 'lg';
     bracketed?: boolean;
     className?: string;
 }
+
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'default'
+
+ | 'cyan'
+
+ | 'pink'
+
+ | 'yellow'
+
+ | 'white';
 
 type ButtonElementProps = ButtonOwnProps & DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
     href?: never;
@@ -296,7 +307,8 @@ interface AvatarProps extends react__default.HTMLAttributes<HTMLDivElement> {
     alt?: string;
     fallback?: string;
     size?: 'sm' | 'md' | 'lg';
-    accent?: 'cyan' | 'pink' | 'yellow' | 'green';
+
+    accent?: AccentToken;
 }
 declare const Avatar: react__default.FC<AvatarProps>;
 
@@ -665,7 +677,8 @@ interface PricingTier {
     period?: string;
     description: string;
     features: string[];
-    accent: 'cyan' | 'pink' | 'yellow' | 'green';
+
+    accent: 'primary' | 'secondary' | 'tertiary';
     highlighted?: boolean;
     ctaText?: string;
 }
@@ -692,7 +705,7 @@ declare const DEFAULT_ADMIN_NAV: AdminNavItem[];
 interface AdminStatusBadge {
     id: string;
     label: string;
-    accent?: 'green' | 'cyan' | 'pink' | 'yellow';
+    accent?: AccentToken;
     icon?: react__default.ReactNode;
 }
 
@@ -980,6 +993,7 @@ export {
   type ButtonElementProps,
   type ButtonLinkProps,
   type ButtonProps,
+  type ButtonVariant,
   Card,
   type CardAccent,
   type CardProps,
