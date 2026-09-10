@@ -122,7 +122,7 @@ alias is still the wrong shape.
 ## 4. Contrast is arithmetic, and it is a gate
 
 Colour is the one axis with a machine-checkable definition of correct, so it is checked.
-`pnpm check:contrast` audits **440 pairs across both themes** on every build and fails CI.
+`pnpm check:contrast` audits **220 pairs — 110 per theme** on every build and fails CI, plus 24 selection devices and 16 Role→Hue agreement checks. The per-theme figure is the one to reason from: it is what a third theme would add.
 
 | | Floor | Why |
 |---|---|---|
@@ -198,8 +198,10 @@ whole frames because a fractional frame lands a render mid-transition. See
 
 **The contrast floor is Medium-keyed too**, which is the part most easily got wrong: colour
 values do not vary by Medium, but the floors they must clear do. `pnpm check:contrast` defaults
-to the web floors and `--medium=video` enforces the stricter frame ones — which the current
-palette does not yet clear, deliberately, since no video artifact is emitted.
+to the web floors; `--medium=video` and `--medium=graphic` enforce the stricter 7:1 frame floors
+and report **45 of 220 pairs below minimum**. That is deliberate, not a regression — no video or
+graphic artifact is emitted yet, and only the `web` run gates CI. If palette values ever move,
+those 45 are the number that moves first.
 
 ## 8. Voice
 

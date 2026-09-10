@@ -128,8 +128,15 @@ code, pre {
  * document is precisely what #54 is about. A consumer's bare tags are theirs. */
 
 /* Keyboard focus must stay visible even where a component replaces the ring
- * with a border colour — a border swap is invisible under forced-colors. */
+ * with a border colour — a border swap is invisible under forced-colors.
+ *
+ * The geometry is the Medium's and the colour is the Level's, which is the two
+ * axes in one declaration. `media.ts` has declared `focusRing` since the axis
+ * landed and this rule kept its own hardcoded `2px` — a token with no reader,
+ * which is the same fault the palette had before `accentHue` gave the Roles
+ * something to point at. A ring that has to be thicker on a 1080p frame now
+ * changes in one place. */
 :focus-visible {
-  outline: 2px solid var(--ds-accent-primary);
-  outline-offset: 2px;
+  outline: var(--ds-focus-width) solid var(--ds-accent-primary);
+  outline-offset: var(--ds-focus-offset);
 }
