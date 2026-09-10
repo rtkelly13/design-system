@@ -3,8 +3,6 @@ import { cn } from '../lib/recipe';
 import { accentVar, semanticTokens } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
 
-/** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
-export type CardAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   title?: string;

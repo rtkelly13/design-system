@@ -113,18 +113,15 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
 
   --font-sans: var(--ds-font-body);
   --font-display: var(--ds-font-display);
@@ -270,33 +267,16 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  /* deprecated — see `pnpm check:tokens` */
-  --color-black: #0a0a1a;
-  --color-white: #ffffff;
-  --border-color: #ffffff;
-  --brutalist-cyan: #22d3ee;
-  --brutalist-neonCyan: #22d3ee;
-  --brutalist-pink: #f955a4;
-  --brutalist-yellow: #facc15;
-  --brutalist-cyberOrange: #facc15;
-  --brutalist-neonGreen: #39ff14;
-  --brutalist-darkBg: #0a0a1a;
-  --brutalist-shadow-color: #ffffff;
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
 }
 
 /* Sketch — Warm paper and pen ink. The light half of the pair. */
@@ -395,33 +375,16 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  /* deprecated — see `pnpm check:tokens` */
-  --color-black: #f5f3ec;
-  --color-white: #23262e;
-  --border-color: #23262e;
-  --brutalist-cyan: #1450d7;
-  --brutalist-neonCyan: #1450d7;
-  --brutalist-pink: #bd0010;
-  --brutalist-yellow: #006b2e;
-  --brutalist-cyberOrange: #006b2e;
-  --brutalist-neonGreen: #006b2e;
-  --brutalist-darkBg: #f5f3ec;
-  --brutalist-shadow-color: #23262e;
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
 }
 
 /* Native form controls, scrollbars and the caret follow `color-scheme`, which

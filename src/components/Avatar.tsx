@@ -10,13 +10,11 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Which accent draws the ring and the offset shadow.
    *
-   * Roles are the vocabulary: `primary`, `secondary`, `tertiary`, `quiet`, and
-   * the four intents. The four hue names are **deprecated aliases** kept so
-   * existing call sites do not break — they resolve to exactly the role they
-   * always did, so nothing renders differently.
+   * Roles only: `primary`, `secondary`, `tertiary`, `quiet`, and the four
+   * intents. The hue names this used to accept are gone.
    *
    * The hue names also mislead now that `palette` exists. On `sketch`,
-   * `accent="cyan"` renders `#1450d7` — blue — because it was never asking for
+   * `accent="primary"` renders `#1450d7` — blue — because it was never asking for
    * cyan, it was asking for the primary accent. Use the role.
    */
   accent?: AccentToken;
@@ -27,7 +25,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   alt = 'Avatar',
   fallback = 'RK',
   size = 'md',
-  accent = 'cyan',
+  accent = 'primary',
   className = '',
   style,
   ...props
@@ -40,10 +38,9 @@ export const Avatar: React.FC<AvatarProps> = ({
     }
   };
 
-  // `accentVar` already owns the role and legacy-alias resolution, including
-  // the deprecated hue names. Duplicating it here as a switch is how the two
-  // drifted before: a role added to the token layer rendered as `primary` in
-  // this component and nowhere else, silently.
+  // `accentVar` owns the resolution. Duplicating it here as a switch is how the
+  // two drifted before: a role added to the token layer rendered as `primary`
+  // in this component and nowhere else, silently.
   const accentColor = accentVar(accent);
 
   const sizePx = getSizePx();

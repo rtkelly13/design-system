@@ -106,6 +106,21 @@ const ACCENT_ROLES = [
  * Deliberately 4px, matching `hard-md`: the palette-named three are 4px too, so
  * swapping one for the other cannot move a layout.
  */
+/**
+ * A glow per accent/intent role, matching `ROLE_SHADOWS`.
+ *
+ * There used to be exactly one glow (`--shadow-glow-accent`, pinned to
+ * `accent.primary`) plus three hue-named ones in the compat layer —
+ * `glow-cyan`, `glow-pink`, `glow-orange`. Removing the compat layer left a
+ * consumer with a pink glow and nowhere to put it, which is a gap rather than a
+ * migration: the asymmetry between hard shadows (role-named, complete) and
+ * glows (one role, three hues) was itself a symptom of the hue layer.
+ */
+const ROLE_GLOWS = ACCENT_ROLES.map(
+  (role) =>
+    `  --shadow-glow-${role}: 0 0 10px color-mix(in oklab, var(--ds-${role}) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-${role}) 30%, transparent);`,
+).join('\n');
+
 const ROLE_SHADOWS = ACCENT_ROLES.map(
   (role) => `  --shadow-hard-${role}: 4px 4px 0px 0px var(--ds-${role});`,
 ).join('\n');
@@ -157,64 +172,10 @@ const TAILWIND_ALIASES = `  --color-surface-base: var(--ds-surface-base);
   --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
   --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
 ${ROLE_SHADOWS}
+${ROLE_GLOWS}
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);`;
 
-/**
- * Bridge for components not yet migrated off the old palette.
- *
- * The pre-ladder token layer overloaded `--color-black` to mean "page ground"
- * and `--color-white` to mean "ink", swapping them per theme. That is why
- * `bg-black` and `text-white` are still scattered through the components and
- * appear to work. Mapping the old names onto the new roles keeps every one of
- * them rendering correctly — including on the two new levels — so the component
- * migration can happen file by file instead of in one commit.
- *
- * `pnpm check:tokens` counts the remaining call sites; this block comes out
- * when that reaches zero.
- *
- * Not covered, and not coverable: literal Tailwind greys (`bg-zinc-900`,
- * `text-zinc-400`) baked into some components. They are real colours, not
- * aliases, so they stay dark on the light levels. The checker reports them.
- */
-function compatAliases(definition) {
-  return `  /* deprecated — see \`pnpm check:tokens\` */
-  --color-black: ${definition.surface.base};
-  --color-white: ${definition.text.primary};
-  --border-color: ${definition.border.strong};
-  --brutalist-cyan: ${definition.accent.primary};
-  --brutalist-neonCyan: ${definition.accent.primary};
-  --brutalist-pink: ${definition.accent.tertiary};
-  --brutalist-yellow: ${definition.accent.secondary};
-  --brutalist-cyberOrange: ${definition.accent.secondary};
-  --brutalist-neonGreen: ${definition.intent.success};
-  --brutalist-darkBg: ${definition.surface.base};
-  --brutalist-shadow-color: ${definition.shadow};
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);`;
-}
 
-/** The same names, declared in `@theme` so Tailwind still emits the utilities. */
-const COMPAT_THEME = `  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);`;
 
 /**
  * Match elements whose NEAREST themed ancestor-or-self is `level`.
@@ -303,8 +264,6 @@ ${(['dark', 'light'])
 @theme {
 ${TAILWIND_ALIASES}
 
-${COMPAT_THEME}
-
   --font-sans: var(--ds-font-body);
   --font-display: var(--ds-font-display);
   --font-mono: var(--ds-font-mono);
@@ -373,7 +332,6 @@ ${levelVariables(definition)}
 
 ${TAILWIND_ALIASES}
 
-${compatAliases(definition)}
 }
 `);
   }

@@ -75,7 +75,7 @@ describe('Input', () => {
   // The deprecation promise: renaming a legacy accent at a call site must not
   // change what renders.
   it('renders a legacy accent identically to its semantic name', () => {
-    const legacy = render(<Input label="Key" accent="cyan" />);
+    const legacy = render(<Input label="Key" accent="primary" />);
     const semantic = render(<Input label="Key" accent="primary" />);
 
     const legacyInput = legacy.container.querySelector('input');

@@ -2,8 +2,6 @@ import type { ReactNode, MouseEventHandler } from 'react';
 import type { AccentToken } from '../lib/theme';
 import { cn } from '../lib/recipe';
 
-/** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
-export type TagAccent = 'yellow' | 'cyan' | 'pink' | 'green';
 
 export interface TagProps {
   /** Tag text string or custom element. */

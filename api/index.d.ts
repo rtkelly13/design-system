@@ -18,9 +18,7 @@ type AnsiHue = Extract<Hue, 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'c
 
 type HueRef = Hue | 'neutral';
 
-type LegacyAccent = 'cyan' | 'pink' | 'yellow' | 'green';
-
-type AccentToken = Emphasis | Intent | LegacyAccent;
+type AccentToken = Emphasis | Intent;
 
 declare function accentVar(token: AccentToken | undefined, fallback?: AccentToken): string;
 declare function surfaceVar(token?: Surface): string;
@@ -100,41 +98,6 @@ declare function isThemeLevel(value: unknown): value is ThemeLevel;
 declare function nextLevel(level: ThemeLevel): ThemeLevel;
 
 declare function assertNever(value: never, message?: string): never;
-
-declare const brutalistTokens: {
-    readonly colors: {
-        readonly cyan: "var(--ds-accent-primary)";
-        readonly pink: "var(--ds-accent-tertiary)";
-        readonly yellow: "var(--ds-accent-secondary)";
-        readonly neonGreen: "var(--ds-intent-success)";
-        readonly neonCyan: "var(--ds-accent-primary)";
-        readonly cyberOrange: "var(--ds-accent-secondary)";
-        readonly darkBg: "var(--ds-surface-base)";
-        readonly black: "var(--ds-surface-base)";
-        readonly white: "var(--ds-text-primary)";
-    };
-    readonly fonts: {
-        readonly display: readonly ["var(--ds-font-display)"];
-        readonly sans: readonly ["var(--ds-font-body)"];
-        readonly mono: readonly ["var(--ds-font-mono)"];
-        readonly pixel: readonly ["var(--ds-font-pixel)"];
-    };
-    readonly shadows: {
-        readonly hardSm: "2px 2px 0px 0px var(--ds-shadow-color)";
-        readonly hardMd: "4px 4px 0px 0px var(--ds-shadow-color)";
-        readonly hardLg: "6px 6px 0px 0px var(--ds-shadow-color)";
-        readonly hardCyan: "4px 4px 0px 0px var(--ds-accent-primary)";
-        readonly hardPink: "4px 4px 0px 0px var(--ds-accent-tertiary)";
-        readonly hardYellow: "4px 4px 0px 0px var(--ds-accent-secondary)";
-        readonly glowCyan: "0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent)";
-        readonly glowPink: "0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent)";
-        readonly glowOrange: "0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent)";
-    };
-    readonly borders: {
-        readonly standard: "2px solid var(--ds-border-strong)";
-        readonly radius: "0px";
-    };
-};
 
 type BrutalistTheme = ThemeLevel;
 
@@ -255,15 +218,7 @@ interface ButtonOwnProps {
     className?: string;
 }
 
-type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'default'
-
- | 'cyan'
-
- | 'pink'
-
- | 'yellow'
-
- | 'white';
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'default';
 
 type ButtonElementProps = ButtonOwnProps & DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
     href?: never;
@@ -276,7 +231,6 @@ type ButtonProps = ButtonElementProps | ButtonLinkProps;
 
 declare function Button(props: ButtonProps): react.JSX.Element;
 
-type CardAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
     title?: string;
     description?: string;
@@ -320,7 +274,6 @@ interface PageTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 }
 declare function PageTitle({ children, subtitle, bracketed, className, ...props }: PageTitleProps): react.JSX.Element;
 
-type PageHeaderAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 interface PageHeaderProps {
 
     title: string;
@@ -339,7 +292,6 @@ interface PageHeaderProps {
 }
 declare function PageHeader({ title, subtitle, icon: Icon, accent, children, className, }: PageHeaderProps): react.JSX.Element;
 
-type TagAccent = 'yellow' | 'cyan' | 'pink' | 'green';
 interface TagProps {
 
     text: string;
@@ -995,7 +947,6 @@ export {
   type ButtonProps,
   type ButtonVariant,
   Card,
-  type CardAccent,
   type CardProps,
   type ClassInput,
   CodeBlock,
@@ -1054,7 +1005,6 @@ export {
   type InputProps,
   type Intent,
   LEVELS,
-  type LegacyAccent,
   type LevelDefinition,
   LoremIpsumPost,
   MAXIMUM_NEUTRAL_CHROMA,
@@ -1071,7 +1021,6 @@ export {
   type NoteBlockProps,
   PALETTE_HUES,
   PageHeader,
-  type PageHeaderAccent,
   type PageHeaderProps,
   PageTitle,
   type PageTitleProps,
@@ -1117,7 +1066,6 @@ export {
   type TableOfContentsProps,
   TableRow,
   Tag,
-  type TagAccent,
   type TagProps,
   TextArea,
   type TextAreaProps,
@@ -1135,7 +1083,6 @@ export {
   auditHueAgreement,
   auditSelectionDevices,
   borderVar,
-  brutalistTokens,
   childrenToText,
   cn,
   collectHeadings,
