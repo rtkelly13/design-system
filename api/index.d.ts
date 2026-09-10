@@ -322,7 +322,9 @@ type ButtonProps = ButtonElementProps | ButtonLinkProps;
 
 declare function Button(props: ButtonProps): react.JSX.Element;
 
+type CardVariant = 'panel' | 'card';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
+
     title?: string;
     description?: string;
     imgSrc?: string;
@@ -337,8 +339,11 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
     badge?: string;
 
     panel?: boolean;
+
+    variant?: CardVariant;
 }
-declare function Card({ title, description, imgSrc, href, asciiArt, filename, children, className, accent, badge, panel, style, ...props }: CardProps): react.JSX.Element;
+
+declare function Card({ title, description, imgSrc, href, asciiArt, filename, children, className, accent, badge, panel, variant, style, ...props }: CardProps): react.JSX.Element;
 
 interface BadgeProps extends react__default.HTMLAttributes<HTMLSpanElement> {
     children: react__default.ReactNode;
@@ -1050,6 +1055,7 @@ export {
   CSS_MEDIUM,
   Card,
   type CardProps,
+  type CardVariant,
   type ClassInput,
   CodeBlock,
   CodeBlockAttachment,
