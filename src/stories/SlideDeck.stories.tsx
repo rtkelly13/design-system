@@ -41,3 +41,28 @@ export const DefaultDeck: Story = {
     </SlideDeck>
   ),
 };
+
+/**
+ * Driven from outside: the index is a prop and the presenter affordances are
+ * off. This is the shape a router, a docs page, or a frame renderer wants — and
+ * the reason a deck can now be shown at a chosen slide at all.
+ */
+export const ControlledChromeless: Story = {
+  render: () => (
+    <SlideDeck slide={1} chrome={false}>
+      <Slide title="FIRST" subtitle="not shown — the deck is on slide 1">
+        <div />
+      </Slide>
+      <Slide title="DRIVEN FROM OUTSIDE" subtitle="slide={1} chrome={false}">
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '1.1rem', color: 'var(--ds-accent-secondary)' }}>
+            No control bar, no arrow keys, no fullscreen.
+          </p>
+          <div style={{ marginTop: '2rem' }}>
+            <Badge accent="primary">THE CALLER OWNS THE INDEX</Badge>
+          </div>
+        </div>
+      </Slide>
+    </SlideDeck>
+  ),
+};

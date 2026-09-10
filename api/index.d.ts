@@ -682,6 +682,12 @@ interface SlideDeckProps {
     children: react__default.ReactElement[];
     aspectRatio?: '16:9' | '4:3';
     autoPlayInterval?: number;
+
+    slide?: number;
+
+    onSlideChange?: (slide: number) => void;
+
+    chrome?: boolean;
 }
 declare const SlideDeck: react__default.FC<SlideDeckProps>;
 
