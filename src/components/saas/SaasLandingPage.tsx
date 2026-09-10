@@ -1,6 +1,5 @@
 import React from 'react';
 import { accentVar } from '../../lib/theme';
-import type { AccentToken } from '../../lib/theme';
 import { ArrowRight, Check, Zap, Shield, Cpu } from 'lucide-react';
 import { PageTitle } from '../PageTitle';
 import { Card } from '../Card';
@@ -14,7 +13,13 @@ export interface PricingTier {
   period?: string;
   description: string;
   features: string[];
-  accent: AccentToken;
+  /**
+   * The tier's accent, used three ways — `Card accent`, `accentVar()` for the
+   * price, and `Button variant` for the CTA. So it has to be in the
+   * intersection of all three, which is the emphasis roles minus `quiet`:
+   * `Button` omits `quiet` because inverse text on a quiet fill is not gated.
+   */
+  accent: 'primary' | 'secondary' | 'tertiary';
   highlighted?: boolean;
   ctaText?: string;
 }
@@ -334,7 +339,10 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
                 }}
               >
                 <Button
-                  variant={tier.accent === 'pink' ? 'pink' : tier.accent === 'yellow' ? 'yellow' : 'cyan'}
+                  // Was a three-way ternary mapping tier hue names onto Button
+                  // hue names. Both vocabularies are roles now, and Button takes
+                  // the full set, so the mapping is the identity.
+                  variant={tier.accent}
                   bracketed
                   style={{ width: '100%', justifyContent: 'center', display: 'flex' }}
                 >

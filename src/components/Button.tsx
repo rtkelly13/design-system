@@ -22,7 +22,21 @@ interface ButtonOwnProps {
    * equally. Renaming them to the roles they resolve to is a breaking API
    * change and is deliberately not bundled with the token migration.
    */
-  variant?:
+  variant?: ButtonVariant;
+  size?: 'sm' | 'md' | 'lg';
+  bracketed?: boolean;
+  className?: string;
+}
+
+/**
+ * The accents a filled Button may take.
+ *
+ * Narrower than `AccentToken` on purpose: `quiet` is missing because
+ * `check:contrast` gates `text.inverse` against `accent.primary`, `secondary`
+ * and `tertiary` only. A quiet fill with inverse text on it is not measured, so
+ * it is not offered.
+ */
+export type ButtonVariant =
     | 'primary'
     | 'secondary'
     | 'tertiary'
@@ -36,10 +50,6 @@ interface ButtonOwnProps {
     | 'yellow'
     /** @deprecated Use `inverse`. Resolves identically. */
     | 'white';
-  size?: 'sm' | 'md' | 'lg';
-  bracketed?: boolean;
-  className?: string;
-}
 
 /**
  * The `<button>` form. `href?: never` is what makes the union below

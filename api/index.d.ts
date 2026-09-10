@@ -249,19 +249,21 @@ declare function useActiveHeading(ids: readonly string[], { offset, enabled }?: 
 interface ButtonOwnProps {
     children: ReactNode;
 
-    variant?: 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'default'
-
-     | 'cyan'
-
-     | 'pink'
-
-     | 'yellow'
-
-     | 'white';
+    variant?: ButtonVariant;
     size?: 'sm' | 'md' | 'lg';
     bracketed?: boolean;
     className?: string;
 }
+
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'inverse' | 'default'
+
+ | 'cyan'
+
+ | 'pink'
+
+ | 'yellow'
+
+ | 'white';
 
 type ButtonElementProps = ButtonOwnProps & DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> & {
     href?: never;
@@ -675,7 +677,8 @@ interface PricingTier {
     period?: string;
     description: string;
     features: string[];
-    accent: AccentToken;
+
+    accent: 'primary' | 'secondary' | 'tertiary';
     highlighted?: boolean;
     ctaText?: string;
 }
@@ -990,6 +993,7 @@ export {
   type ButtonElementProps,
   type ButtonLinkProps,
   type ButtonProps,
+  type ButtonVariant,
   Card,
   type CardAccent,
   type CardProps,

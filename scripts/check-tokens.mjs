@@ -65,6 +65,24 @@ const PROP = /\b(accent|variant|tone)=(?:"|')(cyan|pink|yellow|green)(?:"|')/g;
 const LITERAL = /(?:accent|variant|tone)\s*:\s*'(cyan|pink|yellow|green)'/g;
 /** A Tailwind utility naming the compat palette. */
 const UTILITY = /\b(?:bg|text|border|shadow)-brutalist-[a-zA-Z]+/g;
+/**
+ * A hue name in a *comparison* rather than a value.
+ *
+ * Added because the first version of this gate missed one and the visual suite
+ * caught it instead. `SaasLandingPage` had:
+ *
+ *     variant={tier.accent === 'pink' ? 'pink' : tier.accent === 'yellow' ? 'yellow' : 'cyan'}
+ *
+ * The prop-value patterns above match `variant="pink"`, so they rewrote every
+ * declaration — and left the comparisons. Once `tier.accent` held `'tertiary'`,
+ * both tests were false and all three pricing CTAs fell through to cyan. 26,980
+ * pixels, and `check:tokens` reported zero sites while it happened.
+ *
+ * A gate that only sees one syntactic form of a thing gives a false all-clear
+ * on the others, which is worse than not existing — it is the reason the
+ * migration looked finished.
+ */
+const COMPARISON = /===?\s*(?:"|')(cyan|pink|yellow|green)(?:"|')/g;
 
 /**
  * Files that define the deprecation rather than use it. `theme.ts` declares
@@ -107,7 +125,7 @@ for (const file of walk(SRC)) {
     .replace(/\/\/[^\n]*/g, (m) => ' '.repeat(m.length));
 
   stripped.split('\n').forEach((line, i) => {
-    for (const re of [PROP, LITERAL, UTILITY]) {
+    for (const re of [PROP, LITERAL, UTILITY, COMPARISON]) {
       re.lastIndex = 0;
       let m;
       while ((m = re.exec(line)) !== null) {
