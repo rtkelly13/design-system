@@ -679,6 +679,7 @@ interface SlideProps {
     title?: string;
     subtitle?: string;
     children: react__default.ReactNode;
+
     speakerNotes?: string;
 }
 declare const Slide: react__default.FC<SlideProps>;
@@ -686,6 +687,7 @@ declare const Slide: react__default.FC<SlideProps>;
 interface SlideDeckProps {
     children: react__default.ReactElement[];
     aspectRatio?: '16:9' | '4:3';
+
     autoPlayInterval?: number;
 
     slide?: number;
@@ -694,6 +696,7 @@ interface SlideDeckProps {
 
     chrome?: boolean;
 }
+
 declare const SlideDeck: react__default.FC<SlideDeckProps>;
 
 interface BlogPostProps {
