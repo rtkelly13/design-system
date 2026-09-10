@@ -20,8 +20,8 @@ trigger is the post-merge signal for the default branch specifically.
 
 | Job | What it runs | Roughly | Ceiling |
 | --- | --- | --- | --- |
-| `gates` | `tokens:check`, `check:contrast`, `check:docs`, `lint`, `check:css`, `check:tokens`, `ansi:check`, `check:fonts`, `check:deps` | 30s | 10m |
-| `unit` | `typecheck`, `test`, `build` | 35s | 10m |
+| `gates` | `tokens:check`, `tokens:design:check`, `check:contrast`, `check:docs`, `lint`, `check:css`, `check:tokens`, `ansi:check`, `check:fonts`, `check:deps`, `check:governance` | 30s | 10m |
+| `unit` | `typecheck`, `test`, `build`, `check:api` | 35s | 10m |
 | `visual` | `build-storybook`, `check:visual-coverage`, `test:visual` | 60s | 25m |
 | `verify` | nothing — fails unless the three above succeeded | 10s | 5m |
 
@@ -39,6 +39,17 @@ Only `visual` installs a browser, so only its ceiling has to clear
 `install-playwright`'s retry budget (rule 9). Splitting the job is what let the
 other three drop to a ceiling sized to their own work, instead of every gate
 waiting out a browser-shaped timeout.
+
+**This table is checked.** It is a copy of the roster in `ci.yml`, and it had
+drifted in two rows — `check:tokens` and `ansi:check` had been running in
+`gates` for some time, `check:api` in `unit`, and none of the three appeared
+here. `pnpm check:governance` now fails when a job runs a gate this table omits,
+or claims one it does not run, and asks the same of rule 6 in
+[`docs/workflow.md`](./workflow.md). It also asks the reverse question, which is
+the more dangerous direction: `tokens:design:check` shipped a staleness gate for
+the DTCG export and ran in **no workflow at all**, so a stale `tokens/*.json`
+could reach npm with every check green. A gate in `package.json` now has to be
+wired into a workflow or exempted in the script with a stated reason.
 
 **Add a new gate to `gates` or `unit`, not to `visual`.** The visual job is the
 critical path; the other two have headroom, and putting a check behind a browser

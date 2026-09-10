@@ -46,9 +46,10 @@ concurrency:
 # browser install and the screenshot suite had also run.
 #
 # Split, the critical path is the visual job alone and the gates report in about
-# half a minute. The two new gates in flight (`check:api`, `check:licenses`)
-# land in `unit` beside `build`, where there is roughly twenty seconds of
-# headroom before that job becomes the critical path again.
+# half a minute. `check:api` took the headroom in `unit` beside `build`; there is
+# roughly twenty seconds left there before that job becomes the critical path
+# again, so the next gate needing a built `dist/` goes there and anything that
+# reads only the tree goes in `gates`.
 #
 # Every job carries a `timeout-minutes` per AGENTS.md rule 9. Only `visual`
 # installs a browser, so only its ceiling has to clear that step's retry budget;
@@ -68,7 +69,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -83,6 +84,14 @@ jobs:
       # ordering.
       - name: Theme Token Drift
         run: pnpm tokens:check
+
+      # The same question for the DTCG export in `tokens/`, which ships in the
+      # package and is read by design tools rather than by the build. It had a
+      # staleness check from the day it was written and ran in no workflow at
+      # all, so a stale export could be published with every check green.
+      # `check:governance` below is what noticed, and is why it cannot recur.
+      - name: Design Token Drift
+        run: pnpm tokens:design:check
 
       # Every text-on-surface and border-on-surface pair, on every level.
       - name: Contrast Gate
@@ -130,6 +139,15 @@ jobs:
       - name: Dependencies
         run: pnpm check:deps
 
+      # Last, because it audits everything above it: that every action is pinned
+      # to a SHA, every job has a ceiling, every gate in package.json is wired
+      # into a workflow, the rosters in `docs/ci.md` and rule 6 match what this
+      # file runs, and a `rule N` citation resolves to the same rule in both
+      # AGENTS.md and docs/workflow.md. Rule 14 was violated at 24 of 25 sites
+      # when this was written; nothing had ever looked.
+      - name: Governance
+        run: pnpm check:governance
+
   unit:
     name: test
     runs-on: ubuntu-latest
@@ -138,7 +156,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -174,7 +192,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -197,15 +215,21 @@ jobs:
 
       - name: Upload Playwright Report on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
 
       - name: Upload Generated Snapshots Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
+        # Not `always()`, per rule 9: that fires on cancellation too, and this
+        # workflow cancels its own in-flight runs by design (`concurrency`
+        # above), so the artifact would be uploaded from runs nobody is looking
+        # at — and the moment this step gains `if-no-files-found: error`, every
+        # superseded run reports a failing step. `storybook-walkthrough.yml`
+        # already had the correct condition; this one did not.
+        if: success() || failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: playwright-snapshots
           path: tests/__snapshots__/

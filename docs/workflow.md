@@ -33,10 +33,16 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    `repo-governance verify-pr-checks` with all seven checks green. Rename the
    three jobs below freely; never rename `ci`:
    - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
+   - `pnpm tokens:design:check` (the DTCG export in `tokens/` is neither stale nor orphaned)
    - `pnpm check:contrast` (every role pair, every level)
+   - `pnpm check:docs` (figures written in prose against the source they describe)
    - `pnpm lint` (colour-instead-of-role, reported at the site)
    - `pnpm check:css` (styling-in-CSS ratchet)
+   - `pnpm check:tokens` (hue-named call sites, budget 0)
+   - `pnpm ansi:check` (terminal slot coverage and the committed fixture diff)
+   - `pnpm check:fonts` (every self-hosted family reachable from a `--ds-font-*` stack)
    - `pnpm check:deps` (dependency reasons, sections and usage)
+   - `pnpm check:governance` (this list, and the rest of the rules on this page)
    - `pnpm check:visual-coverage` (every story asserted or excluded with a reason)
    - `pnpm typecheck`
    - `pnpm test` (unit — see "Unit Tests" below)
@@ -44,6 +50,17 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - `pnpm check:api` (the published type surface matches `api/index.d.ts`)
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)
+
+   This list is a copy of what `ci.yml` runs, introduced with the words "all of
+   these run on every PR", and four of thirteen entries were missing when
+   `check:governance` was written — `check:tokens`, `ansi:check`, `check:fonts`
+   and `tokens:design:check`, the last of which ran nowhere at all. `check:docs`
+   made it five: it landed in #146 with a row in `docs/ci.md`'s table and no
+   entry here, which is the first thing this gate caught on the change that
+   followed it. The gate now
+   compares this list, the table in `docs/ci.md` and the workflow itself, in
+   both directions. Adding a gate means adding it in three places, and the third
+   is a required check rather than a courtesy.
 7. **New Components Need Baselines**: adding a story without a snapshot leaves
    `test:visual` unable to assert it. Add the story and its `CASES` row, comment
    **`/update-snapshots`** on the PR to generate the baseline, then push.
@@ -99,3 +116,41 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    every cancelled run into a failing step. Use `if: success() || failure()`.
 
 
+10. **Direct Push Protection**: direct pushes to `main` are blocked; every change
+    arrives as a pull request. This is the rule the other nine hang off — squash
+    merge, linear history and the required check are all settings on a branch
+    nothing can bypass. Note the one legitimate bot push, `update-snapshots.yml`
+    committing baselines back to a *feature* branch, which is why rule 8's caveat
+    exists rather than an exception here.
+11. **Local Temp & Worktree Directory**: temporary files, local databases, scratch
+    files and git worktrees go in the root `/temp/` directory, which is gitignored.
+    One ignored directory rather than a growing list of patterns: a worktree is a
+    full checkout, and the first time one lands somewhere else the diff is the
+    entire repository. `/temp/` and `temp/` are both ignored, because a worktree
+    created from inside a worktree resolves the path differently.
+12. **Gitignored Local TODO File**: a root `TODO.md` MUST exist for local task
+    tracking and MUST be gitignored (both `TODO.md` and `todo.md`, for a
+    case-insensitive filesystem). It is a scratchpad, not a plan of record —
+    anything that outlives a session belongs in an issue, and anything that
+    explains a decision belongs in `docs/`. Committing it turns a private working
+    list into a document reviewers are entitled to read as intent.
+13. **Auto-Merge Enabled**: PRs may enable auto-merge (squash). Safe only because
+    rule 6 makes `ci` a single aggregate check that is *required* — auto-merge
+    waits on required checks, so an unrequired check going red would be merged
+    straight past. That is the load-bearing relationship between these two rules,
+    and it is why `verify` runs with `if: always()`: a skipped required check is
+    indistinguishable from one still running, and auto-merge would wait forever.
+14. **Pinned Action SHAs**: workflows MUST reference third-party actions by
+    40-character commit SHA, never a mutable tag, with the version in a trailing
+    comment (`uses: actions/checkout@11d5960… # v4.4.0`). A tag is a promise that
+    someone else's future commit will run with this repository's `GITHUB_TOKEN`,
+    against a tree that can publish to npm through Trusted Publishing — and `v4`
+    is a *moving* ref, retagged by its author whenever they choose. This rule was
+    written early and honoured in exactly one workflow: when `check:governance`
+    was added it found 24 of 25 sites on a mutable tag, four months after the
+    rule was recorded. Local actions (`./.github/actions/*`) are this repository
+    and need no pin. One action, one SHA, repo-wide — two different SHAs for the
+    same action means a bump landed in some workflows and not the rest, which is
+    how the pinned one goes stale unnoticed. `check:governance` enforces all of
+    it, including the trailing comment: a bare SHA cannot be reviewed or bumped
+    without archaeology.
