@@ -41,16 +41,18 @@
    a different border weight on one level. */
 
 @custom-variant midnight (&:where([data-theme="midnight"], [data-theme="midnight"] *):not(:where([data-theme]:not([data-theme="midnight"]), [data-theme]:not([data-theme="midnight"]) *)));
-@custom-variant dim (&:where([data-theme="dim"], [data-theme="dim"] *):not(:where([data-theme]:not([data-theme="dim"]), [data-theme]:not([data-theme="dim"]) *)));
-@custom-variant bright (&:where([data-theme="bright"], [data-theme="bright"] *):not(:where([data-theme]:not([data-theme="bright"]), [data-theme]:not([data-theme="bright"]) *)));
-@custom-variant white (&:where([data-theme="white"], [data-theme="white"] *):not(:where([data-theme]:not([data-theme="white"]), [data-theme]:not([data-theme="white"]) *)));
+@custom-variant sketch (&:where([data-theme="sketch"], [data-theme="sketch"] *):not(:where([data-theme]:not([data-theme="sketch"]), [data-theme]:not([data-theme="sketch"]) *)));
 
 /* Polarity is a declared property of a level, so these are derived rather than
  * being the axis the system hangs off. Use them for non-colour utilities that
  * genuinely depend on light-vs-dark — a shadow spread, an image filter — never
  * for colour, which the tokens already handle. */
-@custom-variant dark (&:where([data-theme="midnight"], [data-theme="midnight"] *, [data-theme="dim"], [data-theme="dim"] *):not(:where([data-theme]:not([data-theme="midnight"]):not([data-theme="dim"]), [data-theme]:not([data-theme="midnight"]):not([data-theme="dim"]) *)));
-@custom-variant light (&:where([data-theme="bright"], [data-theme="bright"] *, [data-theme="white"], [data-theme="white"] *):not(:where([data-theme]:not([data-theme="bright"]):not([data-theme="white"]), [data-theme]:not([data-theme="bright"]):not([data-theme="white"]) *)));
+@custom-variant dark (&:where([data-theme="midnight"], [data-theme="midnight"] *):not(:where([data-theme]:not([data-theme="midnight"]), [data-theme]:not([data-theme="midnight"]) *)));
+@custom-variant light (&:where([data-theme="sketch"], [data-theme="sketch"] *):not(:where([data-theme]:not([data-theme="sketch"]), [data-theme]:not([data-theme="sketch"]) *)));
+
+/* `light:` is not declared here: a level named `light` already declares it
+ * above, and the two would be the same rule. `dark:` still spans polarity
+ * rather than naming a level, which is why it survives the collapse. */
 
 /* ==========================================================================
    Utility surface
@@ -80,9 +82,29 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
+  --shadow-hard-sm: var(--ds-elev-sm) var(--ds-shadow-color);
+  --shadow-hard-md: var(--ds-elev-md) var(--ds-shadow-color);
+  --shadow-hard-lg: var(--ds-elev-lg) var(--ds-shadow-color);
   --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
   --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
   --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
@@ -91,23 +113,138 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
 
   --font-sans: var(--ds-font-body);
   --font-display: var(--ds-font-display);
   --font-mono: var(--ds-font-mono);
   --font-pixel: var(--ds-font-pixel);
+}
+
+/* ==========================================================================
+   Fixed colours — level-independent, and that is the point
+   ==========================================================================
+
+   These three do not swap with the level. `--color-black` and
+   `--color-white` below DO — they are compat aliases tracking
+   `surface.base` and `text.primary`, which is why `--color-black`
+   resolves to #ffffff on the `white` level. Use these when true black or
+   true white is meant; use `surface.base` for a page ground. */
+
+:root {
+  --ds-fixed-black: #000000;
+  --ds-fixed-white: #ffffff;
+  --ds-fixed-transparent: transparent;
+}
+
+@theme {
+  --color-fixed-black: var(--ds-fixed-black);
+  --color-fixed-white: var(--ds-fixed-white);
+  --color-fixed-transparent: var(--ds-fixed-transparent);
+}
+
+/* ==========================================================================
+   The web Medium — geometry and time, level-independent
+   ==========================================================================
+
+   The second axis. A Level varies colour and is selected at runtime; a Medium
+   varies geometry and time and is selected at build time by which artifact is
+   being emitted. Neither varies on the other's axis, so none of this appears
+   inside a level block. See `docs/adr/0004-two-axes-level-and-medium.md`.
+
+   `video` and `graphic` are real Media with their own numbers — a 1080p
+   frame's type scale is not this one scaled — and they are emitted to their own
+   artifacts rather than to a selector here. */
+
+:root {
+  --ds-space-0: 0;
+  --ds-space-1: 0.25rem;
+  --ds-space-2: 0.5rem;
+  --ds-space-3: 0.75rem;
+  --ds-space-4: 1rem;
+  --ds-space-5: 1.5rem;
+  --ds-space-6: 2rem;
+  --ds-space-7: 3rem;
+  --ds-space-8: 4rem;
+  --ds-space-9: 6rem;
+  --ds-space-10: 8rem;
+  --ds-type-caption: 0.75rem;
+  --ds-leading-caption: 1.4;
+  --ds-type-body: 1rem;
+  --ds-leading-body: 1.6;
+  --ds-type-lead: 1.125rem;
+  --ds-leading-lead: 1.55;
+  --ds-type-title: 1.5rem;
+  --ds-leading-title: 1.2;
+  --ds-type-display: 2.25rem;
+  --ds-leading-display: 1.05;
+  --ds-type-hero: 3rem;
+  --ds-leading-hero: 0.95;
+  --ds-weight-regular: 400;
+  --ds-weight-bold: 700;
+  --ds-weight-black: 900;
+  --ds-stroke-hairline: 1px;
+  --ds-stroke-edge: 2px;
+  --ds-stroke-heavy: 4px;
+  --ds-elev-sm: 2px 2px 0px 0px;
+  --ds-elev-md: 4px 4px 0px 0px;
+  --ds-elev-lg: 6px 6px 0px 0px;
+  --ds-radius-none: 0px;
+  --ds-radius-soft: 0px;
+  --ds-duration-instant: 0ms;
+  --ds-duration-quick: 150ms;
+  --ds-duration-considered: 300ms;
+  --ds-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-layer-base: 0;
+  --ds-layer-raised: 10;
+  --ds-layer-overlay: 100;
+  --ds-layer-top: 1000;
+  --ds-focus-width: 2px;
+  --ds-focus-offset: 2px;
+}
+
+@theme {
+  --text-caption: var(--ds-type-caption);
+  --text-caption--line-height: var(--ds-leading-caption);
+  --text-body: var(--ds-type-body);
+  --text-body--line-height: var(--ds-leading-body);
+  --text-lead: var(--ds-type-lead);
+  --text-lead--line-height: var(--ds-leading-lead);
+  --text-title: var(--ds-type-title);
+  --text-title--line-height: var(--ds-leading-title);
+  --text-display: var(--ds-type-display);
+  --text-display--line-height: var(--ds-leading-display);
+  --text-hero: var(--ds-type-hero);
+  --text-hero--line-height: var(--ds-leading-hero);
+  --font-weight-regular: var(--ds-weight-regular);
+  --font-weight-bold: var(--ds-weight-bold);
+  --font-weight-black: var(--ds-weight-black);
+  --radius-none: var(--ds-radius-none);
+  --radius-soft: var(--ds-radius-soft);
+  --radius-xs: var(--ds-radius-none);
+  --radius-sm: var(--ds-radius-none);
+  --radius-md: var(--ds-radius-none);
+  --radius-lg: var(--ds-radius-none);
+  --radius-xl: var(--ds-radius-none);
+  --radius-2xl: var(--ds-radius-none);
+  --radius-3xl: var(--ds-radius-none);
+  --radius-4xl: var(--ds-radius-none);
+  --duration-instant: var(--ds-duration-instant);
+  --duration-quick: var(--ds-duration-quick);
+  --duration-considered: var(--ds-duration-considered);
+  --z-index-base: var(--ds-layer-base);
+  --z-index-raised: var(--ds-layer-raised);
+  --z-index-overlay: var(--ds-layer-overlay);
+  --z-index-top: var(--ds-layer-top);
+  --ease-brutalist: var(--ds-ease);
 }
 
 /* ==========================================================================
@@ -147,12 +284,32 @@
   --ds-border-subtle: #33334d;
   --ds-accent-primary: #22d3ee;
   --ds-accent-secondary: #facc15;
-  --ds-accent-tertiary: #ec4899;
+  --ds-accent-tertiary: #f955a4;
   --ds-accent-quiet: #8b8ba3;
   --ds-intent-info: #22d3ee;
   --ds-intent-success: #39ff14;
   --ds-intent-warning: #facc15;
-  --ds-intent-danger: #ec4899;
+  --ds-intent-danger: #f955a4;
+  --ds-palette-red: #ff586e;
+  --ds-palette-orange: #ff8c00;
+  --ds-palette-yellow: #facc15;
+  --ds-palette-green: #39ff14;
+  --ds-palette-teal: #34d399;
+  --ds-palette-cyan: #22d3ee;
+  --ds-palette-blue: #38bdf8;
+  --ds-palette-violet: #c3afff;
+  --ds-palette-magenta: #ff1cff;
+  --ds-palette-pink: #f955a4;
+  --ds-palette-bright-red: #ff939b;
+  --ds-palette-bright-orange: #ffba85;
+  --ds-palette-bright-yellow: #ffeaab;
+  --ds-palette-bright-green: #c0ffb8;
+  --ds-palette-bright-teal: #00f7ae;
+  --ds-palette-bright-cyan: #88ebff;
+  --ds-palette-bright-blue: #8cd7ff;
+  --ds-palette-bright-violet: #ddd4ff;
+  --ds-palette-bright-magenta: #ff88fd;
+  --ds-palette-bright-pink: #ff8ebe;
   --ds-shadow-color: #ffffff;
   --ds-polarity: dark;
 
@@ -175,9 +332,29 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
+  --shadow-hard-sm: var(--ds-elev-sm) var(--ds-shadow-color);
+  --shadow-hard-md: var(--ds-elev-md) var(--ds-shadow-color);
+  --shadow-hard-lg: var(--ds-elev-lg) var(--ds-shadow-color);
   --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
   --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
   --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
@@ -186,144 +363,62 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  /* deprecated — see `pnpm check:tokens` */
-  --color-black: #0a0a1a;
-  --color-white: #ffffff;
-  --border-color: #ffffff;
-  --brutalist-cyan: #22d3ee;
-  --brutalist-neonCyan: #22d3ee;
-  --brutalist-pink: #ec4899;
-  --brutalist-yellow: #facc15;
-  --brutalist-cyberOrange: #facc15;
-  --brutalist-neonGreen: #39ff14;
-  --brutalist-darkBg: #0a0a1a;
-  --brutalist-shadow-color: #ffffff;
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
 }
 
-/* Dim — Desaturated neutrals and softer inks, for long reading. */
-[data-theme="dim"] {
-  color-scheme: dark;
-
-  --ds-surface-base: #121316;
-  --ds-surface-raised: #1c1d21;
-  --ds-surface-sunken: #0c0d0f;
-  --ds-surface-overlay: rgba(12, 13, 15, 0.82);
-  --ds-text-primary: #e4e4e7;
-  --ds-text-secondary: #b0b1b8;
-  --ds-text-muted: #8a8b93;
-  --ds-text-inverse: #121316;
-  --ds-border-strong: #e4e4e7;
-  --ds-border-default: #8f9099;
-  --ds-border-subtle: #3c3d44;
-  --ds-accent-primary: #38bdf8;
-  --ds-accent-secondary: #fbbf24;
-  --ds-accent-tertiary: #f43f5e;
-  --ds-accent-quiet: #8a8b93;
-  --ds-intent-info: #38bdf8;
-  --ds-intent-success: #4ade80;
-  --ds-intent-warning: #fbbf24;
-  --ds-intent-danger: #f43f5e;
-  --ds-shadow-color: #e4e4e7;
-  --ds-polarity: dark;
-
-  --color-surface-base: var(--ds-surface-base);
-  --color-surface-raised: var(--ds-surface-raised);
-  --color-surface-sunken: var(--ds-surface-sunken);
-  --color-surface-overlay: var(--ds-surface-overlay);
-  --color-content-primary: var(--ds-text-primary);
-  --color-content-secondary: var(--ds-text-secondary);
-  --color-content-muted: var(--ds-text-muted);
-  --color-content-inverse: var(--ds-text-inverse);
-  --color-edge-strong: var(--ds-border-strong);
-  --color-edge-default: var(--ds-border-default);
-  --color-edge-subtle: var(--ds-border-subtle);
-  --color-accent-primary: var(--ds-accent-primary);
-  --color-accent-secondary: var(--ds-accent-secondary);
-  --color-accent-tertiary: var(--ds-accent-tertiary);
-  --color-accent-quiet: var(--ds-accent-quiet);
-  --color-intent-info: var(--ds-intent-info);
-  --color-intent-success: var(--ds-intent-success);
-  --color-intent-warning: var(--ds-intent-warning);
-  --color-intent-danger: var(--ds-intent-danger);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-accent-quiet: 4px 4px 0px 0px var(--ds-accent-quiet);
-  --shadow-hard-intent-info: 4px 4px 0px 0px var(--ds-intent-info);
-  --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
-  --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
-  --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
-  --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-
-  /* deprecated — see `pnpm check:tokens` */
-  --color-black: #121316;
-  --color-white: #e4e4e7;
-  --border-color: #e4e4e7;
-  --brutalist-cyan: #38bdf8;
-  --brutalist-neonCyan: #38bdf8;
-  --brutalist-pink: #f43f5e;
-  --brutalist-yellow: #fbbf24;
-  --brutalist-cyberOrange: #fbbf24;
-  --brutalist-neonGreen: #4ade80;
-  --brutalist-darkBg: #121316;
-  --brutalist-shadow-color: #e4e4e7;
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
-}
-
-/* Bright — Warm sketch paper and pen ink. The characterful light level. */
-[data-theme="bright"] {
+/* Sketch — Warm paper and pen ink. The light half of the pair. */
+[data-theme="sketch"] {
   color-scheme: light;
 
-  --ds-surface-base: #fcfbf9;
+  --ds-surface-base: #f5f3ec;
   --ds-surface-raised: #ffffff;
-  --ds-surface-sunken: #f4f1e9;
-  --ds-surface-overlay: rgba(24, 24, 27, 0.72);
-  --ds-text-primary: #18181b;
-  --ds-text-secondary: #4b4a45;
-  --ds-text-muted: #66655e;
-  --ds-text-inverse: #fcfbf9;
-  --ds-border-strong: #18181b;
-  --ds-border-default: #7c7a72;
-  --ds-border-subtle: #cbc5b7;
-  --ds-accent-primary: #2563eb;
-  --ds-accent-secondary: #c2410c;
-  --ds-accent-tertiary: #c81e1e;
-  --ds-accent-quiet: #66655e;
-  --ds-intent-info: #2563eb;
-  --ds-intent-success: #146c34;
-  --ds-intent-warning: #9a4708;
-  --ds-intent-danger: #c81e1e;
-  --ds-shadow-color: #18181b;
+  --ds-surface-sunken: #efeadf;
+  --ds-surface-overlay: rgba(35, 38, 46, 0.72);
+  --ds-text-primary: #23262e;
+  --ds-text-secondary: #33373f;
+  --ds-text-muted: #6a6252;
+  --ds-text-inverse: #f5f3ec;
+  --ds-border-strong: #23262e;
+  --ds-border-default: #8f8672;
+  --ds-border-subtle: #c8c3b4;
+  --ds-accent-primary: #1450d7;
+  --ds-accent-secondary: #006b2e;
+  --ds-accent-tertiary: #bd0010;
+  --ds-accent-quiet: #6a6252;
+  --ds-intent-info: #1450d7;
+  --ds-intent-success: #006b2e;
+  --ds-intent-warning: #974503;
+  --ds-intent-danger: #bd0010;
+  --ds-palette-red: #bd0010;
+  --ds-palette-orange: #974503;
+  --ds-palette-yellow: #705a00;
+  --ds-palette-green: #006b2e;
+  --ds-palette-teal: #006859;
+  --ds-palette-cyan: #006675;
+  --ds-palette-blue: #1450d7;
+  --ds-palette-violet: #7d00f4;
+  --ds-palette-magenta: #a300ad;
+  --ds-palette-pink: #b4006c;
+  --ds-palette-bright-red: #8f002a;
+  --ds-palette-bright-orange: #6c3700;
+  --ds-palette-bright-yellow: #534200;
+  --ds-palette-bright-green: #024f00;
+  --ds-palette-bright-teal: #004d34;
+  --ds-palette-bright-cyan: #004b56;
+  --ds-palette-bright-blue: #004e6d;
+  --ds-palette-bright-violet: #6000bd;
+  --ds-palette-bright-magenta: #7f0080;
+  --ds-palette-bright-pink: #8a0052;
+  --ds-shadow-color: #23262e;
   --ds-polarity: light;
 
   --color-surface-base: var(--ds-surface-base);
@@ -345,9 +440,29 @@
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
+  --shadow-hard-sm: var(--ds-elev-sm) var(--ds-shadow-color);
+  --shadow-hard-md: var(--ds-elev-md) var(--ds-shadow-color);
+  --shadow-hard-lg: var(--ds-elev-lg) var(--ds-shadow-color);
   --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
   --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
   --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
@@ -356,118 +471,16 @@
   --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
   --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
   --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
+  --shadow-glow-accent-primary: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
+  --shadow-glow-accent-secondary: 0 0 10px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 30%, transparent);
+  --shadow-glow-accent-tertiary: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
+  --shadow-glow-accent-quiet: 0 0 10px color-mix(in oklab, var(--ds-accent-quiet) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-quiet) 30%, transparent);
+  --shadow-glow-intent-info: 0 0 10px color-mix(in oklab, var(--ds-intent-info) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-info) 30%, transparent);
+  --shadow-glow-intent-success: 0 0 10px color-mix(in oklab, var(--ds-intent-success) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-success) 30%, transparent);
+  --shadow-glow-intent-warning: 0 0 10px color-mix(in oklab, var(--ds-intent-warning) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-warning) 30%, transparent);
+  --shadow-glow-intent-danger: 0 0 10px color-mix(in oklab, var(--ds-intent-danger) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-intent-danger) 30%, transparent);
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
 
-  /* deprecated — see `pnpm check:tokens` */
-  --color-black: #fcfbf9;
-  --color-white: #18181b;
-  --border-color: #18181b;
-  --brutalist-cyan: #2563eb;
-  --brutalist-neonCyan: #2563eb;
-  --brutalist-pink: #c81e1e;
-  --brutalist-yellow: #c2410c;
-  --brutalist-cyberOrange: #c2410c;
-  --brutalist-neonGreen: #146c34;
-  --brutalist-darkBg: #fcfbf9;
-  --brutalist-shadow-color: #18181b;
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
-}
-
-/* White — Neutral and print-safe, for dense UI and documents. */
-[data-theme="white"] {
-  color-scheme: light;
-
-  --ds-surface-base: #ffffff;
-  --ds-surface-raised: #f7f8fa;
-  --ds-surface-sunken: #eef1f5;
-  --ds-surface-overlay: rgba(11, 11, 13, 0.7);
-  --ds-text-primary: #0b0b0d;
-  --ds-text-secondary: #42454d;
-  --ds-text-muted: #5f636d;
-  --ds-text-inverse: #ffffff;
-  --ds-border-strong: #0b0b0d;
-  --ds-border-default: #73777f;
-  --ds-border-subtle: #c6cad2;
-  --ds-accent-primary: #1d4ed8;
-  --ds-accent-secondary: #9a4708;
-  --ds-accent-tertiary: #be123c;
-  --ds-accent-quiet: #5f636d;
-  --ds-intent-info: #1d4ed8;
-  --ds-intent-success: #146c34;
-  --ds-intent-warning: #9a4708;
-  --ds-intent-danger: #b91c1c;
-  --ds-shadow-color: #0b0b0d;
-  --ds-polarity: light;
-
-  --color-surface-base: var(--ds-surface-base);
-  --color-surface-raised: var(--ds-surface-raised);
-  --color-surface-sunken: var(--ds-surface-sunken);
-  --color-surface-overlay: var(--ds-surface-overlay);
-  --color-content-primary: var(--ds-text-primary);
-  --color-content-secondary: var(--ds-text-secondary);
-  --color-content-muted: var(--ds-text-muted);
-  --color-content-inverse: var(--ds-text-inverse);
-  --color-edge-strong: var(--ds-border-strong);
-  --color-edge-default: var(--ds-border-default);
-  --color-edge-subtle: var(--ds-border-subtle);
-  --color-accent-primary: var(--ds-accent-primary);
-  --color-accent-secondary: var(--ds-accent-secondary);
-  --color-accent-tertiary: var(--ds-accent-tertiary);
-  --color-accent-quiet: var(--ds-accent-quiet);
-  --color-intent-info: var(--ds-intent-info);
-  --color-intent-success: var(--ds-intent-success);
-  --color-intent-warning: var(--ds-intent-warning);
-  --color-intent-danger: var(--ds-intent-danger);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-accent-primary: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-accent-secondary: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-hard-accent-tertiary: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-accent-quiet: 4px 4px 0px 0px var(--ds-accent-quiet);
-  --shadow-hard-intent-info: 4px 4px 0px 0px var(--ds-intent-info);
-  --shadow-hard-intent-success: 4px 4px 0px 0px var(--ds-intent-success);
-  --shadow-hard-intent-warning: 4px 4px 0px 0px var(--ds-intent-warning);
-  --shadow-hard-intent-danger: 4px 4px 0px 0px var(--ds-intent-danger);
-  --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-
-  /* deprecated — see `pnpm check:tokens` */
-  --color-black: #ffffff;
-  --color-white: #0b0b0d;
-  --border-color: #0b0b0d;
-  --brutalist-cyan: #1d4ed8;
-  --brutalist-neonCyan: #1d4ed8;
-  --brutalist-pink: #be123c;
-  --brutalist-yellow: #9a4708;
-  --brutalist-cyberOrange: #9a4708;
-  --brutalist-neonGreen: #146c34;
-  --brutalist-darkBg: #ffffff;
-  --brutalist-shadow-color: #0b0b0d;
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);
 }
 
 /* Native form controls, scrollbars and the caret follow `color-scheme`, which

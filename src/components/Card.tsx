@@ -3,8 +3,6 @@ import { cn } from '../lib/recipe';
 import { accentVar, semanticTokens } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
 
-/** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
-export type CardAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   title?: string;
@@ -103,7 +101,7 @@ export function Card({
   const computedFilename = filename || (title ? `${title.toLowerCase().replace(/\s+/g, '_')}.md` : 'card.md');
 
   return (
-    <div className={`p-4 md:w-1/2 style-card-wrap ${className}`.trim()} style={{ maxWidth: '544px' }} {...props}>
+    <div className={cn('p-4 md:w-1/2', className)} style={{ maxWidth: '544px' }} {...props}>
       <div
         style={{
           height: '100%',
@@ -209,5 +207,3 @@ export function Card({
     </div>
   );
 }
-
-export default Card;

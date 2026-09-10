@@ -22,12 +22,7 @@ export type CanonicalAccent =
   | 'intent-warning'
   | 'intent-danger';
 
-/**
- * Every accepted token, including the deprecated palette names, mapped to its
- * role. The legacy rows must agree with `LEGACY_VARS` in `./theme` — a test
- * asserts the two stay in step, since a divergence would make a component's
- * class and its inline style disagree about the same prop.
- */
+/** Every accepted token mapped to its role. */
 const CANONICAL: Record<AccentToken, CanonicalAccent> = {
   primary: 'accent-primary',
   secondary: 'accent-secondary',
@@ -37,11 +32,6 @@ const CANONICAL: Record<AccentToken, CanonicalAccent> = {
   success: 'intent-success',
   warning: 'intent-warning',
   danger: 'intent-danger',
-  // Deprecated palette names, kept resolving so consumers keep compiling.
-  cyan: 'accent-primary',
-  yellow: 'accent-secondary',
-  pink: 'accent-tertiary',
-  green: 'intent-success',
 };
 
 /**

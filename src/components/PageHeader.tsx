@@ -2,8 +2,6 @@ import type { ReactNode, ElementType } from 'react';
 import { cn } from '../lib/recipe';
 import type { AccentToken } from '../lib/theme';
 
-/** @deprecated Use {@link AccentToken}. Retained for existing call sites. */
-export type PageHeaderAccent = 'cyan' | 'pink' | 'yellow' | 'green';
 
 const ACCENT_TEXT: Record<string, string> = {
   primary: 'text-accent-primary',
@@ -62,5 +60,3 @@ export function PageHeader({
     </header>
   );
 }
-
-export default PageHeader;

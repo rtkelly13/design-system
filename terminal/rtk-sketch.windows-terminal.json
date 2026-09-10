@@ -1,0 +1,23 @@
+{
+  "name": "RTK Sketch",
+  "background": "#f5f3ec",
+  "foreground": "#23262e",
+  "cursorColor": "#1450d7",
+  "selectionBackground": "#ffffff",
+  "black": "#23262e",
+  "red": "#bd0010",
+  "green": "#006b2e",
+  "yellow": "#705a00",
+  "blue": "#1450d7",
+  "magenta": "#a300ad",
+  "cyan": "#006675",
+  "white": "#efeadf",
+  "brightBlack": "#33373f",
+  "brightRed": "#8f002a",
+  "brightGreen": "#024f00",
+  "brightYellow": "#534200",
+  "brightBlue": "#004e6d",
+  "brightMagenta": "#7f0080",
+  "brightCyan": "#004b56",
+  "brightWhite": "#ffffff"
+}

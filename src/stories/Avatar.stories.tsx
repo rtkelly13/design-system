@@ -14,7 +14,7 @@ type Story = StoryObj<typeof Avatar>;
 export const Default: Story = {
   args: {
     fallback: 'RK',
-    accent: 'cyan',
+    accent: 'primary',
     size: 'md',
   },
 };
@@ -22,7 +22,7 @@ export const Default: Story = {
 export const PinkAccent: Story = {
   args: {
     fallback: 'AI',
-    accent: 'pink',
+    accent: 'tertiary',
     size: 'lg',
   },
 };

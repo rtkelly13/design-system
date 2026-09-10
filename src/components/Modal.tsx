@@ -179,7 +179,7 @@ export function Modal({
 
         <div className="flex justify-end gap-3 border-t-2 border-edge-strong bg-surface-base px-6 py-4">
           {footer || (
-            <Button onClick={onClose} variant="pink" bracketed size="sm">
+            <Button onClick={onClose} variant="tertiary" bracketed size="sm">
               CLOSE
             </Button>
           )}
@@ -189,5 +189,3 @@ export function Modal({
     document.body,
   );
 }
-
-export default Modal;

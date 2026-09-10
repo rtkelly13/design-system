@@ -70,6 +70,46 @@ const EXCLUDED = {
     'Controlled TanStack table state machine; asserted in unit tests.',
   'foundations-datatable--compound-table':
     'Low-level compound Table primitives; asserted in walkthrough suite.',
+
+  /*
+   * The manifesto's eleven specimens.
+   *
+   * They are stories only so the `Level` toolbar reaches the landing page —
+   * decorators wrap stories, and a docs page carrying none of them cannot be
+   * themed. They are fragments of one page rather than components, and every one
+   * of them is already owned by a gate that asserts the thing it renders, named
+   * below. A pixel diff would add no signal and would churn on every token tweak,
+   * which is the argument `showcase-designsandbox--default-sandbox` is excluded
+   * on.
+   */
+  'manifesto--facts':
+    'Six lines of mono text naming the vocabulary. Nothing renders here that a component baseline does not; a diff could only ever be a wording change.',
+  'manifesto--levels':
+    'The pair rendered against itself — the same assertion `foundations-theme-ladder--all-levels` already makes fullPage, over the same components.',
+  'manifesto--roles':
+    'Role swatches beside the Hue each declares. `check:contrast` asserts that every Role holds its declared Hue’s value, which is the invariant worth gating.',
+  'manifesto--hues':
+    'The ten Hues and the contrast each measures. Every one of those numbers is gated arithmetically by `check:contrast`.',
+  'manifesto--contrast':
+    'Renders the gate’s own counts, like `foundations-theme-ladder--contrast-matrix` and excluded for the same reason: `check:contrast` already fails CI on any violation.',
+  'manifesto--surfaces':
+    'Four grounds per level, straight from `LEVELS`. `check:contrast` measures every pair a component may sit on.',
+  'manifesto--form':
+    'Shadow offsets and the zero radius, read from `MEDIA_DEFINITIONS`. The `Button` and `Card` baselines already assert that shadow and border treatment.',
+  'manifesto--type':
+    'A font-stack specimen. `check:fonts` owns the stacks; a text-render diff here would be a font-loading flake, not a design regression.',
+  'manifesto--media':
+    'A table of `MEDIA_DEFINITIONS` values, two of which emit no artifact. Numbers, not rendering.',
+  'manifesto--ansi':
+    'Sixteen slots from `ansiScheme`. `ansi:check` asserts slot coverage and diffs the committed terminal fixtures.',
+  'manifesto--voice':
+    'Composes PageTitle, Badge and BracketText, each asserted by its own baseline.',
+  'manifesto--graphic':
+    'An SVG palette card in `viewBox` units. Its colours are gated by `check:contrast --medium=graphic` and its layout is arithmetic over `MEDIA_DEFINITIONS.graphic`; a raster diff of vector output would churn on font metrics alone.',
+  'manifesto--motion':
+    'A transition. Its resting state is the only deterministic frame, and what the specimen exists to show — the durations — is exactly what a still cannot capture.',
+  'manifesto--usage':
+    'Code samples in `CodeTabs` and `CodeBlock`, both asserted by their own baselines (`codetabs-merged`, `codeblock-with-title-and-language`).',
 };
 
 /**

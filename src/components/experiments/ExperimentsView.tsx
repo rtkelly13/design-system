@@ -105,7 +105,7 @@ export const ExperimentsView: React.FC<ExperimentsViewProps> = ({ onSelectExperi
                 >
                   {exp.name}
                 </h3>
-                <Badge accent={exp.status === 'active' ? 'cyan' : 'yellow'}>{exp.status.toUpperCase()}</Badge>
+                <Badge accent={exp.status === 'active' ? 'primary' : 'secondary'}>{exp.status.toUpperCase()}</Badge>
               </div>
               <p
                 style={{

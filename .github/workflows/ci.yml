@@ -88,6 +88,14 @@ jobs:
       - name: Contrast Gate
         run: pnpm check:contrast
 
+      # The same question one layer out: do the figures written in prose still
+      # match the arithmetic? DESIGN.md claimed 440 contrast pairs against a gate
+      # reporting 220 for four months, because nothing compared the two. Sits
+      # next to `tokens:check` deliberately — both gate a copy of the source
+      # against the source.
+      - name: Documented figures
+        run: pnpm check:docs
+
       # Ratchet: fails if the count of colour-instead-of-role call sites rises.
       - name: Lint — colour literals and unknown classnames
         run: pnpm lint
@@ -95,6 +103,19 @@ jobs:
       # Ratchet: fails if styling moves back into a stylesheet.
       - name: CSS Surface
         run: pnpm check:css
+
+      # A ratchet at zero. The generator has referenced this command since the
+      # compat aliases were written; it did not exist until 0.5.0, so the exit
+      # condition for deleting them was unmeasurable. Now a new hue-named call
+      # site fails the build with the role it should have used.
+      - name: Hue-named call sites
+        run: pnpm check:tokens
+
+      # Slot coverage and the committed fixture diff — the two gates ADR 0001
+      # says a fan-out map requires, because a wrong map emits confidently: a
+      # terminal renders an unfilled slot as the foreground rather than erroring.
+      - name: Terminal schemes
+        run: pnpm ansi:check
 
       # Self-hosted fonts ship as @font-face rules nothing is obliged to
       # reference. This fails if a --ds-font-* stack cannot name a family the
@@ -134,6 +155,12 @@ jobs:
 
       - name: Build Package
         run: pnpm build
+
+      # Reads dist/index.d.ts, so it belongs in this job, after the build.
+      # Fails if the published type surface moved without api/index.d.ts being
+      # updated — the diff in that file *is* the API change under review.
+      - name: Public API Surface
+        run: pnpm check:api
 
   visual:
     name: visual

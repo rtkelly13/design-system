@@ -19,7 +19,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { LEVELS, THEME_LEVELS } from '../src/theme/levels.ts';
+import { LEVELS, THEME_LEVELS, FIXED_COLOURS } from '../src/theme/levels.ts';
+import { CSS_MEDIUM, MEDIA_DEFINITIONS } from '../src/theme/media.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // Generated straight into the file consumers already import, rather than into a
@@ -65,6 +66,13 @@ function levelVariables(definition) {
   for (const [key, value] of Object.entries(definition.border)) push(`border-${key}`, value);
   for (const [key, value] of Object.entries(definition.accent)) push(`accent-${key}`, value);
   for (const [key, value] of Object.entries(definition.intent)) push(`intent-${key}`, value);
+  // The Hue vocabulary, declared below the Roles above. A component may not
+  // read these — see `docs/adr/0001-hues-declared-below-roles.md`. They exist
+  // for Targets with no notion of jobs: ANSI's sixteen slots, a diagram
+  // needing N distinguishable colours, half a JetBrains scheme.
+  for (const [key, value] of Object.entries(definition.palette)) push(`palette-${key}`, value);
+  for (const [key, value] of Object.entries(definition.paletteBright))
+    push(`palette-bright-${key}`, value);
   push('shadow-color', definition.shadow);
   push('polarity', definition.polarity);
 
@@ -99,6 +107,21 @@ const ACCENT_ROLES = [
  * Deliberately 4px, matching `hard-md`: the palette-named three are 4px too, so
  * swapping one for the other cannot move a layout.
  */
+/**
+ * A glow per accent/intent role, matching `ROLE_SHADOWS`.
+ *
+ * There used to be exactly one glow (`--shadow-glow-accent`, pinned to
+ * `accent.primary`) plus three hue-named ones in the compat layer —
+ * `glow-cyan`, `glow-pink`, `glow-orange`. Removing the compat layer left a
+ * consumer with a pink glow and nowhere to put it, which is a gap rather than a
+ * migration: the asymmetry between hard shadows (role-named, complete) and
+ * glows (one role, three hues) was itself a symptom of the hue layer.
+ */
+const ROLE_GLOWS = ACCENT_ROLES.map(
+  (role) =>
+    `  --shadow-glow-${role}: 0 0 10px color-mix(in oklab, var(--ds-${role}) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-${role}) 30%, transparent);`,
+).join('\n');
+
 const ROLE_SHADOWS = ACCENT_ROLES.map(
   (role) => `  --shadow-hard-${role}: 4px 4px 0px 0px var(--ds-${role});`,
 ).join('\n');
@@ -126,68 +149,34 @@ const TAILWIND_ALIASES = `  --color-surface-base: var(--ds-surface-base);
   --color-intent-success: var(--ds-intent-success);
   --color-intent-warning: var(--ds-intent-warning);
   --color-intent-danger: var(--ds-intent-danger);
-  --shadow-hard-sm: 2px 2px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-md: 4px 4px 0px 0px var(--ds-shadow-color);
-  --shadow-hard-lg: 6px 6px 0px 0px var(--ds-shadow-color);
+  --color-palette-red: var(--ds-palette-red);
+  --color-palette-orange: var(--ds-palette-orange);
+  --color-palette-yellow: var(--ds-palette-yellow);
+  --color-palette-green: var(--ds-palette-green);
+  --color-palette-teal: var(--ds-palette-teal);
+  --color-palette-cyan: var(--ds-palette-cyan);
+  --color-palette-blue: var(--ds-palette-blue);
+  --color-palette-violet: var(--ds-palette-violet);
+  --color-palette-magenta: var(--ds-palette-magenta);
+  --color-palette-pink: var(--ds-palette-pink);
+  --color-palette-bright-red: var(--ds-palette-bright-red);
+  --color-palette-bright-orange: var(--ds-palette-bright-orange);
+  --color-palette-bright-yellow: var(--ds-palette-bright-yellow);
+  --color-palette-bright-green: var(--ds-palette-bright-green);
+  --color-palette-bright-teal: var(--ds-palette-bright-teal);
+  --color-palette-bright-cyan: var(--ds-palette-bright-cyan);
+  --color-palette-bright-blue: var(--ds-palette-bright-blue);
+  --color-palette-bright-violet: var(--ds-palette-bright-violet);
+  --color-palette-bright-magenta: var(--ds-palette-bright-magenta);
+  --color-palette-bright-pink: var(--ds-palette-bright-pink);
+  --shadow-hard-sm: var(--ds-elev-sm) var(--ds-shadow-color);
+  --shadow-hard-md: var(--ds-elev-md) var(--ds-shadow-color);
+  --shadow-hard-lg: var(--ds-elev-lg) var(--ds-shadow-color);
 ${ROLE_SHADOWS}
+${ROLE_GLOWS}
   --shadow-glow-accent: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);`;
 
-/**
- * Bridge for components not yet migrated off the old palette.
- *
- * The pre-ladder token layer overloaded `--color-black` to mean "page ground"
- * and `--color-white` to mean "ink", swapping them per theme. That is why
- * `bg-black` and `text-white` are still scattered through the components and
- * appear to work. Mapping the old names onto the new roles keeps every one of
- * them rendering correctly — including on the two new levels — so the component
- * migration can happen file by file instead of in one commit.
- *
- * `pnpm check:tokens` counts the remaining call sites; this block comes out
- * when that reaches zero.
- *
- * Not covered, and not coverable: literal Tailwind greys (`bg-zinc-900`,
- * `text-zinc-400`) baked into some components. They are real colours, not
- * aliases, so they stay dark on the light levels. The checker reports them.
- */
-function compatAliases(definition) {
-  return `  /* deprecated — see \`pnpm check:tokens\` */
-  --color-black: ${definition.surface.base};
-  --color-white: ${definition.text.primary};
-  --border-color: ${definition.border.strong};
-  --brutalist-cyan: ${definition.accent.primary};
-  --brutalist-neonCyan: ${definition.accent.primary};
-  --brutalist-pink: ${definition.accent.tertiary};
-  --brutalist-yellow: ${definition.accent.secondary};
-  --brutalist-cyberOrange: ${definition.accent.secondary};
-  --brutalist-neonGreen: ${definition.intent.success};
-  --brutalist-darkBg: ${definition.surface.base};
-  --brutalist-shadow-color: ${definition.shadow};
-  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);
-  --shadow-glow-cyan: 0 0 10px color-mix(in oklab, var(--ds-accent-primary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-primary) 30%, transparent);
-  --shadow-glow-pink: 0 0 10px color-mix(in oklab, var(--ds-accent-tertiary) 50%, transparent), 0 0 20px color-mix(in oklab, var(--ds-accent-tertiary) 30%, transparent);
-  --shadow-glow-orange: 0 0 20px color-mix(in oklab, var(--ds-accent-secondary) 80%, transparent), 0 0 40px color-mix(in oklab, var(--ds-accent-secondary) 50%, transparent);`;
-}
 
-/** The same names, declared in `@theme` so Tailwind still emits the utilities. */
-const COMPAT_THEME = `  --color-brutalist-cyan: var(--ds-accent-primary);
-  --color-brutalist-neonCyan: var(--ds-accent-primary);
-  --color-brutalist-pink: var(--ds-accent-tertiary);
-  --color-brutalist-yellow: var(--ds-accent-secondary);
-  --color-brutalist-cyberOrange: var(--ds-accent-secondary);
-  --color-brutalist-neonGreen: var(--ds-intent-success);
-  --color-brutalist-darkBg: var(--ds-surface-base);
-  --shadow-hard-cyan: 4px 4px 0px 0px var(--ds-accent-primary);
-  --shadow-hard-pink: 4px 4px 0px 0px var(--ds-accent-tertiary);
-  --shadow-hard-yellow: 4px 4px 0px 0px var(--ds-accent-secondary);`;
 
 /**
  * Match elements whose NEAREST themed ancestor-or-self is `level`.
@@ -212,6 +201,114 @@ function polarityVariant(levels) {
   const other = levels.map((level) => `:not([data-theme="${level}"])`).join('');
   const outside = `[data-theme]${other}`;
   return `&:where(${inside}):not(:where(${outside}, ${outside} *))`;
+}
+
+/**
+ * The web Medium's geometry and time, as `--ds-*` custom properties.
+ *
+ * On `:root` and **not** inside a level block, which is the whole point of the
+ * second axis: these do not vary by Level, so repeating them per level would
+ * author the same number twice for two Levels that must agree. Colour is the
+ * only thing the level blocks carry.
+ *
+ * Exactly one Medium reaches CSS, per ADR 0004. `video` and `graphic` are
+ * emitted to their own artifacts by their own Emitters — a Medium must never be
+ * selectable by an attribute the way a Level is.
+ */
+function mediumVariables(medium) {
+  const def = MEDIA_DEFINITIONS[medium];
+  const lines = [];
+  const push = (name, value) => lines.push(`  --ds-${name}: ${value};`);
+  const u = def.unit === 'rem' ? 'rem' : 'px';
+
+  def.spacing.forEach((step, i) => push(`space-${i}`, step === 0 ? '0' : `${step}${u}`));
+  for (const [name, step] of Object.entries(def.type)) {
+    // `type-`, not `text-`: `--ds-text-primary` is already a *colour* on the
+    // Level axis. Two axes sharing a prefix is exactly the conflation ADR 0004
+    // exists to prevent, and a reader seeing `--ds-text-body` next to
+    // `--ds-text-muted` has no way to tell a size from an ink.
+    push(`type-${name}`, `${step.size}${u}`);
+    push(`leading-${name}`, `${step.lineHeight}`);
+  }
+  for (const [name, value] of Object.entries(def.weight)) push(`weight-${name}`, `${value}`);
+  // `stroke-`, not `border-`: `--ds-border-strong` is a colour. Same reason.
+  for (const [name, value] of Object.entries(def.borderWidth)) push(`stroke-${name}`, `${value}px`);
+  for (const [name, value] of Object.entries(def.shadowOffset)) {
+    push(`elev-${name}`, `${value}px ${value}px 0px 0px`);
+  }
+  for (const [name, value] of Object.entries(def.radius)) push(`radius-${name}`, `${value}px`);
+  push('duration-instant', `${def.motion.instant}ms`);
+  push('duration-quick', `${def.motion.quick}ms`);
+  push('duration-considered', `${def.motion.considered}ms`);
+  push('ease', def.motion.easing);
+  for (const [name, value] of Object.entries(def.layer)) push(`layer-${name}`, `${value}`);
+  push('focus-width', `${def.focusRing.width}px`);
+  push('focus-offset', `${def.focusRing.offset}px`);
+
+  return lines.join('\n');
+}
+
+/** The same values under the names Tailwind emits utilities from. */
+function mediumTheme(medium) {
+  const def = MEDIA_DEFINITIONS[medium];
+  const lines = [];
+  for (const name of Object.keys(def.type)) {
+    lines.push(`  --text-${name}: var(--ds-type-${name});`);
+    lines.push(`  --text-${name}--line-height: var(--ds-leading-${name});`);
+  }
+  for (const name of Object.keys(def.weight)) {
+    lines.push(`  --font-weight-${name}: var(--ds-weight-${name});`);
+  }
+  for (const name of Object.keys(def.radius)) {
+    lines.push(`  --radius-${name}: var(--ds-radius-${name});`);
+  }
+  // Tailwind's own radius scale, overridden to this Medium's value.
+  //
+  // This is what replaces `*, *::before, *::after { border-radius: 0 !important }`
+  // (#54). That rule reached every element in a consumer's document, including
+  // markup this package has never heard of, and the only way out of it was a
+  // second `!important`. Redefining the scale instead means every `rounded-*`
+  // utility resolves to the Medium's radius while a consumer's own CSS is
+  // untouched — which is the difference between a token and a reset.
+  //
+  // `rounded-full` is deliberately not here: it does not read `--radius-*`, and
+  // a pill is a shape a caller asks for explicitly rather than one they inherit.
+  for (const name of ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl']) {
+    lines.push(`  --radius-${name}: var(--ds-radius-none);`);
+  }
+
+  // Tailwind's `--spacing` is deliberately NOT mapped, and this is the
+  // interesting one.
+  //
+  // It is a single multiplier: `p-N` resolves to N x the step. The Medium's
+  // scale is not linear — web runs 0, .25, .5, .75, 1, 1.5, 2, 3, 4, 6, 8 —
+  // so setting `--spacing: 0.25rem` makes `p-4` agree with `--ds-space-4` at
+  // 1rem and then diverge at every rung above it: `p-5` is 1.25rem where
+  // `--ds-space-5` is 1.5rem. Two meanings for the same number, and the sort
+  // of thing that reads as correct in review because the first five agree.
+  //
+  // Video's scale settles it — 0, 8, 16, 24, 32, 48, 64, 96, 128, 192, 256 is
+  // not a multiple of anything, so no multiplier could carry it even if the
+  // web's happened to be linear.
+  //
+  // So `--ds-space-*` stays a vocabulary a caller reads by name, Tailwind keeps
+  // its own scale for utilities, and the two are not pretended to be the same
+  // thing. The index naming invites the confusion and is worth revisiting.
+
+  // Motion, so `duration-quick` and `ease-brutalist` exist as utilities. The
+  // 19 wall-clock transitions the Remotion evaluation measured are exactly what
+  // these are for — a component naming a duration rather than a number is what
+  // lets the `video` Medium give it frames instead of milliseconds.
+  for (const name of ['instant', 'quick', 'considered']) {
+    lines.push(`  --duration-${name}: var(--ds-duration-${name});`);
+  }
+
+  // Stacking, so `z-overlay` is a name rather than a magic number.
+  for (const name of Object.keys(def.layer)) {
+    lines.push(`  --z-index-${name}: var(--ds-layer-${name});`);
+  }
+  lines.push('  --ease-brutalist: var(--ds-ease);');
+  return lines.join('\n');
 }
 
 function render() {
@@ -243,8 +340,26 @@ ${THEME_LEVELS.map((level) => `@custom-variant ${level} (${levelVariant(level)})
  * being the axis the system hangs off. Use them for non-colour utilities that
  * genuinely depend on light-vs-dark — a shadow spread, an image filter — never
  * for colour, which the tokens already handle. */
-@custom-variant dark (${polarityVariant(byPolarity('dark'))});
-@custom-variant light (${polarityVariant(byPolarity('light'))});`);
+${(['dark', 'light'])
+  .filter((polarity) => {
+    // A level may be *named* for its polarity, in which case the per-level
+    // variant above has already emitted this exact rule and emitting it again
+    // is a duplicate declaration — harmless while that polarity has one level,
+    // and silently divergent the moment it has two, with the later definition
+    // winning.
+    //
+    // Inert as it stands: the levels are `midnight` and `sketch`, so neither
+    // takes `dark` or `light`. Kept because it costs one array filter and the
+    // alternative is a footgun armed by a rename.
+    const clash = THEME_LEVELS.includes(polarity);
+    return !clash;
+  })
+  .map((polarity) => `@custom-variant ${polarity} (${polarityVariant(byPolarity(polarity))});`)
+  .join('\n')}
+
+/* \`light:\` is not declared here: a level named \`light\` already declares it
+ * above, and the two would be the same rule. \`dark:\` still spans polarity
+ * rather than naming a level, which is why it survives the collapse. */`);
 
   sections.push(`
 /* ==========================================================================
@@ -258,12 +373,55 @@ ${THEME_LEVELS.map((level) => `@custom-variant ${level} (${levelVariant(level)})
 @theme {
 ${TAILWIND_ALIASES}
 
-${COMPAT_THEME}
-
   --font-sans: var(--ds-font-body);
   --font-display: var(--ds-font-display);
   --font-mono: var(--ds-font-mono);
   --font-pixel: var(--ds-font-pixel);
+}`);
+
+  sections.push(`
+/* ==========================================================================
+   Fixed colours — level-independent, and that is the point
+   ==========================================================================
+
+   These three do not swap with the level. \`--color-black\` and
+   \`--color-white\` below DO — they are compat aliases tracking
+   \`surface.base\` and \`text.primary\`, which is why \`--color-black\`
+   resolves to #ffffff on the \`white\` level. Use these when true black or
+   true white is meant; use \`surface.base\` for a page ground. */
+
+:root {
+${Object.entries(FIXED_COLOURS)
+  .map(([key, value]) => `  --ds-fixed-${key}: ${value};`)
+  .join('\n')}
+}
+
+@theme {
+${Object.keys(FIXED_COLOURS)
+  .map((key) => `  --color-fixed-${key}: var(--ds-fixed-${key});`)
+  .join('\n')}
+}`);
+
+  sections.push(`
+/* ==========================================================================
+   The web Medium — geometry and time, level-independent
+   ==========================================================================
+
+   The second axis. A Level varies colour and is selected at runtime; a Medium
+   varies geometry and time and is selected at build time by which artifact is
+   being emitted. Neither varies on the other's axis, so none of this appears
+   inside a level block. See \`docs/adr/0004-two-axes-level-and-medium.md\`.
+
+   \`video\` and \`graphic\` are real Media with their own numbers — a 1080p
+   frame's type scale is not this one scaled — and they are emitted to their own
+   artifacts rather than to a selector here. */
+
+:root {
+${mediumVariables(CSS_MEDIUM)}
+}
+
+@theme {
+${mediumTheme(CSS_MEDIUM)}
 }`);
 
   sections.push(`
@@ -305,7 +463,6 @@ ${levelVariables(definition)}
 
 ${TAILWIND_ALIASES}
 
-${compatAliases(definition)}
 }
 `);
   }

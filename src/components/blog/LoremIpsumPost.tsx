@@ -16,7 +16,7 @@ export const LoremIpsumPost: React.FC = () => {
       <TLDR>
         Modern web design systems often default to safe, generic rounded corners and muted colors.
         By enforcing zero border-radius, hard offset shadows, bracketed display typography, and a unified
-        dual-mode (<BracketText accent="cyan">DARK</BracketText> / <BracketText accent="yellow">SKETCH</BracketText>) token matrix,
+        dual-mode (<BracketText accent="primary">DARK</BracketText> / <BracketText accent="secondary">SKETCH</BracketText>) token matrix,
         we achieve an unmistakable visual identity that scales across every application.
       </TLDR>
 
@@ -60,7 +60,7 @@ export const LoremIpsumPost: React.FC = () => {
       </div>
 
       <NoteBlock type="tip" title="DUAL-MODE THEME SYNCHRONIZATION">
-        When cycling to <BracketText accent="yellow">SKETCH</BracketText> mode, the dark screen transforms into a warm paper sheet,
+        When cycling to <BracketText accent="secondary">SKETCH</BracketText> mode, the dark screen transforms into a warm paper sheet,
         while cyan and pink re-map into rich blue and red pen inks.
       </NoteBlock>
 

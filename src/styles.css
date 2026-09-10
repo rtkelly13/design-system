@@ -102,14 +102,41 @@ code, pre {
   font-family: var(--ds-font-mono) !important;
 }
 
-/* Global Brutalist Enforcement */
-*, *::before, *::after {
-  border-radius: 0px !important;
-}
+/* Radius, as a token rather than a reset.
+ *
+ * This was `*, *::before, *::after { border-radius: 0px !important }` — a
+ * universal selector with `!important`, reaching every element in a consumer's
+ * document including ones this package has never heard of. A consumer wanting a
+ * rounded avatar in their own markup could not have one, and the only way out
+ * was a second `!important`. That is #54.
+ *
+ * Zero is a value on the radius scale, not the absence of one. Declared per
+ * Medium in `src/theme/media.ts` and emitted as `--ds-radius-none`, it stops
+ * being a reset: scoped to this package's own elements, and overridable by
+ * ordinary specificity.
+ *
+ * There is no rule here at all, and that is the fix.
+ *
+ * `theme.css` redefines Tailwind's whole radius scale to the Medium's value, so
+ * every `rounded-*` utility — including `rounded-lg` on a component this
+ * package ships — resolves to zero without any selector. Nothing else needs
+ * saying.
+ *
+ * A rule for bare `<input>` / `<button>` tags arriving from a consumer's own
+ * markup was the obvious next thought, and `check:css` was right to refuse it:
+ * `src/styles.css` has a budget of zero, and reaching into a consumer's
+ * document is precisely what #54 is about. A consumer's bare tags are theirs. */
 
 /* Keyboard focus must stay visible even where a component replaces the ring
- * with a border colour — a border swap is invisible under forced-colors. */
+ * with a border colour — a border swap is invisible under forced-colors.
+ *
+ * The geometry is the Medium's and the colour is the Level's, which is the two
+ * axes in one declaration. `media.ts` has declared `focusRing` since the axis
+ * landed and this rule kept its own hardcoded `2px` — a token with no reader,
+ * which is the same fault the palette had before `accentHue` gave the Roles
+ * something to point at. A ring that has to be thicker on a 1080p frame now
+ * changes in one place. */
 :focus-visible {
-  outline: 2px solid var(--ds-accent-primary);
-  outline-offset: 2px;
+  outline: var(--ds-focus-width) solid var(--ds-accent-primary);
+  outline-offset: var(--ds-focus-offset);
 }

@@ -69,5 +69,3 @@ export function DocsLink({ href, children, ...rest }: DocsLinkProps) {
     </Component>
   );
 }
-
-export default DocsLink;

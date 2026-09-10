@@ -67,6 +67,7 @@ const CASES: readonly VisualCase[] = [
 
   { id: 'docs-breadcrumbs--default', snapshot: 'breadcrumbs-default.png' },
   { id: 'docs-codeblock--with-title-and-language', snapshot: 'codeblock-with-title-and-language.png' },
+  { id: 'docs-codetabs--merged', snapshot: 'codetabs-merged.png' },
   { id: 'docs-prose--default', snapshot: 'prose-default.png', fullPage: true },
   { id: 'docs-anchorheading--levels', snapshot: 'anchorheading-levels.png' },
   { id: 'docs-tableofcontents--default', snapshot: 'tableofcontents-default.png' },
@@ -95,12 +96,14 @@ const CASES: readonly VisualCase[] = [
   // gap its own § *Screenshot Walkthrough* calls out.
   { id: 'foundations-theme-ladder--all-levels', snapshot: 'theme-ladder-all-levels.png', fullPage: true },
 
-  // The two page-level shells. Their baselines will churn when the remaining
-  // token migration reaches them, which is the intended behaviour and not a
-  // reason to leave them unasserted — `dim` because it is the rung these
-  // surfaces are meant to be read at.
-  { id: 'saas-admindashboardlayout--dim-mode', snapshot: 'admin-dashboard-dim.png', fullPage: true },
-  { id: 'saas-landingpage--dim-mode', snapshot: 'saas-landing-dim.png', fullPage: true },
+  // The two page-level shells, on both levels now that there are two rather
+  // than four. `DimMode` is gone: with `dim` collapsed into `midnight` it
+  // rendered exactly what `DarkMode` renders, so asserting both was asserting
+  // the same pixels twice under two names.
+  { id: 'saas-admindashboardlayout--dark-mode', snapshot: 'admin-dashboard-midnight.png', fullPage: true },
+  { id: 'saas-admindashboardlayout--sketch-mode', snapshot: 'admin-dashboard-sketch.png', fullPage: true },
+  { id: 'saas-landingpage--dark-mode', snapshot: 'saas-landing-midnight.png', fullPage: true },
+  { id: 'saas-landingpage--sketch-mode', snapshot: 'saas-landing-sketch.png', fullPage: true },
 ];
 
 test.describe('Design System Visual Regression - Components', () => {
