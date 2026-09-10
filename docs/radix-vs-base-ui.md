@@ -5,6 +5,24 @@ The comparison behind the choice recorded in
 `radix-ui` 1.6.7 and `@base-ui/react` 1.7.0, from the published packages and both
 git histories rather than either docs site.
 
+> [!NOTE]
+> **Measured on `650cd9f` (30 August 2026), package `0.3.0`. `main` has moved since,
+> and three surface details below are stale.** The comparison itself is unaffected —
+> it is about Radix and Base UI, not about this repo's palette — so it is recorded as
+> written rather than silently rewritten.
+>
+> - **The ladder is two rungs, not four.** #123 collapsed `midnight`/`dim`/`bright`/`white`
+>   to `midnight` + `sketch`. Wherever the text says *four rungs*, or names `dim`, `bright`
+>   or `white`, read it as the two-rung ladder; the argument it supports — that a vendored
+>   `dark:` utility is wrong on any rung that is not a light/dark flip — holds unchanged,
+>   and holds on `sketch`.
+> - **The hue names are gone.** #137/#138 retired `cyan`/`pink`/`yellow`/`green` from the
+>   component API and `pnpm check:tokens` now gates them at budget **0**.
+> - **`docs/gap-analysis.md` is quoted saying "there is no linter in this repo".** That was
+>   true when written and is not now: `eslint.config.mjs` exists and `pnpm lint` passes.
+>
+> Versions named in the migration plan (`0.3.0`, `0.4.0`) predate the current `0.6.0`.
+
 **Outcome: `@base-ui/react`.** Churn accepted deliberately, bounded by the
 confinement rule in §6 of the evaluation. `@tanstack/react-table` covers tables,
 which neither library provides.
