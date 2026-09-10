@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # The SHA every baseline below is generated against. Compared to the
       # branch tip again before committing, because a run that regenerates
@@ -159,7 +159,7 @@ jobs:
 
       - name: Report success on the PR
         if: success() && inputs.pr-number != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         env:
           COMMITTED: ${{ steps.commit.outputs.committed }}
           ADDED: ${{ steps.changes.outputs.added }}
@@ -217,7 +217,7 @@ jobs:
 
       - name: Report failure on the PR
         if: failure() && inputs.pr-number != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         env:
           PR_NUMBER: ${{ inputs.pr-number }}
           RACED: ${{ steps.commit.outputs.raced }}
@@ -269,8 +269,11 @@ jobs:
             });
 
       - name: Upload Snapshot Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
+        # `success() || failure()`, not `always()`, per rule 9 — a cancelled run
+        # has no baselines worth keeping, and `always()` is how a cancellation
+        # becomes a red step.
+        if: success() || failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: playwright-snapshots
           path: tests/__snapshots__/
@@ -278,7 +281,7 @@ jobs:
 
       - name: Upload Playwright Report on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: playwright-report-snapshot-update
           path: playwright-report/

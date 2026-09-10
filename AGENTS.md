@@ -17,6 +17,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:contrast` | every role pair on every level, as arithmetic |
 | `pnpm check:docs` | figures written in prose against the source they describe — `--list` for the census |
 | `pnpm check:api` | the built type surface against the committed `api/index.d.ts` |
+| `pnpm check:governance` | the repo's own rules: pinned SHAs, job ceilings, every gate wired, `rule N` resolving — `--list` for the census |
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |
 | `pnpm ansi:check` | terminal slot coverage **and** the committed fixture diff |
@@ -82,14 +83,23 @@ Storybook measured against seven public design systems, with the plan it produce
 Rule statements only. The reasoning, and the incidents that produced each one, are in
 [`docs/workflow.md`](./docs/workflow.md) — read that before changing any of them.
 
+**The numbering is shared.** Rule *n* here is rule *n* there, and workflow comments cite rules
+by number. The two lists had drifted to eleven rules and nine, which silently re-pointed every
+citation — nine sites cited "rule 9" for the timeout ceiling while rule 9 here was *Publishing*.
+`pnpm check:governance` now fails if the numbers or the titles disagree, or if a `rule N`
+citation names a rule that does not exist.
+
 1. **Squash Merge Only**: all pull requests merge into `main` using **Squash and Merge**.
 2. **Delete Branch on Merge**: feature branches are deleted immediately on merge.
 3. **Linear History**: rebase onto `main` before merging; no merge commits.
-4. **Direct Push Protection**: direct pushes to `main` are blocked; PRs required.
-5. **Local Temp & Worktree Directory**: temporary files, local databases, scratch files and git worktrees go in the root `/temp/` directory (gitignored).
-6. **Gitignored Local TODO File**: a root `TODO.md` file MUST exist for local task tracking and be gitignored.
-7. **Auto-Merge Enabled**: PRs may enable auto-merge (squash).
-8. **Pinned Action SHAs**: workflows MUST use 40-character commit SHAs, not mutable tags.
-9. **Publishing**: stable releases publish from `main` via npm Trusted Publishing — no tokens. Bump `package.json` in the PR. Comment `/publish-dev` for a prerelease.
-10. **Re-baselining Happens In The PR**: comment `/update-snapshots` — say `all` when the change is *meant* to alter rendering, and name the story that forced it.
-11. **Required Checks**: branch protection requires the single aggregate check named **`ci`**. That name is content-free and **must stay that way** — `shared-utilities` governance matches on the string.
+4. **Publishing**: stable releases publish from `main` via npm Trusted Publishing — no tokens. Bump `package.json` in the PR. Comment `/publish-dev` for a prerelease.
+5. **Visual Regression Testing**: Playwright snapshots, **Linux CI only**, `maxDiffPixels: 0` — and this suite does **not** gate colour; arithmetic does.
+6. **Required Checks**: branch protection requires the single aggregate check named **`ci`**. That name is content-free and **must stay that way** — `shared-utilities` governance matches on the string.
+7. **New Components Need Baselines**: a story without a snapshot asserts nothing. `pnpm check:visual-coverage` is the gate, and its budget is **0**.
+8. **Re-baselining Happens In The PR**: comment `/update-snapshots` — say `all` when the change is *meant* to alter rendering, and name the story that forced it.
+9. **Every CI Job Has A Ceiling**: every job carries `timeout-minutes`, browser installs go through `./.github/actions/install-playwright`, and an upload step uses `if: success() || failure()`, never `always()`.
+10. **Direct Push Protection**: direct pushes to `main` are blocked; PRs required.
+11. **Local Temp & Worktree Directory**: temporary files, local databases, scratch files and git worktrees go in the root `/temp/` directory (gitignored).
+12. **Gitignored Local TODO File**: a root `TODO.md` file MUST exist for local task tracking and be gitignored.
+13. **Auto-Merge Enabled**: PRs may enable auto-merge (squash).
+14. **Pinned Action SHAs**: workflows MUST use 40-character commit SHAs with the version in a trailing comment, not mutable tags. `pnpm check:governance` enforces it.

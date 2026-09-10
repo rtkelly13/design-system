@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup
         uses: ./.github/actions/setup
@@ -60,7 +60,7 @@ jobs:
         # cancels its own in-flight runs by design (see `concurrency` above),
         # so that was a self-inflicted red mark on routine behaviour.
         if: success() || failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: storybook-walkthrough-${{ github.event.pull_request.head.sha || github.sha }}
           path: walkthrough-report/

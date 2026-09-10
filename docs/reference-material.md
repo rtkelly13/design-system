@@ -19,9 +19,11 @@ for background and geometric-pattern work.
 2. **Keep the ignore rule.** `.gitignore` excludes `reference/bookofshapes/svg/`; never
    remove it. `manifest.json` and `ATTRIBUTION.md` are the committed catalogue, and stay
    browsable without the artwork present.
-3. **Nothing here reaches the dependency or licence gates.** No package is added and no
-   third-party file is committed, so `check:licenses` has nothing to see — which is
-   precisely the point of keeping the artwork out of the tree.
+3. **Nothing here reaches the dependency gate.** No package is added and no third-party
+   file is committed, so `check:deps` has nothing to see and there is no licence gate to
+   need — which is precisely the point of keeping the artwork out of the tree. If a
+   licence check is ever built, this directory is the reason it would have to read the
+   tree and not just `package.json`.
 4. **Repopulate with `python3 reference/bookofshapes/fetch.py`** — stdlib only, rate
    limited, and it must never touch the site's `/api/` path (robots-disallowed).
 5. **Read `reference/bookofshapes/README.md` before using any of it.** It covers the
