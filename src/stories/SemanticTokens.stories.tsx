@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { semanticTokens } from '../lib/theme';
+import { Swatch, SwatchGroup } from '../components/Swatch';
 import { Badge } from '../components/Badge';
 import { Tag } from '../components/Tag';
 import { NoteBlock } from '../components/NoteBlock';
@@ -17,64 +18,14 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-function Swatch({ name, value }: { name: string; value: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-      <span
-        style={{
-          width: '2.5rem',
-          height: '2.5rem',
-          flex: 'none',
-          backgroundColor: value,
-          border: `2px solid ${semanticTokens.border.strong}`,
-        }}
-      />
-      <span
-        style={{
-          fontFamily: semanticTokens.font.mono,
-          fontSize: '0.8rem',
-          color: semanticTokens.text.secondary,
-        }}
-      >
-        {name}
-      </span>
-    </div>
-  );
-}
-
-function Group({ title, entries }: { title: string; entries: Record<string, string> }) {
-  return (
-    <section style={{ marginBottom: '2rem' }}>
-      <h3
-        style={{
-          fontFamily: semanticTokens.font.display,
-          fontSize: '0.8rem',
-          fontWeight: 800,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: semanticTokens.accent.secondary,
-          marginBottom: '0.75rem',
-        }}
-      >
-        [ {title} ]
-      </h3>
-      <div style={{ display: 'grid', gap: '0.6rem' }}>
-        {Object.entries(entries).map(([name, value]) => (
-          <Swatch key={name} name={name} value={value} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
 export const Roles: Story = {
   render: () => (
     <div style={{ maxWidth: '640px', color: semanticTokens.text.primary }}>
-      <Group title="Accent — visual hierarchy" entries={semanticTokens.accent} />
-      <Group title="Intent — communicated meaning" entries={semanticTokens.intent} />
-      <Group title="Surface — elevation" entries={semanticTokens.surface} />
-      <Group title="Text — prominence" entries={semanticTokens.text} />
-      <Group title="Border — rule weight" entries={semanticTokens.border} />
+      <SwatchGroup title="Accent — visual hierarchy" entries={semanticTokens.accent} />
+      <SwatchGroup title="Intent — communicated meaning" entries={semanticTokens.intent} />
+      <SwatchGroup title="Surface — elevation" entries={semanticTokens.surface} />
+      <SwatchGroup title="Text — prominence" entries={semanticTokens.text} />
+      <SwatchGroup title="Border — rule weight" entries={semanticTokens.border} />
     </div>
   ),
 };

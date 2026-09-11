@@ -514,6 +514,27 @@ interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'cla
 }
 declare function Select({ label, error, helperText, options, accent, className, id, ...props }: SelectProps): react.JSX.Element;
 
+interface SwatchProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
+
+    value: string;
+
+    name: string;
+
+    detail?: string;
+
+    size?: 'sm' | 'md';
+}
+declare const Swatch: react.ForwardRefExoticComponent<SwatchProps & react.RefAttributes<HTMLDivElement>>;
+interface SwatchGroupProps extends HTMLAttributes<HTMLElement> {
+
+    title: string;
+
+    entries: Record<string, string>;
+    size?: SwatchProps['size'];
+}
+
+declare const SwatchGroup: react.ForwardRefExoticComponent<SwatchGroupProps & react.RefAttributes<HTMLElement>>;
+
 type StatCardAccent = AccentToken;
 interface StatCardProps {
     title: string;
@@ -1188,6 +1209,10 @@ export {
   type StatCardAccent,
   type StatCardProps,
   type Surface,
+  Swatch,
+  SwatchGroup,
+  type SwatchGroupProps,
+  type SwatchProps,
   THEME_ATTRIBUTE,
   THEME_LEVELS,
   THEME_STORAGE_KEY,

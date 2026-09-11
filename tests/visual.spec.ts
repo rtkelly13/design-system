@@ -53,6 +53,7 @@ const CASES: readonly VisualCase[] = [
   { id: 'blog-loremipsumpost--foundational-blog-post', snapshot: 'blog-post-foundational.png', fullPage: true },
 
   { id: 'foundations-badge--emphasis', snapshot: 'badge-emphasis.png' },
+  { id: 'foundations-swatch--group', snapshot: 'swatch-group.png' },
   { id: 'foundations-badge--intent', snapshot: 'badge-intent.png' },
   { id: 'foundations-tag--row', snapshot: 'tag-row.png' },
   { id: 'foundations-brackettext--emphasis', snapshot: 'brackettext-emphasis.png' },
