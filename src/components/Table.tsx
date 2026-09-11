@@ -27,8 +27,8 @@ export function Table({
 }: TableHTMLAttributes<HTMLTableElement> & { containerClassName?: string }) {
   const styles = tableStyles();
   return (
-    <div className={styles.container({ class: containerClassName })}>
-      <table className={styles.table({ class: className })} {...props} />
+    <div data-slot="table-container" className={styles.container({ class: containerClassName })}>
+      <table data-slot="table" className={styles.table({ class: className })} {...props} />
     </div>
   );
 }
@@ -38,7 +38,7 @@ export function TableHeader({
   ...props
 }: HTMLAttributes<HTMLTableSectionElement>) {
   const styles = tableStyles();
-  return <thead className={styles.header({ class: className })} {...props} />;
+  return <thead data-slot="table-header" className={styles.header({ class: className })} {...props} />;
 }
 
 export function TableBody({
@@ -46,7 +46,7 @@ export function TableBody({
   ...props
 }: HTMLAttributes<HTMLTableSectionElement>) {
   const styles = tableStyles();
-  return <tbody className={styles.body({ class: className })} {...props} />;
+  return <tbody data-slot="table-body" className={styles.body({ class: className })} {...props} />;
 }
 
 export function TableFooter({
@@ -54,7 +54,7 @@ export function TableFooter({
   ...props
 }: HTMLAttributes<HTMLTableSectionElement>) {
   const styles = tableStyles();
-  return <tfoot className={styles.footer({ class: className })} {...props} />;
+  return <tfoot data-slot="table-footer" className={styles.footer({ class: className })} {...props} />;
 }
 
 export function TableRow({
@@ -62,7 +62,7 @@ export function TableRow({
   ...props
 }: HTMLAttributes<HTMLTableRowElement>) {
   const styles = tableStyles();
-  return <tr className={styles.row({ class: className })} {...props} />;
+  return <tr data-slot="table-row" className={styles.row({ class: className })} {...props} />;
 }
 
 export function TableHead({
@@ -70,7 +70,7 @@ export function TableHead({
   ...props
 }: ThHTMLAttributes<HTMLTableCellElement>) {
   const styles = tableStyles();
-  return <th className={styles.head({ class: className })} {...props} />;
+  return <th data-slot="table-head" className={styles.head({ class: className })} {...props} />;
 }
 
 export function TableCell({
@@ -78,7 +78,7 @@ export function TableCell({
   ...props
 }: TdHTMLAttributes<HTMLTableCellElement>) {
   const styles = tableStyles();
-  return <td className={styles.cell({ class: className })} {...props} />;
+  return <td data-slot="table-cell" className={styles.cell({ class: className })} {...props} />;
 }
 
 export function TableCaption({

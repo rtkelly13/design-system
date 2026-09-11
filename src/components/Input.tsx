@@ -133,15 +133,24 @@ function FieldFrame({
   children: ReactNode;
 }) {
   return (
-    <BaseField.Root className={styles.root()} invalid={Boolean(error)}>
-      {label && <BaseField.Label className={styles.label()}>{label}</BaseField.Label>}
+    <BaseField.Root data-slot="field" className={styles.root()} invalid={Boolean(error)}>
+      {label && (
+        <BaseField.Label data-slot="field-label" className={styles.label()}>
+          {label}
+        </BaseField.Label>
+      )}
       {children}
       {error ? (
-        <BaseField.Error match className={styles.message()} render={<span role="alert" />}>
+        <BaseField.Error
+          match
+          data-slot="field-error"
+          className={styles.message()}
+          render={<span role="alert" />}
+        >
           &gt; {error}
         </BaseField.Error>
       ) : helperText ? (
-        <BaseField.Description className={styles.message()} render={<span />}>
+        <BaseField.Description data-slot="field-description" className={styles.message()} render={<span />}>
           &gt; {helperText}
         </BaseField.Description>
       ) : null}
@@ -168,6 +177,7 @@ export function Input({
     <FieldFrame label={label} error={error} helperText={helperText} styles={styles}>
       <BaseField.Control
         id={id}
+        data-slot="field-control"
         style={accentStyle(accent)}
         // `class` is the recipe's override slot: it merges in rather than being
         // appended after, so a caller's utility actually wins.
