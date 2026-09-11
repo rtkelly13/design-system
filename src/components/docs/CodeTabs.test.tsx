@@ -90,6 +90,13 @@ describe('CodeTabs', () => {
 
     fireEvent.keyDown(pnpm!, { key: 'ArrowLeft' });
     expect(selectedTab(list)).toBe(yarn);
+
+    // `Home` was the one key in the handler with no assertion behind it — the
+    // rest of this model is covered above, which is what #163 turned out to be
+    // wrong about.
+    fireEvent.keyDown(yarn!, { key: 'Home' });
+    expect(selectedTab(list)).toBe(pnpm);
+    expect(document.activeElement).toBe(pnpm);
   });
 
   it('keeps only the selected tab in the tab order', () => {
