@@ -230,6 +230,11 @@ jobs:
       - name: Docgen Props
         run: pnpm check:docgen-props
 
+      # Title vocabulary, one-level-deep titles, and an autodocs decision per
+      # component. A retitled story orphans its committed baseline.
+      - name: Story Conventions
+        run: pnpm check:story-conventions
+
       - name: Install Playwright Browsers
         uses: ./.github/actions/install-playwright
 

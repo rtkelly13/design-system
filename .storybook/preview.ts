@@ -58,17 +58,26 @@ const preview: Preview = {
 
   parameters: {
     /**
+     * The sidebar order is an argument, not a filing choice.
+     *
      * The landing page is whichever entry sorts first, so the manifesto is
      * pinned rather than left to the alphabet. Before this, Storybook opened on
      * `SaaS/AdminDashboardLayout` — first by title, and the least
      * system-shaped thing in the sidebar.
      *
-     * Everything after the pinned entry keeps its existing order: `order` only
-     * constrains the titles it names, and an unlisted title sorts after them.
+     * The rest reads outward from the system to its applications: the token
+     * surfaces a consumer adopts, then the docs chrome built on them, then the
+     * product mockups that only demonstrate. Left to the alphabet, `Blog/`
+     * landed first — so a consumer's first impression of a token system was a
+     * lorem-ipsum blog post, and two mockups at ~20-25% readiness sat at the
+     * same visual weight as `Docs/*` at ~90% (`docs/surface-readiness.md`).
+     *
+     * `check:story-conventions` holds the same vocabulary closed, so a group
+     * cannot arrive here without a decision about what this system claims to be.
      */
     options: {
       storySort: {
-        order: ['Manifesto', '*'],
+        order: ['Manifesto', 'Foundations', 'Docs', 'Blog', 'Presentation', 'SaaS', 'Showcase', '*'],
       },
     },
 

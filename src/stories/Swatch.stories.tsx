@@ -8,6 +8,7 @@ import { semanticTokens } from '../lib/theme';
  */
 const meta: Meta<typeof Swatch> = {
   title: 'Foundations/Swatch',
+  tags: ['autodocs'],
   component: Swatch,
   parameters: { layout: 'padded' },
 };
