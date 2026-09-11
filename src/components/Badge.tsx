@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import React from 'react';
 import { accentVar } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
@@ -13,15 +14,13 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   accent?: AccentToken;
 }
 
-export const Badge: React.FC<BadgeProps> = ({
-  children,
-  accent = 'primary',
-  className = '',
-  style,
-  ...props
-}) => {
+export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
+  { children, accent = 'primary', className = '', style, ...props },
+  ref,
+) {
   return (
     <span
+      ref={ref}
       className={cn(
         'inline-flex items-center gap-[0.4rem] border-2 border-edge-strong bg-surface-base px-[0.6rem] py-[0.2rem] font-mono text-[0.75rem] font-bold',
         className
@@ -37,4 +36,4 @@ export const Badge: React.FC<BadgeProps> = ({
       {children}
     </span>
   );
-};
+});
