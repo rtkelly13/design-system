@@ -1,24 +1,8 @@
 import type { ReactNode, ElementType } from 'react';
 import { cn } from '../lib/recipe';
+import { accentTextClass } from '../lib/accentClasses';
 import type { AccentToken } from '../lib/theme';
 
-
-/**
- * Typed to `AccentToken`, which is what keeps the hue names out. Four of them —
- * `cyan`, `pink`, `yellow`, `green` — survived #138 here because
- * `Record<string, string>` accepts any key and `check:tokens` reads call sites
- * rather than map keys.
- */
-const ACCENT_TEXT: Record<AccentToken, string> = {
-  primary: 'text-accent-primary',
-  secondary: 'text-accent-secondary',
-  tertiary: 'text-accent-tertiary',
-  quiet: 'text-accent-quiet',
-  info: 'text-intent-info',
-  success: 'text-intent-success',
-  warning: 'text-intent-warning',
-  danger: 'text-intent-danger',
-};
 
 export interface PageHeaderProps {
   /** Rendered bracketed + uppercased as `[ TITLE ]`. */
@@ -43,7 +27,7 @@ export function PageHeader({
   children,
   className = '',
 }: PageHeaderProps) {
-  const accentText = ACCENT_TEXT[accent] ?? ACCENT_TEXT.primary;
+  const accentText = accentTextClass(accent);
 
   return (
     <header className={cn('bg-surface-raised px-6 pt-8 pb-10', className)}>
