@@ -101,7 +101,7 @@ import { ThemeProvider, Button, Card, PageTitle, Badge, Divider } from '@rtkelly
 
 export function App() {
   return (
-    <ThemeProvider defaultTheme="dark">
+    <ThemeProvider defaultLevel="midnight">
       <main style={{ padding: '2rem' }}>
         <PageTitle subtitle="Foundation Design System Surface">
           [ MY APPLICATION ]
