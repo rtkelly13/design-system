@@ -26,6 +26,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |
 | `pnpm ansi:check` | terminal slot coverage **and** the committed fixture diff |
 | `pnpm test:visual` | Playwright snapshots — **Linux only**, see [`docs/visual-regression.md`](./docs/visual-regression.md) |
+| `pnpm test:a11y` | axe over every asserted story, on both Levels |
 | `pnpm walkthrough` | screenshot every story on every level, for review rather than assertion |
 
 `pnpm lint` reports colour literals at the site that wrote them. `pnpm check:deps`,

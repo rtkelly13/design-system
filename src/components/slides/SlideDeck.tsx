@@ -222,7 +222,12 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
           </Button>
 
           {autoPlayInterval > 0 && (
-            <Button onClick={() => setIsPlaying(!isPlaying)} style={{ padding: '0.4rem 0.8rem' }}>
+            <Button
+              onClick={() => setIsPlaying(!isPlaying)}
+              aria-pressed={isPlaying}
+              aria-label={isPlaying ? 'Pause autoplay' : 'Start autoplay'}
+              style={{ padding: '0.4rem 0.8rem' }}
+            >
               {isPlaying ? <Pause size={16} /> : <Play size={16} />}
             </Button>
           )}
@@ -243,7 +248,12 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
             </Button>
           )}
 
-          <Button onClick={toggleFullscreen} style={{ padding: '0.4rem 0.8rem' }}>
+          <Button
+            onClick={toggleFullscreen}
+            aria-pressed={isFullscreen}
+            aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+            style={{ padding: '0.4rem 0.8rem' }}
+          >
             {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </Button>
         </div>
