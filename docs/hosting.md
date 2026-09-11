@@ -27,6 +27,43 @@ shared stack declares only identity, domains and env vars. Repos own how they bu
 Storybook's asset preloading and yielding an empty preview pane. Storybook is one of
 the few static sites where clean URLs are actively wrong.
 
+### Drift — production stopped updating for three days and nothing said so
+
+`Docs/CodeTabs` landed on 8 September in #113 and was still absent from
+`design-system.ryankelly.dev` three days and about thirty merged pull requests later,
+along with the whole Manifesto, `Swatch`, `Card` and `DataTable`. **136 stories served
+against 168 built.**
+
+The Vercel checks were red the whole time, reading `build-rate-limit` — an account
+quota, which is not a code problem and does not look like one. Nothing else was
+watching: every gate in this repo verifies the tree, and none of them looks at what is
+actually being served.
+
+`pnpm check:deployed` compares the live `index.json` with this build, and
+`.github/workflows/deployment-drift.yml` runs it on pushes to `main` and daily. That
+turns silence into a red mark someone owns, and catches drift within one merge instead
+of thirty.
+
+### Why the Vercel check is not, and cannot be, a required check
+
+The obvious guard is to make `Vercel – design-system-storybook` required. It would lock
+the repository, for two independent reasons:
+
+1. **`vercel.json` deliberately does not build feature branches.** Its `ignoreCommand`
+   exits 1 (build) only for `main`, `preview`, `slot/N`, or a commit message tagged
+   `[deploy]` / `[preview]` / `[storybook]`; everything else exits 0 (skip). A required
+   Vercel check would therefore never turn green on an ordinary branch, and **every pull
+   request would block forever**.
+2. **A deployment happens after a merge.** There is nothing for a pull request to check:
+   the deployed site cannot contain the commit under review.
+
+Relaxing the `ignoreCommand` to build every branch would fix (1) and make the underlying
+problem worse — the quota is what broke production, and previews on every push are what
+would exhaust it faster. That is a paid-plan decision, not a configuration one.
+
+So the guard sits where the answer exists: after the merge, and on a schedule.
+
+
 ### Cache policy — `immutable` needs a content hash in the name
 
 `vercel.json` marks `/assets/` immutable for a year, and that is right: Vite writes
