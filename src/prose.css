@@ -230,7 +230,8 @@ html {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  z-index: 1;
+  /* Above the code it sits on. */
+  z-index: var(--ds-layer-raised);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -316,7 +317,7 @@ html {
 .docs-layout-scrim {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: var(--ds-layer-overlay);
   background-color: var(--ds-surface-overlay);
 }
 
@@ -327,7 +328,12 @@ html {
     top: var(--docs-header-height);
     left: 0;
     bottom: 0;
-    z-index: 50;
+    /*
+     * One above the scrim it covers. The layer scale has four rungs and this
+     * chrome needs five — scrim, then sidebar, then header — so the extra step
+     * is expressed as an offset from the token rather than as a new literal.
+     */
+    z-index: calc(var(--ds-layer-overlay) + 1);
     max-height: none;
     background-color: var(--ds-surface-base);
     transform: translateX(-100%);
@@ -373,7 +379,7 @@ html {
 .docs-header {
   position: sticky;
   top: 0;
-  z-index: 60;
+  z-index: var(--ds-layer-top);
   display: flex;
   align-items: center;
   gap: 1rem;
