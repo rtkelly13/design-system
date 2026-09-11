@@ -6,7 +6,7 @@ import { BracketText } from '../components/BracketText';
 const meta: Meta<typeof Slide> = {
   title: 'Presentation/Slide',
   component: Slide,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'experimental'],
   parameters: { layout: 'fullscreen' },
 };
 

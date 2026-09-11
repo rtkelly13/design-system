@@ -5,7 +5,7 @@ import { SectionContainer } from '../components/SectionContainer';
 const meta: Meta<typeof SectionContainer> = {
   title: 'Foundations/SectionContainer',
   component: SectionContainer,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },
 };
 

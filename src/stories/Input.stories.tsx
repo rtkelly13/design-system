@@ -4,7 +4,7 @@ import { Input, TextArea, Select } from '../components/Input';
 const meta: Meta<typeof Input> = {
   title: 'Foundations/Input',
   component: Input,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

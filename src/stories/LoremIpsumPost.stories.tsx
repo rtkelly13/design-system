@@ -5,6 +5,7 @@ import { ThemeProvider } from '../components/ThemeProvider';
 
 const meta: Meta<typeof LoremIpsumPost> = {
   title: 'Blog/LoremIpsumPost',
+  tags: ['stable'],
   component: LoremIpsumPost,
 };
 

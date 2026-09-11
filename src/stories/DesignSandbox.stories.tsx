@@ -3,6 +3,7 @@ import { DesignSandbox } from '../components/experiments/DesignSandbox';
 
 const meta: Meta<typeof DesignSandbox> = {
   title: 'Showcase/DesignSandbox',
+  tags: ['experimental'],
   component: DesignSandbox,
   parameters: {
     layout: 'fullscreen',

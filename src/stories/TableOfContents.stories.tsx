@@ -15,7 +15,7 @@ const toc = [
 const meta: Meta<typeof TableOfContents> = {
   title: 'Docs/TableOfContents',
   component: TableOfContents,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   // Scroll-spy needs a scrolling document; the story frame does not have one.
   args: { spy: false },
 };

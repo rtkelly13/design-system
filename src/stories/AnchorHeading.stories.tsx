@@ -5,7 +5,7 @@ import { AnchorHeading } from '../components/docs/AnchorHeading';
 const meta: Meta<typeof AnchorHeading> = {
   title: 'Docs/AnchorHeading',
   component: AnchorHeading,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

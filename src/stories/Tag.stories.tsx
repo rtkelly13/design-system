@@ -5,7 +5,7 @@ import { Tag } from '../components/Tag';
 const meta: Meta<typeof Tag> = {
   title: 'Foundations/Tag',
   component: Tag,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

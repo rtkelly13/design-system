@@ -63,6 +63,21 @@ const NO_DOCS_PAGE = {
   'Showcase/DesignSandbox': 'An interactive sandbox; it takes no props.',
 };
 
+/**
+ * The status vocabulary, closed — Storybook's own feature-lifecycle words.
+ *
+ * The maturity differences inside this package are known, measured and written
+ * down in `docs/surface-readiness.md`: `Docs/*` at ~90% with "nothing
+ * structural" blocking it, the SaaS mockups at ~20-25% and described there as
+ * "screenshots of one specific product". A consumer browsing the sidebar saw one
+ * flat list in which `Docs/Prose` and `SaaS/LandingPage` looked equally
+ * load-bearing.
+ *
+ * The gap was never that the maturity was unknown. It was that it was known and
+ * not surfaced where the choice gets made.
+ */
+const STATUSES = ['stable', 'experimental', 'preview', 'deprecated'];
+
 const index = JSON.parse(readFileSync(path.join(ROOT, 'storybook-static/index.json'), 'utf8'));
 const entries = Object.values(index.entries ?? {});
 const titles = [...new Set(entries.map((e) => e.title))].sort();
@@ -86,6 +101,16 @@ for (const title of titles) {
   if (rest.length > 1) {
     problems.push(`${title} — a title must be <Group>/<Name>; this nests ${rest.length} deep.`);
   }
+  const tags = new Set(entries.filter((e) => e.title === title).flatMap((e) => e.tags ?? []));
+  const statuses = STATUSES.filter((status) => tags.has(status));
+  if (statuses.length === 0) {
+    problems.push(
+      `${title} — no status tag. Add exactly one of: ${STATUSES.join(', ')}, matching docs/surface-readiness.md.`,
+    );
+  } else if (statuses.length > 1) {
+    problems.push(`${title} — ${statuses.length} status tags (${statuses.join(', ')}); exactly one.`);
+  }
+
   if (!withDocs.has(title) && !NO_DOCS_PAGE[title]) {
     problems.push(
       `${title} — no docs page and no stated reason. Add \`tags: ['autodocs']\`, or a reason in NO_DOCS_PAGE.`,

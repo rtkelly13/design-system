@@ -5,7 +5,7 @@ import { TLDR } from '../components/TLDR';
 const meta: Meta<typeof TLDR> = {
   title: 'Foundations/TLDR',
   component: TLDR,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

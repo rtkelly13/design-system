@@ -5,7 +5,7 @@ import { Button } from '../components/Button';
 const meta: Meta<typeof Button> = {
   title: 'Foundations/Button',
   component: Button,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

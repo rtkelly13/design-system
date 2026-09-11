@@ -37,7 +37,7 @@ const STATE_ACCENT = { ready: 'success', building: 'info', error: 'danger' } as 
 const meta: Meta<typeof DataTable<Deployment>> = {
   title: 'Foundations/DataTable',
   component: DataTable,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

@@ -29,7 +29,7 @@ const nav = [
 const meta: Meta<typeof DocsSidebar> = {
   title: 'Docs/DocsSidebar',
   component: DocsSidebar,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

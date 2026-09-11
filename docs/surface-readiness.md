@@ -27,6 +27,25 @@ included so the numbers can be re-derived rather than trusted.
 The **theme architecture** is ready for four surfaces. The **component
 inventory** is ready for about one and a half.
 
+### These assignments are published as story tags
+
+Every story carries exactly one status tag, and `pnpm check:story-conventions` fails on a
+missing one, an unknown word, or two. **This table is the source**; the tags are how a
+consumer sees it without reading this file.
+
+| Sidebar group | Tag | From the table below |
+|---|---|---|
+| `Foundations/*` | `stable` | the published primitives, gated end to end |
+| `Docs/*` | `stable` | ~90%, "nothing structural" blocking |
+| `Blog/*` | `stable` | ~70%, real primitives really adopted by the blog |
+| `Presentation/*` | `experimental` | `SlideDeck` is, per #70, "the one component no other consumer can use" |
+| `SaaS/*` | `experimental` | ~20–25%, "screenshots of one specific product" |
+| `Showcase/*` | `experimental` | a sandbox, not a component |
+
+The vocabulary is Storybook's own feature lifecycle — `stable`, `experimental`, `preview`,
+`deprecated` — rather than a second one to maintain. A group cannot be added to the sidebar
+without a status, because `check:story-conventions` closes both lists at once.
+
 | Surface | Readiness | What carries it | What blocks it |
 |---|---|---|---|
 | Docs / reference | ~90% | Full chrome kit, semantic throughout, genuinely responsive | Nothing structural |

@@ -5,7 +5,7 @@ import { NoteBlock } from '../components/NoteBlock';
 const meta: Meta<typeof NoteBlock> = {
   title: 'Foundations/NoteBlock',
   component: NoteBlock,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

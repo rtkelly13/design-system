@@ -5,7 +5,7 @@ import { BracketText } from '../components/BracketText';
 const meta: Meta<typeof BracketText> = {
   title: 'Foundations/BracketText',
   component: BracketText,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

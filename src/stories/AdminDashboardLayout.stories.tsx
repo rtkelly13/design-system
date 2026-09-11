@@ -5,6 +5,7 @@ import { ThemeProvider } from '../components/ThemeProvider';
 
 const meta: Meta<typeof AdminDashboardLayout> = {
   title: 'SaaS/AdminDashboardLayout',
+  tags: ['experimental'],
   component: AdminDashboardLayout,
   parameters: {
     layout: 'fullscreen',

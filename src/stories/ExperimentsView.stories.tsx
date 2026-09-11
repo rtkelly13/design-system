@@ -5,7 +5,7 @@ import { ExperimentsView } from '../components/experiments/ExperimentsView';
 const meta: Meta<typeof ExperimentsView> = {
   title: 'Showcase/ExperimentsView',
   component: ExperimentsView,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'experimental'],
   parameters: { layout: 'fullscreen' },
 };
 
