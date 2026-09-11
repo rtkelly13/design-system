@@ -769,7 +769,10 @@ declare const SaasLandingPage: react__default.FC<SaasLandingPageProps>;
 interface AdminNavItem {
     id: string;
     label: string;
-    icon?: react__default.ReactNode;
+
+    icon?: ElementType<{
+        className?: string;
+    }>;
     badgeCount?: number;
 }
 declare const DEFAULT_ADMIN_NAV: AdminNavItem[];
@@ -777,7 +780,10 @@ interface AdminStatusBadge {
     id: string;
     label: string;
     accent?: AccentToken;
-    icon?: react__default.ReactNode;
+
+    icon?: ElementType<{
+        className?: string;
+    }>;
 }
 
 declare const DEFAULT_ADMIN_STATUS: AdminStatusBadge[];
