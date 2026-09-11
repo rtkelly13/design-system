@@ -50,24 +50,24 @@ export function StatCard({
         className,
       )}
     >
-      <div className="flex justify-between items-start mb-2">
-        <span className="font-mono text-xs font-bold uppercase tracking-wider text-content-muted">
+      <div data-slot="statcard-header" className="flex justify-between items-start mb-2">
+        <span data-slot="statcard-label" className="font-mono text-xs font-bold uppercase tracking-wider text-content-muted">
           [ {title} ]
         </span>
         {Icon && <Icon className={cn('h-6 w-6', accentTextClass(accent))} />}
       </div>
-      <div className="flex items-baseline gap-3 my-1">
-        <span className="font-display text-4xl font-extrabold text-content-primary tracking-tight">
+      <div data-slot="statcard-value-row" className="flex items-baseline gap-3 my-1">
+        <span data-slot="statcard-value" className="font-display text-4xl font-extrabold text-content-primary tracking-tight">
           {value}
         </span>
         {change && (
-          <span className={cn('font-mono text-xs font-bold', CHANGE_CLASS[changeType])}>
+          <span data-slot="statcard-change" className={cn('font-mono text-xs font-bold', CHANGE_CLASS[changeType])}>
             {change}
           </span>
         )}
       </div>
       {subtitle && (
-        <p className="font-mono text-xs text-content-muted mt-2">
+        <p data-slot="statcard-detail" className="font-mono text-xs text-content-muted mt-2">
           &gt; {subtitle}
         </p>
       )}

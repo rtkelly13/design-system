@@ -95,10 +95,10 @@ export function Pagination({
   };
 
   return (
-    <div className={cn('pt-6 pb-8 space-y-2 md:space-y-5', className)}>
-      <nav className="flex justify-between items-center font-mono" aria-label="Pagination Navigation">
+    <div data-slot="pagination" className={cn('pt-6 pb-8 space-y-2 md:space-y-5', className)}>
+      <nav data-slot="pagination-nav" className="flex justify-between items-center font-mono" aria-label="Pagination Navigation">
         {renderPrevButton()}
-        <span className="text-content-primary font-bold border-2 border-edge-strong px-6 py-3 bg-surface-base">
+        <span data-slot="pagination-status" className="text-content-primary font-bold border-2 border-edge-strong px-6 py-3 bg-surface-base">
           [ {currentPage} / {totalPages} ]
         </span>
         {renderNextButton()}

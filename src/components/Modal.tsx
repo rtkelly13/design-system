@@ -133,6 +133,7 @@ export function Modal({
 
   return createPortal(
     <div
+      data-slot="modal-backdrop"
       className="fixed inset-0 z-top flex items-center justify-center bg-surface-overlay p-4"
       // A backdrop is not an interactive control, so it gets no role and no key
       // handler — Escape already covers the keyboard path, and adding a
@@ -156,9 +157,10 @@ export function Modal({
           className,
         )}
       >
-        <div className="flex items-center justify-between border-b-2 border-edge-strong bg-surface-base px-6 py-4">
+        <div data-slot="modal-header" className="flex items-center justify-between border-b-2 border-edge-strong bg-surface-base px-6 py-4">
           <h3
             id={titleId}
+            data-slot="modal-title"
             className="font-display text-xl font-bold uppercase tracking-wider text-content-primary"
           >
             [ {title} ]
@@ -173,11 +175,11 @@ export function Modal({
           </button>
         </div>
 
-        <div className="p-6 font-sans text-sm leading-relaxed text-content-primary">
+        <div data-slot="modal-body" className="p-6 font-sans text-sm leading-relaxed text-content-primary">
           {children}
         </div>
 
-        <div className="flex justify-end gap-3 border-t-2 border-edge-strong bg-surface-base px-6 py-4">
+        <div data-slot="modal-footer" className="flex justify-end gap-3 border-t-2 border-edge-strong bg-surface-base px-6 py-4">
           {footer || (
             <Button onClick={onClose} variant="tertiary" bracketed size="sm">
               CLOSE
