@@ -84,6 +84,35 @@ export const Empty: Story = {
   },
 };
 
+/**
+ * Ten thousand deployments — the dataset size where the issue #204 said
+ * pagination stops being an answer. The data is generated deterministically
+ * (no `Math.random`, no clock) per docs/deterministic-rendering.md, because
+ * this story carries a snapshot.
+ */
+const bigRows: Deployment[] = Array.from({ length: 10_000 }, (_, i) => ({
+  id: `dpl_${i}`,
+  branch: `deploy/batch-${Math.floor(i / 500)}-${i}`,
+  state: i % 17 === 0 ? 'error' : i % 5 === 0 ? 'building' : 'ready',
+  duration: `${Math.floor(i / 60) % 10}m ${String(i % 60).padStart(2, '0')}s`,
+  commits: i,
+}));
+
+/** Rows are windowed: the DOM holds the viewport, not the dataset. */
+export const Virtualized: Story = {
+  args: {
+    data: bigRows,
+    keyExtractor: (row) => row.id,
+    columns: [
+      { header: 'BRANCH', accessor: 'branch' },
+      { header: 'STATE', accessor: 'state' },
+      { header: 'DURATION', accessor: 'duration' },
+      { header: 'COMMITS', accessor: 'commits' },
+    ],
+    virtualize: { height: 480 },
+  },
+};
+
 /** Controlled TanStack Table with multi-column sorting. */
 export const HeadlessTanStackTable: Story = {
   render: () => {

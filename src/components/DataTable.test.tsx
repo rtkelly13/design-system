@@ -4,7 +4,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DataTable } from './DataTable';
 
 interface TestItem {
@@ -132,5 +132,87 @@ describe('DataTable', () => {
         FORBIDDEN,
       );
     }
+  });
+
+  // jsdom has no layout: every rect is 0×0, and the virtualizer computes no
+  // window for a zero-height viewport (`calculateRange` bails at size 0).
+  // Stubs give the scroll box the height the component declared for it.
+  // Restored by `vitest`'s unstubGlobals between files — stubbed per test
+  // here because the non-virtualized cases assert DOM that is not affected.
+  function stubViewport(height: number) {
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(height);
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(800);
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('renders only a windowed slice of a large dataset when virtualized', () => {
+    stubViewport(480);
+    const bigData: TestItem[] = Array.from({ length: 5000 }, (_, i) => ({
+      id: `id-${i}`,
+      name: `row-${i}`,
+      count: i,
+    }));
+
+    const { container } = render(
+      <DataTable
+        columns={[{ header: 'Name', accessor: 'name' }]}
+        data={bigData}
+        keyExtractor={(row) => row.id}
+        virtualize={{ rowHeight: 44 }}
+      />,
+    );
+
+    // Every real row carries a data-slot; two spacer rows bracket the window.
+    // 5000 rendered rows would be 5000 slots — the window must be tiny.
+    const rendered = container.querySelectorAll('tbody [data-slot="table-row"]');
+    expect(rendered.length).toBeLessThan(50);
+    // The empty state must NOT be the reason there are so few rows.
+    expect(container.querySelector('[data-slot="table-body"]')?.textContent).toContain('row-0');
+  });
+
+  it('keeps pagination off the row model while virtualizing', () => {
+    stubViewport(480);
+    const bigData: TestItem[] = Array.from({ length: 300 }, (_, i) => ({
+      id: `id-${i}`,
+      name: `row-${i}`,
+      count: i,
+    }));
+
+    render(
+      <DataTable
+        columns={[{ header: 'Name', accessor: 'name' }]}
+        data={bigData}
+        keyExtractor={(row) => row.id}
+        pageSize={2}
+        virtualize={{ rowHeight: 44 }}
+      />,
+    );
+
+    // With pagination attached, the row model would hold 2 rows and virtualize
+    // to a 2-row window. Instead the first window reaches past both.
+    expect(screen.getByText('row-5')).toBeDefined();
+  });
+
+  it('renders every row unchanged when not virtualized', () => {
+    const manyData: TestItem[] = Array.from({ length: 200 }, (_, i) => ({
+      id: `id-${i}`,
+      name: `row-${i}`,
+      count: i,
+    }));
+
+    const { container } = render(
+      <DataTable
+        columns={[{ header: 'Name', accessor: 'name' }]}
+        data={manyData}
+        keyExtractor={(row) => row.id}
+      />,
+    );
+
+    const rendered = container.querySelectorAll('tbody [data-slot="table-row"]');
+    expect(rendered.length).toBe(200);
+    expect(container.querySelector('[data-slot="table-virtual-scroll"]')).toBeNull();
   });
 });

@@ -57,9 +57,11 @@ cost real time:
    what bounds the churn the choice accepts. A component that needs a primitive reaches for Base
    UI or hand-rolls it; it never brings in a package that carries its own. That bars `radix-ui`
    and anything depending on it, which includes `cmdk` (16 `@radix-ui/*` packages transitively).
-   `@tanstack/react-table` is the stated exception and not a counter-example: it is a state
-   engine with no DOM, no focus model and no ARIA, which is why `DataTable` writes its own.
-   Measured comparison in [`docs/radix-vs-base-ui.md`](./docs/radix-vs-base-ui.md).
+   The stated exceptions are TanStack's headless engines — `@tanstack/react-table` (sorting,
+   filtering, pagination state) and `@tanstack/react-virtual` (row windowing, #204). They are not
+   counter-examples: each is a state engine with no DOM, no focus model and no ARIA, which is why
+   `DataTable` writes its own. That triple is the test; a package fails it the moment it renders
+   or focuses anything. Measured comparison in [`docs/radix-vs-base-ui.md`](./docs/radix-vs-base-ui.md).
 
 ## Where things are written down
 
