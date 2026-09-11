@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { ElementType, ReactNode } from 'react';
 import { Menu, Palette, Search, X } from 'lucide-react';
 import { DocsLink } from './DocsLinkProvider';
-import { useTheme } from '../ThemeProvider';
+import { useOptionalTheme } from '../ThemeProvider';
 import { LEVELS } from '../../theme/levels';
 import { cn } from '../../lib/recipe';
 
@@ -59,7 +59,18 @@ export function DocsHeader({
   className = '',
 }: DocsHeaderProps) {
   const ref = useRef<HTMLElement | null>(null);
-  const { level, cycleLevel } = useTheme();
+  /*
+   * `useOptionalTheme`, not `useTheme`. A docs header is chrome, and ADR 0004
+   * says a consumer may theme with the `data-theme` attribute alone and never
+   * mount a provider — developer themes consume colour only, the host owns the
+   * geometry and the clock. The strict hook throws, so requiring it here takes
+   * the whole page down rather than degrading.
+   *
+   * This component *adapts* to the level rather than requiring it: with no
+   * provider there is nothing to cycle, so the control is omitted and the rest
+   * of the header renders.
+   */
+  const theme = useOptionalTheme();
 
   useEffect(() => {
     const el = ref.current;
@@ -140,15 +151,17 @@ export function DocsHeader({
           </button>
         )}
 
-        <button
-          type="button"
-          onClick={cycleLevel}
-          className="docs-header-icon-btn"
-          aria-label={`Switch theme level (current: ${LEVELS[level].label})`}
-          title={`Level: ${LEVELS[level].label}`}
-        >
-          <Palette size={18} />
-        </button>
+        {theme && (
+          <button
+            type="button"
+            onClick={theme.cycleLevel}
+            className="docs-header-icon-btn"
+            aria-label={`Switch theme level (current: ${LEVELS[theme.level].label})`}
+            title={`Level: ${LEVELS[theme.level].label}`}
+          >
+            <Palette size={18} />
+          </button>
+        )}
       </div>
     </header>
   );
