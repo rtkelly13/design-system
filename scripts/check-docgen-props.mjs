@@ -113,9 +113,52 @@ if (process.argv.includes('--list')) {
   console.log('');
 }
 
+/*
+ * The components manifest, which is the machine-readable half of the same
+ * question.
+ *
+ * `features.componentsManifest` was unset and a real build emitted no
+ * `manifests/` directory at all — so an agent querying this catalogue got
+ * nothing, silently. Asserting the file exists and carries props is what stops
+ * that recurring: a manifest built from an extractor that emits nothing would
+ * describe the catalogue as propless and look authoritative doing it.
+ *
+ * It resolves more than the docs pages do — `Button`'s union gives five props
+ * here and two on its page — so this is also the surface worth trusting.
+ */
+const MANIFEST = path.join(ROOT, 'storybook-static/manifests/components.json');
+let manifestProblems = [];
+try {
+  const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
+  const components = manifest.components ?? {};
+  const withProps = Object.values(components).filter(
+    (c) => Object.keys(c.reactDocgenTypescript?.props ?? {}).length > 0,
+  );
+  if (!Object.keys(components).length) {
+    manifestProblems.push('The manifest lists no components.');
+  } else if (withProps.length < Object.keys(components).length / 2) {
+    manifestProblems.push(
+      `Only ${withProps.length} of ${Object.keys(components).length} manifest entries carry props — the extractor is probably not resolving types.`,
+    );
+  }
+  console.log(
+    `Components manifest — ${withProps.length} of ${Object.keys(components).length} entries carry props.`,
+  );
+} catch {
+  manifestProblems.push(
+    'No storybook-static/manifests/components.json. `features.componentsManifest` must stay set in .storybook/main.ts.',
+  );
+}
+
 console.log(
   `Docgen props OK — ${ok.length} components publish props, ${Object.keys(EXCLUDED).length} excluded with a reason.`,
 );
+
+if (manifestProblems.length) {
+  console.error(`\nComponents manifest check failed:\n`);
+  for (const p of manifestProblems) console.error(`  - ${p}`);
+  process.exit(1);
+}
 
 if (bare.length) {
   console.error(`\nDocgen props check failed — ${bare.length} component(s) publish an empty table:\n`);

@@ -64,6 +64,33 @@ would exhaust it faster. That is a paid-plan decision, not a configuration one.
 So the guard sits where the answer exists: after the merge, and on a schedule.
 
 
+### The components manifest
+
+`features.componentsManifest` in `.storybook/main.ts` emits
+`manifests/components.json` — every component, its props, its stories and the import line a
+consumer would write:
+
+```json
+"foundations-button": {
+  "name": "Button",
+  "import": "import { Button } from \"@rtkelly13/design-system\";",
+  "reactDocgenTypescript": { "props": { "variant": …, "size": …, "bracketed": …, "href": … } }
+}
+```
+
+It was **not being produced**. Storybook 10.4 renamed the flag and defaults it to `true`; this
+repo is on 10.5.5 and a real build emitted no `manifests/` directory at all. So the flag is
+declared rather than relied on, and `check:docgen-props` asserts the file exists and that most
+entries carry props — a manifest from an extractor that emits nothing would describe the
+catalogue as propless and look authoritative doing it.
+
+It resolves more than the docs pages do: `Button`'s union yields five props here and two on
+its own page, so this is the surface worth pointing a tool at.
+
+`@storybook/addon-mcp` would expose it over MCP. Not added — that is a decision about
+exposing an endpoint, not a build setting, and belongs with whoever wants the integration.
+
+
 ### Cache policy — `immutable` needs a content hash in the name
 
 `vercel.json` marks `/assets/` immutable for a year, and that is right: Vite writes
