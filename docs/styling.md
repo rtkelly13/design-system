@@ -6,6 +6,36 @@ Why styles are authored in components rather than stylesheets, and the ratchet t
 
 ---
 
+## Targeting a component's internals — `data-slot`
+
+`className` reaches a component's **root** and nothing else. Before this, a consumer who needed to
+adjust one part — the label inside a field, the caption under a table, the status pill in a
+pagination bar — had three options, and all three are bad:
+
+1. a new prop (`labelClassName`, `captionClassName`, …), which grows the API for every part of every
+   component
+2. a descendant selector against a Tailwind utility that happens to be there today
+3. reimplementing the component
+
+So every multi-part component marks its parts:
+
+```css
+[data-slot="field-label"]   { letter-spacing: 0.1em }
+[data-slot="table-cell"]    { padding-block: 0.25rem }
+```
+
+**A slot name is public API.** It is the one thing here a consumer writes a selector against, so
+renaming one breaks them exactly as renaming a prop would — and under the criteria in
+[`research.md`](./research.md) §1 that makes it a breaking change, not a refactor. Name a slot for
+the *part*, never for how it currently looks: `field-label`, not `field-uppercase-text`.
+
+Single-element components do not need one. The rule is that a consumer should be able to reach
+anything they can see as a distinct thing, and in a component that renders one element the root
+already is that.
+
+Convention: `<component>` for the root, `<component>-<part>` below it, kebab-case throughout.
+
+
 ## 🧱 Styling Lives in TSX
 
 **A component's appearance is written on its elements, as Tailwind utilities.
