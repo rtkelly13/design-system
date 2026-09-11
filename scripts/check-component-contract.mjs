@@ -36,7 +36,7 @@
  *   node scripts/check-component-contract.mjs --list    print the census
  */
 
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -55,6 +55,7 @@ const PROVIDERS = {
 
 /** Counts on the day this landed. Lower a line as it is paid down; delete at zero. */
 const BUDGET = {
+  untested: 26,
   inlineStyle: 170,
   ref: 35,
   displayName: 0,
@@ -63,6 +64,7 @@ const BUDGET = {
 };
 
 const CLAUSE = {
+  untested: 'has a co-located unit test',
   inlineStyle: 'keeps inline style objects out of reach of a caller\u2019s className',
   ref: 'forwards its ref to the element it renders',
   displayName: 'declares a displayName alongside forwardRef',
@@ -79,7 +81,7 @@ function files(dir = COMPONENTS) {
   });
 }
 
-const bare = { inlineStyle: [], ref: [], displayName: [], recipe: [], spread: [] };
+const bare = { untested: [], inlineStyle: [], ref: [], displayName: [], recipe: [], spread: [] };
 const counted = [];
 
 for (const file of files().sort()) {
@@ -101,6 +103,16 @@ for (const file of files().sort()) {
    * counts all of them and holds the line. A ratchet on a number nobody can
    * argue with beats a classifier that is wrong a third of the time.
    */
+  /*
+   * A co-located unit test, which 29 of 43 components do not have.
+   *
+   * `vitest.config.mts` used to scope coverage to `src/lib` and `src/hooks`, so
+   * the report was healthy and silent about every component. A measurement
+   * scoped to exclude the gap reads as reassurance; components are in scope now,
+   * and this holds the count.
+   */
+  if (!existsSync(file.replace(/\.tsx$/, '.test.tsx'))) bare.untested.push(rel);
+
   for (const _ of source.matchAll(/style=\{\{/g)) bare.inlineStyle.push(rel);
 
   if (!source.includes('forwardRef')) bare.ref.push(rel);

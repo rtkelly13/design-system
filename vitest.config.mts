@@ -17,7 +17,17 @@ export default defineConfig({
     setupFiles: ['src/test-setup.ts'],
     coverage: {
       provider: 'v8',
-      include: ['src/lib/**', 'src/hooks/**'],
+      /*
+       * Components are in scope, and were not.
+       *
+       * `include` was `['src/lib/**', 'src/hooks/**']`, so coverage reported a
+       * healthy number for the two directories that were tested and said nothing
+       * about the 32 of 43 components that had no test at all. A measurement
+       * scoped to exclude the gap is worse than no measurement: it reads as
+       * reassurance.
+       */
+      include: ['src/lib/**', 'src/hooks/**', 'src/components/**'],
+      exclude: ['**/*.test.{ts,tsx}', 'src/components/**/*.stories.tsx'],
       reporter: ['text', 'lcov'],
     },
   },
