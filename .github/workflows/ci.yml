@@ -105,6 +105,11 @@ jobs:
       - name: Documented figures
         run: pnpm check:docs
 
+      # The other half of the same job: `check:docs` compares figures, this
+      # compares the props and level names in the code fences a consumer copies.
+      - name: Documented snippets
+        run: pnpm check:doc-snippets
+
       # Ratchet: fails if the count of colour-instead-of-role call sites rises.
       - name: Lint — colour literals and unknown classnames
         run: pnpm lint

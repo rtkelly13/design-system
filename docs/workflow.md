@@ -36,6 +36,8 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - `pnpm tokens:design:check` (the DTCG export in `tokens/` is neither stale nor orphaned)
    - `pnpm check:contrast` (every role pair, every level)
    - `pnpm check:docs` (figures written in prose against the source they describe)
+   - `pnpm check:doc-snippets` (props and level names in documentation code fences,
+     against `api/index.d.ts`)
    - `pnpm lint` (colour-instead-of-role, reported at the site)
    - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm check:tokens` (hue-named call sites, budget 0)
