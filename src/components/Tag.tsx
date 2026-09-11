@@ -19,7 +19,14 @@ export interface TagProps {
   children?: ReactNode;
 }
 
-const ACCENT_CLASSES: Record<string, string> = {
+/**
+ * Typed `Record<AccentToken, …>` rather than `Record<string, …>`, which is what
+ * let four hue names — `yellow`, `cyan`, `pink`, `green` — survive here after
+ * #138 removed them from the component API. `accent` is an `AccentToken`, so
+ * they were unreachable and still shipped; `check:tokens` reads call sites and
+ * a map key is not one. The type is the gate for this shape.
+ */
+const ACCENT_CLASSES: Record<AccentToken, string> = {
   primary: 'bg-accent-primary text-content-inverse hover:bg-accent-secondary',
   secondary: 'bg-accent-secondary text-content-inverse hover:bg-accent-tertiary',
   tertiary: 'bg-accent-tertiary text-content-inverse hover:bg-accent-primary',
@@ -28,10 +35,6 @@ const ACCENT_CLASSES: Record<string, string> = {
   success: 'bg-intent-success text-content-inverse hover:bg-accent-secondary',
   warning: 'bg-intent-warning text-content-inverse hover:bg-accent-tertiary',
   danger: 'bg-intent-danger text-content-inverse hover:bg-accent-primary',
-  yellow: 'bg-accent-secondary text-content-inverse hover:bg-accent-tertiary',
-  cyan: 'bg-accent-primary text-content-inverse hover:bg-accent-secondary',
-  pink: 'bg-accent-tertiary text-content-inverse hover:bg-accent-primary',
-  green: 'bg-intent-success text-content-inverse hover:bg-accent-secondary',
 };
 
 export function Tag({

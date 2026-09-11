@@ -164,6 +164,6 @@ if (sites.length > BUDGET) {
 
 console.log(
   sites.length === 0
-    ? 'No hue-named call sites. `compatAliases()` in build-tokens.mjs can come out.'
+    ? 'No hue-named call sites.'
     : `Hue-named call sites: ${sites.length}, within budget ${BUDGET}.`,
 );
