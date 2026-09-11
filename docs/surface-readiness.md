@@ -35,6 +35,7 @@ consumer sees it without reading this file.
 
 | Sidebar group | Tag | From the table below |
 |---|---|---|
+| `Guides/*` | `stable` | prose about decisions already made and shipped |
 | `Foundations/*` | `stable` | the published primitives, gated end to end |
 | `Docs/*` | `stable` | ~90%, "nothing structural" blocking |
 | `Blog/*` | `stable` | ~70%, real primitives really adopted by the blog |

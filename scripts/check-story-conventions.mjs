@@ -37,7 +37,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * surfaces first, product mockups last. A new group here is a decision about
  * what this system claims to be, not a filing choice.
  */
-const GROUPS = ['Foundations', 'Docs', 'Blog', 'Presentation', 'SaaS', 'Showcase'];
+const GROUPS = ['Guides', 'Foundations', 'Docs', 'Blog', 'Presentation', 'SaaS', 'Showcase'];
 
 /**
  * Titles that are a single page rather than a group, so `<Group>/<Name>` does
