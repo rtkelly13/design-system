@@ -36,6 +36,28 @@ already is that.
 Convention: `<component>` for the root, `<component>-<part>` below it, kebab-case throughout.
 
 
+## Inline styles, and the one case that is legitimate
+
+`style={{ … }}` is unreachable by a consumer's `className`. That is #47's third idiom and the
+one it is most right about: a caller can override a utility, and cannot override an inline
+style without `!important`.
+
+`check:component-contract` holds the count at a budget rather than forbidding them, because
+**about a third are legitimate**. A runtime value cannot be a utility — Tailwind's scanner
+reads source text and generates nothing for `bg-[${value}]` — so `Avatar`'s ring colour,
+`Badge`'s accent and `Swatch`'s well are inline by necessity, and each says so where it
+happens.
+
+Telling the two apart needs judgement a script does not have, so the gate counts all of them
+and stops the number rising. A ratchet on a number nobody can argue with beats a classifier
+that is wrong a third of the time.
+
+**Paying it down is per-component work**, not a sweep: converting a style object to utilities
+is a rendering change, so each one wants its own baseline review. The concentration is in the
+demo surfaces — `AdminDashboardLayout` (41) and `SaasLandingPage` (26) are nearly half the
+total, and they are mockups rather than published components.
+
+
 ## 🧱 Styling Lives in TSX
 
 **A component's appearance is written on its elements, as Tailwind utilities.
