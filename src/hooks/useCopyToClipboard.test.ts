@@ -12,8 +12,18 @@ function stubClipboard(writeText: ((value: string) => Promise<void>) | null) {
 }
 
 describe('useCopyToClipboard', () => {
+  /*
+   * Strict fake timers, with no `shouldAdvanceTime`.
+   *
+   * It was `vi.useFakeTimers({ shouldAdvanceTime: true })`, which makes the fake
+   * clock *also* advance with the real one — reintroducing the race that fake
+   * timers exist to remove. Under full-suite parallel load, real time passed
+   * between `advanceTimersByTime(1999)` and the assertion after it, the reset
+   * timer fired early, and the test failed while passing in isolation every
+   * time (#173).
+   */
   beforeEach(() => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
@@ -251,7 +261,14 @@ describe('useCopyToClipboard', () => {
     expect(result.current.copy).toBe(first);
   });
 
+  /*
+   * The one test that wants a real clock: `waitFor` polls on real timers, so
+   * under the fake clock above it would never re-check and would time out. This
+   * asserts that the transition is observable to an awaiting consumer, not when
+   * it happens, so there is no window to control and nothing to make flaky.
+   */
   it('exposes the state transition to consumers awaiting it', async () => {
+    vi.useRealTimers();
     stubClipboard(vi.fn().mockResolvedValue(undefined));
 
     const { result } = renderHook(() => useCopyToClipboard());

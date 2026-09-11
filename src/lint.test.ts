@@ -27,9 +27,27 @@ import { authoredClasses } from '../scripts/authored-classes.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 let eslint: ESLint;
-beforeAll(() => {
+
+/*
+ * Warm the linter here rather than inside the first test.
+ *
+ * `new ESLint()` is cheap; the first `lintText()` is not — it resolves the flat
+ * config, loads `typescript-eslint` and both local plugins, and builds the
+ * stylesheet index `no-custom-classname` reads. That cost used to land inside
+ * whichever test ran first, which took ~2.3s alone and over 9s under full-suite
+ * parallel load, against a 5s default timeout. The test failed on four separate
+ * branches and passed in isolation every time (#173).
+ *
+ * Paying it in a hook with its own generous timeout makes the tests measure the
+ * rules rather than the machine's spare capacity.
+ */
+beforeAll(async () => {
   eslint = new ESLint({ cwd: ROOT });
-});
+  await eslint.lintText('export const _warm = 1;\n', {
+    filePath: path.join(ROOT, 'src/components/__lint_warmup__.tsx'),
+    warnIgnored: false,
+  });
+}, 60_000);
 
 /** Lint a fragment as if it were a component, which is what the config scopes to. */
 async function lintComponent(code: string): Promise<string[]> {
