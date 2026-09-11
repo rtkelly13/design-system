@@ -54,6 +54,36 @@ const config: StorybookConfig = {
     });
   },
   docs: {},
+
+  /**
+   * `react-docgen-typescript`, not the `react-docgen` default.
+   *
+   * The default resolves neither a union type nor the `DetailedHTMLProps`
+   * intersections inside one, and it emits the component **with no props rather
+   * than failing**. `Button` is the case that matters: its props are
+   * `ButtonElementProps | ButtonLinkProps`, so the most-copied component in the
+   * package published an empty table where `variant`, `size`, `bracketed` and
+   * `href` belong — and the long JSDoc on `variant`, which is the entire
+   * mitigation for the naming #90 was about, reached no consumer at all.
+   * `Table*` failed for the same class of reason.
+   *
+   * The `propFilter` is not optional and must not be removed: without it every
+   * inherited `HTMLAttributes` member lands in every table, and a 250-row props
+   * table documents nothing. It keeps a prop only if it is declared in this
+   * repo, which is also what makes the tables honest about what a component
+   * actually adds.
+   *
+   * The cost is a slower Storybook build. Grafana and EUI both pay it and both
+   * chose this extractor; `docs/storybook-benchmarks.md` § 3 has the comparison.
+   */
+  typescript: {
+    reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      shouldExtractLiteralValuesFromEnum: true,
+      shouldRemoveUndefinedFromOptional: true,
+      propFilter: (prop) => !prop.parent?.fileName.includes('node_modules'),
+    },
+  },
 };
 
 export default config;
