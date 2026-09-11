@@ -162,9 +162,46 @@ const INTERACTIONS: readonly InteractionCase[] = [
   },
 ];
 
+/**
+ * The narrow viewport, where behaviour exists that the desktop set cannot reach.
+ *
+ * Every other case in this file is Desktop Chrome at 1280x720, so the docs
+ * sidebar toggle, its scrim, the admin drawer and the responsive type and
+ * padding steps were asserted nowhere. `walkthrough` captures them, and
+ * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
+ * to look" at.
+ *
+ * Deliberately five, not forty-one. Each is a committed PNG a human reviews on
+ * every change, and the point is the layout that *differs* at this width — a
+ * second copy of a component that renders identically is cost without evidence.
+ *
+ * The `-mobile` filenames are load-bearing: `snapshotPathTemplate` carries no
+ * `{projectName}`, so both projects resolve to the same path. Naming them here
+ * avoided renaming 44 existing baselines to add a segment.
+ */
+const MOBILE_CASES: readonly VisualCase[] = [
+  { id: 'docs-docslayout--mobile-drawer', snapshot: 'docs-layout-mobile.png', fullPage: true },
+  { id: 'saas-admindashboardlayout--dark-mode', snapshot: 'admin-dashboard-mobile.png', fullPage: true },
+  { id: 'saas-landingpage--dark-mode', snapshot: 'saas-landing-mobile.png', fullPage: true },
+  { id: 'foundations-pageheader--default', snapshot: 'pageheader-mobile.png' },
+  { id: 'foundations-card--default', snapshot: 'card-mobile.png' },
+];
+
+test.describe('Design System Visual Regression - Narrow viewport', () => {
+  for (const { id, snapshot, fullPage } of MOBILE_CASES) {
+    test(`${id} — mobile`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== 'mobile', 'Narrow-viewport cases run in the mobile project');
+      await page.goto(`/iframe.html?id=${id}&viewMode=story`);
+      await waitForStoryReady(page, id);
+      await expect(page).toHaveScreenshot(snapshot, fullPage ? { fullPage: true } : undefined);
+    });
+  }
+});
+
 test.describe('Design System Visual Regression - Interaction states', () => {
   for (const { id, snapshot, act, target } of INTERACTIONS) {
-    test(`${id} — ${act}`, async ({ page }) => {
+    test(`${id} — ${act}`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== 'chromium', 'Interaction baselines are the chromium project');
       await page.goto(`/iframe.html?id=${id}&viewMode=story`);
       await waitForStoryReady(page, id);
 
@@ -207,7 +244,8 @@ test.describe('Design System Visual Regression - Interaction states', () => {
 
 test.describe('Design System Visual Regression - Components', () => {
   for (const { id, snapshot, fullPage } of CASES) {
-    test(`${id}`, async ({ page }) => {
+    test(`${id}`, async ({ page }, testInfo) => {
+      test.skip(testInfo.project.name !== 'chromium', 'Desktop baselines are the chromium project');
       await page.goto(`/iframe.html?id=${id}&viewMode=story`);
       await waitForStoryReady(page, id);
       await expect(page).toHaveScreenshot(snapshot, fullPage ? { fullPage: true } : undefined);

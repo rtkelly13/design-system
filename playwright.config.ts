@@ -112,6 +112,23 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    /*
+     * A narrow viewport, for the behaviour that only exists there: the docs
+     * sidebar toggle and its scrim, the admin drawer, and the `sm:` / `md:` /
+     * `xl:` steps in `PageHeader`, `SectionContainer` and `Card`. None of it was
+     * asserted anywhere — `walkthrough` captures every story on every Level but
+     * `AGENTS.md` is explicit that it is not a gate and that its output is
+     * "nobody's job to look" at.
+     *
+     * `snapshotPathTemplate` deliberately carries no `{projectName}`, so the two
+     * projects would collide on one set of files. Rather than rename 44 existing
+     * baselines to add a segment, the mobile cases carry their own `-mobile`
+     * filenames and the desktop set is untouched.
+     */
+    {
+      name: 'mobile',
+      use: { ...devices['Pixel 7'] },
+    },
   ],
   webServer: {
     command: 'npx serve storybook-static -p 6006 --config ../serve.json',
