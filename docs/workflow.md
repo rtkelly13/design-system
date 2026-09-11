@@ -39,6 +39,7 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - `pnpm check:doc-snippets` (props and level names in documentation code fences,
      against `api/index.d.ts`)
    - `pnpm check:component-docs` (every component carries a JSDoc — a ratchet)
+   - `pnpm check:licences` (every shipped package against a default-deny baseline)
    - `pnpm lint` (colour-instead-of-role, reported at the site)
    - `pnpm check:css` (styling-in-CSS ratchet)
    - `pnpm check:tokens` (hue-named call sites, budget 0)

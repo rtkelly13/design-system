@@ -114,6 +114,10 @@ jobs:
       - name: Documented components
         run: pnpm check:component-docs
 
+      # Default-deny: every shipped package, and the licence it had last time.
+      - name: Shipped licences
+        run: pnpm check:licences
+
       # Ratchet: fails if the count of colour-instead-of-role call sites rises.
       - name: Lint — colour literals and unknown classnames
         run: pnpm lint
