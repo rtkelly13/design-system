@@ -75,6 +75,7 @@
     "test:coverage": "vitest run --coverage",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
+    "test:a11y": "playwright test tests/a11y.spec.ts",
     "test:visual": "playwright test tests/visual.spec.ts",
     "test:visual:missing": "playwright test tests/visual.spec.ts --update-snapshots=missing",
     "test:visual:update": "playwright test tests/visual.spec.ts --update-snapshots=all",
@@ -130,6 +131,7 @@
     "tailwind-variants": "^3.3.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.62.1",
     "@storybook/addon-docs": "^10.5.5",
     "@storybook/react": "^10.5.5",

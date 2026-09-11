@@ -226,6 +226,12 @@ jobs:
       - name: Run Visual Regression Tests
         run: pnpm test:visual
 
+      # axe over every asserted story, on both Levels. Shares the visual job
+      # because it needs the same Storybook build and the same browser install,
+      # and building either twice is the longest thing in CI.
+      - name: Run Accessibility Tests
+        run: pnpm test:a11y
+
       - name: Upload Playwright Report on Failure
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
