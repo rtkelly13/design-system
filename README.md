@@ -65,6 +65,25 @@ pnpm test:visual
 pnpm test:visual:update
 ```
 
+### Capturing this package deterministically
+
+If you screenshot, print, or render outside a live browser session, three switches decide whether
+you get the same output twice:
+
+```tsx
+<ThemeProvider defaultLevel="midnight" scoped>   {/* 1. no storage, no matchMedia, no documentElement */}
+```
+
+```ts
+await document.fonts.ready;                       // 2. or you capture the fallback face
+// 3. suppress transitions:
+// *, *::before, *::after { transition: none !important; animation: none !important }
+```
+
+`scoped` is the one that does the work — `persist={false} followSystem={false}` look like the
+determinism controls and are redundant under it. Full reasoning in
+[`docs/deterministic-rendering.md`](./docs/deterministic-rendering.md).
+
 ---
 
 ## 📦 Installation & Prerelease Testing
