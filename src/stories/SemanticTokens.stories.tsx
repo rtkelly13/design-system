@@ -12,6 +12,7 @@ import { NoteBlock } from '../components/NoteBlock';
  */
 const meta: Meta = {
   title: 'Foundations/Semantic Tokens',
+  tags: ['autodocs'],
   parameters: { layout: 'padded' },
 };
 
