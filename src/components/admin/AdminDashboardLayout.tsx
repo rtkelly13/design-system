@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { ElementType } from 'react';
 import type { AccentToken } from '../../lib/theme';
 import { LayoutDashboard, FileText, Sliders, LineChart, Database, RefreshCw, ShieldCheck } from 'lucide-react';
 import { Button } from '../Button';
@@ -11,23 +12,31 @@ import { LEVELS } from '../../theme/levels';
 export interface AdminNavItem {
   id: string;
   label: string;
-  icon?: React.ReactNode;
+  /**
+   * A component, not a rendered element — `LayoutDashboard`, never
+   * `<LayoutDashboard />`. Matches `PageHeader`, `StatCard` and `DocsHeader`,
+   * and it is what fixes #30: a React element inside an object inside an array
+   * is what Storybook's source generator cannot serialise, and this is the only
+   * prop default in the repo with that shape.
+   */
+  icon?: ElementType<{ className?: string }>;
   badgeCount?: number;
 }
 
 export const DEFAULT_ADMIN_NAV: AdminNavItem[] = [
-  { id: 'dashboard', label: 'DASHBOARD', icon: <LayoutDashboard size={18} /> },
-  { id: 'reconciliation', label: 'RECONCILIATION', icon: <FileText size={18} />, badgeCount: 3 },
-  { id: 'rules', label: 'RULE ENGINE', icon: <Sliders size={18} /> },
-  { id: 'cashflow', label: 'CASHFLOW FORECAST', icon: <LineChart size={18} /> },
-  { id: 'backups', label: 'DRIVE BACKUPS', icon: <Database size={18} /> },
+  { id: 'dashboard', label: 'DASHBOARD', icon: LayoutDashboard },
+  { id: 'reconciliation', label: 'RECONCILIATION', icon: FileText, badgeCount: 3 },
+  { id: 'rules', label: 'RULE ENGINE', icon: Sliders },
+  { id: 'cashflow', label: 'CASHFLOW FORECAST', icon: LineChart },
+  { id: 'backups', label: 'DRIVE BACKUPS', icon: Database },
 ];
 
 export interface AdminStatusBadge {
   id: string;
   label: string;
   accent?: AccentToken;
-  icon?: React.ReactNode;
+  /** A component, not a rendered element — see {@link AdminNavItem.icon}. */
+  icon?: ElementType<{ className?: string }>;
 }
 
 /**
@@ -36,7 +45,7 @@ export interface AdminStatusBadge {
  * a consumer rendering `<AdminDashboardLayout />` inherits whatever is here.
  */
 export const DEFAULT_ADMIN_STATUS: AdminStatusBadge[] = [
-  { id: 'health', label: 'SYSTEM HEALTH: 100%', accent: 'success', icon: <ShieldCheck size={14} /> },
+  { id: 'health', label: 'SYSTEM HEALTH: 100%', accent: 'success', icon: ShieldCheck },
   { id: 'api', label: 'API: CONNECTED', accent: 'primary' },
 ];
 
@@ -140,7 +149,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    {item.icon}
+                    {item.icon ? <item.icon className="h-[18px] w-[18px]" /> : null}
                     <span>{item.label}</span>
                   </div>
                   {item.badgeCount && (
@@ -191,7 +200,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
               <Badge key={badge.id} accent={badge.accent ?? 'primary'}>
                 {badge.icon ? (
                   <span style={{ display: 'inline-flex', marginRight: '4px', verticalAlign: 'middle' }}>
-                    {badge.icon}
+                    <badge.icon className="h-3.5 w-3.5" />
                   </span>
                 ) : null}
                 {badge.label}
