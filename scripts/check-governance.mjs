@@ -241,10 +241,12 @@ const runsAnywhere = new Set(
  * which is what stops this being the place a gate goes to die.
  */
 const UNGATED = {
-  // Empty, and that is the finding rather than an omission: every gate this
-  // package defines is now wired into a workflow. `tokens:design:check` was the
-  // one that was not, and the honest fix was to run it rather than to write the
-  // first entry here.
+  'check:deployed':
+    'Compares the live Storybook with this build, so on a pull request it can only ' +
+    'be red: the deployment cannot contain the commit under review. It runs in ' +
+    'deployment-drift.yml on pushes to `main` and on a daily schedule, which is ' +
+    'where the answer exists. Making it a PR gate would make it a gate that is ' +
+    'always red, and a gate that is always red gets deleted.',
 };
 
 /** A gate is a script that decides something. `:list`/`:report` only print. */
