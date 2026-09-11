@@ -360,7 +360,8 @@ interface AvatarProps extends react__default.HTMLAttributes<HTMLDivElement> {
 
     accent?: AccentToken;
 }
-declare const Avatar: react__default.FC<AvatarProps>;
+
+declare const Avatar: react__default.ForwardRefExoticComponent<AvatarProps & react__default.RefAttributes<HTMLDivElement>>;
 
 interface PageTitleProps extends HTMLAttributes<HTMLHeadingElement> {
     children: ReactNode;

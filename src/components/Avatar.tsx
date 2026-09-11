@@ -1,3 +1,5 @@
+import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
+import { forwardRef } from 'react';
 import { accentVar } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
 import React from 'react';
@@ -20,7 +22,17 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   accent?: AccentToken;
 }
 
-export const Avatar: React.FC<AvatarProps> = ({
+/**
+ * An avatar, on Base UI's `avatar`.
+ *
+ * The part that matters is the failure path: this rendered a bare `<img src>`
+ * with no `onError`, so a URL that 404s showed the browser's broken-image glyph
+ * rather than the initials — the one state a fallback exists for, and the one
+ * that was never reached. `Avatar.Image` only renders once the image has
+ * actually loaded, and `Avatar.Fallback` covers every other case, including the
+ * moment before it does.
+ */
+export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar({
   src,
   alt = 'Avatar',
   fallback = 'RK',
@@ -29,7 +41,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   className = '',
   style,
   ...props
-}) => {
+}, ref) {
   const getSizePx = () => {
     switch (size) {
       case 'sm': return '32px';
@@ -46,38 +58,58 @@ export const Avatar: React.FC<AvatarProps> = ({
   const sizePx = getSizePx();
 
   return (
-    <div
-      className={className}
-      style={{
-        width: sizePx,
-        height: sizePx,
-        border: '2px solid var(--ds-border-strong)',
-        boxShadow: `3px 3px 0px 0px ${accentColor}`,
-        backgroundColor: 'var(--ds-surface-base)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        boxSizing: 'border-box',
-        ...style
-      }}
-      {...props}
-    >
-      {src ? (
-        <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      ) : (
-        <span
+    <BaseAvatar.Root
+      /*
+       * The *function* form of `render`, as `Input` uses for `Field.Control`.
+       * Base UI's root is typed to a `span`; `AvatarProps extends
+       * HTMLAttributes<HTMLDivElement>` is the published type. Spreading
+       * div-typed props through the element form is a type error rather than a
+       * cosmetic one, and changing the published type to match a library's
+       * default element is the tail wagging the dog.
+       */
+      render={(rootProps) => (
+        <div
+          {...rootProps}
+          {...props}
+          ref={ref}
+          data-slot="avatar"
+          className={className}
           style={{
+            width: sizePx,
+            height: sizePx,
+            border: '2px solid var(--ds-border-strong)',
+            boxShadow: `3px 3px 0px 0px ${accentColor}`,
+            backgroundColor: 'var(--ds-surface-base)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+            boxSizing: 'border-box',
+            ...style,
+          }}
+        />
+      )}
+    >
+      {src && (
+        <BaseAvatar.Image
+          src={src}
+          alt={alt}
+          data-slot="avatar-image"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      )}
+      <BaseAvatar.Fallback
+        data-slot="avatar-fallback"
+        style={{
             fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
             fontWeight: 800,
             fontSize: size === 'sm' ? '0.75rem' : size === 'lg' ? '1.2rem' : '0.95rem',
             color: accentColor,
-            textTransform: 'uppercase',
-          }}
-        >
-          {fallback}
-        </span>
-      )}
-    </div>
+          textTransform: 'uppercase',
+        }}
+      >
+        {fallback}
+      </BaseAvatar.Fallback>
+    </BaseAvatar.Root>
   );
-};
+});
