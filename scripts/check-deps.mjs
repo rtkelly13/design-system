@@ -114,6 +114,14 @@ const MANIFEST = {
     kind: 'dev',
     why: 'no-custom-classname, the only check that catches a class naming nothing — the failure Tailwind is silent about. Its whitelist is derived from the stylesheets by scripts/authored-classes.mjs, so it asks "does this class exist" rather than "is it a Tailwind class".',
   },
+  'eslint-plugin-react-hooks': {
+    kind: 'dev',
+    why: 'The Rules of Hooks, reported as warnings and held by `check:lint-budget` rather than as errors \u2014 4 violations exist today and PR #58 proved that landing this set as errors alongside its own fixes does not merge. Registered as a plugin object because the recommended set is still eslintrc-shaped and flat config rejects its `plugins` array.',
+  },
+  'eslint-plugin-jsx-a11y': {
+    kind: 'dev',
+    why: 'Static accessibility rules \u2014 interactive handlers on non-interactive elements, ambiguous anchor text. Complements #52\u2019s runtime axe gate rather than replacing it: this reads source, that renders the component.',
+  },
   '@types/node': {
     kind: 'dev',
     why: 'Types for `node:fs`/`node:path` in the unit suite, which reads the generated theme.css from disk to assert its shape.',

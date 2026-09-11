@@ -19,6 +19,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:doc-snippets` | props and level names in documentation code fences against `api/index.d.ts` |
 | `pnpm check:component-docs` | every component carries a JSDoc — a ratchet, budget **18** |
 | `pnpm check:licences` | every shipped package against `licenses.baseline.json`, default-deny |
+| `pnpm check:lint-budget` | `react-hooks`, `jsx-a11y` and `no-explicit-any` as a per-rule ratchet |
 | `pnpm check:api` | the built type surface against the committed `api/index.d.ts` |
 | `pnpm check:governance` | the repo's own rules: pinned SHAs, job ceilings, every gate wired, `rule N` resolving — `--list` for the census |
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |

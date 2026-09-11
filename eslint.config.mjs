@@ -1,5 +1,7 @@
 import tseslint from 'typescript-eslint';
 import tailwindcss from 'eslint-plugin-tailwindcss';
+import reactHooks from 'eslint-plugin-react-hooks';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 import { authoredClasses } from './scripts/authored-classes.mjs';
 import { noColourLiterals } from './scripts/eslint-token-rule.mjs';
@@ -107,6 +109,43 @@ export default tseslint.config(
     },
     rules: {
       'tailwindcss/no-custom-classname': ['error', { whitelist: authoredClasses() }],
+    },
+  },
+
+  /**
+   * The general-purpose ruleset, as **warnings**.
+   *
+   * PR #58 tried to land this as errors together with the fixes it demands, and
+   * failed its own `lint` job on a long run of `no-explicit-any` it had not got
+   * to. It never merged. #149 is the correction: land the rules first, green,
+   * then spend the count down.
+   *
+   * `pnpm check:lint-budget` is the ratchet — it counts these warnings and fails
+   * if the number rises, which is the same shape `check:css`, `check:deps` and
+   * `check:fonts` use, and what `check:tokens` used until it reached zero.
+   * Warnings rather than errors so `pnpm lint` stays honest about the two rules
+   * that *are* at zero: a colour named by value, and a class naming nothing.
+   *
+   * `react-hooks` still ships its recommended set eslintrc-shaped, with a
+   * `plugins: ['react-hooks']` array that flat config rejects. Register the
+   * plugin object and reuse its rule list, so the set stays whatever the plugin
+   * says it is rather than a copy that drifts.
+   */
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    plugins: { 'react-hooks': reactHooks, 'jsx-a11y': jsxA11y, '@typescript-eslint': tseslint.plugin },
+    rules: {
+      ...Object.fromEntries(
+        Object.entries(reactHooks.configs.recommended.rules ?? {}).map(([rule]) => [rule, 'warn']),
+      ),
+      ...Object.fromEntries(
+        Object.entries(jsxA11y.flatConfigs?.recommended?.rules ?? {}).map(([rule]) => [rule, 'warn']),
+      ),
+      '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
 );

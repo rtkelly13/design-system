@@ -118,6 +118,11 @@ jobs:
       - name: Shipped licences
         run: pnpm check:licences
 
+      # Ratchet, per rule: the general-purpose ruleset reports as warnings, and
+      # this fails if any rule's count rises. See #58 for why it is not errors.
+      - name: Lint budget
+        run: pnpm check:lint-budget
+
       # Ratchet: fails if the count of colour-instead-of-role call sites rises.
       - name: Lint — colour literals and unknown classnames
         run: pnpm lint
