@@ -68,6 +68,49 @@ const FOCUS_RING: Record<CanonicalAccent, string> = {
   'intent-danger': 'focus:border-intent-danger focus:ring-intent-danger',
 };
 
+/**
+ * A filled chip: the role as a background, with `text.inverse` on it.
+ *
+ * `text.inverse` is why this is a map and not a template — `check:contrast`
+ * measures `text.inverse` against every accent and intent precisely because
+ * this pairing exists, so the two must not be able to disagree.
+ */
+const FILL: Record<CanonicalAccent, string> = {
+  'accent-primary': 'bg-accent-primary text-content-inverse',
+  'accent-secondary': 'bg-accent-secondary text-content-inverse',
+  'accent-tertiary': 'bg-accent-tertiary text-content-inverse',
+  'accent-quiet': 'bg-accent-quiet text-content-inverse',
+  'intent-info': 'bg-intent-info text-content-inverse',
+  'intent-success': 'bg-intent-success text-content-inverse',
+  'intent-warning': 'bg-intent-warning text-content-inverse',
+  'intent-danger': 'bg-intent-danger text-content-inverse',
+};
+
+/**
+ * The hover fill, which deliberately names a *different* role from the one it
+ * hovers off — `Tag` rotates through the emphasis accents so a row of chips
+ * animates rather than merely dimming.
+ *
+ * Kept separate from {@link FILL} for that reason: every other map here emits
+ * one role per token and is tested for it, and folding the rotation in would
+ * have to relax that test for all of them. This is the one map where naming a
+ * second role is the point rather than a bug.
+ *
+ * The rotation itself is a visual choice with no deeper rationale, which is
+ * worth stating — it came from `Tag`, was the only table in the repo that had
+ * it, and is now written once instead of being re-derived.
+ */
+const FILL_HOVER: Record<CanonicalAccent, string> = {
+  'accent-primary': 'hover:bg-accent-secondary',
+  'accent-secondary': 'hover:bg-accent-tertiary',
+  'accent-tertiary': 'hover:bg-accent-primary',
+  'accent-quiet': 'hover:bg-accent-primary',
+  'intent-info': 'hover:bg-accent-secondary',
+  'intent-success': 'hover:bg-accent-secondary',
+  'intent-warning': 'hover:bg-accent-tertiary',
+  'intent-danger': 'hover:bg-accent-primary',
+};
+
 const HOVER_EDGE: Record<CanonicalAccent, string> = {
   'accent-primary': 'hover:border-accent-primary hover:shadow-hard-accent-primary',
   'accent-secondary': 'hover:border-accent-secondary hover:shadow-hard-accent-secondary',
@@ -98,4 +141,10 @@ export function accentHoverEdgeClass(
 }
 
 /** Exposed for tests, which assert every role is spelled out in every map. */
-export const ACCENT_CLASS_MAPS = { TEXT, FOCUS_RING, HOVER_EDGE } as const;
+/** Filled chip, with the hover rotation. */
+export function accentFillClass(token: AccentToken | undefined, fallback?: AccentToken): string {
+  const role = canonicalAccent(token, fallback);
+  return `${FILL[role]} ${FILL_HOVER[role]}`;
+}
+
+export const ACCENT_CLASS_MAPS = { TEXT, FOCUS_RING, HOVER_EDGE, FILL, FILL_HOVER } as const;
