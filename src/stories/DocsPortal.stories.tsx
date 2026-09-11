@@ -16,6 +16,7 @@ import { NoteBlock } from '../components/NoteBlock';
 
 const meta: Meta = {
   title: 'Docs/Portal',
+  tags: ['stable'],
   parameters: { layout: 'fullscreen' },
 };
 

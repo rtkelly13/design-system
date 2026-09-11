@@ -24,6 +24,7 @@ import { auditContrast } from '../theme/contrast';
  */
 const meta = {
   title: 'Foundations/Theme Ladder',
+  tags: ['stable'],
   parameters: {
     layout: 'fullscreen',
   },

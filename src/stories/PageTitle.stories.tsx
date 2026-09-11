@@ -5,7 +5,7 @@ import { PageTitle } from '../components/PageTitle';
 const meta: Meta<typeof PageTitle> = {
   title: 'Foundations/PageTitle',
   component: PageTitle,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

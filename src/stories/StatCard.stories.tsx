@@ -5,7 +5,7 @@ import { Activity, Cpu, ShieldCheck, DollarSign } from 'lucide-react';
 const meta: Meta<typeof StatCard> = {
   title: 'Foundations/StatCard',
   component: StatCard,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

@@ -5,7 +5,7 @@ import { CodeTab, CodeTabs } from '../components/docs/CodeTabs';
 const meta: Meta<typeof CodeTabs> = {
   title: 'Docs/CodeTabs',
   component: CodeTabs,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   argTypes: {
     variant: { control: 'select', options: ['merged', 'underline', 'segmented'] },
     accent: {

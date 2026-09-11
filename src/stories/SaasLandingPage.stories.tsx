@@ -5,6 +5,7 @@ import { ThemeProvider } from '../components/ThemeProvider';
 
 const meta: Meta<typeof SaasLandingPage> = {
   title: 'SaaS/LandingPage',
+  tags: ['experimental'],
   component: SaasLandingPage,
   parameters: {
     layout: 'fullscreen',

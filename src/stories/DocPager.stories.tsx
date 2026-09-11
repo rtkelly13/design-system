@@ -5,7 +5,7 @@ import { DocPager } from '../components/docs/DocPager';
 const meta: Meta<typeof DocPager> = {
   title: 'Docs/DocPager',
   component: DocPager,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

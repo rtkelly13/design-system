@@ -5,7 +5,7 @@ import { BlogPost } from '../components/blog/BlogPost';
 const meta: Meta<typeof BlogPost> = {
   title: 'Blog/BlogPost',
   component: BlogPost,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },
 };
 

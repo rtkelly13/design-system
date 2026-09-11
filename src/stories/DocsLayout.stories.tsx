@@ -35,7 +35,7 @@ const body = (
 const meta: Meta<typeof DocsLayout> = {
   title: 'Docs/DocsLayout',
   component: DocsLayout,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },
 };
 

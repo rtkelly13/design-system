@@ -5,7 +5,7 @@ import { Prose } from '../components/docs/Prose';
 const meta: Meta<typeof Prose> = {
   title: 'Docs/Prose',
   component: Prose,
-  tags: ['autodocs'],
+  tags: ['autodocs', 'stable'],
 };
 
 export default meta;

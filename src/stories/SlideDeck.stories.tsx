@@ -7,6 +7,7 @@ import { Badge } from '../components/Badge';
 
 const meta: Meta<typeof SlideDeck> = {
   title: 'Presentation/SlideDeck',
+  tags: ['experimental'],
   component: SlideDeck,
 };
 
