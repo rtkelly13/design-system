@@ -1,3 +1,5 @@
+import { forwardRef } from 'react';
+import type { Ref } from 'react';
 import type { ReactNode, MouseEventHandler } from 'react';
 import type { AccentToken } from '../lib/theme';
 import { cn } from '../lib/recipe';
@@ -20,14 +22,10 @@ export interface TagProps {
   children?: ReactNode;
 }
 
-export function Tag({
-  text,
-  href,
-  accent = 'secondary',
-  onClick,
-  className = '',
-  prefix = '#',
-}: TagProps) {
+export const Tag = forwardRef<HTMLAnchorElement | HTMLSpanElement, TagProps>(function Tag(
+  { text, href, accent = 'secondary', onClick, className = '', prefix = '#' },
+  ref,
+) {
   const baseClasses =
     'inline-block font-mono text-xs font-bold uppercase border-2 border-edge-strong px-2 py-1 hover:shadow-hard-sm transition-all focus-visible:ring-2 focus-visible:ring-accent-primary';
   const accentClass = accentFillClass(accent, 'secondary');
@@ -36,15 +34,15 @@ export function Tag({
 
   if (href) {
     return (
-      <a href={href} className={combinedClasses} onClick={onClick}>
+      <a ref={ref as Ref<HTMLAnchorElement>} href={href} className={combinedClasses} onClick={onClick}>
         {label}
       </a>
     );
   }
 
   return (
-    <span className={combinedClasses} onClick={onClick}>
+    <span ref={ref as Ref<HTMLSpanElement>} className={combinedClasses} onClick={onClick}>
       {label}
     </span>
   );
-}
+});

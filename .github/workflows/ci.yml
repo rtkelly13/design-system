@@ -114,6 +114,11 @@ jobs:
       - name: Documented components
         run: pnpm check:component-docs
 
+      # Ratchet, per clause: refs, displayName, recipe composition, prop
+      # spreading. Clause 1 is what #162-#166 wait on.
+      - name: Component contract
+        run: pnpm check:component-contract
+
       # Default-deny: every shipped package, and the licence it had last time.
       - name: Shipped licences
         run: pnpm check:licences

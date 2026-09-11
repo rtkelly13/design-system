@@ -39,6 +39,7 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - `pnpm check:doc-snippets` (props and level names in documentation code fences,
      against `api/index.d.ts`)
    - `pnpm check:component-docs` (every component carries a JSDoc — a ratchet)
+   - `pnpm check:component-contract` (refs, displayName, recipe, prop spreading — per clause)
    - `pnpm check:licences` (every shipped package against a default-deny baseline)
    - `pnpm check:lint-budget` (the general-purpose ruleset, as a per-rule ratchet)
    - `pnpm test:a11y` (axe over every asserted story, on both Levels)

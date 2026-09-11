@@ -1,3 +1,5 @@
+import { forwardRef } from 'react';
+import type { Ref } from 'react';
 import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
@@ -136,7 +138,21 @@ const button = recipe({
  * <Button href="/pricing" variant="tertiary" bracketed size="lg">SEE PRICING</Button>
  * ```
  */
-export function Button(props: ButtonProps) {
+/**
+ * Forwards its ref to whichever element it renders.
+ *
+ * `ButtonProps` is a union, so the ref's type is the union of both targets —
+ * `HTMLButtonElement | HTMLAnchorElement`. A caller who knows which form they
+ * asked for can narrow it; one who does not is told the truth, which is that it
+ * depends on `href`.
+ *
+ * This is what `<Tooltip.Trigger render={<Button />} />` needs: Base UI's
+ * composition merges props *and a ref* onto the element it is given, and a
+ * component that drops the ref silently breaks positioning, focus return and
+ * outside-click detection in every primitive that wraps it.
+ */
+export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
+  function Button(props, ref) {
   const {
     children,
     variant = 'tertiary',
@@ -164,6 +180,7 @@ export function Button(props: ButtonProps) {
     const anchorProps = rest as Omit<ButtonLinkProps, keyof ButtonOwnProps>;
     return (
       <a
+        ref={ref as Ref<HTMLAnchorElement>}
         {...anchorProps}
         // A `target="_blank"` document can reach back through `window.opener`
         // unless told otherwise. Modern browsers imply `noopener`, but not
@@ -182,8 +199,12 @@ export function Button(props: ButtonProps) {
 
   const buttonProps = rest as Omit<ButtonElementProps, keyof ButtonOwnProps>;
   return (
-    <button {...buttonProps} className={button({ variant, size, class: className })}>
+    <button
+      ref={ref as Ref<HTMLButtonElement>}
+      {...buttonProps}
+      className={button({ variant, size, class: className })}
+    >
       {content}
     </button>
   );
-}
+});

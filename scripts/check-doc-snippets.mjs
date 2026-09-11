@@ -49,17 +49,60 @@ const LEVELS = [
  * already gated by `check:api`, and reading it means this check cannot disagree
  * with that one.
  */
+/**
+ * Follow a `*Props` name to its members, through type aliases.
+ *
+ * `ButtonElementProps` is `ButtonOwnProps & DetailedHTMLProps<...>`, so the
+ * interface map alone has nothing under that name. One hop resolves it; the
+ * `seen` set stops a self-referential alias spinning.
+ */
+function resolve(name, byInterface, seen) {
+  if (seen.has(name)) return [];
+  seen.add(name);
+
+  /*
+   * Both paths, unioned — not the first that matches.
+   *
+   * `type ButtonElementProps = ButtonOwnProps & DetailedHTMLProps<...> & { href?:
+   * never }` lands in the interface map as `['href']`, because the members regex
+   * happily reads that trailing inline object. Returning there would report
+   * `href` as Button's entire surface and `variant` as nonexistent — which is
+   * exactly what this gate then reported against a README that was correct.
+   */
+  const direct = byInterface.get(name) ?? [];
+  const alias = API.match(new RegExp(`type ${name}\\b[^=]*=([^;]*)`));
+  const viaAlias = alias
+    ? [...new Set([...alias[1].matchAll(/(\w+Props)\b/g)].map((m) => m[1]))].flatMap((n) =>
+        resolve(n, byInterface, seen),
+      )
+    : [];
+  return [...new Set([...direct, ...viaAlias])];
+}
+
 function declaredProps() {
   const byInterface = new Map();
   for (const m of API.matchAll(/(?:interface|type) (\w*Props)\b[^{]*\{([\s\S]*?)\n\}/g)) {
     const props = [...m[2].matchAll(/^\s{4}(\w+)\??:/gm)].map((p) => p[1]);
     byInterface.set(m[1], props);
   }
-  // `declare function Foo(props: FooProps)` / `const Foo: FC<FooProps>`
+  /*
+   * `declare function Foo(props: FooProps)`, `const Foo: FC<FooProps>`, and —
+   * once a component forwards its ref — `const Foo:
+   * ForwardRefExoticComponent<(Omit<AProps,"ref"> | Omit<BProps,"ref">) &
+   * RefAttributes<...>>`.
+   *
+   * So take *every* `*Props` named in the declaration and union their members,
+   * rather than the first one. `Button` is the case that forced this: its props
+   * are a union of two interfaces, and reading only the first reported that
+   * `variant` did not exist — which this gate then correctly flagged against a
+   * README that was right all along.
+   */
   const byComponent = new Map();
-  for (const m of API.matchAll(/declare (?:function|const) (\w+)[^;\n]*?(\w+Props)/g)) {
-    const [, comp, iface] = m;
-    if (byInterface.has(iface)) byComponent.set(comp, byInterface.get(iface));
+  for (const m of API.matchAll(/declare (?:function|const) (\w+)([^;\n]*)/g)) {
+    const [, comp, tail] = m;
+    const named = [...new Set([...tail.matchAll(/(\w+Props)\b/g)].map((x) => x[1]))];
+    const props = named.flatMap((n) => resolve(n, byInterface, new Set()));
+    if (props.length) byComponent.set(comp, [...new Set(props)]);
   }
   for (const [iface, props] of byInterface) {
     const comp = iface.replace(/Props$/, '');

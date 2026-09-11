@@ -320,7 +320,7 @@ type ButtonLinkProps = ButtonOwnProps & DetailedHTMLProps<AnchorHTMLAttributes<H
 };
 type ButtonProps = ButtonElementProps | ButtonLinkProps;
 
-declare function Button(props: ButtonProps): react.JSX.Element;
+declare const Button: react.ForwardRefExoticComponent<(Omit<ButtonElementProps, "ref"> | Omit<ButtonLinkProps, "ref">) & react.RefAttributes<HTMLButtonElement | HTMLAnchorElement>>;
 
 type CardVariant = 'panel' | 'card';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -350,7 +350,7 @@ interface BadgeProps extends react__default.HTMLAttributes<HTMLSpanElement> {
 
     accent?: AccentToken;
 }
-declare const Badge: react__default.FC<BadgeProps>;
+declare const Badge: react__default.ForwardRefExoticComponent<BadgeProps & react__default.RefAttributes<HTMLSpanElement>>;
 
 interface AvatarProps extends react__default.HTMLAttributes<HTMLDivElement> {
     src?: string;
@@ -403,7 +403,7 @@ interface TagProps {
     prefix?: string;
     children?: ReactNode;
 }
-declare function Tag({ text, href, accent, onClick, className, prefix, }: TagProps): react.JSX.Element;
+declare const Tag: react.ForwardRefExoticComponent<TagProps & react.RefAttributes<HTMLAnchorElement | HTMLSpanElement>>;
 
 interface PaginationProps {
     totalPages: number;
@@ -1054,9 +1054,9 @@ declare const mdxComponents: {
     AnchorHeading: typeof AnchorHeading;
     NoteBlock: react.FC<NoteBlockProps>;
     TLDR: react.FC<TLDRProps>;
-    Badge: react.FC<BadgeProps>;
+    Badge: react.ForwardRefExoticComponent<BadgeProps & react.RefAttributes<HTMLSpanElement>>;
     Card: typeof Card;
-    Tag: typeof Tag;
+    Tag: react.ForwardRefExoticComponent<TagProps & react.RefAttributes<HTMLAnchorElement | HTMLSpanElement>>;
     AsciiDivider: react.FC<DividerProps>;
     CodeBlock: typeof CodeBlock;
     CodeTabs: typeof CodeTabs;
