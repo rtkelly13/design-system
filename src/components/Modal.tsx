@@ -133,7 +133,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-surface-overlay p-4"
+      className="fixed inset-0 z-top flex items-center justify-center bg-surface-overlay p-4"
       // A backdrop is not an interactive control, so it gets no role and no key
       // handler — Escape already covers the keyboard path, and adding a
       // `button` role here would put a meaningless stop in the tab order.

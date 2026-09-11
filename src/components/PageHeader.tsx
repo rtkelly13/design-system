@@ -3,7 +3,13 @@ import { cn } from '../lib/recipe';
 import type { AccentToken } from '../lib/theme';
 
 
-const ACCENT_TEXT: Record<string, string> = {
+/**
+ * Typed to `AccentToken`, which is what keeps the hue names out. Four of them —
+ * `cyan`, `pink`, `yellow`, `green` — survived #138 here because
+ * `Record<string, string>` accepts any key and `check:tokens` reads call sites
+ * rather than map keys.
+ */
+const ACCENT_TEXT: Record<AccentToken, string> = {
   primary: 'text-accent-primary',
   secondary: 'text-accent-secondary',
   tertiary: 'text-accent-tertiary',
@@ -12,10 +18,6 @@ const ACCENT_TEXT: Record<string, string> = {
   success: 'text-intent-success',
   warning: 'text-intent-warning',
   danger: 'text-intent-danger',
-  cyan: 'text-accent-primary',
-  pink: 'text-accent-tertiary',
-  yellow: 'text-accent-secondary',
-  green: 'text-intent-success',
 };
 
 export interface PageHeaderProps {
@@ -25,7 +27,7 @@ export interface PageHeaderProps {
   subtitle?: ReactNode;
   /** Optional leading glyph — a lucide icon or SVG component. */
   icon?: ElementType<{ className?: string }>;
-  /** Themes the icon + prompt glyph. Defaults to cyan. */
+  /** Themes the icon + prompt glyph. */
   accent?: AccentToken;
   /** Extra header content (badges, admin notes) below the subtitle. */
   children?: ReactNode;
