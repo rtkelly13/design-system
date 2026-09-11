@@ -1,11 +1,12 @@
-import { useId } from 'react';
 import type {
   CSSProperties,
+  ReactNode,
   InputHTMLAttributes,
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
 import { recipe } from '../lib/recipe';
+import { Field as BaseField } from '@base-ui/react/field';
 import { accentVar } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
 
@@ -89,43 +90,62 @@ interface FieldProps {
  * `aria-describedby` and `aria-invalid` make the error something a screen
  * reader announces rather than a visual-only cue.
  */
-function useField(id: string | undefined, error?: string, helperText?: string) {
-  const generated = useId();
-  const fieldId = id ?? generated;
-  const messageId = error ? `${fieldId}-error` : helperText ? `${fieldId}-help` : undefined;
-  return {
-    fieldId,
-    messageId,
-    controlProps: {
-      id: fieldId,
-      'aria-invalid': error ? true : undefined,
-      'aria-describedby': messageId,
-    },
-  };
-}
-
 /** The accent is known at runtime, so it travels as a custom property. */
 function accentStyle(accent: AccentToken): CSSProperties {
   return { '--field-accent': accentVar(accent) } as CSSProperties;
 }
 
-function Message({
-  id,
+/**
+ * The label, message and ARIA wiring every control shares.
+ *
+ * This was a hand-rolled `useField()` returning `id`, `aria-invalid` and
+ * `aria-describedby`. Base UI's `Field` is the public equivalent, and it owns
+ * two things the hook did not: `aria-describedby` composes when a field carries
+ * *both* a description and an error, and the validity state is exposed to
+ * descendants — `CheckboxRootState extends FieldRootState`, so controls added
+ * later inherit it rather than re-deriving it.
+ *
+ * `error` here is a prop rather than native constraint validation, so
+ * `Field.Root` is told it is `invalid` and `Field.Error` is matched
+ * unconditionally. That keeps the control externally driven, which is what the
+ * existing API promises.
+ *
+ * Both parts render a `span` rather than Base UI's default `p`, because a
+ * message sits inside a flex column beside the control and a block paragraph
+ * would change the layout.
+ *
+ * A caller's `id` goes on the *control*, never on `Field.Root` — the root's
+ * `id` names the wrapper, and passing it there silently leaves the control on
+ * a generated id while the label still points at it. The symptom is an `id`
+ * prop that appears to do nothing.
+ */
+function FieldFrame({
+  label,
   error,
   helperText,
-  className,
+  styles,
+  children,
 }: {
-  id?: string;
+  label?: string;
   error?: string;
   helperText?: string;
-  className: string;
+  styles: { root: () => string; label: () => string; message: () => string };
+  children: ReactNode;
 }) {
-  const body = error ?? helperText;
-  if (!body) return null;
   return (
-    <span id={id} role={error ? 'alert' : undefined} className={className}>
-      &gt; {body}
-    </span>
+    <BaseField.Root className={styles.root()} invalid={Boolean(error)}>
+      {label && <BaseField.Label className={styles.label()}>{label}</BaseField.Label>}
+      {children}
+      {error ? (
+        <BaseField.Error match className={styles.message()} render={<span role="alert" />}>
+          &gt; {error}
+        </BaseField.Error>
+      ) : helperText ? (
+        <BaseField.Description className={styles.message()} render={<span />}>
+          &gt; {helperText}
+        </BaseField.Description>
+      ) : null}
+    </BaseField.Root>
   );
 }
 
@@ -142,26 +162,19 @@ export function Input({
   id,
   ...props
 }: InputProps) {
-  const { fieldId, messageId, controlProps } = useField(id, error, helperText);
   const styles = field({ invalid: Boolean(error) });
 
   return (
-    <div className={styles.root()}>
-      {label && (
-        <label htmlFor={fieldId} className={styles.label()}>
-          {label}
-        </label>
-      )}
-      <input
-        {...controlProps}
+    <FieldFrame label={label} error={error} helperText={helperText} styles={styles}>
+      <BaseField.Control
+        id={id}
         style={accentStyle(accent)}
         // `class` is the recipe's override slot: it merges in rather than being
         // appended after, so a caller's utility actually wins.
         className={styles.control({ class: className })}
         {...props}
       />
-      <Message id={messageId} error={error} helperText={helperText} className={styles.message()} />
-    </div>
+    </FieldFrame>
   );
 }
 
@@ -178,24 +191,29 @@ export function TextArea({
   id,
   ...props
 }: TextAreaProps) {
-  const { fieldId, messageId, controlProps } = useField(id, error, helperText);
   const styles = field({ shape: 'box', invalid: Boolean(error) });
 
   return (
-    <div className={styles.root()}>
-      {label && (
-        <label htmlFor={fieldId} className={styles.label()}>
-          {label}
-        </label>
-      )}
-      <textarea
-        {...controlProps}
-        style={accentStyle(accent)}
-        className={styles.control({ class: className })}
-        {...props}
+    <FieldFrame label={label} error={error} helperText={helperText} styles={styles}>
+      {/*
+        The function form of `render`, not the element form, because
+        `Field.Control` is typed to `HTMLInputElement` — spreading a
+        textarea's own props through it is a type error rather than a
+        cosmetic one. This takes the wired props and puts them on an element
+        of the right type.
+      */}
+      <BaseField.Control
+        render={(controlProps) => (
+          <textarea
+            {...controlProps}
+            {...props}
+            id={id}
+            style={accentStyle(accent)}
+            className={styles.control({ class: className })}
+          />
+        )}
       />
-      <Message id={messageId} error={error} helperText={helperText} className={styles.message()} />
-    </div>
+    </FieldFrame>
   );
 }
 
@@ -220,36 +238,34 @@ export function Select({
   id,
   ...props
 }: SelectProps) {
-  const { fieldId, messageId, controlProps } = useField(id, error, helperText);
   const styles = field({ invalid: Boolean(error), interactive: true });
 
   return (
-    <div className={styles.root()}>
-      {label && (
-        <label htmlFor={fieldId} className={styles.label()}>
-          {label}
-        </label>
-      )}
-      <select
-        {...controlProps}
-        style={accentStyle(accent)}
-        className={styles.control({ class: className })}
-        {...props}
-      >
-        {options.map((opt) => (
-          // Most platforms paint the open dropdown natively rather than from
-          // CSS. `color-scheme`, which each level declares, is what actually
-          // makes it match — another reason polarity is a declared field.
-          <option
-            key={opt.value}
-            value={opt.value}
-            className="bg-surface-raised text-content-primary"
+    <FieldFrame label={label} error={error} helperText={helperText} styles={styles}>
+      <BaseField.Control
+        render={(controlProps) => (
+          <select
+            {...controlProps}
+            {...props}
+            id={id}
+            style={accentStyle(accent)}
+            className={styles.control({ class: className })}
           >
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <Message id={messageId} error={error} helperText={helperText} className={styles.message()} />
-    </div>
+            {options.map((opt) => (
+              // Most platforms paint the open dropdown natively rather than from
+              // CSS. `color-scheme`, which each level declares, is what actually
+              // makes it match — another reason polarity is a declared field.
+              <option
+                key={opt.value}
+                value={opt.value}
+                className="bg-surface-raised text-content-primary"
+              >
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        )}
+      />
+    </FieldFrame>
   );
 }

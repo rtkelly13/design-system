@@ -27,9 +27,9 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 `pnpm lint` reports colour literals at the site that wrote them. `pnpm check:deps`,
 `pnpm check:css` and `pnpm check:fonts` are ratchets with stated budgets.
 
-## The three rules that are not discoverable
+## The four rules that are not discoverable
 
-Everything else here you can find by reading the code. These three you cannot, and each has
+Everything else here you can find by reading the code. These four you cannot, and each has
 cost real time:
 
 1. **`src/theme.css` is generated.** `src/theme/levels.ts` is the only place a level name or a
@@ -43,6 +43,14 @@ cost real time:
    `text-intent-danger`, not `cyan`. See
    [`docs/adr/0001-hues-declared-below-roles.md`](./docs/adr/0001-hues-declared-below-roles.md)
    for why a hue layer exists anyway, and why components still may not touch it.
+4. **There is exactly one primitive library, and it is `@base-ui/react`.** Adopt no second one —
+   two focus-management implementations in one tree is worse than either alone, and this rule is
+   what bounds the churn the choice accepts. A component that needs a primitive reaches for Base
+   UI or hand-rolls it; it never brings in a package that carries its own. That bars `radix-ui`
+   and anything depending on it, which includes `cmdk` (16 `@radix-ui/*` packages transitively).
+   `@tanstack/react-table` is the stated exception and not a counter-example: it is a state
+   engine with no DOM, no focus model and no ARIA, which is why `DataTable` writes its own.
+   Measured comparison in [`docs/radix-vs-base-ui.md`](./docs/radix-vs-base-ui.md).
 
 ## Where things are written down
 
