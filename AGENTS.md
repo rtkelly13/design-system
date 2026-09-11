@@ -24,7 +24,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:api` | the built type surface against the committed `api/index.d.ts` |
 | `pnpm check:governance` | the repo's own rules: pinned SHAs, job ceilings, every gate wired, `rule N` resolving — `--list` for the census |
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |
-| `pnpm check:docgen-props` | every documented component publishes its props table |
+| `pnpm check:docgen-props` | every documented component publishes its props, and the components manifest carries them |
 | `pnpm check:story-conventions` | story title vocabulary, and an autodocs decision per component |
 | `pnpm check:deployed` | the live Storybook against this build — deliberately **not** a PR gate |
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |

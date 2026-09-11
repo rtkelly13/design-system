@@ -76,6 +76,30 @@ const config: StorybookConfig = {
    * The cost is a slower Storybook build. Grafana and EUI both pay it and both
    * chose this extractor; `docs/storybook-benchmarks.md` § 3 has the comparison.
    */
+  /**
+   * The components manifest: `manifests/components.json` in the build output.
+   *
+   * Storybook 10 generates it from static analysis of CSF plus the prop
+   * extraction configured below, and 10.4 renamed the flag from
+   * `experimentalComponentsManifest` and defaults it to `true`. This repo is on
+   * 10.5.5 and a real build emitted **no `manifests/` directory at all**, so the
+   * flag is declared rather than relied on — whatever the default is meant to
+   * be, nothing was being produced.
+   *
+   * It matters here more than most: this is the most agent-oriented repo in the
+   * estate, `AGENTS.md` is a knowledge base of topic docs each introduced with
+   * *when* to load it, and the component catalogue was the one part of it that
+   * was not machine-readable. An agent could be told `Button` exists and had no
+   * way to be told it takes a `variant`.
+   *
+   * `check:docgen-props` is what makes the manifest worth having: a manifest
+   * built from an extractor that silently emits no props would describe the
+   * catalogue as propless and look authoritative doing it.
+   */
+  features: {
+    componentsManifest: true,
+  },
+
   typescript: {
     reactDocgen: 'react-docgen-typescript',
     reactDocgenTypescriptOptions: {
