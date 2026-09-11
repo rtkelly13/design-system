@@ -9,7 +9,62 @@ Proper release notes start at 1.0. Until then this file records only what a
 consumer has to *do*, newest first. The reasoning lives in the pull requests and
 in [`docs/adr/`](./docs/adr/).
 
-## Unreleased
+## 0.7.0
+
+The primitive layer, and four new gates.
+
+### You have to do something
+
+- **`@base-ui/react` is a runtime dependency.** Nine packages, all MIT. `Input`, `TextArea` and
+  `Select` are built on its `Field` instead of a hand-rolled `useField()`; the props are unchanged.
+  It is now the *only* permitted primitive library — rule 4 in `AGENTS.md` — which bars `radix-ui`
+  and anything depending on it, `cmdk` included.
+- **`BracketText` no longer accepts `accent="white"`.** Omit `accent` for the default ink. It was an
+  appearance name in a component API, which ADR 0001 exists to prevent, and it outlived the hue
+  vocabulary #138 removed because the union named it explicitly.
+- **`AdminNavItem.icon` and `AdminStatusBadge.icon` take a component, not an element** —
+  `LayoutDashboard`, never `<LayoutDashboard size={18} />`. Size travels as a `className`. This
+  matches `PageHeader`, `StatCard` and `DocsHeader`, and it is what stopped Storybook's source
+  generator throwing on those stories.
+
+### Rendering changed
+
+- **Code blocks are `text.primary`, not `intent.success`.** Every code block rendered in the
+  "this worked" green, contradicting the `--tw-prose-pre-code` mapping eleven lines above it.
+  6.02:1 → 13.63:1 on `sketch`.
+- **`Modal` is above the docs header.** It was `z-50` against the header's `z-index: 60`, so a
+  dialog painted *under* the page chrome it covers. Both now read the `--ds-layer-*` scale.
+- **Three touch-device affordances stopped being dimmed.** `.docs-anchor-link`,
+  `.docs-codeblock-copy` and `.docs-sidebar-link-static` addressed `text.muted` instead of an
+  `opacity` on `text.primary` — 3.45:1 and 2.64:1 on `sketch`, permanently, on every touch device.
+  `opacity` changes the foreground *after* `check:contrast` reads it.
+
+### New
+
+- **`Swatch` and `SwatchGroup`** — the package can draw its own palette outside a story file.
+- `accentFillClass()`, joining `accentTextClass()` / `accentFocusClass()` / `accentHoverEdgeClass()`.
+  All four accent-to-class maps are now one, in `lib/accentClasses`.
+- **Four gates**: `check:doc-snippets` (props and level names in documentation code fences against
+  `api/index.d.ts`), `check:component-docs` (every component carries a JSDoc — a ratchet at 18),
+  plus `motion.transitions` and `motion.keyframes` claims in `check:docs`.
+- `docs/deterministic-rendering.md` — the three switches that decide whether a capture reproduces.
+  `scoped` is the one that does the work; `persist={false} followSystem={false}` look like the
+  determinism controls and are redundant under it.
+- `docs/research.md` — the outside reading, and what each idea changed here.
+- Interaction baselines: `button-hover`, `button-pressed`, `input-keyboard-focus`. The focus one is
+  the assertion `focus-ring.test.ts` says it cannot make.
+
+### Fixed
+
+- The keyboard focus ring survives on `Input`, `TextArea`, `Tag`, `Modal` and `CodeTabs` —
+  `focus:outline-none` at (0,2,0) was beating the global `:focus-visible` at (0,1,0).
+- `DocsHeader` and `AdminDashboardLayout` render without a `ThemeProvider` instead of throwing.
+- `SectionContainer` merges a caller's `className` instead of appending it, so a conflicting
+  utility now wins.
+- `accent.quiet` is audited as a fill. 220 contrast pairs → 222.
+- The README's integration snippet passed a prop that does not exist.
+
+### Also in this release, landed after 0.6.0 published
 
 Terminal schemes, and the second axis.
 
