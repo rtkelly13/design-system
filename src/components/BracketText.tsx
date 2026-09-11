@@ -1,6 +1,7 @@
 import type { ReactNode, HTMLAttributes } from 'react';
 import type { AccentToken } from '../lib/theme';
 import { cn } from '../lib/recipe';
+import { accentTextClass } from '../lib/accentClasses';
 
 export interface BracketTextProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;
@@ -21,18 +22,8 @@ export function BracketText({
   className = '',
   ...props
 }: BracketTextProps) {
-  const accentClasses: Record<AccentToken, string> = {
-    primary: 'text-accent-primary',
-    secondary: 'text-accent-secondary',
-    tertiary: 'text-accent-tertiary',
-    quiet: 'text-accent-quiet',
-    info: 'text-intent-info',
-    success: 'text-intent-success',
-    warning: 'text-intent-warning',
-    danger: 'text-intent-danger',
-  };
-
-  const accentClass = accent ? accentClasses[accent] : '';
+  // No per-render object: the map lives in `lib/accentClasses`, written once.
+  const accentClass = accent ? accentTextClass(accent) : '';
 
   return (
     <span className={cn(accentClass, className)} {...props}>
