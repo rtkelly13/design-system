@@ -52,6 +52,8 @@
     "lint:fix": "eslint src --fix",
     "check:css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs",
     "check:css:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs --list",
+    "check:lint-budget": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-lint-budget.mjs",
+    "check:lint-budget:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-lint-budget.mjs --list",
     "check:licences": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-licences.mjs",
     "check:licences:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-licences.mjs --list",
     "licences:update": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-licences.mjs --update",
