@@ -50,26 +50,56 @@ function assertedStoryIds(): string[] {
  * Violations that exist today, by rule. Lower a number as they are fixed; delete
  * the line at zero. A rule absent here is budgeted at zero and fails on sight.
  */
-const KNOWN: Record<string, number> = {};
+const KNOWN: Record<string, number> = {
+  /*
+   * One node, on `saas-admindashboardlayout--sketch-mode` at the narrow
+   * viewport: `#1450d7` on `#0a0a1a`, 2.94:1.
+   *
+   * Those are sketch's `accent.primary` and **midnight's** `surface.base`, which
+   * is a combination the palette never produces. The story wraps the dashboard
+   * in `<ThemeProvider defaultLevel="sketch" scoped className="min-h-screen
+   * bg-surface-base">`, and that wrapper paints a viewport-wide box. At 412px
+   * the dashboard's fixed-width grid overflows it, so a sketch-blue heading ends
+   * up over the iframe body, which is still midnight.
+   *
+   * Real, and not a palette defect: `AdminDashboardLayout` is not responsive. It
+   * is #189, and this line comes out with it rather than the violation being
+   * excluded — a budget of 1 still fails on a second one.
+   */
+  'color-contrast': 1,
+};
 
 const LEVELS = ['midnight', 'sketch'] as const;
+
+/**
+ * Stories that pin their own Level, and must not be forced onto the other one.
+ *
+ * A story named `--dark-mode` or `--sketch-mode` wraps itself in a provider for
+ * that Level. Overriding the toolbar global on top renders *sketch's* accent on
+ * *midnight's* ground — `#1450d7` on `#0a0a1a`, 2.94:1 — which axe reports as a
+ * contrast failure and which is not one: no consumer can reach that combination,
+ * because the component never chooses a ground and a Level never mixes.
+ *
+ * That cost an hour of chasing five "violations" on `SaasLandingPage` whose
+ * measured colours matched no declared value on either Level. The real defect
+ * from the same run — a `<pre>` that scrolls and cannot be focused — was
+ * genuine, and is fixed.
+ */
+function pinsItsOwnLevel(id: string): boolean {
+  return /--(dark|sketch|midnight)-mode$|--all-levels$/.test(id);
+}
 
 test.describe('Accessibility', () => {
   for (const level of LEVELS) {
     for (const id of assertedStoryIds()) {
-      test(`${id} — ${level}`, async ({ page }, testInfo) => {
-        /*
-         * The `chromium` project only, for now.
-         *
-         * When the `mobile` project arrived this suite began running in both
-         * without anyone asking it to, and immediately found two real
-         * narrow-viewport defects — a `scrollable-region-focusable` and a
-         * `color-contrast`. Both are worth fixing and neither belongs in the PR
-         * that added a viewport, so they are #189 and this guard comes
-         * off there rather than the findings being suppressed here.
-         */
-        test.skip(testInfo.project.name !== 'chromium', 'Accessibility runs in the chromium project');
-        await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=level:${level}`);
+      test(`${id} — ${level}`, async ({ page }) => {
+        test.skip(
+          pinsItsOwnLevel(id) && level !== LEVELS[0],
+          'Story pins its own Level; forcing the other one mixes two palettes',
+        );
+
+        const global = pinsItsOwnLevel(id) ? '' : `&globals=level:${level}`;
+        await page.goto(`/iframe.html?id=${id}&viewMode=story${global}`);
         await waitForStoryRendered(page, id);
 
         /*

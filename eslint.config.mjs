@@ -146,6 +146,20 @@ export default tseslint.config(
         Object.entries(jsxA11y.flatConfigs?.recommended?.rules ?? {}).map(([rule]) => [rule, 'warn']),
       ),
       '@typescript-eslint/no-explicit-any': 'warn',
+
+      /*
+       * `region` is allowed to carry a `tabIndex`, because here the two
+       * accessibility tools disagree and axe is right.
+       *
+       * A `<pre>` that scrolls horizontally cannot be scrolled by keyboard at
+       * all unless it is focusable — axe's `scrollable-region-focusable`, and a
+       * real trap rather than a technicality. `jsx-a11y` objects to a `tabIndex`
+       * on a non-interactive element, which is correct as a general rule and
+       * wrong for a scroll container. The WAI remedy is exactly what is written:
+       * `tabindex="0"` plus `role="region"` and an accessible name, so the thing
+       * a keyboard user lands on announces what it is.
+       */
+      'jsx-a11y/no-noninteractive-tabindex': ['warn', { roles: ['region', 'tabpanel'] }],
     },
   },
 );
