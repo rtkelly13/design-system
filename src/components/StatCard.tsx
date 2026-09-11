@@ -54,14 +54,14 @@ export function StatCard({
         <span className="font-mono text-xs font-bold uppercase tracking-wider text-content-muted">
           [ {title} ]
         </span>
-        {Icon && <Icon className={`h-6 w-6 ${accentTextClass(accent)}`} />}
+        {Icon && <Icon className={cn('h-6 w-6', accentTextClass(accent))} />}
       </div>
       <div className="flex items-baseline gap-3 my-1">
         <span className="font-display text-4xl font-extrabold text-content-primary tracking-tight">
           {value}
         </span>
         {change && (
-          <span className={`font-mono text-xs font-bold ${CHANGE_CLASS[changeType]}`}>
+          <span className={cn('font-mono text-xs font-bold', CHANGE_CLASS[changeType])}>
             {change}
           </span>
         )}

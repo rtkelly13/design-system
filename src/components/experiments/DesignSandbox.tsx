@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { cn } from '../../lib/recipe';
 import { PageTitle } from '../PageTitle';
 import { Card } from '../Card';
 import { Button } from '../Button';
@@ -71,11 +72,12 @@ export const DesignSandbox: React.FC = () => {
               onClick={() => setLevel(t)}
               aria-pressed={level === t}
               title={LEVELS[t].description}
-              className={`font-mono font-bold text-xs px-3 py-1.5 border-2 border-edge-strong uppercase transition-all ${
+              className={cn(
+                'font-mono font-bold text-xs px-3 py-1.5 border-2 border-edge-strong uppercase transition-all',
                 level === t
                   ? 'bg-accent-primary text-content-inverse'
                   : 'bg-transparent text-content-primary hover:bg-surface-raised'
-              }`}
+              )}
             >
               {LEVELS[t].label}
             </button>
