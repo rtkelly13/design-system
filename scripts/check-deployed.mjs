@@ -46,9 +46,14 @@ try {
 }
 
 let deployed;
+let builtAt = null;
 try {
   const response = await fetch(`${SITE}/index.json`);
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+  // The single most useful number when this fails: *when* the live build is
+  // from. A drift of 38 stories reads very differently at two hours and at two
+  // weeks, and the header is the only place that says which.
+  builtAt = response.headers.get('last-modified');
   deployed = (await response.json()).entries;
 } catch (error) {
   console.error(`Could not read ${SITE}/index.json — ${error.message}`);
@@ -66,6 +71,7 @@ const titles = (ids, source) => [...new Set(ids.map((id) => source[id].title))].
 console.log(`Deployed Storybook — ${SITE}`);
 console.log(`  built:    ${localIds.size} stories`);
 console.log(`  deployed: ${deployedIds.size} stories`);
+if (builtAt) console.log(`  built at: ${builtAt}`);
 
 if (!missing.length && !stale.length) {
   console.log('\nThe deployment matches this build.');
@@ -73,8 +79,28 @@ if (!missing.length && !stale.length) {
 }
 
 if (missing.length) {
-  console.log(`\n  ${missing.length} built and not deployed, across ${titles(missing, local).length} titles:`);
-  for (const title of titles(missing, local)) console.log(`    ${title}`);
+  /*
+   * Split by whether the *title* is absent or merely behind.
+   *
+   * Reporting only "11 titles" invites the reader to conclude that eleven
+   * components are missing from the site, and it is not what the numbers say:
+   * `Card` and `DataTable` are deployed and have newer stories that are not,
+   * while `CodeTabs` and the Manifesto are absent entirely. Those are different
+   * problems and the second is the alarming one.
+   */
+  const deployedTitles = new Set(Object.values(deployed).map((e) => e.title));
+  const absent = titles(missing, local).filter((t) => !deployedTitles.has(t));
+  const behind = titles(missing, local).filter((t) => deployedTitles.has(t));
+
+  console.log(`\n  ${missing.length} stories built and not deployed.`);
+  if (absent.length) {
+    console.log(`\n  ${absent.length} titles absent from the deployment entirely:`);
+    for (const title of absent) console.log(`    ${title}`);
+  }
+  if (behind.length) {
+    console.log(`\n  ${behind.length} titles deployed but missing newer stories:`);
+    for (const title of behind) console.log(`    ${title}`);
+  }
 }
 if (stale.length) {
   console.log(`\n  ${stale.length} deployed and no longer built, across ${titles(stale, deployed).length} titles:`);
