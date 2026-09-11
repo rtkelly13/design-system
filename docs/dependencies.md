@@ -6,6 +6,35 @@ How a dependency earns its place, and the ones held back on purpose.
 
 ---
 
+## Licences
+
+`pnpm check:licences` gates every **shipped** package — `dependencies` and what they pull in —
+against `licenses.baseline.json`.
+
+**Default-deny by construction.** The baseline lists every package and the licence it had when it
+was recorded, so a package that is not in it fails whatever its licence says. That is the failure
+mode worth guarding: not any particular licence being wrong, but a dependency arriving unrecorded
+and a later bump changing it silently.
+
+The gate landed because `@base-ui/react` put nine packages into the shipped scope in one commit.
+They were resolved by hand and found to be MIT, which was the right answer by the wrong mechanism.
+
+| Licence | Why it is allowed |
+|---|---|
+| MIT | Permissive, no attribution burden at runtime |
+| ISC | Functionally MIT; the OSI treats them as equivalent |
+| OFL-1.1 | The SIL Open Font Licence — fonts only, and self-hosting is what it is for |
+| Apache-2.0 | Permissive with a patent grant. Depending on it is not redistributing it, and this repo has depended on TypeScript under exactly these terms since day one |
+| 0BSD, BSD-*| Permissive |
+
+When the change is intended: `pnpm licences:update`, and commit the baseline — **the diff is the
+licence change under review**, which is the same contract `check:api` uses for the type surface.
+
+devDependencies are out of scope: they are not redistributed. The other half of the licence
+question — third-party material that is *vendored* rather than depended on — is
+[`reference-material.md`](./reference-material.md).
+
+
 ## 📦 Dependencies
 
 Dependencies are fine. **Undocumented ones are not.** Every entry in
