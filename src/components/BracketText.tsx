@@ -4,8 +4,14 @@ import { cn } from '../lib/recipe';
 
 export interface BracketTextProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;
-  /** Semantic emphasis. Legacy palette names still resolve identically. */
-  accent?: AccentToken | 'white';
+  /**
+   * Semantic emphasis. Roles only — `'white'` was still accepted here after
+   * #138 removed the hue vocabulary from the component API, because the union
+   * named it explicitly and the class map was typed `Record<string, string>`.
+   * An appearance name in a component API is the defect ADR 0001 exists to
+   * prevent; omit `accent` for the default ink.
+   */
+  accent?: AccentToken;
   className?: string;
 }
 
@@ -15,7 +21,7 @@ export function BracketText({
   className = '',
   ...props
 }: BracketTextProps) {
-  const accentClasses: Record<string, string> = {
+  const accentClasses: Record<AccentToken, string> = {
     primary: 'text-accent-primary',
     secondary: 'text-accent-secondary',
     tertiary: 'text-accent-tertiary',
@@ -24,11 +30,6 @@ export function BracketText({
     success: 'text-intent-success',
     warning: 'text-intent-warning',
     danger: 'text-intent-danger',
-    cyan: 'text-accent-primary',
-    pink: 'text-accent-tertiary',
-    yellow: 'text-accent-secondary',
-    green: 'text-intent-success',
-    white: 'text-content-primary',
   };
 
   const accentClass = accent ? accentClasses[accent] : '';

@@ -21,7 +21,7 @@ export const Emphasis: Story = {
       <BracketText accent="primary">PRIMARY</BracketText>
       <BracketText accent="secondary">SECONDARY</BracketText>
       <BracketText accent="quiet">QUIET</BracketText>
-      <BracketText accent="white">WHITE</BracketText>
+      <BracketText accent="danger">DANGER</BracketText>
     </div>
   ),
 };

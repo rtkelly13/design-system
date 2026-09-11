@@ -474,7 +474,7 @@ declare const useOptionalTheme: () => ThemeContextValue | undefined;
 interface BracketTextProps extends HTMLAttributes<HTMLSpanElement> {
     children: ReactNode;
 
-    accent?: AccentToken | 'white';
+    accent?: AccentToken;
     className?: string;
 }
 declare function BracketText({ children, accent, className, ...props }: BracketTextProps): react.JSX.Element;
