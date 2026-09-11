@@ -55,6 +55,7 @@ const PROVIDERS = {
 
 /** Counts on the day this landed. Lower a line as it is paid down; delete at zero. */
 const BUDGET = {
+  inlineStyle: 170,
   ref: 35,
   displayName: 0,
   recipe: 11,
@@ -62,6 +63,7 @@ const BUDGET = {
 };
 
 const CLAUSE = {
+  inlineStyle: 'keeps inline style objects out of reach of a caller\u2019s className',
   ref: 'forwards its ref to the element it renders',
   displayName: 'declares a displayName alongside forwardRef',
   recipe: "composes classes with recipe()/cn() so a caller's className merges",
@@ -77,7 +79,7 @@ function files(dir = COMPONENTS) {
   });
 }
 
-const bare = { ref: [], displayName: [], recipe: [], spread: [] };
+const bare = { inlineStyle: [], ref: [], displayName: [], recipe: [], spread: [] };
 const counted = [];
 
 for (const file of files().sort()) {
@@ -85,6 +87,21 @@ for (const file of files().sort()) {
   if (PROVIDERS[rel]) continue;
   const source = readFileSync(file, 'utf8');
   counted.push(rel);
+
+  /*
+   * Inline styles, counted rather than judged.
+   *
+   * `style={{ … }}` is unreachable by a consumer's `className` — #47's third
+   * idiom, and the one it is right about. 170 of them exist, and about a third
+   * are legitimate: a runtime value cannot be a utility, because Tailwind's
+   * scanner reads source text and generates nothing for `bg-[${value}]`.
+   * `Avatar`, `Badge` and `Swatch` are that case and say so where they do it.
+   *
+   * Telling the two apart needs judgement this script does not have, so it
+   * counts all of them and holds the line. A ratchet on a number nobody can
+   * argue with beats a classifier that is wrong a third of the time.
+   */
+  for (const _ of source.matchAll(/style=\{\{/g)) bare.inlineStyle.push(rel);
 
   if (!source.includes('forwardRef')) bare.ref.push(rel);
   /*
@@ -108,7 +125,8 @@ if (process.argv.includes('--list')) {
   for (const [clause, missing] of Object.entries(bare)) {
     console.log(`${clause} — ${CLAUSE[clause]}`);
     console.log(`  ${counted.length - missing.length} of ${counted.length}, budget ${BUDGET[clause]}`);
-    for (const f of missing) console.log(`    ${f}`);
+    const shown = clause === 'inlineStyle' ? [...new Set(missing)] : missing;
+    for (const f of shown) console.log(`    ${f}${clause === 'inlineStyle' ? ` (${missing.filter((m) => m === f).length})` : ''}`);
     console.log('');
   }
   console.log(`Exempt (${Object.keys(PROVIDERS).length}):`);
