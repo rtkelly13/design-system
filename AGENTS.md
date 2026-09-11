@@ -75,6 +75,7 @@ Load these when the task is in them, not before.
 | Dependencies, and the ones held back | [`docs/dependencies.md`](./docs/dependencies.md) |
 | Hosted Storybook and its domains | [`docs/hosting.md`](./docs/hosting.md) |
 | Workflow conventions, with the incidents behind them | [`docs/workflow.md`](./docs/workflow.md) |
+| Outside reading, and what each idea changed here | [`docs/research.md`](./docs/research.md) |
 | **Third-party reference material — licensing** | [`docs/reference-material.md`](./docs/reference-material.md) |
 
 Standing analysis, written once and still true:
