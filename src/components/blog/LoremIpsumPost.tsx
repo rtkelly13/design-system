@@ -44,7 +44,8 @@ export const LoremIpsumPost: React.FC = () => {
         <div style={{ padding: '0.75rem 1.25rem', backgroundColor: 'var(--ds-border-strong)', color: 'var(--ds-surface-base)', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontWeight: 800, fontSize: '0.875rem' }}>
           // tailwind-preset.ts
         </div>
-        <pre style={{ padding: '1.25rem', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', color: 'var(--ds-intent-success)', overflowX: 'auto', margin: 0 }}>
+        {/* Scrollable at narrow widths — see `CodeBlock` for why this needs a tabIndex. */}
+        <pre tabIndex={0} role="region" aria-label="Code sample" style={{ padding: '1.25rem', fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.875rem', color: 'var(--ds-intent-success)', overflowX: 'auto', margin: 0 }}>
 {`export const brutalistTailwindPreset = {
   theme: {
     extend: {

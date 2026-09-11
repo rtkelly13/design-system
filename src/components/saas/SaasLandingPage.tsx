@@ -151,7 +151,11 @@ export const SaasLandingPage: React.FC<SaasLandingPageProps> = ({
               STATUS: ACTIVE
             </span>
           </div>
+          {/* Scrollable at narrow widths — see `CodeBlock` for why this needs a tabIndex. */}
           <pre
+            tabIndex={0}
+            role="region"
+            aria-label="Deployment log"
             style={{
               padding: '1.5rem',
               fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace',
