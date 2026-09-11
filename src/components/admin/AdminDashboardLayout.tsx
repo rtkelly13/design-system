@@ -5,7 +5,7 @@ import { Button } from '../Button';
 import { Badge } from '../Badge';
 import { Card } from '../Card';
 import { Avatar } from '../Avatar';
-import { useTheme } from '../ThemeProvider';
+import { useOptionalTheme } from '../ThemeProvider';
 import { LEVELS } from '../../theme/levels';
 
 export interface AdminNavItem {
@@ -59,7 +59,13 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
   children,
 }) => {
   const [currentNav, setCurrentNav] = useState(activeNavId);
-  const { level, cycleLevel } = useTheme();
+  /*
+   * Adapts rather than requires — same reasoning as `DocsHeader`. The level
+   * drives one button in the sidebar footer; with no provider there is nothing
+   * to cycle, so the button is omitted and the dashboard renders. See ADR 0004
+   * for why a consumer may theme with the attribute alone.
+   */
+  const theme = useOptionalTheme();
 
   const handleSelect = (id: string) => {
     setCurrentNav(id);
@@ -148,9 +154,11 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
 
         {/* Sidebar Footer Controls */}
         <div style={{ paddingTop: '1rem', borderTop: '2px solid var(--ds-border-strong)' }}>
-          <Button onClick={cycleLevel} bracketed style={{ width: '100%', marginBottom: '0.75rem', fontSize: '0.8rem' }}>
-            LEVEL: {LEVELS[level].label.toUpperCase()}
-          </Button>
+          {theme && (
+            <Button onClick={theme.cycleLevel} bracketed style={{ width: '100%', marginBottom: '0.75rem', fontSize: '0.8rem' }}>
+              LEVEL: {LEVELS[theme.level].label.toUpperCase()}
+            </Button>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <Avatar fallback="RK" size="sm" accent="primary" />
             <div>

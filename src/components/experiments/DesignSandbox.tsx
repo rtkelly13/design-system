@@ -28,6 +28,14 @@ interface UserRecord {
 }
 
 export const DesignSandbox: React.FC = () => {
+  /*
+   * The strict hook, deliberately. Unlike `DocsHeader` and
+   * `AdminDashboardLayout`, this component does not *adapt* to the level — a
+   * sandbox whose whole purpose is switching between Levels cannot render
+   * meaningfully without a provider, so failing loudly is correct. The
+   * distinction is required-versus-adapts; see `useOptionalTheme` for the other
+   * side of it.
+   */
   const { level, cycleLevel, setLevel, levels } = useTheme();
   const [activeTab, setActiveTab] = useState<'components' | 'saas' | 'ecommerce' | 'slides' | 'post'>('components');
   const [isModalOpen, setIsModalOpen] = useState(false);
