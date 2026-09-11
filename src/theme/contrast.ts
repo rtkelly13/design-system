@@ -375,7 +375,11 @@ export function auditContrast(
 
     // `text.inverse` is what a filled accent button prints in, so it is measured
     // against the accents rather than against a surface.
-    for (const tone of ['primary', 'secondary', 'tertiary'] as const satisfies readonly Emphasis[]) {
+    // `quiet` is in this list because `Tag` ships `bg-accent-quiet
+    // text-content-inverse`. It was omitted while the other three were checked,
+    // so a palette edit to `quiet` would have gone unmeasured — a coverage gap
+    // rather than a live defect, but the README claims every pair is audited.
+    for (const tone of ['primary', 'secondary', 'tertiary', 'quiet'] as const satisfies readonly Emphasis[]) {
       check(
         `text.inverse on accent.${tone}`,
         def.text.inverse,
