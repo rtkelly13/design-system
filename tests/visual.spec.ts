@@ -107,6 +107,104 @@ const CASES: readonly VisualCase[] = [
   { id: 'saas-landingpage--sketch-mode', snapshot: 'saas-landing-sketch.png', fullPage: true },
 ];
 
+/**
+ * Interaction states, which the table above never reaches.
+ *
+ * Every case above renders a component **at rest**, and the aesthetic this
+ * package exists for is an interaction one. `Button`'s `PRESS` constant declares
+ * three states in one string and is shared across every accent *specifically* so
+ * they cannot drift apart — a guarantee with nothing behind it while only the
+ * resting state is captured.
+ *
+ * The focus row is the one that closes a known hole. `src/focus-ring.test.ts`
+ * scans source for `outline-none` and says plainly why it is not the assertion
+ * this deserves:
+ *
+ *   > Reading the resolved outline off a keyboard-focused control is the
+ *   > assertion this deserves, and it is not available here: the cascade that
+ *   > decides it lives in the Tailwind output generated at build time, which
+ *   > jsdom never loads.
+ *
+ * Playwright does load it. `focus-visible` needs a *keyboard* focus rather than
+ * `.focus()`, which is why these press `Tab` instead of calling it — a
+ * programmatic focus does not match `:focus-visible` and would bake a ring-less
+ * baseline while appearing to test the ring.
+ *
+ * Deliberately few. Each is a committed PNG a human reviews on every change, so
+ * this covers the two states the system's identity rests on and the one that is
+ * an accessibility guarantee — not every state of every component.
+ */
+interface InteractionCase extends VisualCase {
+  /** What to do before capturing. `target` is resolved inside the story frame. */
+  act: 'hover' | 'keyboard-focus' | 'press';
+  /** CSS selector for the control to drive. */
+  target: string;
+}
+
+const INTERACTIONS: readonly InteractionCase[] = [
+  {
+    id: 'foundations-button--default',
+    snapshot: 'button-hover.png',
+    act: 'hover',
+    target: '#storybook-root button',
+  },
+  {
+    id: 'foundations-button--default',
+    snapshot: 'button-pressed.png',
+    act: 'press',
+    target: '#storybook-root button',
+  },
+  {
+    id: 'foundations-input--default-input',
+    snapshot: 'input-keyboard-focus.png',
+    act: 'keyboard-focus',
+    target: '#storybook-root input',
+  },
+];
+
+test.describe('Design System Visual Regression - Interaction states', () => {
+  for (const { id, snapshot, act, target } of INTERACTIONS) {
+    test(`${id} — ${act}`, async ({ page }) => {
+      await page.goto(`/iframe.html?id=${id}&viewMode=story`);
+      await waitForStoryReady(page, id);
+
+      /*
+       * Suppress transitions before driving anything. `Button` carries
+       * `transition-all duration-200`, so a press captured immediately after
+       * `mouse.down()` lands *mid-interpolation* — measured at rest-to-pressed
+       * 23% of the way through, with a 0.93px shadow offset that is a different
+       * number on every run. That is exactly the race
+       * `docs/deterministic-rendering.md` tells consumers to suppress, and this
+       * suite is one of the consumers it is written for.
+       *
+       * Scoped to `#storybook-root` for a related reason: the iframe carries
+       * four `button` elements, and the first in document order is Storybook's
+       * own chrome, which has no bounding box and cannot be hovered.
+       */
+      await page.addStyleTag({
+        content: '*,*::before,*::after{transition:none!important;animation:none!important}',
+      });
+      const el = page.locator(target).first();
+
+      if (act === 'hover') {
+        await el.hover();
+      } else if (act === 'keyboard-focus') {
+        // Tab, not `.focus()` — `:focus-visible` does not match a programmatic
+        // focus, so calling it would capture a ring-less baseline and look like
+        // a passing test of the ring.
+        await page.keyboard.press('Tab');
+        await expect(el).toBeFocused();
+      } else {
+        await el.hover();
+        await page.mouse.down();
+      }
+
+      await expect(page).toHaveScreenshot(snapshot);
+      if (act === 'press') await page.mouse.up();
+    });
+  }
+});
+
 test.describe('Design System Visual Regression - Components', () => {
   for (const { id, snapshot, fullPage } of CASES) {
     test(`${id}`, async ({ page }) => {

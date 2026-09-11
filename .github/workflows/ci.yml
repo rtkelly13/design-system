@@ -110,6 +110,10 @@ jobs:
       - name: Documented snippets
         run: pnpm check:doc-snippets
 
+      # Ratchet: fails if the count of undocumented components rises.
+      - name: Documented components
+        run: pnpm check:component-docs
+
       # Ratchet: fails if the count of colour-instead-of-role call sites rises.
       - name: Lint — colour literals and unknown classnames
         run: pnpm lint
