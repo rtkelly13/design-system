@@ -109,7 +109,44 @@ const FRAME_FLOOR = MEDIA_DEFINITIONS.video.contrastFloor;
  * sentence rather than to the bare number, so `(\d+) pairs` does not start
  * matching an unrelated count that happens to appear later.
  */
+/** Count regex hits under a set of paths, skipping tests. `sources()` is the doc
+ *  census and deliberately does not reach `src/components`, so these read the
+ *  tree directly. */
+function countIn(roots, filePattern, needle) {
+  let n = 0;
+  const visit = (rel) => {
+    const abs = path.join(ROOT, rel);
+    if (statSync(abs).isDirectory()) {
+      for (const e of readdirSync(abs)) visit(path.join(rel, e));
+      return;
+    }
+    if (!filePattern.test(rel) || rel.includes('.test.')) return;
+    n += (readFileSync(abs, 'utf8').match(needle) ?? []).length;
+  };
+  for (const r of roots) visit(r);
+  return n;
+}
+
 const CLAIMS = [
+  {
+    /*
+     * Both figures below are stated in `docs/deterministic-rendering.md`, which
+     * tells a consumer what to suppress before capturing. A transition that
+     * arrives after the doc is written is one the consumer is not told about,
+     * and `@keyframes` appearing at all would invalidate the doc's claim that
+     * the one-line suppression is enough.
+     */
+    key: 'motion.transitions',
+    what: 'CSS transitions across components and prose.css',
+    actual: () => countIn(['src/components', 'src/prose.css'], /\.(tsx?|css)$/, /transition/g),
+    patterns: [/(\d+) CSS transitions\b/g],
+  },
+  {
+    key: 'motion.keyframes',
+    what: '@keyframes rules in the package',
+    actual: () => countIn(['src'], /\.css$/, /@keyframes/g),
+    patterns: [/and \*\*(zero|\d+)\*\* `@keyframes`/g],
+  },
   {
     key: 'contrast.pairs',
     what: 'contrast pairs audited, both Levels',
