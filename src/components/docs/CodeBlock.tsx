@@ -92,7 +92,14 @@ export function CodeBlock({
             {copied ? <Check size={14} /> : <Copy size={14} />}
           </button>
         )}
-        <pre ref={preRef} {...rest}>
+        {/*
+          `tabIndex={0}` because the block scrolls horizontally at narrow widths
+          (`prose.css` gives it `overflow-x: auto`). A scrollable region that
+          cannot be focused cannot be scrolled by keyboard at all — axe's
+          `scrollable-region-focusable`, and a real trap rather than a technicality:
+          the content is simply unreachable without a pointer.
+        */}
+        <pre ref={preRef} tabIndex={0} role="region" aria-label={title ?? 'Code'} {...rest}>
           {children}
         </pre>
       </div>
