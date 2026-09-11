@@ -52,6 +52,8 @@
     "lint:fix": "eslint src --fix",
     "check:css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs",
     "check:css:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-css.mjs --list",
+    "check:component-docs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-component-docs.mjs",
+    "check:component-docs:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-component-docs.mjs --list",
     "check:doc-snippets": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-doc-snippets.mjs",
     "check:doc-snippets:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-doc-snippets.mjs --list",
     "check:docs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-docs.mjs",
