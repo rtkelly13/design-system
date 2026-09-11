@@ -225,6 +225,11 @@ jobs:
       - name: Visual Coverage
         run: pnpm check:visual-coverage
 
+      # Same build, same index.json: does every documented component publish its
+      # props, or carry a stated reason not to. An empty table errors nowhere.
+      - name: Docgen Props
+        run: pnpm check:docgen-props
+
       - name: Install Playwright Browsers
         uses: ./.github/actions/install-playwright
 
