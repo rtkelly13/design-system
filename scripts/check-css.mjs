@@ -65,7 +65,15 @@ const BUDGET = {
   // chrome-inside-prose reset are gone, replaced by @tailwindcss/typography
   // plus a variables-only token mapping. What remains is the docs chrome —
   // ~12 components, each with a 1:1 class. Migrate one at a time.
-  'src/prose.css': 328,
+  //
+  // 328 -> 330, deliberately and once: the two `@media (hover: none)` rules
+  // each needed a `color` alongside their `opacity`, to fix an AA failure the
+  // arithmetic gate cannot see (#135 — `opacity` changes the foreground after
+  // `check:contrast` has read it; 0.55 and 0.6 composited to 3.45:1 and 2.64:1
+  // on `sketch`, permanently, on every touch device). A ratchet that forbids an
+  // accessibility fix is a worse rule than the debt it guards. It comes back
+  // down when the docs chrome moves to TSX, which is what the budget is for.
+  'src/prose.css': 330,
 };
 
 /** Strip comments and string literals so braces inside them do not confuse the scan. */

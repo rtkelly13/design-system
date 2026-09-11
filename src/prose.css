@@ -103,10 +103,19 @@ html {
   box-shadow: 2px 2px 0 0 currentColor;
 }
 
-/* Touch devices have no hover state, so the affordance would be unreachable. */
+/*
+ * Touch devices have no hover state, so the affordance would be unreachable.
+ *
+ * Shown at full opacity in a *declared* role rather than dimmed. `opacity`
+ * changes the foreground after `check:contrast` has read it, so a dimmed
+ * `text.primary` is invisible to the gate: this rule was 0.55, which composites
+ * to 3.45:1 on `sketch` and fails AA on every touch device permanently.
+ * `text.muted` is a Role the gate measures — 5.90 on midnight, 5.43 on sketch.
+ */
 @media (hover: none) {
   .docs-anchor-link {
-    opacity: 0.55;
+    opacity: 1;
+    color: var(--ds-text-muted);
   }
 }
 
@@ -197,7 +206,15 @@ html {
   font-family: var(--ds-font-mono);
   font-size: 0.85rem;
   line-height: 1.6;
-  color: var(--ds-intent-success);
+  /*
+   * `text.primary`, not `intent.success`. This rendered every code block in the
+   * success green — a Role that means "this worked", used as body ink — and
+   * contradicted the mapping eleven lines up, which already declares
+   * `--tw-prose-pre-code: var(--ds-text-primary)`. Set explicitly rather than
+   * inherited because `.docs-codeblock` is also used outside `.prose`, where
+   * the `--tw-prose-*` variables are not in scope.
+   */
+  color: var(--ds-text-primary);
 }
 
 .docs-codeblock-body pre code {
@@ -243,9 +260,12 @@ html {
   color: var(--ds-intent-success);
 }
 
+/* Same reasoning as `.docs-anchor-link` above: 0.6 composited to 2.64:1 on
+ * `sketch`, so the copy button failed AA on every touch device. */
 @media (hover: none) {
   .docs-codeblock-copy {
-    opacity: 0.6;
+    opacity: 1;
+    color: var(--ds-text-muted);
   }
 }
 
@@ -582,9 +602,14 @@ html {
   opacity: 0.9;
 }
 
+/*
+ * Muted by Role, not by opacity. At 0.55 this composited to 3.45:1 on `sketch`
+ * — readable text below AA, and invisible to `check:contrast`, which reads the
+ * declared foreground before `opacity` is applied. `text.muted` is measured.
+ */
 .docs-sidebar-link-static {
   cursor: default;
-  opacity: 0.55;
+  color: var(--ds-text-muted);
 }
 
 /* ==========================================================================
