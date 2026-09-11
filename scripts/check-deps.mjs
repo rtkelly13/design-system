@@ -122,6 +122,10 @@ const MANIFEST = {
     kind: 'dev',
     why: 'Static accessibility rules \u2014 interactive handlers on non-interactive elements, ambiguous anchor text. Complements #52\u2019s runtime axe gate rather than replacing it: this reads source, that renders the component.',
   },
+  '@axe-core/playwright': {
+    kind: 'dev',
+    why: 'Runs axe against a rendered story in `tests/a11y.spec.ts` \u2014 the runtime half of the accessibility surface, where `eslint-plugin-jsx-a11y` is the static half. Nine gates could measure colour to two decimal places and none could observe an accessibility regression until this landed.',
+  },
   '@types/node': {
     kind: 'dev',
     why: 'Types for `node:fs`/`node:path` in the unit suite, which reads the generated theme.css from disk to assert its shape.',
