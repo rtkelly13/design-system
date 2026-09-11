@@ -77,7 +77,7 @@ const preview: Preview = {
      */
     options: {
       storySort: {
-        order: ['Manifesto', 'Foundations', 'Docs', 'Blog', 'Presentation', 'SaaS', 'Showcase', '*'],
+        order: ['Manifesto', 'Guides', 'Foundations', 'Docs', 'Blog', 'Presentation', 'SaaS', 'Showcase', '*'],
       },
     },
 
