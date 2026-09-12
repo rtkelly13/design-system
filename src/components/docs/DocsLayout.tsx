@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { useHotkey } from '@tanstack/react-hotkeys';
 import { cn } from '../../lib/recipe';
 
 export interface DocsLayoutProps {
@@ -43,16 +44,16 @@ export function DocsLayout({
     };
   }, [sidebarOpen]);
 
-  useEffect(() => {
-    if (!sidebarOpen || !onCloseSidebar || typeof window === 'undefined') return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onCloseSidebar();
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [sidebarOpen, onCloseSidebar]);
+  // Escape belongs to the drawer only while the drawer is open; `enabled`
+  // says so declaratively where the old code rebuilt a `window` listener
+  // around that condition. `preventDefault` stays off: closing a drawer is
+  // not the kind of default that should be swallowed.
+  useHotkey('Escape', () => onCloseSidebar?.(), {
+    enabled: sidebarOpen && Boolean(onCloseSidebar),
+    preventDefault: false,
+    stopPropagation: false,
+    meta: { name: 'Close navigation', description: 'Dismisses the open docs drawer' },
+  });
 
   return (
     <div className={cn('docs-layout', className)}>

@@ -57,9 +57,9 @@ describe('SlideDeck — uncontrolled (the existing behaviour)', () => {
 
   it('is driven by the arrow keys', () => {
     deck();
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' });
     expect(shown()).toBe('BETA');
-    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    fireEvent.keyDown(document.body, { key: 'ArrowLeft' });
     expect(shown()).toBe('ALPHA');
   });
 });
@@ -116,12 +116,29 @@ describe('SlideDeck — chrome', () => {
     expect(screen.queryByText(/SLIDE/)).toBeNull();
   });
 
+  it('leaves arrow keys to a focused text input', () => {
+    // The behaviour the hand-rolled `window` switch got wrong: typing an
+    // answer into a field must not page the deck behind it.
+    const onSlideChange = vi.fn();
+    const view = deck({ onSlideChange });
+    const input = document.createElement('input');
+    view.container.appendChild(input);
+    input.focus();
+
+    fireEvent.keyDown(input, { key: 'ArrowRight' });
+    expect(onSlideChange).not.toHaveBeenCalled();
+
+    input.blur();
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' });
+    expect(onSlideChange).toHaveBeenCalledWith(1);
+  });
+
   it('stops listening for arrow keys when chrome is off', () => {
     // A deck embedded in a page that owns its own keyboard must not also
     // silently consume the arrow keys.
     const onSlideChange = vi.fn();
     deck({ chrome: false, onSlideChange });
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' });
     expect(onSlideChange).not.toHaveBeenCalled();
     expect(shown()).toBe('ALPHA');
   });
@@ -193,7 +210,7 @@ describe('SlideDeck presenter notes', () => {
   it('leaves N inert on a deck with no notes', () => {
     const { container } = deckWithoutNotes();
     const before = container.innerHTML;
-    fireEvent.keyDown(window, { key: 'n' });
+    fireEvent.keyDown(document.body, { key: 'n' });
     expect(container.innerHTML).toBe(before);
   });
 
@@ -213,23 +230,23 @@ describe('SlideDeck presenter notes', () => {
 
   it('opens on N', () => {
     deckWithNotes();
-    fireEvent.keyDown(window, { key: 'n' });
+    fireEvent.keyDown(document.body, { key: 'n' });
     expect(screen.getByText(/Notes for the first slide/)).toBeTruthy();
   });
 
   it('follows the current slide', () => {
     deckWithNotes();
-    fireEvent.keyDown(window, { key: 'n' });
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    fireEvent.keyDown(document.body, { key: 'n' });
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' });
     expect(screen.getByText(/Notes for the second slide/)).toBeTruthy();
     expect(screen.queryByText(/Notes for the first slide/)).toBeNull();
   });
 
   it('says so on a slide with no notes rather than closing the panel', () => {
     deckWithNotes();
-    fireEvent.keyDown(window, { key: 'n' });
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    fireEvent.keyDown(document.body, { key: 'n' });
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' });
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' });
     expect(screen.getByText(/No notes on this slide/)).toBeTruthy();
   });
 
