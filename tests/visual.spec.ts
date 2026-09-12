@@ -105,6 +105,11 @@ const CASES: readonly VisualCase[] = [
   { id: 'saas-admindashboardlayout--sketch-mode', snapshot: 'admin-dashboard-sketch.png', fullPage: true },
   { id: 'saas-landingpage--dark-mode', snapshot: 'saas-landing-midnight.png', fullPage: true },
   { id: 'saas-landingpage--sketch-mode', snapshot: 'saas-landing-sketch.png', fullPage: true },
+
+  // Chart Primitives
+  { id: 'foundations-barchart--vertical', snapshot: 'barchart-vertical.png' },
+  { id: 'foundations-sparkline--primary-trend', snapshot: 'sparkline-primary-trend.png' },
+  { id: 'foundations-bulletchart--primary-benchmark', snapshot: 'bulletchart-primary-benchmark.png' },
 ];
 
 /**

@@ -30,7 +30,7 @@ export const ChartTooltip = forwardRef<HTMLDivElement, ChartTooltipProps>(
         ref={ref}
         data-slot="chart-tooltip"
         className={cn(
-          'pointer-events-none z-50 min-w-32 border-2 border-edge-strong bg-surface-raised p-2.5 font-mono text-xs shadow-hard-sm transition-colors duration-150',
+          'pointer-events-none z-50 min-w-32 border-2 border-edge-strong bg-surface-raised p-2.5 font-mono text-xs shadow-hard-sm',
           accentHoverEdgeClass(accent),
           className,
         )}
