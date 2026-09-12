@@ -106,6 +106,10 @@ const MANIFEST = {
   '@storybook/addon-docs': { kind: 'dev', why: 'MDX docs pages in Storybook.' },
   '@storybook/react': { kind: 'dev', why: 'Story types (Meta, StoryObj).' },
   '@storybook/react-vite': { kind: 'dev', why: 'Storybook framework adapter for the Vite builder.' },
+  '@tanstack/intent': {
+    kind: 'dev',
+    why: 'Validator and publisher for the skills/ tree (#206 spike). No runtime surface: it generates, validates and staleness-checks SKILL.md files at build time, and its edit-package-json wiring (files + keywords) is committed, not re-run. Its own dependencies (@clack, cac, yaml…) never ship.',
+  },
   '@tailwindcss/vite': { kind: 'dev', why: 'Compiles Tailwind inside the Storybook build.' },
   '@types/react': { kind: 'dev', why: 'Types for the react peer.' },
   '@types/react-dom': { kind: 'dev', why: 'Types for the react-dom peer.' },
