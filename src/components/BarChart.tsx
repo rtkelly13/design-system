@@ -172,7 +172,7 @@ function BarChartCanvas({
                   fill={fillColor}
                   stroke="var(--ds-border-strong)"
                   strokeWidth={2}
-                  className="cursor-pointer transition-opacity hover:opacity-80"
+                  className="cursor-pointer hover:opacity-80"
                   onClick={() => onBarClick?.(d, index)}
                 />
                 {showValues && (
@@ -207,7 +207,7 @@ function BarChartCanvas({
                 fill={fillColor}
                 stroke="var(--ds-border-strong)"
                 strokeWidth={2}
-                className="cursor-pointer transition-opacity hover:opacity-80"
+                className="cursor-pointer hover:opacity-80"
                 onClick={() => onBarClick?.(d, index)}
               />
               {showValues && (
