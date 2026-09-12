@@ -86,6 +86,7 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-avatar--default', snapshot: 'avatar-default.png' },
   { id: 'foundations-input--default-input', snapshot: 'input-default.png' },
   { id: 'foundations-statcard--system-health', snapshot: 'statcard-system-health.png' },
+  { id: 'foundations-datatable--virtualized', snapshot: 'datatable-virtualized.png' },
   { id: 'foundations-semantic-tokens--roles', snapshot: 'semantic-tokens-roles.png', fullPage: true },
   { id: 'docs-docslayout--default', snapshot: 'docslayout-default.png', fullPage: true },
   { id: 'docs-portal--full-portal', snapshot: 'portal-full.png', fullPage: true },
