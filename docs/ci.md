@@ -20,7 +20,7 @@ trigger is the post-merge signal for the default branch specifically.
 
 | Job | What it runs | Roughly | Ceiling |
 | --- | --- | --- | --- |
-| `gates` | `tokens:check`, `tokens:design:check`, `check:contrast`, `check:docs`, `check:doc-snippets`, `check:component-docs`, `check:component-contract`, `check:licences`, `check:lint-budget`, `lint`, `check:css`, `check:tokens`, `ansi:check`, `check:fonts`, `check:deps`, `check:governance` | 30s | 10m |
+| `gates` | `tokens:check`, `tokens:design:check`, `check:contrast`, `check:docs`, `check:doc-snippets`, `check:skills`, `check:component-docs`, `check:component-contract`, `check:licences`, `check:lint-budget`, `lint`, `check:css`, `check:tokens`, `ansi:check`, `check:fonts`, `check:deps`, `check:governance` | 30s | 10m |
 | `unit` | `typecheck`, `test`, `build`, `check:api` | 35s | 10m |
 | `visual` | `build-storybook`, `check:visual-coverage`, `check:docgen-props`, `check:story-conventions`, `test:visual`, `test:a11y` | 60s | 25m |
 | `verify` | nothing — fails unless the three above succeeded | 10s | 5m |

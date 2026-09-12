@@ -32,7 +32,9 @@
     "terminal",
     "CHANGELOG.md",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "skills",
+    "!skills/_artifacts"
   ],
   "sideEffects": [
     "**/*.css"
@@ -61,6 +63,7 @@
     "check:component-docs:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-component-docs.mjs --list",
     "check:doc-snippets": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-doc-snippets.mjs",
     "check:doc-snippets:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-doc-snippets.mjs --list",
+    "check:skills": "intent validate skills",
     "check:docs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-docs.mjs",
     "check:docs:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-docs.mjs --list",
     "check:governance": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-governance.mjs",
@@ -119,7 +122,8 @@
     "deck",
     "experiments",
     "theme-ladder",
-    "design-tokens"
+    "design-tokens",
+    "tanstack-intent"
   ],
   "author": "Ryan Kelly",
   "license": "MIT",
@@ -148,6 +152,7 @@
     "@storybook/react-vite": "^10.5.5",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/intent": "^0.4.0",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^26.2.0",
     "@types/react": "^19.2.18",
@@ -176,5 +181,10 @@
     "tailwindcss": {
       "optional": true
     }
+  },
+  "intent": {
+    "skills": [
+      "skills"
+    ]
   }
 }
