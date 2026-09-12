@@ -46,6 +46,8 @@ const ALLOWED = {
   'Apache-2.0':
     'Permissive with a patent grant. Depending on it is not redistributing it, and this repo has depended on TypeScript under exactly these terms since day one.',
   '0BSD': 'Public-domain-equivalent; no conditions at all.',
+  Unlicense: 'Public-domain-equivalent dedication; no conditions at all.',
+  'MIT and ISC': 'Permissive dual-licence combining MIT and ISC.',
   BSD: 'Permissive.',
   'BSD-2-Clause': 'Permissive.',
   'BSD-3-Clause': 'Permissive.',
