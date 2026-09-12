@@ -35,9 +35,18 @@ along with the whole Manifesto, `Swatch`, `Card` and `DataTable`. **136 stories 
 against 168 built.**
 
 The Vercel checks were red the whole time, reading `build-rate-limit` — an account
-quota, which is not a code problem and does not look like one. Nothing else was
-watching: every gate in this repo verifies the tree, and none of them looks at what is
-actually being served.
+quota, which is not a code problem and does not look like one. That turned out to be
+only a third of the story: with the quota arithmetic fixed (#212), *one push* built
+fine on the docs project and was still canceled on this one, second for second, on
+the same commit. `Auto-expose system environment variables` had been switched off on
+the storybook project, so `ignoreCommand` ran with no `$VERCEL_GIT_COMMIT_REF` and
+compared `""` against `main` — skipping **every branch, production included**. Turned
+back on, the next build to `main` served 174 stories again. A quiet project setting
+is indistinguishable from quota from the outside, and this repo cannot see project
+settings: nothing here was watching then except the tree. Nothing here is watching
+now either — the estate audit (`repo-governance vercel-gating`, in `shared-utilities`)
+counts what Vercel *did*: deployments created off the allowed refs, and whether the
+latest Ready production build matches `origin/main`.
 
 `pnpm check:deployed` compares the live `index.json` with this build, and
 `.github/workflows/deployment-drift.yml` runs it on pushes to `main` and daily. That
@@ -56,15 +65,16 @@ the repository, for two independent reasons:
    one saves the quota: a skipped deployment is still created, still shows as
    canceled, and still spends one of the 100 deployments per day. Before the creation
    gate, one session of ordinary PR traffic created **83 deployments in a day, 79 of
-   them canceled**, and it was the storybook project's production builds that starved.
+   them canceled**.
    A required Vercel check would therefore never turn green on an ordinary branch —
    there is no check at all — and **every pull request would block forever**.
 2. **A deployment happens after a merge.** There is nothing for a pull request to check:
    the deployed site cannot contain the commit under review.
 
-Previews on every push were what broke production; the creation gate retires them as a
-side effect of the quota arithmetic. That was a paid-plan decision, not a configuration
-one, until `git.deploymentEnabled` made it a configuration one.
+Previews on every push are what broke the *quota* — 100/day is the ceiling — and the
+creation gate retires them. What broke *production* was the blind `ignoreCommand`
+above, which no amount of quota would have explained. Neither failure looked like the
+other, and both looked like Vercel being grumpy.
 
 So the guard sits where the answer exists: after the merge, and on a schedule.
 
