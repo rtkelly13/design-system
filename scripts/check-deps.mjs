@@ -68,6 +68,10 @@ const MANIFEST = {
     kind: 'runtime',
     why: 'Builds the style recipes in src/lib/recipe.ts. Confined to that one file and deliberately absent from the published .d.ts, so it can be replaced without a breaking change.',
   },
+  '@tanstack/react-hotkeys': {
+    kind: 'runtime',
+    why: 'Keyboard bindings for SlideDeck and the DocsLayout drawer (#205). Same exemption as react-table and react-virtual: a binding engine with no DOM of its own, no focus model and no ARIA — it listens, matches and fires; the components keep every keystroke\u2019s consequence. The binding tables it feeds are also the single source the docs cheatsheet renders from.',
+  },
   '@tanstack/react-table': {
     kind: 'runtime',
     why: 'Headless data table state engine for DataTable (sorting, filtering, pagination, selection). Not a counter-example to the one-primitive-library rule: it has no DOM, no focus model and no ARIA, which is why DataTable writes its own semantics — and why neither primitive library replaces it.',

@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, FileText, Maximize2, Minimize2, Play, Pause } from 'lucide-react';
+import { useHotkeys, type RegisterableHotkey } from '@tanstack/react-hotkeys';
 import { Button } from '../Button';
 import type { SlideProps } from './Slide';
 
@@ -17,6 +18,39 @@ function speakerNotesOf(node: React.ReactNode): string | undefined {
   const notes = (node.props as Partial<SlideProps>).speakerNotes;
   return notes?.trim() ? notes : undefined;
 }
+
+/**
+ * One key on the deck's keyboard surface, as registered and as documented.
+ * This array is the only place a deck key is written: `SlideDeck` registers
+ * it with `@tanstack/react-hotkeys`, the presenter sees it in the controls,
+ * and the docs cheatsheet renders it — three consumers of one list, so none
+ * of them can drift from the other two.
+ */
+export interface SlideDeckHotkey {
+  /** The binding in @tanstack/react-hotkeys notation — `ArrowRight`, `f`. */
+  hotkey: RegisterableHotkey;
+  /** What the key does, in the deck's own words. */
+  label: string;
+  /** The one line the cheatsheet shows beside the key. */
+  description: string;
+  action: 'next' | 'previous' | 'fullscreen' | 'notes';
+  /**
+   * Whether the browser's own behaviour (caret, scroll, space-scroll) is
+   * swallowed when the binding fires. `false` for fullscreen, whose `F` is
+   * not a scrolling key and whose default action belongs to nobody.
+   */
+  preventsDefault?: boolean;
+  /** A binding only exists when the deck has the feature it drives. */
+  requires?: 'notes';
+}
+
+export const SLIDE_DECK_HOTKEYS: readonly SlideDeckHotkey[] = [
+  { hotkey: 'ArrowRight', label: 'Next', description: 'Advance one slide, wrapping at the end', action: 'next' },
+  { hotkey: 'Space', label: 'Next', description: 'Advance one slide, as → does', action: 'next' },
+  { hotkey: 'ArrowLeft', label: 'Previous', description: 'Go back one slide, wrapping at the start', action: 'previous' },
+  { hotkey: 'F', label: 'Fullscreen', description: 'Toggle fullscreen on the deck frame', action: 'fullscreen', preventsDefault: false },
+  { hotkey: 'N', label: 'Notes', description: 'Toggle the presenter panel — bound only when a slide carries notes', action: 'notes', requires: 'notes' },
+];
 
 export interface SlideDeckProps {
   children: React.ReactElement[];
@@ -62,7 +96,8 @@ export interface SlideDeckProps {
  * the panel starts closed — so notes never reach a projector unasked, and a
  * deck without them renders exactly as it did before the feature existed.
  *
- * Keyboard: `←`/`→` or space to page, `F` for fullscreen, `N` for notes.
+ * Keyboard: the bindings in `SLIDE_DECK_HOTKEYS` — `←`/`→` or space to page,
+ * `F` for fullscreen, `N` for notes when any slide carries them.
  *
  * Slides are indexed by position, so the children must be a stable array. A
  * conditional slide that disappears shifts every index after it.
@@ -135,32 +170,41 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
     }
   }, []);
 
-  useEffect(() => {
-    if (!chrome) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') {
-        e.preventDefault();
-        nextSlide();
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        prevSlide();
-      } else if (e.key === 'f' || e.key === 'F') {
-        toggleFullscreen();
-      } else if (e.key === 'n' || e.key === 'N') {
-        // Only when the deck has notes, so `N` is not a key that appears to do
-        // nothing on a deck that has none.
-        if (deckHasNotes) {
-          e.preventDefault();
-          setShowNotes((visible) => !visible);
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-    // Previously `[totalSlides]`, which closed over stale nav functions. That
-    // worked only because they touched nothing but the state updater; the
-    // moment one read a prop it would have stopped.
-  }, [chrome, nextSlide, prevSlide, toggleFullscreen, deckHasNotes]);
+  const deckActions = useMemo(
+    () => ({
+      next: nextSlide,
+      previous: prevSlide,
+      fullscreen: toggleFullscreen,
+      notes: () => setShowNotes((visible) => !visible),
+    }),
+    [nextSlide, prevSlide, toggleFullscreen],
+  );
+
+  // `SLIDE_DECK_HOTKEYS` replaces a hand-rolled `window` keydown switch:
+  // registration is declarative, `enabled` stands in for the old
+  // `if (!chrome) return` and the notes gate (a disabled binding does not
+  // fire and does not preventDefault, but stays visible in devtools), and
+  // single-key bindings default to `ignoreInputs` — the old handler stole
+  // arrows and space from any focused text field, which this no longer does.
+  // `stopPropagation: false` and the per-binding `preventsDefault` keep the
+  // wired behaviour identical; `conflictBehavior: 'allow'` reproduces what
+  // two `window` listeners did for two mounted decks — both respond, neither
+  // warns. One tightening is real: the old switch read `e.key`, so Shift+F
+  // and Shift+N fired; the bindings are plain F and N, which is what a
+  // presenter means.
+  useHotkeys(
+    SLIDE_DECK_HOTKEYS.map((binding) => ({
+      hotkey: binding.hotkey,
+      callback: () => deckActions[binding.action](),
+      options: {
+        enabled: chrome && (binding.requires !== 'notes' || deckHasNotes),
+        preventDefault: binding.preventsDefault !== false,
+        stopPropagation: false,
+        conflictBehavior: 'allow' as const,
+        meta: { name: binding.label, description: binding.description },
+      },
+    })),
+  );
 
   useEffect(() => {
     if (!isPlaying || autoPlayInterval <= 0) return;

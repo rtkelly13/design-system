@@ -1,6 +1,7 @@
 import * as react from 'react';
 import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
 import { Table as Table$1, ColumnDef } from '@tanstack/react-table';
+import { RegisterableHotkey } from '@tanstack/react-hotkeys';
 
 type Emphasis = 'primary' | 'secondary' | 'tertiary' | 'quiet';
 
@@ -706,6 +707,20 @@ interface SlideProps {
 }
 declare const Slide: react__default.FC<SlideProps>;
 
+interface SlideDeckHotkey {
+
+    hotkey: RegisterableHotkey;
+
+    label: string;
+
+    description: string;
+    action: 'next' | 'previous' | 'fullscreen' | 'notes';
+
+    preventsDefault?: boolean;
+
+    requires?: 'notes';
+}
+declare const SLIDE_DECK_HOTKEYS: readonly SlideDeckHotkey[];
 interface SlideDeckProps {
     children: react__default.ReactElement[];
     aspectRatio?: '16:9' | '4:3';
@@ -1190,6 +1205,7 @@ export {
   Prose,
   type ProseProps,
   type Rgb,
+  SLIDE_DECK_HOTKEYS,
   SLOTS,
   SYSTEM_LEVEL,
   SaasLandingPage,
@@ -1203,6 +1219,7 @@ export {
   type SelectionDeviceCheck,
   Slide,
   SlideDeck,
+  type SlideDeckHotkey,
   type SlideDeckProps,
   type SlideProps,
   Slugger,
