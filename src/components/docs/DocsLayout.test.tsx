@@ -18,7 +18,7 @@ describe('DocsLayout', () => {
   it('does not claim Escape while the drawer is closed', () => {
     const onCloseSidebar = vi.fn();
     render(
-      <DocsLayout sidebar={<nav>NAV</nav>} sidebarOpen={false} onCloseSidebar>
+      <DocsLayout sidebar={<nav>NAV</nav>} sidebarOpen={false} onCloseSidebar={onCloseSidebar}>
         <p>CONTENT</p>
       </DocsLayout>,
     );
