@@ -49,17 +49,22 @@ of thirty.
 The obvious guard is to make `Vercel – design-system-storybook` required. It would lock
 the repository, for two independent reasons:
 
-1. **`vercel.json` deliberately does not build feature branches.** Its `ignoreCommand`
-   exits 1 (build) only for `main`, `preview`, `slot/N`, or a commit message tagged
-   `[deploy]` / `[preview]` / `[storybook]`; everything else exits 0 (skip). A required
-   Vercel check would therefore never turn green on an ordinary branch, and **every pull
-   request would block forever**.
+1. **Feature branches do not deploy at all, and that is two gates, not one.**
+   `git.deploymentEnabled` in `vercel.json` refuses to *create* a deployment for any
+   branch outside `main`, `preview` and `slot/N`; `ignoreCommand` is the same list
+   again, as a skip for anything that reaches the build step anyway. Only the first
+   one saves the quota: a skipped deployment is still created, still shows as
+   canceled, and still spends one of the 100 deployments per day. Before the creation
+   gate, one session of ordinary PR traffic created **83 deployments in a day, 79 of
+   them canceled**, and it was the storybook project's production builds that starved.
+   A required Vercel check would therefore never turn green on an ordinary branch —
+   there is no check at all — and **every pull request would block forever**.
 2. **A deployment happens after a merge.** There is nothing for a pull request to check:
    the deployed site cannot contain the commit under review.
 
-Relaxing the `ignoreCommand` to build every branch would fix (1) and make the underlying
-problem worse — the quota is what broke production, and previews on every push are what
-would exhaust it faster. That is a paid-plan decision, not a configuration one.
+Previews on every push were what broke production; the creation gate retires them as a
+side effect of the quota arithmetic. That was a paid-plan decision, not a configuration
+one, until `git.deploymentEnabled` made it a configuration one.
 
 So the guard sits where the answer exists: after the merge, and on a schedule.
 
