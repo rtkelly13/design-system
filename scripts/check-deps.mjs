@@ -74,7 +74,39 @@ const MANIFEST = {
   },
   '@base-ui/react': {
     kind: 'runtime',
-    why: 'The primitive layer \u2014 the one permitted focus-management implementation, per rule 4 in AGENTS.md. Chosen over Radix on maintenance rather than API; the measured comparison is docs/radix-vs-base-ui.md and the staged adoption is issue #105. Runtime rather than peer because a consumer should get working components without opting in, matching lucide-react. Brings 9 packages, all MIT (verified at 1.8.0, not just the 1.7.0 the evaluation measured).',
+    why: 'The primitive layer — the one permitted focus-management implementation, per rule 4 in AGENTS.md. Chosen over Radix on maintenance rather than API; the measured comparison is docs/radix-vs-base-ui.md and the staged adoption is issue #105. Runtime rather than peer because a consumer should get working components without opting in, matching lucide-react. Brings 9 packages, all MIT (verified at 1.8.0, not just the 1.7.0 the evaluation measured).',
+  },
+  '@visx/axis': {
+    kind: 'runtime',
+    why: 'SVG axis renderer for brutalist charts (AxisBottom, AxisLeft). Unopinionated SVG geometry with zero DOM focus runtimes, respecting Rule 4.',
+  },
+  '@visx/grid': {
+    kind: 'runtime',
+    why: 'SVG grid lines (GridRows, GridColumns) for brutalist chart grids.',
+  },
+  '@visx/group': {
+    kind: 'runtime',
+    why: 'SVG transform group container (<Group>) used across chart primitives.',
+  },
+  '@visx/responsive': {
+    kind: 'runtime',
+    why: 'Fluid responsive sizing (<ParentSize>) for chart layout adaptation.',
+  },
+  '@visx/scale': {
+    kind: 'runtime',
+    why: 'D3-backed coordinate projection (scaleBand, scaleLinear) mapping domains to SVG pixels.',
+  },
+  '@visx/shape': {
+    kind: 'runtime',
+    why: 'SVG element geometry generators (Bar, LinePath, AreaClosed) for brutalist chart shapes.',
+  },
+  '@visx/tooltip': {
+    kind: 'runtime',
+    why: 'Headless coordinate-aware tooltip state (useTooltip, TooltipWithBounds) without markup opinions, enabling tooltips to render through Card.',
+  },
+  '@microcharts/react': {
+    kind: 'runtime',
+    why: 'Zero-dependency micro-chart primitives (106 chart types) for inline data density, table cells, KPI indicators, and LLM-streamed content. Server-component safe with accessible descriptions.',
   },
 
   react: {
