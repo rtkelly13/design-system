@@ -110,6 +110,12 @@ jobs:
       - name: Documented snippets
         run: pnpm check:doc-snippets
 
+      # The agent-facing skills tree (#206). `intent validate` parses every
+      # SKILL.md's frontmatter and enforces the schema an agent relies on; a
+      # malformed skill is a silent one, since a loading agent just skips it.
+      - name: Intent skills
+        run: pnpm check:skills
+
       # Ratchet: fails if the count of undocumented components rises.
       - name: Documented components
         run: pnpm check:component-docs
