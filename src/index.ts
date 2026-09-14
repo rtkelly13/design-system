@@ -60,6 +60,12 @@ export * from './components/Modal';
 export * from './components/NerdIcon';
 export * from './components/Glyph';
 
+// Chart Primitives & Trend Visualizers
+export * from './components/BarChart';
+export * from './components/Sparkline';
+export * from './components/ChartTooltip';
+export * from './components/BulletChart';
+
 // Slides & Presentation Deck Engine
 export * from './components/slides/Slide';
 export * from './components/slides/SlideDeck';

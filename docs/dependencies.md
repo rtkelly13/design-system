@@ -26,6 +26,8 @@ They were resolved by hand and found to be MIT, which was the right answer by th
 | OFL-1.1 | The SIL Open Font Licence — fonts only, and self-hosting is what it is for |
 | Apache-2.0 | Permissive with a patent grant. Depending on it is not redistributing it, and this repo has depended on TypeScript under exactly these terms since day one |
 | 0BSD, BSD-*| Permissive |
+| Unlicense | Public-domain-equivalent dedication; no conditions at all |
+| MIT and ISC | Permissive dual-licence combining MIT and ISC |
 
 When the change is intended: `pnpm licences:update`, and commit the baseline — **the diff is the
 licence change under review**, which is the same contract `check:api` uses for the type surface.

@@ -49,7 +49,7 @@ const EXCLUDED = {
 };
 
 /** The count of undocumented components on the day this gate landed. */
-const BUDGET = 18;
+const BUDGET = 17;
 
 function componentFiles(dir = COMPONENTS) {
   return readdirSync(dir).flatMap((entry) => {
