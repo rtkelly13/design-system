@@ -1,5 +1,5 @@
 import * as react from 'react';
-import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
+import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes, RefObject } from 'react';
 import { Table as Table$1, ColumnDef } from '@tanstack/react-table';
 
 type Emphasis = 'primary' | 'secondary' | 'tertiary' | 'quiet';
@@ -569,28 +569,39 @@ interface Column<T> {
     enableSorting?: boolean;
     sortValue?: (row: T) => any;
 }
-type DataTableProps<T> = {
 
-    table: Table$1<T>;
-    columns?: never;
-    data?: never;
+interface DataTableVirtualization {
+
+    height?: number;
+
+    rowHeight?: number;
+
+    overscan?: number;
+
+    scrollElementRef?: RefObject<HTMLElement | null>;
+}
+type DataTableSharedProps<T> = {
     keyExtractor?: (row: T, index: number) => string | number;
     emptyText?: string;
     className?: string;
     containerClassName?: string;
+
+    virtualize?: boolean | DataTableVirtualization;
+};
+type DataTableProps<T> = DataTableSharedProps<T> & ({
+
+    table: Table$1<T>;
+    columns?: never;
+    data?: never;
 } | {
     table?: never;
 
     columns: Column<T>[] | ColumnDef<T, any>[];
     data: T[];
-    keyExtractor?: (row: T, index: number) => string | number;
-    emptyText?: string;
-    className?: string;
-    containerClassName?: string;
     enableSorting?: boolean;
     pageSize?: number;
-};
-declare function DataTable<T>({ table: providedTable, columns, data, keyExtractor, emptyText, className, containerClassName, ...rest }: DataTableProps<T>): react.JSX.Element;
+});
+declare function DataTable<T>({ table: providedTable, columns, data, keyExtractor, emptyText, className, containerClassName, virtualize, ...rest }: DataTableProps<T>): react.JSX.Element;
 
 interface ModalProps {
     isOpen: boolean;
@@ -1123,6 +1134,7 @@ export {
   DIVIDER_PATTERNS,
   DataTable,
   type DataTableProps,
+  type DataTableVirtualization,
   DesignSandbox,
   Divider,
   type DividerProps,

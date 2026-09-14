@@ -72,6 +72,10 @@ const MANIFEST = {
     kind: 'runtime',
     why: 'Headless data table state engine for DataTable (sorting, filtering, pagination, selection). Not a counter-example to the one-primitive-library rule: it has no DOM, no focus model and no ARIA, which is why DataTable writes its own semantics — and why neither primitive library replaces it.',
   },
+  '@tanstack/react-virtual': {
+    kind: 'runtime',
+    why: 'Row windowing for DataTable\u2019s `virtualize` prop. Same exemption as react-table and for the same reason: it is a measurement and range-computation engine with no DOM of its own, no focus model and no ARIA. DataTable decides which `<tr>`s mount and how they are spaced; the virtualizer never renders or styles anything, so it does not become a second primitive library under rule 4. Adopted under issue #204.',
+  },
   '@base-ui/react': {
     kind: 'runtime',
     why: 'The primitive layer \u2014 the one permitted focus-management implementation, per rule 4 in AGENTS.md. Chosen over Radix on maintenance rather than API; the measured comparison is docs/radix-vs-base-ui.md and the staged adoption is issue #105. Runtime rather than peer because a consumer should get working components without opting in, matching lucide-react. Brings 9 packages, all MIT (verified at 1.8.0, not just the 1.7.0 the evaluation measured).',

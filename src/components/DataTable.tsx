@@ -9,7 +9,15 @@ import {
   type SortingState,
   type Table as TanStackTable,
 } from '@tanstack/react-table';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import { cn } from '../lib/recipe';
 import { NerdIcon } from './NerdIcon';
 import {
@@ -30,29 +38,73 @@ export interface Column<T> {
   sortValue?: (row: T) => any;
 }
 
-export type DataTableProps<T> =
-  | {
-      /** Pre-configured TanStack table instance */
-      table: TanStackTable<T>;
-      columns?: never;
-      data?: never;
-      keyExtractor?: (row: T, index: number) => string | number;
-      emptyText?: string;
-      className?: string;
-      containerClassName?: string;
-    }
-  | {
-      table?: never;
-      /** Column definitions (either simple Column<T>[] or TanStack ColumnDef<T>[]) */
-      columns: Column<T>[] | ColumnDef<T, any>[];
-      data: T[];
-      keyExtractor?: (row: T, index: number) => string | number;
-      emptyText?: string;
-      className?: string;
-      containerClassName?: string;
-      enableSorting?: boolean;
-      pageSize?: number;
-    };
+/** Virtualization geometry is runtime arithmetic; hoisted objects (the
+ * `ATTACHED_STYLE` convention from CodeBlock) keep it off the inline-style
+ * sites the contract counts. */
+const SPACER_STYLE_BASE = { padding: 0, border: 0 } as const;
+function spacerStyle(height: number) {
+  return { height, ...SPACER_STYLE_BASE };
+}
+function scrollBoxStyle(height: number) {
+  return { height };
+}
+
+/**
+ * Row virtualization is planned against a fixed row height rather than measured
+ * rows: deterministic rendering is a contract here (docs/deterministic-rendering.md),
+ * and a measured engine would make the snapshot of a 10k-row table depend on font
+ * loading. Multi-line cell content is therefore clipped to `rowHeight`.
+ */
+export interface DataTableVirtualization {
+  /**
+   * Viewport height, in px, of the scroll box the table builds for itself.
+   * Ignored when `scrollElementRef` is provided. Defaults to 480.
+   */
+  height?: number;
+  /** Fixed row height, in px, the virtualizer plans against. Defaults to 44. */
+  rowHeight?: number;
+  /** Rows rendered beyond each edge of the viewport. Defaults to 8. */
+  overscan?: number;
+  /**
+   * Scroll inside an existing scrollable element instead of building one. When
+   * provided, no wrapper is rendered and this element owns both axes — and it
+   * must be keyboard-reachable itself (`tabIndex={0}`), or the window cannot be
+   * scrolled without a mouse.
+   */
+  scrollElementRef?: RefObject<HTMLElement | null>;
+}
+
+type DataTableSharedProps<T> = {
+  keyExtractor?: (row: T, index: number) => string | number;
+  emptyText?: string;
+  className?: string;
+  containerClassName?: string;
+  /**
+   * Window the body to the visible rows so a dataset of thousands renders as
+   * many rows as fit, not as many as exist. `true` uses the defaults;
+   * mutually exclusive with `pageSize`, which wins nothing — pagination is
+   * simply not attached while virtualizing.
+   */
+  virtualize?: boolean | DataTableVirtualization;
+};
+
+export type DataTableProps<T> = DataTableSharedProps<T> &
+  (
+    | {
+        /** Pre-configured TanStack table instance */
+        table: TanStackTable<T>;
+        columns?: never;
+        data?: never;
+      }
+    | {
+        table?: never;
+        /** Column definitions (either simple Column<T>[] or TanStack ColumnDef<T>[]) */
+        columns: Column<T>[] | ColumnDef<T, any>[];
+        data: T[];
+        enableSorting?: boolean;
+        pageSize?: number;
+      }
+  );
 
 export function DataTable<T>({
   table: providedTable,
@@ -62,9 +114,22 @@ export function DataTable<T>({
   emptyText = 'No items found.',
   className = '',
   containerClassName = '',
+  virtualize,
   ...rest
 }: DataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  // Memoized (the exhaustive-deps rule's own suggestion): a caller passing a
+  // fresh `virtualize={{ ... }}` literal must not churn the measure effect.
+  const virtualization = useMemo(
+    () => (virtualize ? (typeof virtualize === 'object' ? virtualize : {}) : undefined),
+    [virtualize],
+  );
+  const {
+    height = 480,
+    rowHeight = 44,
+    overscan = 8,
+    scrollElementRef,
+  } = virtualization ?? {};
   const [globalFilter, setGlobalFilter] = useState('');
 
   // Normalize columns if legacy format is provided
@@ -125,13 +190,80 @@ export function DataTable<T>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel:
-      'pageSize' in rest && rest.pageSize ? getPaginationRowModel() : undefined,
+      !virtualization && 'pageSize' in rest && rest.pageSize
+        ? getPaginationRowModel()
+        : undefined,
   });
 
   const activeTable = providedTable || defaultTable;
+  const rows = activeTable.getRowModel().rows;
 
-  return (
-    <Table className={className} containerClassName={containerClassName}>
+  const scrollRef = useRef<HTMLDivElement>(null);
+  // The virtualizer measures from the top of the scroll element, which on a
+  // table is the header's top-left — but rows begin below it. Measuring the
+  // body's offset once (the header's height is static by recipe) removes the
+  // scrollMargin error that would otherwise offset every window by ~46px.
+  const [scrollMargin, setScrollMargin] = useState(0);
+  useLayoutEffect(() => {
+    if (!virtualization) return;
+    const scrollEl = scrollElementRef?.current ?? scrollRef.current;
+    const body = scrollEl?.querySelector('[data-slot="table-body"]');
+    if (!scrollEl || !body) return;
+    setScrollMargin(
+      body.getBoundingClientRect().top -
+        scrollEl.getBoundingClientRect().top +
+        scrollEl.scrollTop,
+    );
+  }, [virtualization, scrollElementRef, rows.length]);
+
+  const virtualizer = useVirtualizer({
+    count: virtualization ? rows.length : 0,
+    estimateSize: () => rowHeight,
+    overscan,
+    getScrollElement: () => scrollElementRef?.current ?? scrollRef.current,
+    scrollMargin,
+  });
+
+  const renderRow = (row: (typeof rows)[number], rowIdx: number) => {
+    const rowKey = keyExtractor ? keyExtractor(row.original, rowIdx) : row.id;
+
+    return (
+      <TableRow key={rowKey} data-state={row.getIsSelected() && 'selected'}>
+        {row.getVisibleCells().map((cell) => {
+          const meta = cell.column.columnDef.meta as { className?: string } | undefined;
+          return (
+            <TableCell key={cell.id} className={meta?.className}>
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </TableCell>
+          );
+        })}
+      </TableRow>
+    );
+  };
+
+  const colSpan = activeTable.getAllColumns().length || 1;
+
+  const virtualItems = virtualization ? virtualizer.getVirtualItems() : [];
+  // `getVirtualItems` positions are relative to the scroll element and already
+  // include `scrollMargin`; the gaps are what remains of the total column
+  // above the first rendered row and below the last.
+  const firstItem = virtualItems[0];
+  const lastItem = virtualItems[virtualItems.length - 1];
+  const topGap = virtualization && firstItem ? firstItem.start - scrollMargin : 0;
+  const bottomGap =
+    virtualization && lastItem
+      ? virtualizer.getTotalSize() - lastItem.end
+      : 0;
+
+  const table = (
+    <Table
+      className={className}
+      containerClassName={
+        virtualization && !scrollElementRef
+          ? cn(containerClassName, 'border-0 overflow-x-visible')
+          : containerClassName
+      }
+    >
       <TableHeader>
         {activeTable.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
@@ -179,39 +311,54 @@ export function DataTable<T>({
         ))}
       </TableHeader>
       <TableBody>
-        {activeTable.getRowModel().rows.length === 0 ? (
+        {rows.length === 0 ? (
           <TableRow>
             <TableCell
-              colSpan={activeTable.getAllColumns().length || 1}
+              colSpan={colSpan}
               className="px-4 py-8 text-center text-content-muted font-mono"
             >
               &gt; {emptyText}
             </TableCell>
           </TableRow>
+        ) : virtualization ? (
+          <>
+            {topGap > 0 && <SpacerRow height={topGap} colSpan={colSpan} />}
+            {virtualItems.map((item) => renderRow(rows[item.index], item.index))}
+            {bottomGap > 0 && <SpacerRow height={bottomGap} colSpan={colSpan} />}
+          </>
         ) : (
-          activeTable.getRowModel().rows.map((row, rowIdx) => {
-            const rowKey = keyExtractor
-              ? keyExtractor(row.original, rowIdx)
-              : row.id;
-
-            return (
-              <TableRow key={rowKey} data-state={row.getIsSelected() && 'selected'}>
-                {row.getVisibleCells().map((cell) => {
-                  const meta = cell.column.columnDef.meta as { className?: string } | undefined;
-                  return (
-                    <TableCell key={cell.id} className={meta?.className}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            );
-          })
+          rows.map((row, rowIdx) => renderRow(row, rowIdx))
         )}
       </TableBody>
     </Table>
+  );
+
+  if (!virtualization || scrollElementRef) return table;
+
+  return (
+    <div
+      ref={scrollRef}
+      data-slot="table-virtual-scroll"
+      tabIndex={0}
+      role="region"
+      aria-label="Table contents"
+      className="relative w-full overflow-y-auto"
+      style={scrollBoxStyle(height)}
+    >
+      {table}
+    </div>
+  );
+}
+
+/**
+ * Splits the difference between a windowed tbody and the table's own grid:
+ * the row contributes height, contributes nothing to column sizing, and is
+ * hidden from assistive tech because the rows it stands in for are absent.
+ */
+function SpacerRow({ height, colSpan }: { height: number; colSpan: number }) {
+  return (
+    <tr aria-hidden="true">
+      <td aria-hidden="true" colSpan={colSpan} style={spacerStyle(height)} />
+    </tr>
   );
 }
