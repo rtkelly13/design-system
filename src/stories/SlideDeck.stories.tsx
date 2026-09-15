@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { SlideDeck } from '../components/slides/SlideDeck';
+import { formatForDisplay } from '@tanstack/react-hotkeys';
+import { SlideDeck, SLIDE_DECK_HOTKEYS } from '../components/slides/SlideDeck';
 import { Slide } from '../components/slides/Slide';
 import { TLDR } from '../components/TLDR';
 import { Badge } from '../components/Badge';
@@ -121,5 +122,33 @@ export const WithSpeakerNotes: Story = {
         <p>No notes on this one — the panel says so rather than disappearing.</p>
       </Slide>
     </SlideDeck>
+  ),
+};
+
+/**
+ * The keys the deck actually binds, rendered from `SLIDE_DECK_HOTKEYS` —
+ * the same array the deck registers through `useHotkeys` at mount. A binding
+ * changed in one is a binding changed in the other, because there is one.
+ */
+export const KeyboardCheatsheet: Story = {
+  render: () => (
+    <div className="w-full max-w-2xl">
+      <SlideDeck>
+        <Slide title="ARROW KEYS PAGE THIS DECK">
+          <p>The legend below is generated from the deck&apos;s own binding table.</p>
+        </Slide>
+        <Slide title="THE SECOND SLIDE">
+          <p>Wraps at both ends, like always.</p>
+        </Slide>
+      </SlideDeck>
+      <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 border-2 border-edge-strong bg-surface-base p-4 font-mono text-sm">
+        {SLIDE_DECK_HOTKEYS.map((binding) => (
+          <React.Fragment key={binding.label}>
+            <dt className="text-accent-primary">{formatForDisplay(binding.hotkey)}</dt>
+            <dd className="text-content-muted">{binding.description}</dd>
+          </React.Fragment>
+        ))}
+      </dl>
+    </div>
   ),
 };
