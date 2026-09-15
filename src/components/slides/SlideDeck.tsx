@@ -200,7 +200,7 @@ export const SlideDeck: React.FC<SlideDeckProps> = ({
         enabled: chrome && (binding.requires !== 'notes' || deckHasNotes),
         preventDefault: binding.preventsDefault !== false,
         stopPropagation: false,
-        conflictBehavior: 'allow' as const,
+        conflictBehavior: 'allow',
         meta: { name: binding.label, description: binding.description },
       },
     })),
