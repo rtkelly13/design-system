@@ -81,6 +81,32 @@ const WORKFLOWS = workflowFiles();
  * ------------------------------------------------------------------ */
 
 const SHA = /^[0-9a-f]{40}$/;
+/**
+ * Pinned third-party action SHAs.
+ * owner/repo -> expected 40-character commit SHA.
+ */
+const PINNED_ACTIONS = new Map([
+  ['amannn/action-semantic-pull-request', '0723387faaf9b38adef4775cd42cfd5155ed6017'],
+]);
+
+/**
+ * Known job names in CI workflows conforming to the shared governance lexicon.
+ */
+const JOB_LEXICON = new Set([
+  'backup',
+  'gates',
+  'unit',
+  'visual',
+  'verify',
+  'drift',
+  'publish-dev',
+  'build-and-publish',
+  'walkthrough',
+  'update-snapshots',
+  'semantic-pr',
+  'semantic_pr',
+]);
+
 /** owner/repo -> the one SHA this repo pins it to. Split-brain is a finding. */
 const pinnedTo = new Map();
 
@@ -127,6 +153,13 @@ for (const file of WORKFLOWS) {
       );
     } else if (!already) {
       pinnedTo.set(action, { ref, comment, at });
+    }
+
+    const expectedSha = PINNED_ACTIONS.get(action);
+    if (expectedSha && ref !== expectedSha) {
+      problems.push(
+        `${at}: \`${action}\` is pinned to ${ref} (${comment}), but PINNED_ACTIONS expects ${expectedSha}.`,
+      );
     }
     note('pins', true, `${at} — ${action}@${ref.slice(0, 7)} (${comment})`);
   });
