@@ -82,7 +82,39 @@ const MANIFEST = {
   },
   '@base-ui/react': {
     kind: 'runtime',
-    why: 'The primitive layer \u2014 the one permitted focus-management implementation, per rule 4 in AGENTS.md. Chosen over Radix on maintenance rather than API; the measured comparison is docs/radix-vs-base-ui.md and the staged adoption is issue #105. Runtime rather than peer because a consumer should get working components without opting in, matching lucide-react. Brings 9 packages, all MIT (verified at 1.8.0, not just the 1.7.0 the evaluation measured).',
+    why: 'The primitive layer — the one permitted focus-management implementation, per rule 4 in AGENTS.md. Chosen over Radix on maintenance rather than API; the measured comparison is docs/radix-vs-base-ui.md and the staged adoption is issue #105. Runtime rather than peer because a consumer should get working components without opting in, matching lucide-react. Brings 9 packages, all MIT (verified at 1.8.0, not just the 1.7.0 the evaluation measured).',
+  },
+  '@visx/axis': {
+    kind: 'runtime',
+    why: 'Rendering-only SVG axis geometry for composed brutalist charts (AxisBottom, AxisLeft). It owns no focus, popup, keyboard, or application interaction; see ADR 0005.',
+  },
+  '@visx/grid': {
+    kind: 'runtime',
+    why: 'Rendering-only SVG grid geometry (GridRows, GridColumns) for composed brutalist charts; no interaction primitives. See ADR 0005.',
+  },
+  '@visx/group': {
+    kind: 'runtime',
+    why: 'Rendering-only SVG transform grouping (<Group>) used across chart primitives; no interaction primitives. See ADR 0005.',
+  },
+  '@visx/responsive': {
+    kind: 'runtime',
+    why: 'Fluid responsive sizing (<ParentSize>) for composed chart layout adaptation; no focus or interaction model. See ADR 0005.',
+  },
+  '@visx/scale': {
+    kind: 'runtime',
+    why: 'D3-backed coordinate projection (scaleBand, scaleLinear) mapping domains to SVG pixels; rendering math only. See ADR 0005.',
+  },
+  '@visx/shape': {
+    kind: 'runtime',
+    why: 'Rendering-only SVG element geometry (Bar, LinePath, AreaClosed) for brutalist chart shapes; no focus, popup, or application interaction. See ADR 0005.',
+  },
+  '@visx/tooltip': {
+    kind: 'runtime',
+    why: 'Coordinate-aware tooltip positioning (useTooltip, TooltipWithBounds) without focus or popup management; ChartTooltip supplies the Card presentation. See ADR 0005.',
+  },
+  '@microcharts/react': {
+    kind: 'runtime',
+    why: 'Rendering-only SVG micro-chart geometry for fixed-size, word-sized KPI indicators such as BulletChart. It owns chart labels but no focus, popup, keyboard, or application interaction; see ADR 0005.',
   },
 
   react: {
