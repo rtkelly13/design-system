@@ -249,6 +249,17 @@ const UNGATED = {
     'always red, and a gate that is always red gets deleted.',
 };
 
+/**
+ * Infrastructure and security guards that run in CI before design system gates.
+ * They enforce cold-build / protocol safety rather than design system properties,
+ * so they are exempt from the design system gate rosters in documentation.
+ */
+const INFRA_GUARDS = {
+  'check:lockfile':
+    'Fast install-free lockfile protocol guard to prevent cold build failures. ' +
+    'Runs after setup as infrastructure protection rather than a design system gate.',
+};
+
 /** A gate is a script that decides something. `:list`/`:report` only print. */
 const isGate = (name) =>
   (name.startsWith('check:') || name.endsWith(':check')) &&
@@ -279,6 +290,15 @@ for (const [name, why] of Object.entries(UNGATED)) {
     problems.push(`UNGATED names \`${script}\`, which is not a package.json script. Remove the entry.`);
   } else if (runsAnywhere.has(script) && script === name) {
     problems.push(`UNGATED says \`${script}\` is unenforced (${why}), but a workflow runs it. Remove the entry.`);
+  }
+}
+
+for (const [name, why] of Object.entries(INFRA_GUARDS)) {
+  const script = name.split(' ')[0];
+  if (!scripts.includes(script)) {
+    problems.push(`INFRA_GUARDS names \`${script}\`, which is not a package.json script. Remove the entry.`);
+  } else if (!runsInCi.has(script)) {
+    problems.push(`INFRA_GUARDS says \`${script}\` runs in CI (${why}), but ci.yml does not run it. Remove the entry.`);
   }
 }
 
@@ -316,7 +336,7 @@ for (const [job, ran] of ciJobs) {
     );
     continue;
   }
-  const missing = ran.filter((s) => !stated.includes(s));
+  const missing = ran.filter((s) => !stated.includes(s) && !(s in INFRA_GUARDS));
   const phantom = stated.filter((s) => !ran.includes(s) && scripts.includes(s));
   if (missing.length) {
     problems.push(
@@ -350,7 +370,7 @@ const rule6 = (() => {
 if (rule6 === null) {
   problems.push(`docs/workflow.md has no rule 6 "Required Checks" — the roster this gate reads.`);
 } else {
-  const missing = [...runsInCi].filter((s) => !rule6.includes(s));
+  const missing = [...runsInCi].filter((s) => !rule6.includes(s) && !(s in INFRA_GUARDS));
   if (missing.length) {
     problems.push(
       `docs/workflow.md rule 6 lists what "all runs on every PR" and omits ` +
