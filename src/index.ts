@@ -24,6 +24,7 @@ export type { AnsiSlot, AnsiScheme, AnsiChrome } from './theme/ansi';
 
 // Semantic theming — prefer these over the raw palette in `tokens`.
 export * from './lib/theme';
+export * from './theme/recommended';
 // Only `cn` is public. `recipe`'s type comes from the library that implements
 // it, so exporting it would put that library back into the published .d.ts and
 // make replacing it a breaking change. Components import it directly.

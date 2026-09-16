@@ -39,6 +39,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const COMPONENTS = path.join(ROOT, 'src/components');
@@ -60,7 +61,7 @@ const BUDGET = {
   ref: 35,
   displayName: 0,
   recipe: 11,
-  spread: 24,
+  spread: 23,
 };
 
 const CLAUSE = {
@@ -113,24 +114,77 @@ for (const file of files().sort()) {
    */
   if (!existsSync(file.replace(/\.tsx$/, '.test.tsx'))) bare.untested.push(rel);
 
-  for (const _ of source.matchAll(/style=\{\{/g)) bare.inlineStyle.push(rel);
+  const sf = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
 
-  if (!source.includes('forwardRef')) bare.ref.push(rel);
+  let forwardRefCall = null;
+  let hasDisplayName = false;
+  let importsRecipe = false;
+  let hasSpreadProps = false;
+
+  function visit(node) {
+    if (ts.isJsxAttribute(node) && node.name.text === 'style') {
+      if (
+        node.initializer &&
+        ts.isJsxExpression(node.initializer) &&
+        node.initializer.expression &&
+        ts.isObjectLiteralExpression(node.initializer.expression)
+      ) {
+        bare.inlineStyle.push(rel);
+      }
+    }
+
+    if (ts.isCallExpression(node)) {
+      const expr = node.expression;
+      if (
+        (ts.isIdentifier(expr) && expr.text === 'forwardRef') ||
+        (ts.isPropertyAccessExpression(expr) && expr.name.text === 'forwardRef')
+      ) {
+        forwardRefCall = node;
+      }
+    }
+
+    if (
+      ts.isBinaryExpression(node) &&
+      ts.isPropertyAccessExpression(node.left) &&
+      node.left.name.text === 'displayName'
+    ) {
+      hasDisplayName = true;
+    }
+
+    if (ts.isImportDeclaration(node)) {
+      if (ts.isStringLiteral(node.moduleSpecifier) && node.moduleSpecifier.text.includes('lib/recipe')) {
+        importsRecipe = true;
+      }
+    }
+
+    if (ts.isJsxSpreadAttribute(node)) {
+      if (/(?:props|rest)/i.test(node.expression.getText(sf))) {
+        hasSpreadProps = true;
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  }
+  visit(sf);
+
+  if (!forwardRefCall) bare.ref.push(rel);
+
   /*
    * Only meaningful where a ref is forwarded, and a *named* function expression
    * already supplies it — `forwardRef(function Swatch(...))` gives React the
    * name, so requiring a separate `displayName` there would be ceremony. An
    * arrow function passed to `forwardRef` is the case that needs one.
    */
-  if (
-    source.includes('forwardRef') &&
-    !source.includes('displayName') &&
-    !/forwardRef<[^>]*>\(\s*function\s+\w/.test(source)
-  ) {
-    bare.displayName.push(rel);
+  if (forwardRefCall) {
+    const firstArg = forwardRefCall.arguments[0];
+    const hasNamedFunction = firstArg && ts.isFunctionExpression(firstArg) && Boolean(firstArg.name);
+    if (!hasDisplayName && !hasNamedFunction) {
+      bare.displayName.push(rel);
+    }
   }
-  if (!source.includes('lib/recipe')) bare.recipe.push(rel);
-  if (!/\{\.\.\.(props|rest)\}/.test(source)) bare.spread.push(rel);
+
+  if (!importsRecipe) bare.recipe.push(rel);
+  if (!hasSpreadProps) bare.spread.push(rel);
 }
 
 if (process.argv.includes('--list')) {
