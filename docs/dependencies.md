@@ -93,6 +93,14 @@ reach.
 
 ## 📌 Dependencies Held Back on Purpose
 
+### Chart rendering engines
+
+The chart layer deliberately has two rendering engines with non-overlapping jobs. `@visx/*`
+handles composed/responsive SVG geometry; `@microcharts/react` handles fixed-size, word-sized KPI
+indicators such as `BulletChart`. Neither is an interaction primitive: Base UI remains the only
+library that owns focus, popup, or keyboard behavior. See [ADR 0005](./adr/0005-chart-rendering-engines.md)
+before adding another chart engine or moving a component between them.
+
 Anything here is **pinned below latest for a reason**. Check this list before
 "just bumping it", and delete the row if you clear the blocker.
 
@@ -125,5 +133,4 @@ TS 7 does two things this repo cannot yet absorb:
 **Unblocked when** `rollup-plugin-dts` supports TS 7, or this package moves off
 `tsup` for bundling (`tsdown`, the rolldown-era successor, is the likely
 candidate). Because the blog consumes this package, move both repos together.
-
 

@@ -1,7 +1,9 @@
 import * as react from 'react';
-import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes, RefObject } from 'react';
+import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes, RefObject, SVGProps } from 'react';
 import { Table as Table$1, ColumnDef } from '@tanstack/react-table';
 import { RegisterableHotkey } from '@tanstack/react-hotkeys';
+export { ParentSize as ResponsiveChartContainer } from '@visx/responsive';
+export { useTooltip as useChartTooltip } from '@visx/tooltip';
 
 type Emphasis = 'primary' | 'secondary' | 'tertiary' | 'quiet';
 
@@ -709,6 +711,95 @@ interface GlyphProps extends HTMLAttributes<HTMLSpanElement> {
 
 declare function Glyph({ name, accent, size, bracketed, children, label, className, ...props }: GlyphProps): react.JSX.Element;
 
+interface BarChartDatum {
+    label: string;
+    value: number;
+    accent?: AccentToken;
+}
+interface BarChartProps extends Omit<SVGProps<SVGSVGElement>, 'data'> {
+
+    data: BarChartDatum[];
+
+    width?: number;
+
+    height?: number;
+
+    responsive?: boolean;
+
+    orientation?: 'vertical' | 'horizontal';
+
+    accent?: AccentToken;
+
+    showGrid?: boolean;
+
+    showValues?: boolean;
+
+    emptyMessage?: string;
+
+    ariaLabel?: string;
+
+    margin?: {
+        top: number;
+        right: number;
+        bottom: number;
+        left: number;
+    };
+
+    onBarClick?: (datum: BarChartDatum, index: number) => void;
+}
+
+declare const BarChart: react.ForwardRefExoticComponent<Omit<BarChartProps, "ref"> & react.RefAttributes<SVGSVGElement>>;
+
+interface SparklineProps extends Omit<SVGProps<SVGSVGElement>, 'data'> {
+
+    data: number[];
+
+    width?: number;
+
+    height?: number;
+
+    accent?: AccentToken;
+
+    showArea?: boolean;
+
+    ariaLabel?: string;
+}
+
+declare const Sparkline: react.ForwardRefExoticComponent<Omit<SparklineProps, "ref"> & react.RefAttributes<SVGSVGElement>>;
+
+interface ChartTooltipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+    title?: ReactNode;
+    accent?: AccentToken;
+    top?: number;
+    left?: number;
+    children: ReactNode;
+}
+
+declare const ChartTooltip: react.ForwardRefExoticComponent<ChartTooltipProps & react.RefAttributes<HTMLDivElement>>;
+
+interface BulletChartProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'color'> {
+
+    value: number;
+
+    target: number;
+
+    bands?: number[];
+
+    accent?: AccentToken;
+
+    width?: number;
+
+    height?: number;
+
+    title?: string;
+
+    summary?: string;
+
+    label?: 'none' | 'value' | 'both';
+}
+
+declare const BulletChart: react.ForwardRefExoticComponent<BulletChartProps & react.RefAttributes<HTMLDivElement>>;
+
 interface SlideProps {
     title?: string;
     subtitle?: string;
@@ -1110,6 +1201,9 @@ export {
   type AvatarProps,
   Badge,
   type BadgeProps,
+  BarChart,
+  type BarChartDatum,
+  type BarChartProps,
   BlogPost,
   type BlogPostProps,
   type BorderTone,
@@ -1118,6 +1212,8 @@ export {
   Breadcrumbs,
   type BreadcrumbsProps,
   type BrutalistTheme,
+  BulletChart,
+  type BulletChartProps,
   Button,
   type ButtonElementProps,
   type ButtonLinkProps,
@@ -1127,6 +1223,8 @@ export {
   Card,
   type CardProps,
   type CardVariant,
+  ChartTooltip,
+  type ChartTooltipProps,
   type ClassInput,
   CodeBlock,
   CodeBlockAttachment,
@@ -1235,6 +1333,8 @@ export {
   type SlideDeckProps,
   type SlideProps,
   Slugger,
+  Sparkline,
+  type SparklineProps,
   StatCard,
   type StatCardAccent,
   type StatCardProps,

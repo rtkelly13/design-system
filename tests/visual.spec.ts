@@ -111,6 +111,7 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-barchart--vertical', snapshot: 'barchart-vertical.png' },
   { id: 'foundations-sparkline--primary-trend', snapshot: 'sparkline-primary-trend.png' },
   { id: 'foundations-bulletchart--primary-benchmark', snapshot: 'bulletchart-primary-benchmark.png' },
+  { id: 'foundations-charttooltip--primary', snapshot: 'charttooltip-primary.png' },
 ];
 
 /**

@@ -1,8 +1,8 @@
 import { TooltipWithBounds, useTooltip } from '@visx/tooltip';
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
-import { accentHoverEdgeClass } from '../lib/accentClasses';
 import { cn } from '../lib/recipe';
 import type { AccentToken } from '../lib/theme';
+import { Card } from './Card';
 
 export { useTooltip as useChartTooltip };
 
@@ -29,24 +29,26 @@ export const ChartTooltip = forwardRef<HTMLDivElement, ChartTooltipProps>(
       <div
         ref={ref}
         data-slot="chart-tooltip"
-        className={cn(
-          'pointer-events-none z-50 min-w-32 border-2 border-edge-strong bg-surface-raised p-2.5 font-mono text-xs shadow-hard-sm',
-          accentHoverEdgeClass(accent),
-          className,
-        )}
+        className={cn('pointer-events-none', className)}
         {...props}
       >
-        {title && (
-          <div
-            data-slot="chart-tooltip-title"
-            className="mb-1 border-b border-edge-subtle pb-1 font-bold uppercase tracking-wider text-content-muted"
-          >
-            [ {title} ]
+        <Card
+          variant="panel"
+          accent={accent}
+          className={cn('min-w-32 p-2.5 font-mono text-xs shadow-hard-sm', className)}
+        >
+          {title && (
+            <div
+              data-slot="chart-tooltip-title"
+              className="mb-1 border-b border-edge-subtle pb-1 font-bold uppercase tracking-wider text-content-muted"
+            >
+              [ {title} ]
+            </div>
+          )}
+          <div data-slot="chart-tooltip-body" className="space-y-0.5 text-content-primary">
+            {children}
           </div>
-        )}
-        <div data-slot="chart-tooltip-body" className="space-y-0.5 text-content-primary">
-          {children}
-        </div>
+        </Card>
       </div>
     );
 

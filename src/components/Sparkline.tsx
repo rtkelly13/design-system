@@ -1,6 +1,6 @@
 import { AreaClosed, LinePath } from '@visx/shape';
 import { scaleLinear } from '@visx/scale';
-import { forwardRef, useId, type SVGProps } from 'react';
+import { forwardRef, type SVGProps } from 'react';
 import { cn } from '../lib/recipe';
 import { type AccentToken, accentVar } from '../lib/theme';
 
@@ -39,7 +39,6 @@ export const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(function Spar
   },
   ref,
 ) {
-  const gradientId = useId();
   const strokeColor = accentVar(accent);
 
   if (!data || data.length === 0) {
@@ -94,20 +93,14 @@ export const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(function Spar
       className={cn('inline-block overflow-visible', className)}
       {...props}
     >
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={strokeColor} stopOpacity={0.25} />
-          <stop offset="100%" stopColor={strokeColor} stopOpacity={0.02} />
-        </linearGradient>
-      </defs>
-
       {showArea && data.length > 1 && (
         <AreaClosed
           data={data}
           x={(_, i) => xScale(i) ?? 0}
           y={(d) => yScale(d) ?? 0}
           yScale={yScale}
-          fill={`url(#${gradientId})`}
+          fill={strokeColor}
+          fillOpacity={0.12}
         />
       )}
 

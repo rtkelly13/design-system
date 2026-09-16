@@ -52,18 +52,18 @@ cost real time:
    `text-intent-danger`, not `cyan`. See
    [`docs/adr/0001-hues-declared-below-roles.md`](./docs/adr/0001-hues-declared-below-roles.md)
    for why a hue layer exists anyway, and why components still may not touch it.
-4. **There is exactly one primitive library, and it is `@base-ui/react`.** Adopt no second one —
-   two focus-management implementations in one tree is worse than either alone, and this rule is
-   what bounds the churn the choice accepts. A component that needs a primitive reaches for Base
-   UI or hand-rolls it; it never brings in a package that carries its own. That bars `radix-ui`
-   and anything depending on it, which includes `cmdk` (16 `@radix-ui/*` packages transitively).
-   The stated exceptions are TanStack's headless engines — `@tanstack/react-table`,
-   `@tanstack/react-virtual` (#204) and `@tanstack/react-hotkeys` (#205). They are not
-   counter-examples: each is a state engine with no DOM, no focus model and no ARIA, which is why
-   `DataTable` writes its own semantics and `SlideDeck` owns its keystrokes' consequences. That
-   triple is the test; an engine fails it the moment it renders or focuses anything, and each
-   entry says its piece in the MANIFEST at `scripts/check-deps.mjs`. Measured comparison in
-   [`docs/radix-vs-base-ui.md`](./docs/radix-vs-base-ui.md).
+4. **There is exactly one interaction-primitive library, and it is `@base-ui/react`.** Adopt no
+   second focus, popup, or keyboard-management library — two focus-management implementations in
+   one tree is worse than either alone, and this rule bounds the churn the choice accepts. A
+   component that needs interaction primitives reaches for Base UI or hand-rolls them; it never
+   brings in a package that carries its own focus model. That bars `radix-ui` and anything
+   depending on it, which includes `cmdk` (16 `@radix-ui/*` packages transitively).
+   Headless state engines (`@tanstack/react-table`, `@tanstack/react-virtual`) and rendering-only
+   chart engines (`@visx/*`, `@microcharts/react`) are separate concerns: they may compute or emit
+   chart geometry, but they must not own focus, popups, keyboard handling, or chart interactions.
+   Components own the accessible wrapper and interaction contract. The chart boundary and package
+   rationale live in [`docs/adr/0005-chart-rendering-engines.md`](./adr/0005-chart-rendering-engines.md).
+   Measured comparison of the interaction layer remains in [`docs/radix-vs-base-ui.md`](./radix-vs-base-ui.md).
 
 ## Where things are written down
 

@@ -86,35 +86,35 @@ const MANIFEST = {
   },
   '@visx/axis': {
     kind: 'runtime',
-    why: 'SVG axis renderer for brutalist charts (AxisBottom, AxisLeft). Unopinionated SVG geometry with zero DOM focus runtimes, respecting Rule 4.',
+    why: 'Rendering-only SVG axis geometry for composed brutalist charts (AxisBottom, AxisLeft). It owns no focus, popup, keyboard, or application interaction; see ADR 0005.',
   },
   '@visx/grid': {
     kind: 'runtime',
-    why: 'SVG grid lines (GridRows, GridColumns) for brutalist chart grids.',
+    why: 'Rendering-only SVG grid geometry (GridRows, GridColumns) for composed brutalist charts; no interaction primitives. See ADR 0005.',
   },
   '@visx/group': {
     kind: 'runtime',
-    why: 'SVG transform group container (<Group>) used across chart primitives.',
+    why: 'Rendering-only SVG transform grouping (<Group>) used across chart primitives; no interaction primitives. See ADR 0005.',
   },
   '@visx/responsive': {
     kind: 'runtime',
-    why: 'Fluid responsive sizing (<ParentSize>) for chart layout adaptation.',
+    why: 'Fluid responsive sizing (<ParentSize>) for composed chart layout adaptation; no focus or interaction model. See ADR 0005.',
   },
   '@visx/scale': {
     kind: 'runtime',
-    why: 'D3-backed coordinate projection (scaleBand, scaleLinear) mapping domains to SVG pixels.',
+    why: 'D3-backed coordinate projection (scaleBand, scaleLinear) mapping domains to SVG pixels; rendering math only. See ADR 0005.',
   },
   '@visx/shape': {
     kind: 'runtime',
-    why: 'SVG element geometry generators (Bar, LinePath, AreaClosed) for brutalist chart shapes.',
+    why: 'Rendering-only SVG element geometry (Bar, LinePath, AreaClosed) for brutalist chart shapes; no focus, popup, or application interaction. See ADR 0005.',
   },
   '@visx/tooltip': {
     kind: 'runtime',
-    why: 'Headless coordinate-aware tooltip state (useTooltip, TooltipWithBounds) without markup opinions, enabling tooltips to render through Card.',
+    why: 'Coordinate-aware tooltip positioning (useTooltip, TooltipWithBounds) without focus or popup management; ChartTooltip supplies the Card presentation. See ADR 0005.',
   },
   '@microcharts/react': {
     kind: 'runtime',
-    why: 'Zero-dependency micro-chart primitives (106 chart types) for inline data density, table cells, KPI indicators, and LLM-streamed content. Server-component safe with accessible descriptions.',
+    why: 'Rendering-only SVG micro-chart geometry for fixed-size, word-sized KPI indicators such as BulletChart. It owns chart labels but no focus, popup, keyboard, or application interaction; see ADR 0005.',
   },
 
   react: {

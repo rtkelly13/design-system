@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BarChart, type BarChartDatum } from '../components/BarChart';
+import { ThemeProvider } from '../components/ThemeProvider';
 
 const SAMPLE_DATA: BarChartDatum[] = [
   { label: 'HTTP 200', value: 3420, accent: 'success' },
@@ -44,5 +45,20 @@ export const EmptyState: Story = {
     width: 540,
     height: 200,
     emptyMessage: 'NO METRICS RECORDED',
+  },
+};
+
+export const SketchTheme: Story = {
+  render: (args) => (
+    <ThemeProvider defaultLevel="sketch" scoped persist={false} followSystem={false}>
+      <BarChart {...args} />
+    </ThemeProvider>
+  ),
+  args: {
+    data: SAMPLE_DATA,
+    width: 540,
+    height: 280,
+    orientation: 'vertical',
+    accent: 'primary',
   },
 };

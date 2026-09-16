@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Sparkline } from '../components/Sparkline';
+import { ThemeProvider } from '../components/ThemeProvider';
 
 const meta: Meta<typeof Sparkline> = {
   title: 'Foundations/Sparkline',
@@ -45,5 +46,20 @@ export const Empty: Story = {
     data: [],
     width: 140,
     height: 36,
+  },
+};
+
+export const SketchTheme: Story = {
+  render: (args) => (
+    <ThemeProvider defaultLevel="sketch" scoped persist={false} followSystem={false}>
+      <Sparkline {...args} />
+    </ThemeProvider>
+  ),
+  args: {
+    data: [12, 19, 14, 25, 22, 30, 28, 42],
+    width: 140,
+    height: 36,
+    accent: 'primary',
+    showArea: true,
   },
 };
