@@ -29,7 +29,7 @@ export const ChartTooltip = forwardRef<HTMLDivElement, ChartTooltipProps>(
       <div
         ref={ref}
         data-slot="chart-tooltip"
-        className={cn('pointer-events-none', className)}
+        className={cn('pointer-events-none inline-block align-top', className)}
         {...props}
       >
         <Card
