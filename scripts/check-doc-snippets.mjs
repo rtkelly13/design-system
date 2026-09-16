@@ -30,6 +30,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = ['README.md', 'DESIGN.md', 'AGENTS.md', 'CONTEXT.md'];
@@ -49,65 +50,144 @@ const LEVELS = [
  * already gated by `check:api`, and reading it means this check cannot disagree
  * with that one.
  */
-/**
- * Follow a `*Props` name to its members, through type aliases.
- *
- * `ButtonElementProps` is `ButtonOwnProps & DetailedHTMLProps<...>`, so the
- * interface map alone has nothing under that name. One hop resolves it; the
- * `seen` set stops a self-referential alias spinning.
- */
-function resolve(name, byInterface, seen) {
-  if (seen.has(name)) return [];
-  seen.add(name);
-
-  /*
-   * Both paths, unioned — not the first that matches.
-   *
-   * `type ButtonElementProps = ButtonOwnProps & DetailedHTMLProps<...> & { href?:
-   * never }` lands in the interface map as `['href']`, because the members regex
-   * happily reads that trailing inline object. Returning there would report
-   * `href` as Button's entire surface and `variant` as nonexistent — which is
-   * exactly what this gate then reported against a README that was correct.
-   */
-  const direct = byInterface.get(name) ?? [];
-  const alias = API.match(new RegExp(`type ${name}\\b[^=]*=([^;]*)`));
-  const viaAlias = alias
-    ? [...new Set([...alias[1].matchAll(/(\w+Props)\b/g)].map((m) => m[1]))].flatMap((n) =>
-        resolve(n, byInterface, seen),
-      )
-    : [];
-  return [...new Set([...direct, ...viaAlias])];
-}
-
 function declaredProps() {
-  const byInterface = new Map();
-  for (const m of API.matchAll(/(?:interface|type) (\w*Props)\b[^{]*\{([\s\S]*?)\n\}/g)) {
-    const props = [...m[2].matchAll(/^\s{4}(\w+)\??:/gm)].map((p) => p[1]);
-    byInterface.set(m[1], props);
+  const sourceFile = ts.createSourceFile('api/index.d.ts', API, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+
+  const interfaces = new Map();
+  const typeAliases = new Map();
+
+  ts.forEachChild(sourceFile, (node) => {
+    if (ts.isInterfaceDeclaration(node)) {
+      interfaces.set(node.name.text, node);
+    } else if (ts.isTypeAliasDeclaration(node)) {
+      typeAliases.set(node.name.text, node);
+    }
+  });
+
+  function getPropertyName(nameNode) {
+    if (ts.isIdentifier(nameNode) || ts.isStringLiteral(nameNode)) {
+      return nameNode.text;
+    }
+    return nameNode.getText(sourceFile);
   }
-  /*
-   * `declare function Foo(props: FooProps)`, `const Foo: FC<FooProps>`, and —
-   * once a component forwards its ref — `const Foo:
-   * ForwardRefExoticComponent<(Omit<AProps,"ref"> | Omit<BProps,"ref">) &
-   * RefAttributes<...>>`.
-   *
-   * So take *every* `*Props` named in the declaration and union their members,
-   * rather than the first one. `Button` is the case that forced this: its props
-   * are a union of two interfaces, and reading only the first reported that
-   * `variant` did not exist — which this gate then correctly flagged against a
-   * README that was right all along.
-   */
+
+  function resolveTypeName(name, seen = new Set()) {
+    if (seen.has(name)) return [];
+    seen.add(name);
+
+    const props = [];
+    if (interfaces.has(name)) {
+      const iface = interfaces.get(name);
+      for (const member of iface.members) {
+        if (ts.isPropertySignature(member)) {
+          props.push(getPropertyName(member.name));
+        }
+      }
+      if (iface.heritageClauses) {
+        for (const hc of iface.heritageClauses) {
+          for (const t of hc.types) {
+            props.push(...extractPropsFromTypeNode(t, seen));
+          }
+        }
+      }
+    }
+
+    if (typeAliases.has(name)) {
+      const alias = typeAliases.get(name);
+      props.push(...extractPropsFromTypeNode(alias.type, seen));
+    }
+
+    return [...new Set(props)];
+  }
+
+  function extractPropsFromTypeNode(typeNode, seen = new Set()) {
+    if (!typeNode) return [];
+
+    if (ts.isTypeLiteralNode(typeNode)) {
+      const props = [];
+      for (const member of typeNode.members) {
+        if (ts.isPropertySignature(member)) {
+          props.push(getPropertyName(member.name));
+        }
+      }
+      return props;
+    }
+
+    if (ts.isIntersectionTypeNode(typeNode) || ts.isUnionTypeNode(typeNode)) {
+      return typeNode.types.flatMap((t) => extractPropsFromTypeNode(t, seen));
+    }
+
+    if (ts.isParenthesizedTypeNode(typeNode)) {
+      return extractPropsFromTypeNode(typeNode.type, seen);
+    }
+
+    if (ts.isTypeReferenceNode(typeNode)) {
+      const typeName = ts.isIdentifier(typeNode.typeName)
+        ? typeNode.typeName.text
+        : typeNode.typeName.right.text;
+
+      if (typeName === 'Omit' && typeNode.typeArguments?.[0]) {
+        return extractPropsFromTypeNode(typeNode.typeArguments[0], seen);
+      }
+      return resolveTypeName(typeName, seen);
+    }
+
+    if (ts.isExpressionWithTypeArguments(typeNode)) {
+      const exprName = ts.isIdentifier(typeNode.expression)
+        ? typeNode.expression.text
+        : typeNode.expression.getText(sourceFile);
+      if (exprName === 'Omit' && typeNode.typeArguments?.[0]) {
+        return extractPropsFromTypeNode(typeNode.typeArguments[0], seen);
+      }
+      return resolveTypeName(exprName, seen);
+    }
+
+    return [];
+  }
+
+  function findPropsTypeReferences(node) {
+    const refs = [];
+    function visit(n) {
+      if (ts.isTypeReferenceNode(n)) {
+        const text = n.typeName.getText(sourceFile);
+        if (text.endsWith('Props')) refs.push(text);
+      }
+      ts.forEachChild(n, visit);
+    }
+    visit(node);
+    return [...new Set(refs)];
+  }
+
   const byComponent = new Map();
-  for (const m of API.matchAll(/declare (?:function|const) (\w+)([^;\n]*)/g)) {
-    const [, comp, tail] = m;
-    const named = [...new Set([...tail.matchAll(/(\w+Props)\b/g)].map((x) => x[1]))];
-    const props = named.flatMap((n) => resolve(n, byInterface, new Set()));
-    if (props.length) byComponent.set(comp, [...new Set(props)]);
+
+  ts.forEachChild(sourceFile, (node) => {
+    if (ts.isFunctionDeclaration(node) && node.name && /^[A-Z]/.test(node.name.text)) {
+      const comp = node.name.text;
+      const propTypes = findPropsTypeReferences(node);
+      const props = propTypes.flatMap((t) => resolveTypeName(t, new Set()));
+      if (props.length) byComponent.set(comp, [...new Set(props)]);
+    } else if (ts.isVariableStatement(node)) {
+      for (const decl of node.declarationList.declarations) {
+        if (ts.isIdentifier(decl.name) && /^[A-Z]/.test(decl.name.text)) {
+          const comp = decl.name.text;
+          const propTypes = findPropsTypeReferences(decl);
+          const props = propTypes.flatMap((t) => resolveTypeName(t, new Set()));
+          if (props.length) byComponent.set(comp, [...new Set(props)]);
+        }
+      }
+    }
+  });
+
+  for (const name of [...interfaces.keys(), ...typeAliases.keys()]) {
+    if (name.endsWith('Props')) {
+      const comp = name.replace(/Props$/, '');
+      if (!byComponent.has(comp)) {
+        const props = resolveTypeName(name, new Set());
+        if (props.length) byComponent.set(comp, props);
+      }
+    }
   }
-  for (const [iface, props] of byInterface) {
-    const comp = iface.replace(/Props$/, '');
-    if (!byComponent.has(comp)) byComponent.set(comp, props);
-  }
+
   return byComponent;
 }
 

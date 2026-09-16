@@ -40,6 +40,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'src');
@@ -58,31 +59,11 @@ const REPLACEMENT = {
   pink: 'tertiary',
   green: 'success',
 };
+const HUES = new Set(Object.keys(REPLACEMENT));
+const TARGET_PROPS = new Set(['accent', 'variant', 'tone']);
 
-/** A hue name used as a prop value: accent="cyan", variant="pink", … */
-const PROP = /\b(accent|variant|tone)=(?:"|')(cyan|pink|yellow|green)(?:"|')/g;
-/** The same, in an object or array literal: accent: 'cyan', ['cyan', …] */
-const LITERAL = /(?:accent|variant|tone)\s*:\s*'(cyan|pink|yellow|green)'/g;
 /** A Tailwind utility naming the compat palette. */
 const UTILITY = /\b(?:bg|text|border|shadow)-brutalist-[a-zA-Z]+/g;
-/**
- * A hue name in a *comparison* rather than a value.
- *
- * Added because the first version of this gate missed one and the visual suite
- * caught it instead. `SaasLandingPage` had:
- *
- *     variant={tier.accent === 'pink' ? 'pink' : tier.accent === 'yellow' ? 'yellow' : 'cyan'}
- *
- * The prop-value patterns above match `variant="pink"`, so they rewrote every
- * declaration — and left the comparisons. Once `tier.accent` held `'tertiary'`,
- * both tests were false and all three pricing CTAs fell through to cyan. 26,980
- * pixels, and `check:tokens` reported zero sites while it happened.
- *
- * A gate that only sees one syntactic form of a thing gives a false all-clear
- * on the others, which is worse than not existing — it is the reason the
- * migration looked finished.
- */
-const COMPARISON = /===?\s*(?:"|')(cyan|pink|yellow|green)(?:"|')/g;
 
 /**
  * Files that define the deprecation rather than use it. `theme.ts` declares
@@ -112,33 +93,110 @@ for (const file of walk(SRC)) {
   if (/\.test\.tsx?$/.test(rel)) continue;
 
   const text = readFileSync(file, 'utf8');
-  // Blank out comments before matching.
-  //
-  // The first run of this checker flagged its own explanation: the JSDoc on
-  // `Avatar.accent` says `accent="cyan"` in order to describe what is
-  // deprecated, and the regex read that as a call site. Documenting a
-  // deprecation must not count as committing it — the same mistake, and the
-  // same fix, as `strip_code` in shared-utilities' AGENTS.md auditor, where a
-  // markdown link inside a code span was being read as a live pointer.
-  const stripped = text
-    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
-    .replace(/\/\/[^\n]*/g, (m) => ' '.repeat(m.length));
+  const sourceFile = ts.createSourceFile(
+    file,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+    file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
 
-  stripped.split('\n').forEach((line, i) => {
-    for (const re of [PROP, LITERAL, UTILITY, COMPARISON]) {
-      re.lastIndex = 0;
-      let m;
-      while ((m = re.exec(line)) !== null) {
-        const hue = m[2] ?? m[1];
+  function getLine(node) {
+    return sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+  }
+
+  function visit(node) {
+    // 1. JSX attribute: accent="cyan", variant="pink", tone="yellow"
+    if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && TARGET_PROPS.has(node.name.text)) {
+      let val = null;
+      if (node.initializer) {
+        if (ts.isStringLiteral(node.initializer)) {
+          val = node.initializer.text;
+        } else if (
+          ts.isJsxExpression(node.initializer) &&
+          node.initializer.expression &&
+          ts.isStringLiteral(node.initializer.expression)
+        ) {
+          val = node.initializer.expression.text;
+        }
+      }
+      if (val && HUES.has(val)) {
         sites.push({
           file: rel,
-          line: i + 1,
-          match: m[0].trim(),
-          fix: REPLACEMENT[hue] ? `use "${REPLACEMENT[hue]}"` : 'use a role token',
+          line: getLine(node),
+          match: node.getText(sourceFile).trim(),
+          fix: `use "${REPLACEMENT[val]}"`,
         });
       }
     }
-  });
+
+    // 2. Object literal property assignment: { accent: 'cyan', variant: 'pink' }
+    if (ts.isPropertyAssignment(node)) {
+      const propName =
+        ts.isIdentifier(node.name) || ts.isStringLiteral(node.name) ? node.name.text : null;
+      if (propName && TARGET_PROPS.has(propName)) {
+        if (ts.isStringLiteral(node.initializer) && HUES.has(node.initializer.text)) {
+          const val = node.initializer.text;
+          sites.push({
+            file: rel,
+            line: getLine(node),
+            match: node.getText(sourceFile).trim(),
+            fix: `use "${REPLACEMENT[val]}"`,
+          });
+        }
+      }
+    }
+
+    // 3. Binary comparison: tier.accent === 'pink', accent == 'cyan', etc.
+    if (ts.isBinaryExpression(node)) {
+      const op = node.operatorToken.kind;
+      if (
+        op === ts.SyntaxKind.EqualsEqualsToken ||
+        op === ts.SyntaxKind.EqualsEqualsEqualsToken ||
+        op === ts.SyntaxKind.ExclamationEqualsToken ||
+        op === ts.SyntaxKind.ExclamationEqualsEqualsToken
+      ) {
+        let hue = null;
+        if (ts.isStringLiteral(node.right) && HUES.has(node.right.text)) {
+          hue = node.right.text;
+        } else if (ts.isStringLiteral(node.left) && HUES.has(node.left.text)) {
+          hue = node.left.text;
+        }
+        if (hue) {
+          sites.push({
+            file: rel,
+            line: getLine(node),
+            match: node.getText(sourceFile).trim(),
+            fix: `use "${REPLACEMENT[hue]}"`,
+          });
+        }
+      }
+    }
+
+    // 4. Tailwind utility classes naming legacy hues: bg-brutalist-cyan, etc.
+    if (
+      ts.isStringLiteral(node) ||
+      ts.isNoSubstitutionTemplateLiteral(node) ||
+      ts.isTemplateHead(node) ||
+      ts.isTemplateMiddle(node) ||
+      ts.isTemplateTail(node)
+    ) {
+      UTILITY.lastIndex = 0;
+      let m;
+      while ((m = UTILITY.exec(node.text)) !== null) {
+        sites.push({
+          file: rel,
+          line: getLine(node),
+          match: m[0].trim(),
+          fix: 'use a role token',
+        });
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
 }
 
 if (process.argv.includes('--list')) {

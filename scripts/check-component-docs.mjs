@@ -34,6 +34,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import ts from 'typescript';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const COMPONENTS = path.join(ROOT, 'src/components');
@@ -60,8 +61,55 @@ function componentFiles(dir = COMPONENTS) {
   });
 }
 
-/** A JSDoc block immediately above an exported component declaration. */
-const DOCUMENTED = /\/\*\*[\s\S]*?\*\/\s*\n\s*export (?:function|const) [A-Z]/;
+function hasAttachedJSDoc(node, sourceFile) {
+  if (typeof ts.getJSDocCommentsAndTags === 'function') {
+    const comments = ts.getJSDocCommentsAndTags(node);
+    if (comments && comments.length > 0) return true;
+  }
+  const ranges = ts.getLeadingCommentRanges(sourceFile.text, node.pos);
+  if (ranges) {
+    for (const r of ranges) {
+      if (
+        r.kind === ts.SyntaxKind.MultiLineCommentTrivia &&
+        sourceFile.text.slice(r.pos, r.pos + 3) === '/**'
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function isComponentDocumented(file) {
+  const content = readFileSync(file, 'utf8');
+  const sourceFile = ts.createSourceFile(
+    file,
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  );
+
+  for (const node of sourceFile.statements) {
+    const isExported = (ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) !== 0;
+    if (!isExported) continue;
+
+    let isComponentDecl = false;
+    if (ts.isFunctionDeclaration(node) && node.name && /^[A-Z]/.test(node.name.text)) {
+      isComponentDecl = true;
+    } else if (ts.isVariableStatement(node)) {
+      isComponentDecl = node.declarationList.declarations.some(
+        (decl) => ts.isIdentifier(decl.name) && /^[A-Z]/.test(decl.name.text),
+      );
+    }
+
+    if (isComponentDecl && hasAttachedJSDoc(node, sourceFile)) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 const documented = [];
 const bare = [];
@@ -73,7 +121,7 @@ for (const file of componentFiles().sort()) {
     excluded.push(`${rel} — ${EXCLUDED[rel]}`);
     continue;
   }
-  (DOCUMENTED.test(readFileSync(file, 'utf8')) ? documented : bare).push(rel);
+  (isComponentDocumented(file) ? documented : bare).push(rel);
 }
 
 if (process.argv.includes('--list')) {
