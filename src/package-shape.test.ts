@@ -39,7 +39,11 @@ describe('published package shape', () => {
 
   it('every checked-in `files` entry exists', () => {
     // `dist` is generated after this suite runs; see the note above.
-    const checkedIn = pkg.files.filter((entry) => entry !== 'dist');
+    // Entries starting with `!` are npm *exclusion* globs — `intent`'s
+    // `edit-package-json` adds `!skills/_artifacts` to keep the working
+    // artifacts out of the tarball. They are instructions to the packer, not
+    // paths, so they are not checked in.
+    const checkedIn = pkg.files.filter((entry) => entry !== 'dist' && !entry.startsWith('!'));
     const missing = checkedIn.filter((entry) => !existsSync(path.join(ROOT, entry)));
 
     expect(missing).toEqual([]);
