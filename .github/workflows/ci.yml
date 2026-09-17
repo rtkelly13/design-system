@@ -85,7 +85,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          title: ${{ github.event.pull_request.title }}
           types: |
             feat
             fix
