@@ -2,21 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { LEVELS, THEME_LEVELS } from './levels';
 import {
   getRecommendedColours,
-  getRecommendedColors,
   isRecommendedColourClass,
-  isRecommendedColorClass,
   RECOMMENDED_COLOUR_CLASSES,
   RECOMMENDED_COLOUR_NAMESPACES,
   RECOMMENDED_COLOUR_ROLES,
   RECOMMENDED_COLOUR_VARS,
   RECOMMENDED_COLOURS,
-  RECOMMENDED_COLORS,
 } from './recommended';
 
 describe('recommended colours', () => {
   it('covers both theme levels', () => {
     expect(Object.keys(RECOMMENDED_COLOURS)).toEqual(['midnight', 'sketch']);
-    expect(RECOMMENDED_COLORS).toBe(RECOMMENDED_COLOURS);
   });
 
   it('matches the values declared in LEVELS', () => {
@@ -36,7 +32,6 @@ describe('recommended colours', () => {
     expect(getRecommendedColours('midnight')).toBe(RECOMMENDED_COLOURS.midnight);
     expect(getRecommendedColours('sketch')).toBe(RECOMMENDED_COLOURS.sketch);
     expect(getRecommendedColours()).toBe(RECOMMENDED_COLOURS.midnight);
-    expect(getRecommendedColors).toBe(getRecommendedColours);
   });
 
   it('exposes the 5 recommended namespaces and their roles', () => {
@@ -83,7 +78,5 @@ describe('recommended colours', () => {
     expect(isRecommendedColourClass('text-zinc-900')).toBe(false);
     expect(isRecommendedColourClass('bg-[#14142a]')).toBe(false);
     expect(isRecommendedColourClass('')).toBe(false);
-
-    expect(isRecommendedColorClass).toBe(isRecommendedColourClass);
   });
 });

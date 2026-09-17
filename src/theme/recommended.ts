@@ -29,8 +29,6 @@ export const RECOMMENDED_COLOUR_NAMESPACES = [
 ] as const;
 
 export type RecommendedColourNamespace = (typeof RECOMMENDED_COLOUR_NAMESPACES)[number];
-export const RECOMMENDED_COLOR_NAMESPACES = RECOMMENDED_COLOUR_NAMESPACES;
-export type RecommendedColorNamespace = RecommendedColourNamespace;
 
 /**
  * The roles defined in each recommended namespace.
@@ -43,8 +41,6 @@ export const RECOMMENDED_COLOUR_ROLES = {
   intent: ['info', 'success', 'warning', 'danger'],
 } as const;
 
-export const RECOMMENDED_COLOR_ROLES = RECOMMENDED_COLOUR_ROLES;
-
 /**
  * Resolved colour literals (hex/rgba) for each recommended role on a single theme level.
  */
@@ -55,8 +51,6 @@ export interface RecommendedThemeColours {
   readonly accent: Readonly<Record<Emphasis, string>>;
   readonly intent: Readonly<Record<Intent, string>>;
 }
-
-export type RecommendedThemeColors = RecommendedThemeColours;
 
 /**
  * The recommended colour values for each level of the theme ladder.
@@ -81,16 +75,12 @@ export const RECOMMENDED_COLOURS: Readonly<Record<ThemeLevel, RecommendedThemeCo
   },
 };
 
-export const RECOMMENDED_COLORS = RECOMMENDED_COLOURS;
-
 /**
  * Return the recommended colours for a given theme level, defaulting to `midnight`.
  */
 export function getRecommendedColours(level: ThemeLevel = 'midnight'): RecommendedThemeColours {
   return RECOMMENDED_COLOURS[level] ?? RECOMMENDED_COLOURS.midnight;
 }
-
-export const getRecommendedColors = getRecommendedColours;
 
 /**
  * CSS custom property expressions for every recommended role, aligned with the
@@ -128,8 +118,6 @@ export const RECOMMENDED_COLOUR_VARS = {
   },
 } as const;
 
-export const RECOMMENDED_COLOR_VARS = RECOMMENDED_COLOUR_VARS;
-
 /**
  * Canonical Tailwind utility classes for recommended colours.
  * Useful for linters, AI agent instructions, and runtime class validation.
@@ -165,8 +153,6 @@ export const RECOMMENDED_COLOUR_CLASSES = [
 ] as const;
 
 export type RecommendedColourClass = (typeof RECOMMENDED_COLOUR_CLASSES)[number];
-export const RECOMMENDED_COLOR_CLASSES = RECOMMENDED_COLOUR_CLASSES;
-export type RecommendedColorClass = RecommendedColourClass;
 
 /**
  * Test whether a Tailwind class addresses a recommended role utility.
@@ -177,5 +163,3 @@ export function isRecommendedColourClass(className: string): boolean {
   const base = className.split(':').pop() ?? '';
   return (RECOMMENDED_COLOUR_CLASSES as readonly string[]).includes(base);
 }
-
-export const isRecommendedColorClass = isRecommendedColourClass;
