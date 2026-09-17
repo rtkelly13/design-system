@@ -58,6 +58,7 @@ export * from './components/Table';
 export * from './components/DataTable';
 export * from './components/Modal';
 export * from './components/NerdIcon';
+export * from './components/SocialIcon';
 export * from './components/Glyph';
 
 // Chart Primitives & Trend Visualizers
