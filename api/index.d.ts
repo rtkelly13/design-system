@@ -325,8 +325,13 @@ declare const RECOMMENDED_COLOUR_VARS: {
     };
 };
 
-declare const RECOMMENDED_COLOUR_CLASSES: readonly ["bg-surface-base", "bg-surface-raised", "bg-surface-sunken", "bg-surface-overlay", "text-content-primary", "text-content-secondary", "text-content-muted", "text-content-inverse", "border-edge-strong", "border-edge-default", "border-edge-subtle", "text-accent-primary", "text-accent-secondary", "text-accent-tertiary", "text-accent-quiet", "bg-accent-primary", "bg-accent-secondary", "bg-accent-tertiary", "bg-accent-quiet", "text-intent-info", "text-intent-success", "text-intent-warning", "text-intent-danger", "bg-intent-info", "bg-intent-success", "bg-intent-warning", "bg-intent-danger"];
-type RecommendedColourClass = (typeof RECOMMENDED_COLOUR_CLASSES)[number];
+declare const RECOMMENDED_COLOUR_PROPERTIES: readonly ["bg", "text", "border", "ring", "divide", "placeholder", "from", "via", "to"];
+type RecommendedColourProperty = (typeof RECOMMENDED_COLOUR_PROPERTIES)[number];
+
+type RecommendedColourClass = {
+    [N in RecommendedColourNamespace]: `${RecommendedColourProperty}-${N}-${(typeof RECOMMENDED_COLOUR_ROLES)[N][number]}`;
+}[RecommendedColourNamespace];
+declare const RECOMMENDED_COLOUR_CLASSES: readonly RecommendedColourClass[];
 
 declare function isRecommendedColourClass(className: string): boolean;
 
@@ -1410,10 +1415,12 @@ export {
   RECOMMENDED_COLOURS,
   RECOMMENDED_COLOUR_CLASSES,
   RECOMMENDED_COLOUR_NAMESPACES,
+  RECOMMENDED_COLOUR_PROPERTIES,
   RECOMMENDED_COLOUR_ROLES,
   RECOMMENDED_COLOUR_VARS,
   type RecommendedColourClass,
   type RecommendedColourNamespace,
+  type RecommendedColourProperty,
   type RecommendedThemeColours,
   type Rgb,
   SLIDE_DECK_HOTKEYS,

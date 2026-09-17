@@ -15,7 +15,7 @@
  */
 
 import type { BorderTone, Emphasis, Intent, Surface, TextTone } from '../lib/theme';
-import { LEVELS, type ThemeLevel } from './levels';
+import { DEFAULT_LEVEL, LEVELS, type ThemeLevel } from './levels';
 
 /**
  * The five semantic namespaces that make up the recommended colour surface.
@@ -76,10 +76,12 @@ export const RECOMMENDED_COLOURS: Readonly<Record<ThemeLevel, RecommendedThemeCo
 };
 
 /**
- * Return the recommended colours for a given theme level, defaulting to `midnight`.
+ * Return the recommended colours for a given theme level, defaulting to the
+ * ladder's own default — read from `levels.ts`, never restated here, so the
+ * two cannot drift.
  */
-export function getRecommendedColours(level: ThemeLevel = 'midnight'): RecommendedThemeColours {
-  return RECOMMENDED_COLOURS[level] ?? RECOMMENDED_COLOURS.midnight;
+export function getRecommendedColours(level: ThemeLevel = DEFAULT_LEVEL): RecommendedThemeColours {
+  return RECOMMENDED_COLOURS[level] ?? RECOMMENDED_COLOURS[DEFAULT_LEVEL];
 }
 
 /**
@@ -119,47 +121,59 @@ export const RECOMMENDED_COLOUR_VARS = {
 } as const;
 
 /**
- * Canonical Tailwind utility classes for recommended colours.
- * Useful for linters, AI agent instructions, and runtime class validation.
+ * The colour-bearing utility families, taken from the same list
+ * `scripts/token-rules.mjs` treats as colours. A hand-picked subset would be
+ * the thing the next new component trips over: `border-intent-danger`,
+ * `ring-accent-primary` and `divide-edge-strong` are already in the package.
  */
-export const RECOMMENDED_COLOUR_CLASSES = [
-  'bg-surface-base',
-  'bg-surface-raised',
-  'bg-surface-sunken',
-  'bg-surface-overlay',
-  'text-content-primary',
-  'text-content-secondary',
-  'text-content-muted',
-  'text-content-inverse',
-  'border-edge-strong',
-  'border-edge-default',
-  'border-edge-subtle',
-  'text-accent-primary',
-  'text-accent-secondary',
-  'text-accent-tertiary',
-  'text-accent-quiet',
-  'bg-accent-primary',
-  'bg-accent-secondary',
-  'bg-accent-tertiary',
-  'bg-accent-quiet',
-  'text-intent-info',
-  'text-intent-success',
-  'text-intent-warning',
-  'text-intent-danger',
-  'bg-intent-info',
-  'bg-intent-success',
-  'bg-intent-warning',
-  'bg-intent-danger',
+export const RECOMMENDED_COLOUR_PROPERTIES = [
+  'bg',
+  'text',
+  'border',
+  'ring',
+  'divide',
+  'placeholder',
+  'from',
+  'via',
+  'to',
 ] as const;
 
-export type RecommendedColourClass = (typeof RECOMMENDED_COLOUR_CLASSES)[number];
+export type RecommendedColourProperty = (typeof RECOMMENDED_COLOUR_PROPERTIES)[number];
+
+/**
+ * Canonical Tailwind utility classes for recommended colours: every supported
+ * colour property × namespace × role. Derived from {@link RECOMMENDED_COLOUR_ROLES}
+ * rather than enumerated, so a new role appears here the moment it appears
+ * there — the hand-maintained list this replaced was already missing the
+ * `ring`, `divide` and colour-edged `border` utilities the package itself uses.
+ */
+export type RecommendedColourClass = {
+  [N in RecommendedColourNamespace]: `${RecommendedColourProperty}-${N}-${(typeof RECOMMENDED_COLOUR_ROLES)[N][number]}`;
+}[RecommendedColourNamespace];
+
+export const RECOMMENDED_COLOUR_CLASSES: readonly RecommendedColourClass[] = Object.freeze(
+  RECOMMENDED_COLOUR_PROPERTIES.flatMap((property) =>
+    RECOMMENDED_COLOUR_NAMESPACES.flatMap((namespace) =>
+      RECOMMENDED_COLOUR_ROLES[namespace].map(
+        (role) => `${property}-${namespace}-${role}` as RecommendedColourClass,
+      ),
+    ),
+  ),
+);
+
+const CLASS_SET: ReadonlySet<string> = new Set<string>(RECOMMENDED_COLOUR_CLASSES);
 
 /**
  * Test whether a Tailwind class addresses a recommended role utility.
- * Strips variant prefixes (e.g. `dark:`, `hover:`, `md:`) before testing.
+ * Non-colour variants (`hover:`, `md:`) are stripped; polarity variants
+ * (`dark:`, `light:`) are rejected outright — role tokens already switch per
+ * level, and `dark:` now means "midnight or dim", not "not sketch", so a
+ * polarity-prefixed colour utility is the bug this validator exists to catch.
  */
 export function isRecommendedColourClass(className: string): boolean {
   if (!className) return false;
-  const base = className.split(':').pop() ?? '';
-  return (RECOMMENDED_COLOUR_CLASSES as readonly string[]).includes(base);
+  const segments = className.split(':');
+  const base = segments.pop() ?? '';
+  if (segments.includes('dark') || segments.includes('light')) return false;
+  return CLASS_SET.has(base);
 }

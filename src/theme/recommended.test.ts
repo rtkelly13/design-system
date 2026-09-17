@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { LEVELS, THEME_LEVELS } from './levels';
+import { DEFAULT_LEVEL, LEVELS, THEME_LEVELS } from './levels';
 import {
   getRecommendedColours,
   isRecommendedColourClass,
   RECOMMENDED_COLOUR_CLASSES,
   RECOMMENDED_COLOUR_NAMESPACES,
+  RECOMMENDED_COLOUR_PROPERTIES,
   RECOMMENDED_COLOUR_ROLES,
   RECOMMENDED_COLOUR_VARS,
   RECOMMENDED_COLOURS,
@@ -28,10 +29,10 @@ describe('recommended colours', () => {
     }
   });
 
-  it('provides getRecommendedColours helper defaulting to midnight', () => {
+  it('provides getRecommendedColours helper defaulting to the ladder default', () => {
     expect(getRecommendedColours('midnight')).toBe(RECOMMENDED_COLOURS.midnight);
     expect(getRecommendedColours('sketch')).toBe(RECOMMENDED_COLOURS.sketch);
-    expect(getRecommendedColours()).toBe(RECOMMENDED_COLOURS.midnight);
+    expect(getRecommendedColours()).toBe(RECOMMENDED_COLOURS[DEFAULT_LEVEL]);
   });
 
   it('exposes the 5 recommended namespaces and their roles', () => {
@@ -59,18 +60,20 @@ describe('recommended colours', () => {
     }
   });
 
-  it('RECOMMENDED_COLOUR_CLASSES covers expected utilities', () => {
-    expect(RECOMMENDED_COLOUR_CLASSES).toContain('bg-surface-base');
-    expect(RECOMMENDED_COLOUR_CLASSES).toContain('text-content-primary');
-    expect(RECOMMENDED_COLOUR_CLASSES).toContain('border-edge-strong');
-    expect(RECOMMENDED_COLOUR_CLASSES).toContain('text-accent-primary');
-    expect(RECOMMENDED_COLOUR_CLASSES).toContain('text-intent-danger');
+  it('RECOMMENDED_COLOUR_CLASSES covers every property × namespace × role', () => {
+    for (const property of RECOMMENDED_COLOUR_PROPERTIES) {
+      for (const namespace of RECOMMENDED_COLOUR_NAMESPACES) {
+        for (const role of RECOMMENDED_COLOUR_ROLES[namespace]) {
+          expect(RECOMMENDED_COLOUR_CLASSES).toContain(`${property}-${namespace}-${role}`);
+        }
+      }
+    }
+    expect(new Set(RECOMMENDED_COLOUR_CLASSES).size).toBe(RECOMMENDED_COLOUR_CLASSES.length);
   });
 
-  it('isRecommendedColourClass correctly validates classes with or without variants', () => {
+  it('isRecommendedColourClass validates role utilities and tolerates non-colour variants', () => {
     expect(isRecommendedColourClass('bg-surface-raised')).toBe(true);
     expect(isRecommendedColourClass('hover:bg-surface-raised')).toBe(true);
-    expect(isRecommendedColourClass('dark:md:text-content-primary')).toBe(true);
     expect(isRecommendedColourClass('border-edge-default')).toBe(true);
 
     // Non-semantic hues or arbitrary values
@@ -78,5 +81,12 @@ describe('recommended colours', () => {
     expect(isRecommendedColourClass('text-zinc-900')).toBe(false);
     expect(isRecommendedColourClass('bg-[#14142a]')).toBe(false);
     expect(isRecommendedColourClass('')).toBe(false);
+  });
+
+  it('isRecommendedColourClass rejects polarity variants — roles switch by level already', () => {
+    expect(isRecommendedColourClass('dark:bg-surface-base')).toBe(false);
+    expect(isRecommendedColourClass('light:text-content-primary')).toBe(false);
+    expect(isRecommendedColourClass('md:dark:ring-accent-primary')).toBe(false);
+    expect(isRecommendedColourClass('hover:scale-100')).toBe(false);
   });
 });
