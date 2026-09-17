@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { GitHubIcon, SocialIcon } from './SocialIcon';
 
 describe('SocialIcon', () => {
@@ -29,5 +29,18 @@ describe('SocialIcon', () => {
 
     expect(screen.getByRole('link', { name: 'Contact Ryan' }).getAttribute('rel')).toBe('me');
     expect(screen.getByRole('link').querySelector('svg')?.className.baseVal).toContain('text-accent-primary');
+  });
+
+  it('points an object ref at the anchor, not the nested mark, when linked', () => {
+    const objectRef = { current: null };
+    render(<SocialIcon name="github" href="https://github.com/rtkelly13" ref={objectRef} />);
+    expect(objectRef.current).toBe(screen.getByRole('link'));
+  });
+
+  it('fires a callback ref once, for the rendered root only', () => {
+    const callbackRef = vi.fn();
+    render(<SocialIcon name="x" href="https://x.com/rtkelly13" ref={callbackRef} />);
+    expect(callbackRef).toHaveBeenCalledTimes(1);
+    expect(callbackRef).toHaveBeenCalledWith(screen.getByRole('link'));
   });
 });

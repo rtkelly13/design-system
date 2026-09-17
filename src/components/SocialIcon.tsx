@@ -62,7 +62,10 @@ export const SocialIcon = forwardRef<SVGSVGElement | HTMLAnchorElement, SocialIc
     const svg = (
       <svg
         {...svgProps}
-        ref={ref as Ref<SVGSVGElement>}
+        // The ref follows the rendered root only: inside an anchor the SVG is
+        // decoration, and a callback ref fired on both would run element
+        // setup/cleanup logic against the nested mark first.
+        ref={href ? undefined : (ref as Ref<SVGSVGElement>)}
         data-slot="social-icon"
         viewBox="0 0 24 24"
         fill="currentColor"
