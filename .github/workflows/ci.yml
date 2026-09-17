@@ -232,9 +232,15 @@ jobs:
           path: |
             storybook-static
             node_modules/.cache/storybook
-          key: storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'src/**', '.storybook/**') }}
+          # Two separate `hashFiles` calls, so the lockfile hash is a shared
+          # prefix: GitHub matches `restore-keys` against the start of saved
+          # keys only. One combined hash over lock-and-source would put the
+          # lockfile-only restore key nowhere any saved key begins with, so
+          # every source-changing PR would restore nothing and upload a fresh
+          # full cache — the cost this step exists to avoid.
+          key: storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', '.storybook/**', 'package.json') }}
           restore-keys: |
-            storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+            storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
       # No `pnpm build` first: Storybook compiles from `src/`, not from `dist/`,
       # so this job does not depend on the package build and can run beside it.
