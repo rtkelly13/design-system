@@ -1,6 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { GitHubIcon, SocialIcon } from './SocialIcon';
+import {
+  BlueskyIcon,
+  GitHubIcon,
+  LinkedInIcon,
+  MailIcon,
+  SocialIcon,
+  XIcon,
+} from './SocialIcon';
 
 describe('SocialIcon', () => {
   it('renders each supported brand as a labelled SVG image', () => {
@@ -42,5 +49,25 @@ describe('SocialIcon', () => {
     render(<SocialIcon name="x" href="https://x.com/rtkelly13" ref={callbackRef} />);
     expect(callbackRef).toHaveBeenCalledTimes(1);
     expect(callbackRef).toHaveBeenCalledWith(screen.getByRole('link'));
+  });
+
+  it('exports named wrappers for every supported mark', () => {
+    render(
+      <>
+        <GitHubIcon />
+        <LinkedInIcon />
+        <BlueskyIcon />
+        <XIcon />
+        <MailIcon />
+      </>,
+    );
+
+    expect(screen.getAllByRole('img').map((icon) => icon.getAttribute('aria-label'))).toEqual([
+      'GitHub',
+      'LinkedIn',
+      'Bluesky',
+      'X',
+      'Email',
+    ]);
   });
 });
