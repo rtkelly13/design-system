@@ -694,6 +694,35 @@ interface NerdIconProps extends HTMLAttributes<HTMLSpanElement> {
 
 declare function NerdIcon({ name, accent, size, bracketed, label, className, ...props }: NerdIconProps): react.JSX.Element;
 
+type SocialIconName = 'github' | 'linkedin' | 'bluesky' | 'x' | 'mail';
+interface SocialIconProps extends Omit<SVGProps<SVGSVGElement>, 'color'> {
+
+    name: SocialIconName;
+
+    accent?: AccentToken;
+
+    label?: string;
+
+    href?: string;
+
+    target?: AnchorHTMLAttributes<HTMLAnchorElement>['target'];
+
+    rel?: string;
+}
+
+declare const SocialIcon: react.ForwardRefExoticComponent<Omit<SocialIconProps, "ref"> & react.RefAttributes<HTMLAnchorElement | SVGSVGElement>>;
+type NamedSocialIconProps = Omit<SocialIconProps, 'name'>;
+
+declare function GitHubIcon(props: NamedSocialIconProps): react.JSX.Element;
+
+declare function LinkedInIcon(props: NamedSocialIconProps): react.JSX.Element;
+
+declare function BlueskyIcon(props: NamedSocialIconProps): react.JSX.Element;
+
+declare function XIcon(props: NamedSocialIconProps): react.JSX.Element;
+
+declare function MailIcon(props: NamedSocialIconProps): react.JSX.Element;
+
 interface GlyphProps extends HTMLAttributes<HTMLSpanElement> {
 
     name?: NerdIconName;
@@ -1206,6 +1235,7 @@ export {
   type BarChartProps,
   BlogPost,
   type BlogPostProps,
+  BlueskyIcon,
   type BorderTone,
   BracketText,
   type BracketTextProps,
@@ -1273,6 +1303,7 @@ export {
   type ExperimentsViewProps,
   FIXED_COLOURS,
   type FixedColour,
+  GitHubIcon,
   Glyph,
   type GlyphProps,
   HEADING_EMPHASIS,
@@ -1285,11 +1316,13 @@ export {
   type Intent,
   LEVELS,
   type LevelDefinition,
+  LinkedInIcon,
   LoremIpsumPost,
   MAXIMUM_NEUTRAL_CHROMA,
   MEDIA,
   MEDIA_DEFINITIONS,
   MINIMUM_RATIO,
+  MailIcon,
   type MdxComponents,
   type Medium,
   type MediumDefinition,
@@ -1333,6 +1366,9 @@ export {
   type SlideDeckProps,
   type SlideProps,
   Slugger,
+  SocialIcon,
+  type SocialIconName,
+  type SocialIconProps,
   Sparkline,
   type SparklineProps,
   StatCard,
@@ -1373,6 +1409,7 @@ export {
   type UseActiveHeadingOptions,
   type UseCopyToClipboardResult,
   WEB_FLOOR,
+  XIcon,
   accentVar,
   ansiScheme,
   assertNever,
