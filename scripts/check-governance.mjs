@@ -89,24 +89,6 @@ const PINNED_ACTIONS = new Map([
   ['amannn/action-semantic-pull-request', '0723387faaf9b38adef4775cd42cfd5155ed6017'],
 ]);
 
-/**
- * Known job names in CI workflows conforming to the shared governance lexicon.
- */
-const JOB_LEXICON = new Set([
-  'backup',
-  'gates',
-  'unit',
-  'visual',
-  'verify',
-  'drift',
-  'publish-dev',
-  'build-and-publish',
-  'walkthrough',
-  'update-snapshots',
-  'semantic-pr',
-  'semantic_pr',
-]);
-
 /** owner/repo -> the one SHA this repo pins it to. Split-brain is a finding. */
 const pinnedTo = new Map();
 
