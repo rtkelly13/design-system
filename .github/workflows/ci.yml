@@ -197,8 +197,8 @@ jobs:
       # incidental: `src/package-shape.test.ts` asserts on what `files` declares
       # while `dist/` does not yet exist. Running it after a build would change
       # what it is testing.
-      - name: Unit Tests
-        run: pnpm test
+      - name: Unit Tests and Coverage
+        run: pnpm test:coverage
 
       - name: Build Package
         run: pnpm build
