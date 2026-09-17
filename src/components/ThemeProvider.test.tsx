@@ -100,13 +100,42 @@ describe('ThemeProvider', () => {
     await waitFor(() => expect(screen.getByTestId('level').textContent).toBe('sketch'));
   });
 
-  it('works without touching storage when persistence is disabled', async () => {
-    render(
-      <ThemeProvider defaultLevel="sketch" persist={false} followSystem={false}>
-        <Probe />
-      </ThemeProvider>,
-    );
+  it('never reads or writes storage when persistence is disabled', async () => {
+    // Replace the ambient storage with an explicit spy surface: jsdom's
+    // `localStorage` is per-environment and asserting against its emptiness
+    // proves nothing if a host ever swaps it out.
+    const store = new Map<string, string>([[THEME_STORAGE_KEY, 'midnight']]);
+    const getItem = vi.fn((key: string) => store.get(key) ?? null);
+    const setItem = vi.fn((key: string, value: string) => store.set(key, value));
+    const original = Object.getOwnPropertyDescriptor(window, 'localStorage');
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: { getItem, setItem },
+    });
 
-    await waitFor(() => expect(screen.getByTestId('level').textContent).toBe('sketch'));
+    try {
+      render(
+        <ThemeProvider defaultLevel="sketch" persist={false} followSystem={false}>
+          <Probe />
+        </ThemeProvider>,
+      );
+
+      await waitFor(() => expect(screen.getByTestId('level').textContent).toBe('sketch'));
+
+      screen.getByRole('button', { name: 'Next' }).click();
+      await waitFor(() =>
+        expect(screen.getByTestId('level').textContent).not.toBe('sketch'),
+      );
+
+      expect(getItem).not.toHaveBeenCalled();
+      expect(setItem).not.toHaveBeenCalled();
+      expect(store.get(THEME_STORAGE_KEY)).toBe('midnight');
+    } finally {
+      if (original) {
+        Object.defineProperty(window, 'localStorage', original);
+      } else {
+        Reflect.deleteProperty(window, 'localStorage');
+      }
+    }
   });
 });

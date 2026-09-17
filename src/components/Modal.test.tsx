@@ -19,33 +19,32 @@ describe('Modal', () => {
     expect(dialog.getAttribute('aria-modal')).toBe('true');
   });
 
-  it('closes on Escape and restores focus to the opener', async () => {
+  it('sends focus into the dialog on open, closes on Escape, and restores focus to the opener', async () => {
     const onClose = vi.fn();
-    const { rerender } = render(
+    const modal = (isOpen: boolean) => (
       <>
         <button type="button">Open settings</button>
-        <Modal isOpen onClose={onClose} title="Settings">
+        <Modal isOpen={isOpen} onClose={onClose} title="Settings">
           Content
         </Modal>
-      </>,
+      </>
     );
+
+    const { rerender } = render(modal(false));
 
     const opener = screen.getByRole('button', { name: 'Open settings' });
     opener.focus();
-    await screen.findByRole('dialog');
 
-    fireEvent.keyDown(document.body, { key: 'Escape' });
+    rerender(modal(true));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(document.activeElement).toBe(dialog);
+
+    fireEvent.keyDown(dialog, { key: 'Escape' });
 
     expect(onClose).toHaveBeenCalledOnce();
 
-    rerender(
-      <>
-        <button type="button">Open settings</button>
-        <Modal isOpen={false} onClose={onClose} title="Settings">
-          Content
-        </Modal>
-      </>,
-    );
+    rerender(modal(false));
     expect(document.activeElement).toBe(opener);
   });
 
