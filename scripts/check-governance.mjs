@@ -250,15 +250,17 @@ const UNGATED = {
 };
 
 /**
- * Infrastructure and security guards that run in CI before design system gates.
- * They enforce cold-build / protocol safety rather than design system properties,
- * so they are exempt from the design system gate rosters in documentation.
+ * Infrastructure and security guards that run before design-system gates.
+ * They enforce cold-build / protocol safety rather than design system
+ * properties, so they are exempt from the design system gate rosters in
+ * documentation — but they must run *before* the step they guard, which is
+ * what the setup action's step order is checked for below.
  */
 const INFRA_GUARDS = {
   'check:lockfile':
     'Fast install-free lockfile protocol guard to prevent cold build failures. ' +
-    'Runs before the setup action installs dependencies, so a lockfile the ' +
-    'install cannot resolve still produces an actionable gate failure.',
+    'Runs inside .github/actions/setup ahead of `pnpm install --frozen-lockfile`, ' +
+    'so a lockfile the install cannot resolve still produces an actionable failure.',
 };
 
 /** A gate is a script that decides something. `:list`/`:report` only print. */
@@ -274,6 +276,10 @@ for (const name of scripts.filter(isGate)) {
   }
   if (name in UNGATED) {
     note('roster', true, `${name} — exempt: ${UNGATED[name]}`);
+    continue;
+  }
+  if (name in INFRA_GUARDS) {
+    note('roster', true, `${name} — exempt: infra guard, wired by the setup action`);
     continue;
   }
   problems.push(
@@ -294,12 +300,27 @@ for (const [name, why] of Object.entries(UNGATED)) {
   }
 }
 
+const setupSteps = read('.github/actions/setup/action.yml');
+
 for (const [name, why] of Object.entries(INFRA_GUARDS)) {
   const script = name.split(' ')[0];
   if (!scripts.includes(script)) {
     problems.push(`INFRA_GUARDS names \`${script}\`, which is not a package.json script. Remove the entry.`);
-  } else if (!runsInCi.has(script)) {
-    problems.push(`INFRA_GUARDS says \`${script}\` runs in CI (${why}), but ci.yml does not run it. Remove the entry.`);
+    continue;
+  }
+  // A guard whose whole point is to precede `pnpm install` is worthless after
+  // it — so the invariant is positional: the guard's script file must appear
+  // in the setup action ahead of the install line, not merely somewhere.
+  const file = /([\w./-]+\.mjs)/.exec(pkg.scripts[script])?.[1];
+  const guardAt = file ? setupSteps.indexOf(file) : -1;
+  // The actual step, not the prose: action.yml comments discuss `pnpm install`
+  // too, and a first-occurrence match would land in the header.
+  const installAt = /run:\s*pnpm install/.exec(setupSteps)?.index ?? -1;
+  if (guardAt === -1 || installAt === -1 || guardAt > installAt) {
+    problems.push(
+      `INFRA_GUARDS says \`${script}\` runs before the install it guards (${why}), ` +
+        `but .github/actions/setup/action.yml does not invoke ${file ?? script} ahead of \`pnpm install\`.`,
+    );
   }
 }
 
