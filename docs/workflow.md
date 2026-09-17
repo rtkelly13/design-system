@@ -56,7 +56,7 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - `pnpm check:docgen-props` (every documented component publishes its props)
    - `pnpm check:story-conventions` (title vocabulary, and an autodocs decision per component)
    - `pnpm typecheck`
-   - `pnpm test` (unit — see "Unit Tests" below)
+   - `pnpm test:coverage` (unit and V8 coverage — see "Unit Tests" below)
    - `pnpm build`
    - `pnpm check:api` (the published type surface matches `api/index.d.ts`)
    - `pnpm build-storybook`
