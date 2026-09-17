@@ -71,11 +71,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - name: Setup
-        uses: ./.github/actions/setup
-
+      # Before `Setup`: the point of this guard is to fail fast on a lockfile
+      # that `pnpm install --frozen-lockfile` cannot resolve, and a check that
+      # runs after the install it guards against reports nothing the install
+      # did not already say. Reads the committed lockfile with plain node.
       - name: Lockfile Protocol Guard
         run: pnpm check:lockfile
+
+      - name: Setup
+        uses: ./.github/actions/setup
 
       # theme.css is generated from src/theme/levels.ts. This fails if the
       # committed CSS no longer matches the source, which is the only thing

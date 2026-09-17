@@ -25,14 +25,25 @@ const FORBIDDEN = [
     re: /git\+https:\/\/git@/,
     label: 'git+https with SSH user (git+https://git@…)',
   },
-  { re: /^\s*repo:\s*git@/, label: 'git repo over SSH (repo: git@…)' },
-  { re: /^\s*type:\s*git\b/, label: 'git-type resolution (type: git)' },
+  {
+    re: /\brepo:\s*['"]?git@/,
+    label: 'git repo over SSH (repo: git@…)',
+  },
+  {
+    // Unanchored: pnpm emits `type: git` both as a block mapping line and
+    // inside a flow mapping such as
+    // `resolution: {commit: …, repo: https://…, type: git}`.
+    re: /\btype:\s*git\b/,
+    label: 'git-type resolution (type: git)',
+  },
   {
     re: /file:\.\.\//,
     label: 'out-of-repo file: dependency (file:../…)',
   },
   {
-    re: /^\s*resolution:\s*\{directory:\s*\.\./,
+    // Unanchored for the same flow-mapping reason as `type:` above: the
+    // `directory` key need not follow `resolution: {` immediately.
+    re: /\bdirectory:\s*['"]?\.\./,
     label: 'out-of-repo directory resolution',
   },
   {

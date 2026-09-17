@@ -257,7 +257,8 @@ const UNGATED = {
 const INFRA_GUARDS = {
   'check:lockfile':
     'Fast install-free lockfile protocol guard to prevent cold build failures. ' +
-    'Runs after setup as infrastructure protection rather than a design system gate.',
+    'Runs before the setup action installs dependencies, so a lockfile the ' +
+    'install cannot resolve still produces an actionable gate failure.',
 };
 
 /** A gate is a script that decides something. `:list`/`:report` only print. */
