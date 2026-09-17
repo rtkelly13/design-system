@@ -100,6 +100,44 @@ function declaredProps() {
     return [...new Set(props)];
   }
 
+  /**
+   * Property-preserving utility types: `Omit`/`Partial`/`Required` keep the
+   * base prop surface, and `Pick` narrows it to its literal key list. Left
+   * unresolved, a component declared as `Pick<BaseProps, …>` would vanish from
+   * the roster and its documented props would go unchecked — silently weaker
+   * than the regex it replaced, which followed the base type.
+   */
+  function unwrapUtilityType(name, typeArguments, seen) {
+    if (!typeArguments?.length) return null;
+    switch (name) {
+      case 'Omit':
+      case 'Partial':
+      case 'Required':
+        return extractPropsFromTypeNode(typeArguments[0], seen);
+      case 'Pick': {
+        const base = extractPropsFromTypeNode(typeArguments[0], seen);
+        const keys = new Set();
+        const keyArg = typeArguments[1];
+        const literals =
+          keyArg && ts.isUnionTypeNode(keyArg)
+            ? keyArg.types
+            : keyArg
+              ? [keyArg]
+              : [];
+        for (const t of literals) {
+          if (ts.isLiteralTypeNode(t) && ts.isStringLiteralLike(t.literal)) {
+            keys.add(t.literal.text);
+          } else {
+            return base;
+          }
+        }
+        return base.filter((p) => keys.has(p));
+      }
+      default:
+        return null;
+    }
+  }
+
   function extractPropsFromTypeNode(typeNode, seen = new Set()) {
     if (!typeNode) return [];
 
@@ -126,9 +164,8 @@ function declaredProps() {
         ? typeNode.typeName.text
         : typeNode.typeName.right.text;
 
-      if (typeName === 'Omit' && typeNode.typeArguments?.[0]) {
-        return extractPropsFromTypeNode(typeNode.typeArguments[0], seen);
-      }
+      const utility = unwrapUtilityType(typeName, typeNode.typeArguments, seen);
+      if (utility) return utility;
       return resolveTypeName(typeName, seen);
     }
 
@@ -136,9 +173,8 @@ function declaredProps() {
       const exprName = ts.isIdentifier(typeNode.expression)
         ? typeNode.expression.text
         : typeNode.expression.getText(sourceFile);
-      if (exprName === 'Omit' && typeNode.typeArguments?.[0]) {
-        return extractPropsFromTypeNode(typeNode.typeArguments[0], seen);
-      }
+      const utility = unwrapUtilityType(exprName, typeNode.typeArguments, seen);
+      if (utility) return utility;
       return resolveTypeName(exprName, seen);
     }
 

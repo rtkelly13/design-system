@@ -105,6 +105,26 @@ for (const file of walk(SRC)) {
     return sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
   }
 
+  /**
+   * The literal text beneath assertion wrappers — `{ accent: 'cyan' as const }`
+   * is an AsExpression around the StringLiteral, and the old textual check saw
+   * the quotes regardless of what TS wrapped around them. `as`, `satisfies`
+   * and parentheses change the static type, never the runtime value, so they
+   * are transparent to this gate.
+   */
+  function literalText(node) {
+    while (
+      node &&
+      (ts.isAsExpression(node) ||
+        ts.isSatisfiesExpression(node) ||
+        ts.isParenthesizedExpression(node) ||
+        node.kind === ts.SyntaxKind.TypeAssertionExpression)
+    ) {
+      node = node.expression;
+    }
+    return node && ts.isStringLiteralLike(node) ? node.text : null;
+  }
+
   function visit(node) {
     // 1. JSX attribute: accent="cyan", variant="pink", tone="yellow"
     if (ts.isJsxAttribute(node) && ts.isIdentifier(node.name) && TARGET_PROPS.has(node.name.text)) {
@@ -112,12 +132,8 @@ for (const file of walk(SRC)) {
       if (node.initializer) {
         if (ts.isStringLiteral(node.initializer)) {
           val = node.initializer.text;
-        } else if (
-          ts.isJsxExpression(node.initializer) &&
-          node.initializer.expression &&
-          ts.isStringLiteral(node.initializer.expression)
-        ) {
-          val = node.initializer.expression.text;
+        } else if (ts.isJsxExpression(node.initializer)) {
+          val = literalText(node.initializer.expression);
         }
       }
       if (val && HUES.has(val)) {
@@ -135,8 +151,8 @@ for (const file of walk(SRC)) {
       const propName =
         ts.isIdentifier(node.name) || ts.isStringLiteral(node.name) ? node.name.text : null;
       if (propName && TARGET_PROPS.has(propName)) {
-        if (ts.isStringLiteral(node.initializer) && HUES.has(node.initializer.text)) {
-          const val = node.initializer.text;
+        const val = literalText(node.initializer);
+        if (val && HUES.has(val)) {
           sites.push({
             file: rel,
             line: getLine(node),
@@ -157,10 +173,12 @@ for (const file of walk(SRC)) {
         op === ts.SyntaxKind.ExclamationEqualsEqualsToken
       ) {
         let hue = null;
-        if (ts.isStringLiteral(node.right) && HUES.has(node.right.text)) {
-          hue = node.right.text;
-        } else if (ts.isStringLiteral(node.left) && HUES.has(node.left.text)) {
-          hue = node.left.text;
+        const right = literalText(node.right);
+        const left = literalText(node.left);
+        if (right && HUES.has(right)) {
+          hue = right;
+        } else if (left && HUES.has(left)) {
+          hue = left;
         }
         if (hue) {
           sites.push({
