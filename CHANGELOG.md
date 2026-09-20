@@ -9,6 +9,49 @@ Proper release notes start at 1.0. Until then this file records only what a
 consumer has to *do*, newest first. The reasoning lives in the pull requests and
 in [`docs/adr/`](./docs/adr/).
 
+## 0.9.0
+
+`Modal` on Base UI's dialog, and the `AlertDialog` that had to ship with it.
+
+### You have to do something
+
+- **Nothing, if you only render `Modal`.** `ModalProps` is unchanged — `isOpen`, `onClose`,
+  `title`, `children`, `footer`, `closeOnBackdropClick`, `className` all mean what they meant.
+  `Modal` now also forwards a ref and spreads unrecognised props onto the dialog.
+- **If you targeted `[data-slot="modal-backdrop"]` to position or size the dialog**, that element
+  no longer wraps it. Base UI splits the one element into two: `modal-backdrop` is the dim,
+  `modal-viewport` is the centring container and the dialog's parent. Styling the dim is unchanged;
+  anything about layout moves to `modal-viewport`.
+- **If you asserted `aria-modal` on the dialog**, it is gone, and not by omission. Base UI marks the
+  portal's siblings `aria-hidden` instead — the mechanism `aria-modal` is a hint for, and the one
+  screen readers implement consistently. Assert the sibling marking, not the attribute.
+- **If you tested backdrop dismissal with `mouseDown` alone**, send a pointer sequence
+  (`pointerdown` then `click`). Base UI confirms an outside press rather than acting on the first
+  event, which is closer to what a browser sends.
+
+### Rendering changed
+
+- **`Modal` gains a backdrop element and a viewport element**, and fades both on open and close via
+  `data-starting-style` / `data-ending-style`, at `--ds-duration-quick`. The enter/exit is
+  suppressed under `prefers-reduced-motion`. `modal-*` baselines move.
+- **Focus lands on the dialog, not on its close button.** Unchanged in effect from the hand-rolled
+  version, but it is now a deliberate `initialFocus` rather than a side effect of a `tabIndex={-1}`
+  container.
+
+### New
+
+- **`AlertDialog`** — destructive confirmation. Same surface as `Modal`, different dismissal
+  contract: a backdrop press *cannot* close it, Escape can, and there is no `×`. `onConfirm` is
+  separate from `onClose`, so the two answers never collapse into one handler.
+
+### Deleted
+
+- `Modal`'s hand-rolled focus trap, capture-phase `document` Escape listener, `body.style.overflow`
+  scroll lock and focus-return ref. With them go three defects: Escape closing two stacked dialogs
+  at once, a focus boundary computed once from the first and last focusable node, and a page behind
+  the dialog that was never hidden from assistive technology. The scroll lock also no longer shifts
+  the page by the scrollbar's width.
+
 ## 0.7.0
 
 The primitive layer, and four new gates.

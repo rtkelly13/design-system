@@ -55,12 +55,12 @@ const PROVIDERS = {
 
 /** Counts on the day this landed. Lower a line as it is paid down; delete at zero. */
 const BUDGET = {
-  untested: 26,
+  untested: 24,
   inlineStyle: 170,
-  ref: 35,
+  ref: 34,
   displayName: 0,
   recipe: 11,
-  spread: 24,
+  spread: 23,
 };
 
 const CLAUSE = {

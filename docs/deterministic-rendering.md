@@ -63,11 +63,19 @@ layer down — silent, plausible-looking, wrong output.
 
 ### 3. Turn the transitions off
 
-There are 22 CSS transitions and **zero** `@keyframes`. All the transitions are hover- or
-focus-intent, so they are inert wherever there is no pointer. But a transition fires on *any* change
-to the named property, from any cause — so a consumer animating a prop that lands on one gets a
-150–300ms wall-clock interpolation it did not ask for and cannot see. Between two captures taken
-milliseconds apart, the transition barely advances and then snaps.
+There are 27 CSS transitions and **zero** `@keyframes`. Most are hover- or focus-intent, so they are
+inert wherever there is no pointer — but since #162 that is no longer all of them. `Modal` and
+`AlertDialog` fade their backdrop and popup on open and close, driven by Base UI's
+`data-starting-style` / `data-ending-style` attributes rather than by a pointer, so a capture taken
+while a dialog is opening catches it mid-fade with nothing having been hovered. Those two carry
+`motion-reduce:transition-none`, which makes `prefers-reduced-motion` a second and more honest lever
+than the reset below; the reset is still what a capture harness should use, because it does not
+depend on the component having remembered.
+
+A transition also fires on *any* change to the named property, from any cause — so a consumer
+animating a prop that lands on one gets a 150–300ms wall-clock interpolation it did not ask for and
+cannot see. Between two captures taken milliseconds apart, the transition barely advances and then
+snaps.
 
 ```css
 *, *::before, *::after { transition: none !important; animation: none !important; }

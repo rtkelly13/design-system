@@ -1,18 +1,47 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
-import { createPortal } from 'react-dom';
+import { forwardRef, useCallback, useRef } from 'react';
+import type { ForwardedRef, HTMLAttributes, ReactNode } from 'react';
+import { Dialog } from '@base-ui/react/dialog';
 import { cn } from '../lib/recipe';
+import { dialogSurface } from './dialogSurface';
 import { Button } from './Button';
 
 /**
- * Everything the browser will focus, in DOM order. `:not([tabindex="-1"])`
- * keeps programmatically-focusable-but-not-tabbable elements out of the cycle,
- * which is the same set Tab itself walks.
+ * Module scope on purpose: written inline, the assignment reads to the
+ * compiler lint as a component mutating a value it captured during render.
  */
-const FOCUSABLE =
-  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+function assignRef<T>(ref: ForwardedRef<T>, node: T | null) {
+  if (typeof ref === 'function') {
+    ref(node);
+    return;
+  }
+  if (ref) {
+    ref.current = node;
+  }
+}
 
-export interface ModalProps {
+/**
+ * Keeps a local handle on the popup while still honouring a caller's ref.
+ *
+ * `initialFocus` needs the popup *element*, and the only ref slot Base UI
+ * offers is the one the caller may also have asked for. Merging them here is
+ * cheaper than making the caller give theirs up.
+ */
+function usePopupRef(forwarded: ForwardedRef<HTMLDivElement>) {
+  const popup = useRef<HTMLDivElement | null>(null);
+
+  const attach = useCallback(
+    (node: HTMLDivElement | null) => {
+      popup.current = node;
+      assignRef(forwarded, node);
+    },
+    [forwarded],
+  );
+
+  return [popup, attach] as const;
+}
+
+export interface ModalProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'className'> {
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -27,167 +56,130 @@ export interface ModalProps {
 }
 
 /**
- * A modal dialog.
+ * A modal dialog, on Base UI's `dialog`.
  *
  * "Modal" is a behavioural claim, not a visual one: while it is open, the rest
- * of the page is inert. Four things make that true, and this component
- * previously had none of them — it was a styled `position: fixed` box.
+ * of the page is inert. This component used to make that claim and hand-roll
+ * every part of it — a capture-phase `document` listener for Escape, a
+ * first/last focus trap, `body.style.overflow`, and focus return through a ref
+ * captured at open time. All of it is deleted. What replaced it is not a
+ * smaller version of the same code; it is the primitive that owns the problem.
  *
- *   1. **Portal.** `position: fixed` resolves against the nearest ancestor with
- *      a `transform`, `filter` or `contain` — so rendered in place, a dialog
- *      inside any animated or filtered subtree is clipped to that subtree
- *      instead of covering the viewport. Portalling to `body` removes the
- *      question.
- *   2. **Focus trap.** Without one, Tab walks straight out of the dialog into
- *      the page behind it, which a keyboard user cannot see is still there.
- *   3. **Escape.** The dialog is dismissible by keyboard, not only by finding
- *      and clicking a close control.
- *   4. **Scroll lock.** The background does not scroll under the overlay.
+ * Three defects went with the deletion, each of which the hand-rolled version
+ * had and none of which was cheap to fix in place:
  *
- * Focus is moved into the dialog on open and returned on close to whatever had
- * it before — otherwise dismissing the dialog drops focus onto `<body>` and the
- * next Tab restarts from the top of the document.
+ *   1. **No dialog stack.** Two open dialogs both listened on `document` in
+ *      the capture phase, so Escape closed both. Base UI keeps a stack, and
+ *      Escape now closes the topmost surface only — the invariant every
+ *      overlay added after this one inherits.
+ *   2. **The background was never hidden from assistive technology.** Nothing
+ *      set `inert` or `aria-hidden`, so a screen reader's virtual cursor
+ *      walked the page behind the dialog even though Tab could not. Base UI
+ *      marks every sibling of the portal `aria-hidden` while the dialog is
+ *      open — `aria-hidden`, not `inert`, which is worth knowing when reading
+ *      the DOM: the outside content stays in the tab order's way only as far
+ *      as the focus guards allow, and the guards are what stop it.
+ *   3. **The focus trap read the DOM once, by first and last.** Content that
+ *      changed while open — a list that filtered, a button that became
+ *      disabled — left the boundary pointing at a node that was no longer
+ *      focusable.
+ *
+ * ## What is deliberately kept
+ *
+ * `ModalProps` is unchanged, so no consumer moves. `isOpen`/`onClose` stay the
+ * API rather than becoming Base UI's `open`/`onOpenChange`: this is a
+ * controlled dialog in both consumers, and a compound `Dialog.Root`/`Trigger`
+ * composition would be a breaking change bought for nothing they need.
+ *
+ * Focus goes to the **popup**, not to the first tabbable element inside it.
+ * Base UI's default would land on the close button, which a screen reader
+ * announces as "Close dialog, button" — the dialog's own title never read.
+ * Pointing `initialFocus` at the popup restores what the hand-rolled
+ * `tabIndex={-1}` container was for.
  */
-export function Modal({
-  isOpen,
-  onClose,
-  title,
-  children,
-  footer,
-  closeOnBackdropClick = true,
-  className,
-}: ModalProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
-  // Captured at open time rather than read at close time: by the time the
-  // dialog is closing, focus is inside it and the original element is gone
-  // from `document.activeElement`.
-  const returnFocusRef = useRef<HTMLElement | null>(null);
-  const titleId = useId();
+export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
+  {
+    isOpen,
+    onClose,
+    title,
+    children,
+    footer,
+    closeOnBackdropClick = true,
+    className,
+    ...props
+  },
+  ref,
+) {
+  const slots = dialogSurface();
+  const [popup, attachPopup] = usePopupRef(ref);
 
-  // `document` does not exist while server-rendering, and a portal needs it.
-  // Rendering nothing until mounted keeps the server and client markup
-  // identical instead of hydration-mismatching.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.stopPropagation();
-        onClose();
-        return;
-      }
-      if (event.key !== 'Tab' || !dialogRef.current) return;
-
-      const focusable = Array.from(
-        dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
-      ).filter((el) => el.offsetParent !== null || el === document.activeElement);
-      if (focusable.length === 0) {
-        // Nothing to cycle between — hold focus on the dialog rather than
-        // letting Tab escape to the page behind it.
-        event.preventDefault();
-        return;
-      }
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement;
-
-      // Only the two ends need intercepting; between them the browser's own
-      // ordering is what we want, and re-implementing it would get it wrong.
-      if (event.shiftKey && (active === first || active === dialogRef.current)) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    },
-    [onClose],
-  );
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    returnFocusRef.current = document.activeElement as HTMLElement | null;
-
-    const { body } = document;
-    const previousOverflow = body.style.overflow;
-    body.style.overflow = 'hidden';
-
-    document.addEventListener('keydown', handleKeyDown, true);
-
-    // The dialog container carries `tabIndex={-1}`, so it can hold focus when
-    // it contains nothing focusable, and a screen reader announces the dialog
-    // rather than starting mid-content on the first control.
-    dialogRef.current?.focus();
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown, true);
-      body.style.overflow = previousOverflow;
-      returnFocusRef.current?.focus();
-    };
-  }, [isOpen, handleKeyDown]);
-
-  if (!isOpen || !mounted) return null;
-
-  return createPortal(
-    <div
-      data-slot="modal-backdrop"
-      className="fixed inset-0 z-top flex items-center justify-center bg-surface-overlay p-4"
-      // A backdrop is not an interactive control, so it gets no role and no key
-      // handler — Escape already covers the keyboard path, and adding a
-      // `button` role here would put a meaningless stop in the tab order.
-      onMouseDown={(event) => {
-        if (closeOnBackdropClick && event.target === event.currentTarget) onClose();
+  return (
+    <Dialog.Root
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
       }}
+      // Base UI's own name for "a click outside does not dismiss this". The
+      // prop is inverted because the published API asks the question the other
+      // way round, and the published API is the one that stays.
+      disablePointerDismissal={!closeOnBackdropClick}
     >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        // `cn`, not a template string: appended, a caller's `max-w-3xl` would
-        // have emitted alongside `max-w-lg` and left CSS source order to pick
-        // one. A dialog is sized by its caller often enough that this is the
-        // prop most likely to be reached for.
-        className={cn(
-          'max-h-[90vh] w-full max-w-lg overflow-y-auto border-4 border-edge-strong bg-surface-raised font-mono shadow-hard-lg',
-          className,
-        )}
-      >
-        <div data-slot="modal-header" className="flex items-center justify-between border-b-2 border-edge-strong bg-surface-base px-6 py-4">
-          <h3
-            id={titleId}
-            data-slot="modal-title"
-            className="font-display text-xl font-bold uppercase tracking-wider text-content-primary"
+      <Dialog.Portal>
+        <Dialog.Backdrop data-slot="modal-backdrop" className={slots.backdrop()} />
+        <Dialog.Viewport data-slot="modal-viewport" className={slots.viewport()}>
+          <Dialog.Popup
+            ref={attachPopup}
+            // Base UI's default is the first tabbable element, which here is
+            // the close button. Pointing at the popup itself is what the
+            // hand-rolled `tabIndex={-1}` container did, and it is why the
+            // dialog's own title is what gets announced.
+            // The function form, not the ref form: Base UI reads a `RefObject`
+            // early enough that the popup is sometimes still `null`, and it
+            // then silently falls back to the first tabbable element. Reading
+            // `.current` at focus time is the same intent without the race.
+            initialFocus={() => popup.current}
+            data-slot="modal"
+            // `class`, not an appended string: a caller's `max-w-3xl` would
+            // otherwise emit alongside `max-w-lg` and leave CSS source order to
+            // pick one. A dialog is sized by its caller often enough that this
+            // is the prop most likely to be reached for.
+            className={cn(slots.popup(), className)}
+            {...props}
           >
-            [ {title} ]
-          </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="border-2 border-edge-strong bg-surface-raised px-2 font-mono text-lg font-bold text-content-primary transition-colors hover:bg-surface-base hover:text-accent-tertiary focus-visible:ring-2 focus-visible:ring-accent-primary"
-            aria-label="Close dialog"
-          >
-            &times;
-          </button>
-        </div>
+            <div data-slot="modal-header" className={slots.header()}>
+              {/*
+                * The heading text lives on the render element rather than on
+                * `Title`: Base UI keeps the element's own children, and the
+                * a11y lint rule can only see content it can read literally.
+                */}
+              <Dialog.Title
+                data-slot="modal-title"
+                className={slots.title()}
+                render={<h3>[ {title} ]</h3>}
+              />
+              <Dialog.Close
+                data-slot="modal-close"
+                className={slots.close()}
+                aria-label="Close dialog"
+              >
+                &times;
+              </Dialog.Close>
+            </div>
 
-        <div data-slot="modal-body" className="p-6 font-sans text-sm leading-relaxed text-content-primary">
-          {children}
-        </div>
+            <div data-slot="modal-body" className={slots.body()}>
+              {children}
+            </div>
 
-        <div data-slot="modal-footer" className="flex justify-end gap-3 border-t-2 border-edge-strong bg-surface-base px-6 py-4">
-          {footer || (
-            <Button onClick={onClose} variant="tertiary" bracketed size="sm">
-              CLOSE
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>,
-    document.body,
+            <div data-slot="modal-footer" className={slots.footer()}>
+              {footer || (
+                <Button onClick={onClose} variant="tertiary" bracketed size="sm">
+                  CLOSE
+                </Button>
+              )}
+            </div>
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
-}
+});

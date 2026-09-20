@@ -38,8 +38,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BUDGET = {
   '@typescript-eslint/no-explicit-any': 10,
   'react-hooks/rules-of-hooks': 4,
-  'react-hooks/set-state-in-effect': 3,
-  'jsx-a11y/no-static-element-interactions': 3,
+  'react-hooks/set-state-in-effect': 2,
+  'jsx-a11y/no-static-element-interactions': 2,
   'jsx-a11y/click-events-have-key-events': 2,
   'react-hooks/incompatible-library': 1,
   'react-hooks/static-components': 1,
