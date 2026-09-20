@@ -264,6 +264,20 @@ const UNGATED = {
     'always red, and a gate that is always red gets deleted.',
 };
 
+/**
+ * Infrastructure and security guards that run before design-system gates.
+ * They enforce cold-build / protocol safety rather than design system
+ * properties, so they are exempt from the design system gate rosters in
+ * documentation — but they must run *before* the step they guard, which is
+ * what the setup action's step order is checked for below.
+ */
+const INFRA_GUARDS = {
+  'check:lockfile':
+    'Fast install-free lockfile protocol guard to prevent cold build failures. ' +
+    'Runs inside .github/actions/setup ahead of `pnpm install --frozen-lockfile`, ' +
+    'so a lockfile the install cannot resolve still produces an actionable failure.',
+};
+
 /** A gate is a script that decides something. `:list`/`:report` only print. */
 const isGate = (name) =>
   (name.startsWith('check:') || name.endsWith(':check')) &&
@@ -277,6 +291,10 @@ for (const name of scripts.filter(isGate)) {
   }
   if (name in UNGATED) {
     note('roster', true, `${name} — exempt: ${UNGATED[name]}`);
+    continue;
+  }
+  if (name in INFRA_GUARDS) {
+    note('roster', true, `${name} — exempt: infra guard, wired by the setup action`);
     continue;
   }
   problems.push(
@@ -294,6 +312,30 @@ for (const [name, why] of Object.entries(UNGATED)) {
     problems.push(`UNGATED names \`${script}\`, which is not a package.json script. Remove the entry.`);
   } else if (runsAnywhere.has(script) && script === name) {
     problems.push(`UNGATED says \`${script}\` is unenforced (${why}), but a workflow runs it. Remove the entry.`);
+  }
+}
+
+const setupSteps = read('.github/actions/setup/action.yml');
+
+for (const [name, why] of Object.entries(INFRA_GUARDS)) {
+  const script = name.split(' ')[0];
+  if (!scripts.includes(script)) {
+    problems.push(`INFRA_GUARDS names \`${script}\`, which is not a package.json script. Remove the entry.`);
+    continue;
+  }
+  // A guard whose whole point is to precede `pnpm install` is worthless after
+  // it — so the invariant is positional: the guard's script file must appear
+  // in the setup action ahead of the install line, not merely somewhere.
+  const file = /([\w./-]+\.mjs)/.exec(pkg.scripts[script])?.[1];
+  const guardAt = file ? setupSteps.indexOf(file) : -1;
+  // The actual step, not the prose: action.yml comments discuss `pnpm install`
+  // too, and a first-occurrence match would land in the header.
+  const installAt = /run:\s*pnpm install/.exec(setupSteps)?.index ?? -1;
+  if (guardAt === -1 || installAt === -1 || guardAt > installAt) {
+    problems.push(
+      `INFRA_GUARDS says \`${script}\` runs before the install it guards (${why}), ` +
+        `but .github/actions/setup/action.yml does not invoke ${file ?? script} ahead of \`pnpm install\`.`,
+    );
   }
 }
 
@@ -331,7 +373,7 @@ for (const [job, ran] of ciJobs) {
     );
     continue;
   }
-  const missing = ran.filter((s) => !stated.includes(s));
+  const missing = ran.filter((s) => !stated.includes(s) && !(s in INFRA_GUARDS));
   const phantom = stated.filter((s) => !ran.includes(s) && scripts.includes(s));
   if (missing.length) {
     problems.push(
@@ -365,7 +407,7 @@ const rule6 = (() => {
 if (rule6 === null) {
   problems.push(`docs/workflow.md has no rule 6 "Required Checks" — the roster this gate reads.`);
 } else {
-  const missing = [...runsInCi].filter((s) => !rule6.includes(s));
+  const missing = [...runsInCi].filter((s) => !rule6.includes(s) && !(s in INFRA_GUARDS));
   if (missing.length) {
     problems.push(
       `docs/workflow.md rule 6 lists what "all runs on every PR" and omits ` +
