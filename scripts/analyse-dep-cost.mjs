@@ -303,6 +303,18 @@ function printTable(result) {
   }
 }
 
+/**
+ * The report is rendered from the *baseline*, never from a live measurement.
+ *
+ * Measurement has platform jitter: the same tree weighed on macOS and on the CI
+ * runner differs by a few bytes, because esbuild and zlib are not the same
+ * builds. The numeric check absorbs that with a tolerance. Comparing rendered
+ * markdown byte-for-byte against a fresh measurement would not — it made the
+ * document read as stale on a runner whose every package was within tolerance,
+ * which is a gate failing for a reason that has nothing to do with dependency
+ * cost. Rendering from the committed JSON makes this check ask the question it
+ * means to ask: is the prose in step with the data it describes.
+ */
 function renderReport(result) {
   const lines = [];
   lines.push('# What the dependencies cost');
@@ -396,6 +408,20 @@ function toBaseline(result) {
   };
 }
 
+/** Read a committed baseline back into the shape `renderReport` expects. */
+function fromBaseline(baseline) {
+  return {
+    own: baseline.own,
+    total: baseline.total,
+    packages: Object.entries(baseline.packages)
+      .map(([name, row]) => ({ name, ...row }))
+      .sort((a, b) => b.marginal.gzip - a.marginal.gzip || a.name.localeCompare(b.name)),
+    scopes: Object.entries(baseline.scopes)
+      .map(([scope, marginal]) => ({ scope, marginal }))
+      .sort((a, b) => b.marginal.gzip - a.marginal.gzip),
+  };
+}
+
 const result = await measure();
 
 if (mode === 'list') {
@@ -404,8 +430,9 @@ if (mode === 'list') {
 }
 
 if (mode === 'update') {
-  writeFileSync(BASELINE, `${JSON.stringify(toBaseline(result), null, 2)}\n`);
-  writeFileSync(REPORT, renderReport(result));
+  const recorded = toBaseline(result);
+  writeFileSync(BASELINE, `${JSON.stringify(recorded, null, 2)}\n`);
+  writeFileSync(REPORT, renderReport(fromBaseline(recorded)));
   printTable(result);
   console.log(`\nWrote ${path.relative(ROOT, BASELINE)} and ${path.relative(ROOT, REPORT)}.`);
   process.exit(0);
@@ -460,9 +487,9 @@ for (const name of Object.keys(baseline.packages)) {
 
 if (!existsSync(REPORT)) {
   problems.push(`${path.relative(ROOT, REPORT)} is missing. Run \`pnpm deps:cost:update\`.`);
-} else if (readFileSync(REPORT, 'utf8') !== renderReport(result)) {
+} else if (readFileSync(REPORT, 'utf8') !== renderReport(fromBaseline(baseline))) {
   problems.push(
-    `${path.relative(ROOT, REPORT)} is stale — it does not match what the current build measures. ` +
+    `${path.relative(ROOT, REPORT)} is stale — it does not match ${path.relative(ROOT, BASELINE)}. ` +
       'Run `pnpm deps:cost:update`.',
   );
 }
