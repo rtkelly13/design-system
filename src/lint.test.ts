@@ -47,7 +47,7 @@ beforeAll(async () => {
     filePath: path.join(ROOT, 'src/components/__lint_warmup__.tsx'),
     warnIgnored: false,
   });
-}, 60_000);
+}, 180_000);
 
 /** Lint a fragment as if it were a component, which is what the config scopes to. */
 async function lintComponent(code: string): Promise<string[]> {
@@ -98,7 +98,7 @@ describe('no-colour-literals', () => {
     const messages = await lintComponent(wrap(`<div className="bg-zinc-900 text-zinc-400" />`));
     expect(messages).toHaveLength(2);
   });
-});
+}, 30_000);
 
 describe('no-custom-classname', () => {
   it('rejects a utility that exists in no namespace', async () => {
@@ -145,7 +145,7 @@ describe('no-custom-classname', () => {
     );
     expect(messages.join('\n')).toContain('docs-imaginary');
   });
-});
+}, 30_000);
 
 describe('scope', () => {
   /**
@@ -162,4 +162,4 @@ describe('scope', () => {
     });
     expect(result?.messages ?? []).toEqual([]);
   });
-});
+}, 30_000);

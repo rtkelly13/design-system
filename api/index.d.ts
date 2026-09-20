@@ -270,6 +270,71 @@ interface AnsiScheme {
 
 declare function ansiScheme(level: ThemeLevel): AnsiScheme;
 
+declare const RECOMMENDED_COLOUR_NAMESPACES: readonly ["surface", "content", "edge", "accent", "intent"];
+type RecommendedColourNamespace = (typeof RECOMMENDED_COLOUR_NAMESPACES)[number];
+
+declare const RECOMMENDED_COLOUR_ROLES: {
+    readonly surface: readonly ["base", "raised", "sunken", "overlay"];
+    readonly content: readonly ["primary", "secondary", "muted", "inverse"];
+    readonly edge: readonly ["strong", "default", "subtle"];
+    readonly accent: readonly ["primary", "secondary", "tertiary", "quiet"];
+    readonly intent: readonly ["info", "success", "warning", "danger"];
+};
+
+interface RecommendedThemeColours {
+    readonly surface: Readonly<Record<Surface, string>>;
+    readonly content: Readonly<Record<TextTone, string>>;
+    readonly edge: Readonly<Record<BorderTone, string>>;
+    readonly accent: Readonly<Record<Emphasis, string>>;
+    readonly intent: Readonly<Record<Intent, string>>;
+}
+
+declare const RECOMMENDED_COLOURS: Readonly<Record<ThemeLevel, RecommendedThemeColours>>;
+
+declare function getRecommendedColours(level?: ThemeLevel): RecommendedThemeColours;
+
+declare const RECOMMENDED_COLOUR_VARS: {
+    readonly surface: {
+        readonly base: "var(--ds-surface-base)";
+        readonly raised: "var(--ds-surface-raised)";
+        readonly sunken: "var(--ds-surface-sunken)";
+        readonly overlay: "var(--ds-surface-overlay)";
+    };
+    readonly content: {
+        readonly primary: "var(--ds-text-primary)";
+        readonly secondary: "var(--ds-text-secondary)";
+        readonly muted: "var(--ds-text-muted)";
+        readonly inverse: "var(--ds-text-inverse)";
+    };
+    readonly edge: {
+        readonly strong: "var(--ds-border-strong)";
+        readonly default: "var(--ds-border-default)";
+        readonly subtle: "var(--ds-border-subtle)";
+    };
+    readonly accent: {
+        readonly primary: "var(--ds-accent-primary)";
+        readonly secondary: "var(--ds-accent-secondary)";
+        readonly tertiary: "var(--ds-accent-tertiary)";
+        readonly quiet: "var(--ds-accent-quiet)";
+    };
+    readonly intent: {
+        readonly info: "var(--ds-intent-info)";
+        readonly success: "var(--ds-intent-success)";
+        readonly warning: "var(--ds-intent-warning)";
+        readonly danger: "var(--ds-intent-danger)";
+    };
+};
+
+declare const RECOMMENDED_COLOUR_PROPERTIES: readonly ["bg", "text", "border", "ring", "divide", "placeholder", "from", "via", "to"];
+type RecommendedColourProperty = (typeof RECOMMENDED_COLOUR_PROPERTIES)[number];
+
+type RecommendedColourClass = {
+    [N in RecommendedColourNamespace]: `${RecommendedColourProperty}-${N}-${(typeof RECOMMENDED_COLOUR_ROLES)[N][number]}`;
+}[RecommendedColourNamespace];
+declare const RECOMMENDED_COLOUR_CLASSES: readonly RecommendedColourClass[];
+
+declare function isRecommendedColourClass(className: string): boolean;
+
 type ClassInput = string | number | null | undefined | false | ClassInput[];
 
 declare function cn(...inputs: ClassInput[]): string;
@@ -1347,6 +1412,16 @@ export {
   type PricingTier,
   Prose,
   type ProseProps,
+  RECOMMENDED_COLOURS,
+  RECOMMENDED_COLOUR_CLASSES,
+  RECOMMENDED_COLOUR_NAMESPACES,
+  RECOMMENDED_COLOUR_PROPERTIES,
+  RECOMMENDED_COLOUR_ROLES,
+  RECOMMENDED_COLOUR_VARS,
+  type RecommendedColourClass,
+  type RecommendedColourNamespace,
+  type RecommendedColourProperty,
+  type RecommendedThemeColours,
   type Rgb,
   SLIDE_DECK_HOTKEYS,
   SLOTS,
@@ -1424,9 +1499,11 @@ export {
   contrastRatio,
   createAnchorHeading,
   fontVar,
+  getRecommendedColours,
   getThemeInitScript,
   isExternalHref,
   isMedium,
+  isRecommendedColourClass,
   isThemeLevel,
   mdxComponents,
   nextLevel,
