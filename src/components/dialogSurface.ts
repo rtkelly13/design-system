@@ -32,8 +32,26 @@ export const dialogSurface = recipe({
       'fixed inset-0 z-top bg-surface-overlay transition-opacity duration-quick ease-brutalist '
       + 'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none',
     viewport: 'fixed inset-0 z-top flex items-center justify-center p-4',
+    /*
+     * `focus-visible:outline-none!` on the popup and nowhere else. Focus lands
+     * on this element so a screen reader announces the dialog's own title
+     * rather than its close button — it is an announcement target, not a
+     * keyboard stop, and the global `:focus-visible` rule in styles.css would
+     * otherwise draw the accent ring around the entire surface. The
+     * hand-rolled container this replaced took focus the same way and painted
+     * no ring; Base UI's focus call matches `:focus-visible`, so the ring has
+     * to be turned off here instead. Controls inside the dialog keep theirs.
+     *
+     * The `!` is load-bearing, and the only one in the package. That rule is
+     * unlayered on purpose — styles.css says keyboard focus must stay visible
+     * even where a component restyles it — so it outranks Tailwind's
+     * `@layer utilities` regardless of specificity. Important is the sanctioned
+     * way past it, and the narrow scope is what makes it safe: one slot, one
+     * element that no keyboard user can Tab to.
+     */
     popup:
       'max-h-[90vh] w-full max-w-lg overflow-y-auto border-4 border-edge-strong bg-surface-raised '
+      + 'focus-visible:outline-none! '
       + 'font-mono shadow-hard-lg transition-opacity duration-quick ease-brutalist '
       + 'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none',
     header:
