@@ -30,9 +30,17 @@ machines. Anything whose correctness *is* its appearance stays in `test:visual` 
 asserting on class strings is a worse version of a screenshot and breaks on every
 harmless refactor.
 
-The suite covers `src/lib/`, `src/hooks/`, the generated `theme.css`, and — so far —
-`Input` and `StatCard` under `src/components/`. Prefer asserting behaviour (is the
-label wired to the control? does the error replace the helper text?) over markup.
+The suite covers `src/lib/`, `src/hooks/`, the generated `theme.css`, and component
+behaviour under `src/components/`. `Modal` and `ThemeProvider` are covered because
+their portal, focus, persistence, and theme-resolution logic has a right answer
+independent of pixels. Prefer asserting behaviour (is the label wired to the
+control? does the error replace the helper text?) over markup.
+
+`pnpm test:coverage` runs the same suite with V8 coverage over the library, hooks,
+and components. Its thresholds are ratchets set from the first
+component-inclusive measurement; raise them as behavioural tests are added rather
+than treating the number as an aspirational claim. CI runs this command in the
+unit job.
 
 Two tests are cross-cutting rather than co-located, because what they cover is a
 property of the package and not of one file: `src/lint.test.ts` pins the two lint
@@ -61,5 +69,4 @@ does not read them and `typecheck` cannot. The failure it guards is one that
 already shipped twice — `files` listed `LICENSE` and `license` said MIT while no
 such file existed. Note it runs before `pnpm build`, so `dist/` is asserted to be
 *declared*, not to be present.
-
 
