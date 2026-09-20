@@ -235,6 +235,13 @@ jobs:
       - name: Bundle Size Budget
         run: pnpm check:bundle-size
 
+      # The other half of the weight. `check:bundle-size` weighs what this
+      # package authors; `tsup` externalises every runtime dependency, so what
+      # a consumer actually installs is this plus ~100 KB gzip that no gate
+      # could see. Reads dist/ for the import surface, so it belongs here.
+      - name: Dependency Cost
+        run: pnpm check:dep-cost
+
       # Reads dist/index.d.ts, so it belongs in this job, after the build.
       # Fails if the published type surface moved without api/index.d.ts being
       # updated — the diff in that file *is* the API change under review.
