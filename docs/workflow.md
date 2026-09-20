@@ -58,6 +58,7 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - `pnpm typecheck`
    - `pnpm test:coverage` (unit and V8 coverage — see "Unit Tests" below)
    - `pnpm build`
+   - `pnpm check:bundle-size` (built bundle and CSS stay within raw and gzip byte budgets)
    - `pnpm check:api` (the published type surface matches `api/index.d.ts`)
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)

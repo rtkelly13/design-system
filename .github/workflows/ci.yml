@@ -230,6 +230,11 @@ jobs:
       - name: Build Package
         run: pnpm build
 
+      # Reads dist/ and src/theme.css, so it belongs in this job, after the build.
+      # Fails if output size exceeds the raw or gzip byte budgets.
+      - name: Bundle Size Budget
+        run: pnpm check:bundle-size
+
       # Reads dist/index.d.ts, so it belongs in this job, after the build.
       # Fails if the published type surface moved without api/index.d.ts being
       # updated — the diff in that file *is* the API change under review.
