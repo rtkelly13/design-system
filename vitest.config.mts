@@ -29,6 +29,15 @@ export default defineConfig({
       include: ['src/lib/**', 'src/hooks/**', 'src/components/**'],
       exclude: ['**/*.test.{ts,tsx}', 'src/components/**/*.stories.tsx'],
       reporter: ['text', 'lcov'],
+      // Ratchet the measured surface from the first component-inclusive run.
+      // These are floors, not an aspirational target: raise them when
+      // behavioural tests grow, never lower them to make a regression green.
+      thresholds: {
+        statements: 70,
+        branches: 58,
+        functions: 65,
+        lines: 71,
+      },
     },
   },
 });

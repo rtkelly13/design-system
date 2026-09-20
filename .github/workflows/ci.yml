@@ -71,6 +71,33 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # The squash commit inherits the PR title, and `release-train.mjs` reads
+      # its version bump from that title — a non-conventional title merged on
+      # an otherwise-green PR poisons the next stable release. It is a step in
+      # `gates` rather than its own workflow because only jobs inside this
+      # file can enter the `ci` aggregate's `needs` (rule 6): a required check
+      # in a second workflow is an advisory check, and an advisory check gets
+      # merged red. The title comes from the event payload, so this needs
+      # neither an install nor an API token.
+      - name: Conventional PR Title
+        if: github.event_name == 'pull_request'
+        uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+
       - name: Setup
         uses: ./.github/actions/setup
 
@@ -197,8 +224,8 @@ jobs:
       # incidental: `src/package-shape.test.ts` asserts on what `files` declares
       # while `dist/` does not yet exist. Running it after a build would change
       # what it is testing.
-      - name: Unit Tests
-        run: pnpm test
+      - name: Unit Tests and Coverage
+        run: pnpm test:coverage
 
       - name: Build Package
         run: pnpm build
@@ -225,6 +252,22 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
+
+      - name: Cache Storybook
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            storybook-static
+            node_modules/.cache/storybook
+          # Two separate `hashFiles` calls, so the lockfile hash is a shared
+          # prefix: GitHub matches `restore-keys` against the start of saved
+          # keys only. One combined hash over lock-and-source would put the
+          # lockfile-only restore key nowhere any saved key begins with, so
+          # every source-changing PR would restore nothing and upload a fresh
+          # full cache — the cost this step exists to avoid.
+          key: storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', '.storybook/**', 'package.json') }}
+          restore-keys: |
+            storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
       # No `pnpm build` first: Storybook compiles from `src/`, not from `dist/`,
       # so this job does not depend on the package build and can run beside it.

@@ -112,6 +112,7 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-sparkline--primary-trend', snapshot: 'sparkline-primary-trend.png' },
   { id: 'foundations-bulletchart--primary-benchmark', snapshot: 'bulletchart-primary-benchmark.png' },
   { id: 'foundations-charttooltip--primary', snapshot: 'charttooltip-primary.png' },
+  { id: 'foundations-socialicon--brand-marks', snapshot: 'socialicon-brand-marks.png' },
 ];
 
 /**
