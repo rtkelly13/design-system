@@ -671,7 +671,7 @@ type DataTableProps<T> = DataTableSharedProps<T> & ({
 });
 declare function DataTable<T>({ table: providedTable, columns, data, keyExtractor, emptyText, className, containerClassName, virtualize, ...rest }: DataTableProps<T>): react.JSX.Element;
 
-interface ModalProps {
+interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'className'> {
     isOpen: boolean;
     onClose: () => void;
     title: string;
@@ -682,7 +682,25 @@ interface ModalProps {
     className?: string;
 }
 
-declare function Modal({ isOpen, onClose, title, children, footer, closeOnBackdropClick, className, }: ModalProps): react.ReactPortal | null;
+declare const Modal: react.ForwardRefExoticComponent<ModalProps & react.RefAttributes<HTMLDivElement>>;
+
+interface AlertDialogProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'className'> {
+    isOpen: boolean;
+
+    onClose: () => void;
+
+    onConfirm: () => void;
+    title: string;
+
+    children: ReactNode;
+    confirmLabel?: string;
+    cancelLabel?: string;
+
+    footer?: ReactNode;
+    className?: string;
+}
+
+declare const AlertDialog: react.ForwardRefExoticComponent<AlertDialogProps & react.RefAttributes<HTMLDivElement>>;
 
 declare const NERD_GLYPHS: {
     readonly sort: "";
@@ -1283,6 +1301,8 @@ export {
   type AdminDashboardLayoutProps,
   type AdminNavItem,
   type AdminStatusBadge,
+  AlertDialog,
+  type AlertDialogProps,
   AnchorHeading,
   type AnchorHeadingProps,
   type AnsiChrome,
