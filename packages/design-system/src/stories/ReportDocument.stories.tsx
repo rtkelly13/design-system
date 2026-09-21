@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ReportDocument, ReportDetails, ReportSection } from '../components/ReportDocument';
 import { Badge } from '../components/Badge';
 import { Card } from '../components/Card';
+import { CodeBlock } from '../components/docs/CodeBlock';
 import { DataTable } from '../components/DataTable';
 import { NoteBlock } from '../components/NoteBlock';
 import { StatCard } from '../components/StatCard';
@@ -60,13 +61,13 @@ export const QualityGate: Story = {
         </ReportSection>
         <ReportSection title="Detail">
           <ReportDetails summary="check:css — full output" note="3 lines" open>
-            {/* Same reason as `Table`'s container: a long line in a narrow
-                viewport makes this scrollable, and a scrollable region has to
-                be focusable to be reachable by keyboard. A report generator
-                emitting `<pre>` owes its readers the same attribute. */}
-            <pre tabIndex={0} className="overflow-x-auto font-mono text-xs text-content-secondary">
+            {/* `CodeBlock`, not a raw `<pre>`: it already pairs the tabIndex a
+                scrollable region needs with the role and name that make the
+                focus stop worth landing on. A report emitting fixed-width
+                output should reach for it for the same reason. */}
+            <CodeBlock title="check:css output">
               {'prose.css   328 declarations   budget 320   OVER by 8'}
-            </pre>
+            </CodeBlock>
           </ReportDetails>
           <DataTable
             columns={[

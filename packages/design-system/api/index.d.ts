@@ -683,8 +683,10 @@ interface StatCardProps {
 }
 declare function StatCard({ title, value, change, changeType, subtitle, icon: Icon, accent, className, }: StatCardProps): react.JSX.Element;
 
-declare function Table({ className, containerClassName, ...props }: TableHTMLAttributes<HTMLTableElement> & {
+declare function Table({ className, containerClassName, label, ...props }: TableHTMLAttributes<HTMLTableElement> & {
     containerClassName?: string;
+
+    label?: string;
 }): react.JSX.Element;
 declare function TableHeader({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
 declare function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
