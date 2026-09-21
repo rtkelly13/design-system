@@ -29,7 +29,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |
 | `pnpm check:docgen-props` | every documented component publishes its props, and the components manifest carries them |
 | `pnpm check:story-conventions` | story title vocabulary, and an autodocs decision per component |
-| `pnpm check:story-docs` | what a component page actually tells a reader — docs page, description, three samples, story captions, prop docs. A ratchet, ceiling **47** |
+| `pnpm check:story-docs` | what a component page actually tells a reader — docs page, description, three samples, story captions, prop docs. A ratchet, ceiling **43** |
 | `pnpm check:deployed` | the live Storybook against this build — deliberately **not** a PR gate |
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |
 | `pnpm ansi:check` | terminal slot coverage **and** the committed fixture diff |

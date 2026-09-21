@@ -11,6 +11,10 @@ const meta: Meta<typeof Badge> = {
 export default meta;
 type Story = StoryObj<typeof Badge>;
 
+/**
+ * The badge at its default accent — the shape and weight before any role is
+ * chosen.
+ */
 export const Default: Story = {
   args: { children: 'ACTIVE' },
 };

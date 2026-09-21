@@ -9,6 +9,11 @@ import type {
 import { recipe } from '../lib/recipe';
 
 interface ButtonOwnProps {
+  /**
+   * The label. Written in caps at the call site rather than upper-cased in
+   * CSS, so a screen reader is given the words rather than the shouting, and
+   * so an acronym that is already caps does not read as emphasis.
+   */
   children: ReactNode;
   /**
    * Named for the colour it is on `midnight`, not for a colour it guarantees.
@@ -25,8 +30,24 @@ interface ButtonOwnProps {
    * change and is deliberately not bundled with the token migration.
    */
   variant?: ButtonVariant;
+  /**
+   * Padding and type scale, not a semantic weight. `md` is the default and the
+   * one to reach for; `sm` is for dense rows such as a table's row actions,
+   * and `lg` for a page's single primary action. Hit area is the constraint
+   * that decides — `sm` is still 44px tall at the `web` Medium.
+   */
   size?: 'sm' | 'md' | 'lg';
+  /**
+   * Wraps the label in `[ ]`. The brutalist cue for "this one does something"
+   * — worth it for a form's submit or a destructive confirm, noise on every
+   * button in a toolbar. It is punctuation in the label, not a border.
+   */
   bracketed?: boolean;
+  /**
+   * Merged into the recipe's own classes. Reach for it to place the button —
+   * `w-full`, a grid slot — rather than to restyle it; a colour set here is
+   * what `pnpm check:tokens` exists to find.
+   */
   className?: string;
 }
 
@@ -58,6 +79,12 @@ export type ButtonElementProps = ButtonOwnProps &
 /** The `<a>` form. Passing `href` selects it; there is no `as` prop to remember. */
 export type ButtonLinkProps = ButtonOwnProps &
   DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> & {
+    /**
+     * Where it navigates — and the discriminant. Supplying it renders an `<a>`
+     * wearing the button's styling, which is what a keyboard user, a screen
+     * reader and a middle click all need from something that navigates. Omit
+     * it for anything that acts on the current page.
+     */
     href: string;
   };
 
