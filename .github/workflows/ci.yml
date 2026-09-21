@@ -277,6 +277,22 @@ jobs:
       - name: Public API Surface
         run: pnpm check:api
 
+      # The second package. It builds against the first one's `dist/`, so it
+      # runs after `Build Package` and inside its own directory — the job's
+      # default is the design system's.
+      #
+      # `verify:report-cli` is the one that matters: it packs both packages,
+      # installs them into a throwaway project and drives the CLI as a consumer
+      # would. A generator that works in the workspace and not from a tarball
+      # is a generator nobody else can run.
+      - name: Report Generator
+        working-directory: packages/design-system-report
+        run: |
+          pnpm typecheck
+          pnpm test
+          pnpm build
+          pnpm verify:report-cli
+
   visual:
     name: visual
     runs-on: ubuntu-latest

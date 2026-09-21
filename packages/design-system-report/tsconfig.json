@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    // Same tsup dts-worker problem as the design system: it injects its own
+    // `baseUrl` and then cannot resolve @types/node, so every `node:` import
+    // fails there while `tsc --noEmit` is happy. See AGENTS.md.
+    "ignoreDeprecations": "6.0",
+    "types": ["node"],
+    "typeRoots": ["../../node_modules/@types", "./node_modules/@types"]
+  },
+  "include": ["src/**/*"],
+  // A fixture that is *meant* not to typecheck — it is what the report
+  // typechecker is pointed at to prove it reports something.
+  "exclude": ["src/__fixtures__/broken-types.tsx"]
+}
