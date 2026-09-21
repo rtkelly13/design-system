@@ -10,6 +10,10 @@ const meta: Meta<typeof Input> = {
 export default meta;
 type Story = StoryObj<typeof Input>;
 
+/**
+ * The resting state: label, control, helper text. What every other state here
+ * is a departure from.
+ */
 export const DefaultInput: Story = {
   args: {
     label: 'API Key',
@@ -19,6 +23,11 @@ export const DefaultInput: Story = {
   },
 };
 
+/**
+ * `error` set. The message replaces the helper text rather than joining it,
+ * and the same prop drives `aria-invalid` and the danger border — so what a
+ * screen reader is told and what the page shows cannot disagree.
+ */
 export const InputWithError: Story = {
   args: {
     label: 'Workspace Domain',
@@ -28,6 +37,11 @@ export const InputWithError: Story = {
   },
 };
 
+/**
+ * The same contract over several lines. Reach for it when the answer is prose
+ * — a description, a note — rather than when a single-line value merely runs
+ * long.
+ */
 export const TextAreaStory: StoryObj<typeof TextArea> = {
   render: () => (
     <TextArea
@@ -38,6 +52,12 @@ export const TextAreaStory: StoryObj<typeof TextArea> = {
   ),
 };
 
+/**
+ * One of a fixed set, on the native control. Native because it is what a
+ * mobile keyboard, a screen reader and a keyboard user all already know — the
+ * system's richer listbox is #164, and until it lands this is the honest
+ * choice rather than a half-built one.
+ */
 export const SelectStory: StoryObj<typeof Select> = {
   render: () => (
     <Select

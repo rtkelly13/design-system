@@ -369,11 +369,15 @@ interface UseActiveHeadingOptions {
 declare function useActiveHeading(ids: readonly string[], { offset, enabled }?: UseActiveHeadingOptions): string | null;
 
 interface ButtonOwnProps {
+
     children: ReactNode;
 
     variant?: ButtonVariant;
+
     size?: 'sm' | 'md' | 'lg';
+
     bracketed?: boolean;
+
     className?: string;
 }
 
@@ -384,6 +388,7 @@ type ButtonElementProps = ButtonOwnProps & DetailedHTMLProps<ButtonHTMLAttribute
 };
 
 type ButtonLinkProps = ButtonOwnProps & DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> & {
+
     href: string;
 };
 type ButtonProps = ButtonElementProps | ButtonLinkProps;
@@ -394,12 +399,19 @@ type CardVariant = 'panel' | 'card';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
 
     title?: string;
+
     description?: string;
+
     imgSrc?: string;
+
     href?: string;
+
     asciiArt?: string;
+
     filename?: string;
+
     children?: ReactNode;
+
     className?: string;
 
     accent?: AccentToken;
@@ -414,10 +426,12 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 declare function Card({ title, description, imgSrc, href, asciiArt, filename, children, className, accent, badge, panel, variant, style, ...props }: CardProps): react.JSX.Element;
 
 interface BadgeProps extends react__default.HTMLAttributes<HTMLSpanElement> {
+
     children: react__default.ReactNode;
 
     accent?: AccentToken;
 }
+
 declare const Badge: react__default.ForwardRefExoticComponent<BadgeProps & react__default.RefAttributes<HTMLSpanElement>>;
 
 interface ReportMetaItem {
@@ -606,15 +620,20 @@ interface TLDRProps {
 declare const TLDR: react__default.FC<TLDRProps>;
 
 interface FieldProps {
+
     label?: string;
+
     error?: string;
+
     helperText?: string;
 
     accent?: AccentToken;
+
     className?: string;
 }
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'>, FieldProps {
 }
+
 declare function Input({ label, error, helperText, accent, className, id, ...props }: InputProps): react.JSX.Element;
 interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'>, FieldProps {
 }

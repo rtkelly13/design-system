@@ -19,12 +19,45 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
    * full card form over the panel form — see the note on `variant`.
    */
   title?: string;
+  /**
+   * The standfirst under the title — one or two sentences saying what the card
+   * is about. Longer body copy belongs in `children`, which is not constrained
+   * to a paragraph.
+   */
   description?: string;
+  /**
+   * A cover image above the card's text. Mutually exclusive with `asciiArt` in
+   * practice rather than in types: both occupy the same slot, and a card given
+   * both shows the image.
+   */
   imgSrc?: string;
+  /**
+   * Turns the card into a link to here, rendered as a trailing affordance
+   * rather than by wrapping the whole card — so the title stays selectable and
+   * nested controls keep their own click targets.
+   */
   href?: string;
+  /**
+   * Monospace art rendered in place of an image. The reason the mono face is
+   * latin-only by deliberate choice: box-drawing characters must land on the
+   * same advance width or the art shears.
+   */
   asciiArt?: string;
+  /**
+   * Shown in the card's header strip as a file name would be in an editor
+   * tab. A label for the card's provenance, not a download.
+   */
   filename?: string;
+  /**
+   * The card's body. Whatever `title` and `description` cannot say — a list, a
+   * chart, controls. With no `title` and no `variant`, supplying this is what
+   * selects the panel form; see the note on `variant`.
+   */
   children?: ReactNode;
+  /**
+   * Merged into the recipe's classes. For placement and span — a grid cell, a
+   * width — rather than for restyling the surface.
+   */
   className?: string;
   /** Semantic accent for the left border highlight. */
   accent?: AccentToken;
