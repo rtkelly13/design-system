@@ -63,7 +63,7 @@ layer down — silent, plausible-looking, wrong output.
 
 ### 3. Turn the transitions off
 
-There are 40 CSS transitions and **zero** `@keyframes`. Most are hover- or focus-intent, so they are
+There are 40 CSS transitions and **3** `@keyframes`. Most of the transitions are hover- or focus-intent, so they are
 inert wherever there is no pointer — but since #162 that is no longer all of them. `Modal`,
 `AlertDialog` and `Drawer` fade their backdrop and popup on open and close, driven by Base UI's
 `data-starting-style` / `data-ending-style` attributes rather than by a pointer, so a capture taken
@@ -86,8 +86,22 @@ snaps.
 ```
 
 This belongs to the consumer rather than the package — a stylesheet that suppressed its own
-transitions would be wrong in a browser. Zero `@keyframes` is the good news: those would be
-genuinely harder to suppress cleanly.
+transitions would be wrong in a browser.
+
+The three `@keyframes` are the reason the reset names `animation` as well as `transition`, and they
+are a harder case than a transition in one specific way: they are **infinite loops**, declared in
+`styles.css` as `--animate-ds-*` tokens and worn by `Spinner`, `Skeleton` and `Progress`. A
+transition is inert until something changes; a loop is never at rest, so a capture taken at an
+arbitrary moment lands on an arbitrary frame. Nothing about that is a race the harness can wait out
+— the only deterministic frame is the one where the animation is not running.
+
+Two levers reach them, and they are not the same lever. `animation: none !important` in the reset
+above removes them outright, which is what a capture harness wants. Playwright's
+`animations: 'disabled'` — what `tests/visual.spec.ts` runs under — instead resets an infinite
+animation to its **first** frame, which is why the gated baselines of those three components are
+reproducible without the reset. `prefers-reduced-motion` is the third lever and deliberately not a
+capture tool: `Skeleton` stops under it, but `Spinner` only slows, because a spinner that has
+stopped reads as a page that has hung.
 
 ## All three together
 

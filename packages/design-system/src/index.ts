@@ -77,6 +77,16 @@ export * from './components/DataTable';
 export * from './components/Modal';
 export * from './components/AlertDialog';
 export * from './components/Drawer';
+
+// System feedback — the three states an application has besides "loaded".
+// One vocabulary on purpose: the same motion tokens, the same reduced-motion
+// rule, the same muted surface, so a loading card and an empty table read as
+// the same system rather than as two consumers' guesses.
+export * from './components/Spinner';
+export * from './components/Skeleton';
+export * from './components/Progress';
+export * from './components/EmptyState';
+
 export * from './components/NerdIcon';
 export * from './components/SocialIcon';
 export * from './components/Glyph';
