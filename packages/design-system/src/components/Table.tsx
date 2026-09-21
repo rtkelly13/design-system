@@ -26,8 +26,25 @@ export function Table({
   ...props
 }: TableHTMLAttributes<HTMLTableElement> & { containerClassName?: string }) {
   const styles = tableStyles();
+  /*
+   * `tabIndex={0}` on the container because it is `overflow-x-auto`: any table
+   * wider than its column becomes a scrollable region, and a scrollable region
+   * that cannot take focus cannot be scrolled by keyboard at all — axe's
+   * `scrollable-region-focusable`, and a real trap rather than a technicality,
+   * since the columns off the right edge are then reachable only with a
+   * pointer. `CodeBlock` carries the same attribute for the same reason.
+   *
+   * No `role="region"`: that would demand an accessible name this component
+   * has none to give, trading one violation for another. A focusable generic
+   * container is what the rule asks for, and `<caption>` already names the
+   * table for anyone reading it.
+   */
   return (
-    <div data-slot="table-container" className={styles.container({ class: containerClassName })}>
+    <div
+      data-slot="table-container"
+      tabIndex={0}
+      className={styles.container({ class: containerClassName })}
+    >
       <table data-slot="table" className={styles.table({ class: className })} {...props} />
     </div>
   );

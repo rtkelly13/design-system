@@ -60,7 +60,11 @@ export const QualityGate: Story = {
         </ReportSection>
         <ReportSection title="Detail">
           <ReportDetails summary="check:css — full output" note="3 lines" open>
-            <pre className="overflow-x-auto font-mono text-xs text-content-secondary">
+            {/* Same reason as `Table`'s container: a long line in a narrow
+                viewport makes this scrollable, and a scrollable region has to
+                be focusable to be reachable by keyboard. A report generator
+                emitting `<pre>` owes its readers the same attribute. */}
+            <pre tabIndex={0} className="overflow-x-auto font-mono text-xs text-content-secondary">
               {'prose.css   328 declarations   budget 320   OVER by 8'}
             </pre>
           </ReportDetails>
