@@ -10,7 +10,7 @@ The deployed Storybook, its domains, and the build quota that governs them.
 
 | URL | Serves | Vercel mechanism |
 | --- | --- | --- |
-| [design-system.ryankelly.dev](https://design-system.ryankelly.dev) | `main` | Production domain |
+| [design-system.ryankelly.dev](https://design-system.ryankelly.dev) | the `production` branch | Production domain |
 | [preview.design-system.ryankelly.dev](https://preview.design-system.ryankelly.dev) | the `preview` branch | Branch domain (`gitBranch`) |
 
 Both domains are declared **outside this repo**, in `rtkelly13/shared-utilities` at
@@ -52,6 +52,43 @@ latest Ready production build matches `origin/main`.
 `.github/workflows/deployment-drift.yml` runs it on pushes to `main` and daily. That
 turns silence into a red mark someone owns, and catches drift within one merge instead
 of thirty.
+
+### The production domain has never tracked `main`
+
+The table above said `main` until 21 September. It was wrong, and it was wrong in the
+direction that costs the most: the site had been serving 12 September for nine days, and
+every check you would reach for said success.
+
+`shared-utilities` declares this project with **`productionBranch: 'production'`**
+([`infra/vercel/sites.ts`](https://github.com/rtkelly13/shared-utilities/blob/main/infra/vercel/sites.ts)),
+and `design-system.ryankelly.dev` is that project's production domain. So a merge to
+`main` produces a *preview* deployment of this project — which is why the GitHub
+deployment list shows `Preview – design-system-storybook` for commits on `main`, and why
+every one of them reports success while the domain does not move. Nothing is broken in
+the sense of failing. The branch the domain serves simply stops being advanced.
+
+It stopped on 12 September, at `583e08a` — which is, with some irony, the commit that
+documented the *previous* stale-production incident. Eighteen commits later the site was
+still serving the 174 stories that incident ended on, without `AlertDialog`, the four
+chart primitives or `SocialIcon`.
+
+**To promote, advance `production`:** it is the same promote-by-merge model the `preview`
+branch uses, and the section below says so for that one.
+
+```sh
+git push origin origin/main:production   # fast-forward; a deploy follows
+```
+
+Two things follow from this, and both are worth stating rather than rediscovering:
+
+1. **`check:deployed` and `deployment-drift` compare the live site against `main`,** not
+   against `production`. Under promote-by-merge that makes them red for as long as
+   anything is unpromoted — which is true, and is not the same claim as "the deployment
+   is broken". Read a red drift run as *there is unpromoted work*, and promote.
+2. **If the intent is that `main` deploys straight to the domain,** the fix is one line
+   of `productionBranch` in `shared-utilities`, not anything in this repo — and then the
+   `production` branch should go, because a branch nothing advances is a trap the next
+   reader falls into exactly as this one did.
 
 ### Why the Vercel check is not, and cannot be, a required check
 
