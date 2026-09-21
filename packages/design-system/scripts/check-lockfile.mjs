@@ -6,8 +6,8 @@
 // (`file:../…`, `link:../…`). Those clone or link over paths or protocols
 // that build environments don't have, turning cold builds into hard failures.
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, relative, resolve } from 'node:path';
 
 import { REPO_ROOT } from './repo-root.mjs';
 
@@ -51,6 +51,9 @@ const FORBIDDEN = [
   {
     re: /link:\.\.\//,
     label: 'out-of-repo link: dependency (link:../…)',
+    // A workspace sibling is written exactly this way, so this one is
+    // resolved against the importer rather than matched on sight. See below.
+    resolveAgainstImporter: true,
   },
 ];
 
@@ -62,13 +65,47 @@ try {
   process.exit(2);
 }
 
+/*
+ * `link:../design-system` is what pnpm writes for a `workspace:*` dependency
+ * between two packages in this repository. Read on sight it looks identical to
+ * the thing this guard exists to catch — a `pnpm link` at someone's checkout,
+ * which is unresolvable anywhere else — and until the tree moved under
+ * `packages/` the two could not be told apart, because there was only ever one
+ * package and any `../` left the repo.
+ *
+ * Now they can: the difference is whether the target stays inside the
+ * repository, and that depends on which importer the line belongs to.
+ * `link:../design-system` under `importers: packages/design-system-report` is
+ * the sibling and is fine; the same string under `importers: .` points outside
+ * and is not. So the scan tracks the current importer and resolves the target
+ * before judging it.
+ */
+const importerOf = (() => {
+  let current = '.';
+  let inImporters = false;
+  return (line) => {
+    if (/^importers:/.test(line)) { inImporters = true; return current; }
+    if (inImporters && /^\S/.test(line)) inImporters = false;
+    const header = inImporters && line.match(/^  ([^\s:]+):\s*$/);
+    if (header) current = header[1];
+    return current;
+  };
+})();
+
 const violations = [];
 text.split('\n').forEach((line, i) => {
-  for (const { re, label } of FORBIDDEN) {
-    if (re.test(line)) {
-      violations.push({ line: i + 1, label, text: line.trim() });
-      break;
+  const importer = importerOf(line);
+  for (const { re, label, resolveAgainstImporter } of FORBIDDEN) {
+    if (!re.test(line)) continue;
+    if (resolveAgainstImporter) {
+      const target = line.match(/link:(\S+)/)?.[1];
+      const abs = resolve(REPO_ROOT, importer, target ?? '');
+      const rel = relative(REPO_ROOT, abs);
+      const insideRepo = rel !== '' && !rel.startsWith('..') && existsSync(abs);
+      if (insideRepo) break;
     }
+    violations.push({ line: i + 1, label, text: line.trim() });
+    break;
   }
 });
 
