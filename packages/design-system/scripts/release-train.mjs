@@ -2,6 +2,10 @@
 import { execSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 import process from 'node:process';
+import {
+  selectGatingChecks,
+  summariseChecks,
+} from './release-train-checks.mjs';
 
 function run(command) {
   try {
@@ -103,50 +107,16 @@ try {
     const data = JSON.parse(checkRunsJson);
     const checkRuns = data.check_runs || [];
 
-    /*
-     * Checks that observe the deployment rather than gate the code, and so
-     * must not gate the release.
-     *
-     * `deployment-drift` is the one that matters, and it deadlocks without
-     * this: it fails precisely *because* production is behind main, which is
-     * the condition promoting would fix. Left in the blocking set, the first
-     * train to find the site stale refuses to depart, the site stays stale,
-     * and every subsequent train refuses for the same reason. Verified on
-     * 2026-09-21 against a nine-day-old production — the assessment read
-     * "CI checks failed for 4bb0717: failed (deployment-drift). Release
-     * blocked."
-     *
-     * `release-train` and `backup-main` are excluded for the plainer reason
-     * that they are this workflow and a housekeeping job; neither says
-     * anything about whether `main` is fit to deploy.
-     */
-    const OBSERVERS = ['release-train', 'release train', 'backup-main', 'deployment-drift'];
-    const relevantChecks = checkRuns.filter(
-      (c) => !OBSERVERS.some((name) => c.name.toLowerCase().includes(name)),
-    );
+    const gating = selectGatingChecks(checkRuns, {
+      selfRunId: process.env.GITHUB_RUN_ID,
+    });
 
-    if (relevantChecks.length > 0) {
-      const inProgress = relevantChecks.filter(
-        (c) => c.status === 'in_progress' || c.status === 'queued',
-      );
-      const failed = relevantChecks.filter(
-        (c) =>
-          c.status === 'completed' &&
-          ['failure', 'timed_out', 'cancelled'].includes(c.conclusion),
-      );
-      const successful = relevantChecks.filter(
-        (c) => c.status === 'completed' && c.conclusion === 'success',
-      );
-
-      if (failed.length > 0) {
-        ciFailed = true;
-        ciSummary = `failed (${failed.map((c) => c.name).join(', ')})`;
-      } else if (inProgress.length > 0) {
-        ciPending = true;
-        ciSummary = `in progress (${inProgress.map((c) => c.name).join(', ')})`;
-      } else if (successful.length > 0) {
-        ciSummary = `passed (${successful.length} checks)`;
-      }
+    if (gating.length > 0) {
+      const { ciFailed: failed, ciPending: pending, ciSummary: summary } =
+        summariseChecks(gating);
+      ciFailed = failed;
+      ciPending = pending;
+      ciSummary = summary;
     } else {
       ciSummary = 'no blocking checks';
     }
