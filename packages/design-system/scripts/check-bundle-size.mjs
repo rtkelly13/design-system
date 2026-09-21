@@ -60,16 +60,24 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * locally, or leave enough cushion to cover the spread. `check:dep-cost` has
  * the same property and absorbs it with a tolerance; this gate is a hard
  * ceiling, so the cushion has to live in the number.
+ *
+ * Raised again for `TOKEN_RULES` and `scanRules`: +1,068 B raw, +316 B gzip.
+ * That is four regexes and a line-scanner entering the published surface so
+ * the report generator can hold a report to the same colour-instead-of-role
+ * rule this package holds itself to. A consumer who imports neither pays none
+ * of it — `sideEffects` is declared and the module is shaken out — but this
+ * ceiling weighs the whole file, so the number moves and is justified here
+ * rather than quietly widened.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 218_600,
-    maxGzip: 51_200,
+    maxRaw: 220_500,
+    maxGzip: 52_000,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 241_700,
-    maxGzip: 53_300,
+    maxRaw: 243_600,
+    maxGzip: 54_100,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

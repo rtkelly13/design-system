@@ -479,6 +479,29 @@ interface ReportDetailsProps extends HTMLAttributes<HTMLDetailsElement> {
 }
 declare const ReportDetails: react.ForwardRefExoticComponent<ReportDetailsProps & react.RefAttributes<HTMLDetailsElement>>;
 
+interface TokenRule {
+    id: 'hex' | 'rawPalette' | 'legacyAlias' | 'darkVariant';
+    label: string;
+
+    pattern: RegExp;
+    fix: string;
+}
+declare const TOKEN_RULES: readonly TokenRule[];
+interface Finding<Id extends string = string> {
+    ruleId: Id;
+    line: number;
+    match: string;
+
+    text: string;
+}
+
+declare function scanRules<Id extends string>(source: string, rules: readonly {
+    id: Id;
+    pattern: RegExp;
+}[]): Finding<Id>[];
+
+declare function scanTokenRules(source: string): Finding<TokenRule['id']>[];
+
 interface AvatarProps extends react__default.HTMLAttributes<HTMLDivElement> {
     src?: string;
     alt?: string;
@@ -1453,6 +1476,7 @@ export {
   ExperimentsView,
   type ExperimentsViewProps,
   FIXED_COLOURS,
+  type Finding,
   type FixedColour,
   GitHubIcon,
   Glyph,
@@ -1552,6 +1576,7 @@ export {
   THEME_STORAGE_KEY,
   TLDR,
   type TLDRProps,
+  TOKEN_RULES,
   Table,
   TableBody,
   TableCaption,
@@ -1572,6 +1597,7 @@ export {
   ThemeProvider,
   type ThemeProviderProps,
   type TocEntry,
+  type TokenRule,
   type TypeStep,
   type TypeStepName,
   type UseActiveHeadingOptions,
@@ -1602,6 +1628,8 @@ export {
   nextLevel,
   parseColor,
   relativeLuminance,
+  scanRules,
+  scanTokenRules,
   semanticTokens,
   slugify,
   surfaceVar,

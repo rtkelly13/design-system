@@ -46,6 +46,13 @@ export * from './components/Badge';
 // measure, the header strip and the print behaviour, and everything inside it
 // is ordinary composition.
 export * from './components/ReportDocument';
+
+// The colour-instead-of-role rules, and the scanner over them. Published
+// because a tool generating markup against this system should be able to hold
+// itself to the same rule the system holds itself to — the report generator
+// lints at budget zero with exactly these.
+export { TOKEN_RULES, scanRules, scanTokenRules } from './lib/tokenRules';
+export type { Finding, TokenRule } from './lib/tokenRules';
 export * from './components/Avatar';
 export * from './components/PageTitle';
 export * from './components/PageHeader';

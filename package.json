@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "pnpm --filter @rtkelly13/design-system build",
+    "build": "pnpm --filter @rtkelly13/design-system build && pnpm --filter @rtkelly13/design-system-report build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm --filter @rtkelly13/design-system lint",
@@ -15,6 +15,7 @@
     "build-storybook": "pnpm --filter @rtkelly13/design-system build-storybook",
     "test:visual": "pnpm --filter @rtkelly13/design-system test:visual",
     "test:a11y": "pnpm --filter @rtkelly13/design-system test:a11y",
-    "walkthrough": "pnpm --filter @rtkelly13/design-system walkthrough"
+    "walkthrough": "pnpm --filter @rtkelly13/design-system walkthrough",
+    "report": "pnpm --filter @rtkelly13/design-system-report report"
   }
 }
