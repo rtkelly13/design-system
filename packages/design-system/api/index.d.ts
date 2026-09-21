@@ -654,13 +654,43 @@ interface FieldProps {
 
     className?: string;
 }
+
+interface BooleanFieldProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'className' | 'defaultChecked' | 'onChange'>, FieldProps {
+
+    checked?: boolean;
+
+    defaultChecked?: boolean;
+
+    onCheckedChange?: (checked: boolean) => void;
+
+    name?: string;
+
+    value?: string;
+
+    disabled?: boolean;
+
+    readOnly?: boolean;
+
+    required?: boolean;
+
+    id?: string;
+}
+
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'>, FieldProps {
 }
 
-declare function Input({ label, error, helperText, accent, className, id, ...props }: InputProps): react.JSX.Element;
+declare function Input({ label, error, helperText,
+
+accent,
+
+className, id, ...props }: InputProps): react.JSX.Element;
 interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'>, FieldProps {
 }
-declare function TextArea({ label, error, helperText, accent, className, id, ...props }: TextAreaProps): react.JSX.Element;
+declare function TextArea({ label, error, helperText,
+
+accent,
+
+className, id, ...props }: TextAreaProps): react.JSX.Element;
 interface SelectOption {
     label: string;
     value: string;
@@ -668,7 +698,23 @@ interface SelectOption {
 interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'className'>, FieldProps {
     options: SelectOption[];
 }
-declare function Select({ label, error, helperText, options, accent, className, id, ...props }: SelectProps): react.JSX.Element;
+declare function Select({ label, error, helperText, options,
+
+accent,
+
+className, id, ...props }: SelectProps): react.JSX.Element;
+
+interface CheckboxProps extends BooleanFieldProps {
+
+    indeterminate?: boolean;
+}
+
+declare const Checkbox: react.ForwardRefExoticComponent<CheckboxProps & react.RefAttributes<HTMLSpanElement>>;
+
+interface SwitchProps extends BooleanFieldProps {
+}
+
+declare const Switch: react.ForwardRefExoticComponent<SwitchProps & react.RefAttributes<HTMLSpanElement>>;
 
 interface SwatchProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
 
@@ -1451,6 +1497,8 @@ export {
   type CardVariant,
   ChartTooltip,
   type ChartTooltipProps,
+  Checkbox,
+  type CheckboxProps,
   type ClassInput,
   CodeBlock,
   CodeBlockAttachment,
@@ -1596,6 +1644,8 @@ export {
   SwatchGroup,
   type SwatchGroupProps,
   type SwatchProps,
+  Switch,
+  type SwitchProps,
   THEME_ATTRIBUTE,
   THEME_LEVELS,
   THEME_STORAGE_KEY,

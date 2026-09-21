@@ -49,8 +49,12 @@ const EXCLUDED = {
   'docs/DocsLinkProvider.tsx': 'A context provider; its contract is the docs it is documented in.',
 };
 
-/** The count of undocumented components on the day this gate landed. */
-const BUDGET = 17;
+/**
+ * The count of undocumented components. Lowered from 17 with #238: `Checkbox`,
+ * `Switch` and the extracted `fieldFrame` all arrived documented, so the gap
+ * shrank rather than merely not growing.
+ */
+const BUDGET = 15;
 
 function componentFiles(dir = COMPONENTS) {
   return readdirSync(dir).flatMap((entry) => {

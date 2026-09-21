@@ -66,6 +66,10 @@ export * from './components/BracketText';
 export * from './components/NoteBlock';
 export * from './components/TLDR';
 export * from './components/Input';
+// The booleans, added together: one capability in two presentations,
+// composing the same Field as the text controls above.
+export * from './components/Checkbox';
+export * from './components/Switch';
 export * from './components/Swatch';
 export * from './components/StatCard';
 export * from './components/Table';
