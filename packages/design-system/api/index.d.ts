@@ -791,6 +791,28 @@ interface AlertDialogProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' 
 
 declare const AlertDialog: react.ForwardRefExoticComponent<AlertDialogProps & react.RefAttributes<HTMLDivElement>>;
 
+type DrawerPlacement = 'left' | 'right';
+interface DrawerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'className'> {
+
+    isOpen: boolean;
+
+    onClose: () => void;
+
+    title: string;
+
+    children: ReactNode;
+
+    placement?: DrawerPlacement;
+
+    footer?: ReactNode;
+
+    closeOnBackdropClick?: boolean;
+
+    className?: string;
+}
+
+declare const Drawer: react.ForwardRefExoticComponent<DrawerProps & react.RefAttributes<HTMLDivElement>>;
+
 declare const NERD_GLYPHS: {
     readonly sort: "";
     readonly 'sort-asc': "";
@@ -1471,6 +1493,9 @@ export {
   type DocsNavNode,
   DocsSidebar,
   type DocsSidebarProps,
+  Drawer,
+  type DrawerPlacement,
+  type DrawerProps,
   type Emphasis,
   type ExperimentItem,
   ExperimentsView,

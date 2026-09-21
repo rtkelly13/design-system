@@ -229,9 +229,13 @@ by [#38](https://github.com/rtkelly13/design-system/pull/38).
 
 ### Missing for any real admin
 
-`Tabs`, `Toast`, `Dropdown` / `Menu`, `Checkbox`, `Radio`, `Switch`, `Drawer`,
+`Tabs`, `Toast`, `Dropdown` / `Menu`, `Checkbox`, `Radio`, `Switch`,
 `Tooltip`, `Skeleton` / `Spinner`, `EmptyState`, `Progress`, sortable and
 paginated `DataTable`, form-field layout, auth screens, charts.
+
+`Drawer` was on this list until [#241](https://github.com/rtkelly13/design-system/issues/241)
+landed it as `Modal`'s edge-anchored sibling — the off-canvas primitive the
+responsive admin sidebar, filter panels and mobile navigation all sit on.
 
 `gap-analysis.md` §5 ranks these by *demonstrated demand in shipped code* —
 `Checkbox`, `Switch`, `Spinner` and an `Alert` (which `NoteBlock` probably
