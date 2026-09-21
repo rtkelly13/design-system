@@ -45,16 +45,31 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * on the ESM bundle for three components. It is tree-shaken away from anyone
  * who does not import it, and `check:dep-cost` confirms it adds no dependency
  * weight at all — it is markup and a recipe over primitives already paid for.
+ *
+ * ## Record these from CI, not from a laptop
+ *
+ * gzip is not reproducible across platforms. The same `dist/index.mjs` weighs
+ * 50,721 bytes gzipped on macOS and 50,870 on ubuntu-latest — a 149-byte
+ * spread that comes from zlib builds rather than from anything in the bundle.
+ * Budgets first recorded on a developer machine had enough headroom to hide
+ * it; the report frame's +21 B did not, and the gate failed in CI on a tree
+ * that passed locally.
+ *
+ * So the ceilings below are the **runner's** measurements plus roughly half a
+ * percent. Re-record from a CI run rather than from `pnpm check:bundle-size`
+ * locally, or leave enough cushion to cover the spread. `check:dep-cost` has
+ * the same property and absorbs it with a tolerance; this gate is a hard
+ * ceiling, so the cushion has to live in the number.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 218_000,
-    maxGzip: 50_800,
+    maxRaw: 218_600,
+    maxGzip: 51_200,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 241_100,
-    maxGzip: 52_900,
+    maxRaw: 241_700,
+    maxGzip: 53_300,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
