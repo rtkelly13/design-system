@@ -64,6 +64,14 @@ jobs:
   gates:
     name: lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # Every `pnpm` step below is this package's. The workspace root holds
+        # only the lockfile, the workflows and `vercel.json`; the gates, the
+        # build and the suites all live in `packages/design-system`, and setting
+        # this once per job keeps each step reading exactly as it did when the
+        # package was the repository.
+        working-directory: packages/design-system
     # ~30s of Node scripts and one eslint pass, no network past `pnpm install`.
     timeout-minutes: 10
 
@@ -220,6 +228,14 @@ jobs:
   unit:
     name: test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # Every `pnpm` step below is this package's. The workspace root holds
+        # only the lockfile, the workflows and `vercel.json`; the gates, the
+        # build and the suites all live in `packages/design-system`, and setting
+        # this once per job keeps each step reading exactly as it did when the
+        # package was the repository.
+        working-directory: packages/design-system
     # ~35s: tsc, the Vitest suite, and a tsup build.
     timeout-minutes: 10
 
@@ -264,6 +280,14 @@ jobs:
   visual:
     name: visual
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # Every `pnpm` step below is this package's. The workspace root holds
+        # only the lockfile, the workflows and `vercel.json`; the gates, the
+        # build and the suites all live in `packages/design-system`, and setting
+        # this once per job keeps each step reading exactly as it did when the
+        # package was the repository.
+        working-directory: packages/design-system
     # The only job here that installs a browser, so the only one that has to
     # clear `install-playwright`'s retry budget: two 8-minute attempts plus
     # ~1.5 minutes of everything else is 18. Sized above that for the same
@@ -282,15 +306,15 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
-            storybook-static
-            node_modules/.cache/storybook
+            packages/design-system/storybook-static
+            packages/design-system/node_modules/.cache/storybook
           # Two separate `hashFiles` calls, so the lockfile hash is a shared
           # prefix: GitHub matches `restore-keys` against the start of saved
           # keys only. One combined hash over lock-and-source would put the
           # lockfile-only restore key nowhere any saved key begins with, so
           # every source-changing PR would restore nothing and upload a fresh
           # full cache — the cost this step exists to avoid.
-          key: storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', '.storybook/**', 'package.json') }}
+          key: storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('packages/design-system/src/**', 'packages/design-system/.storybook/**', 'packages/design-system/package.json') }}
           restore-keys: |
             storybook-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
@@ -331,7 +355,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: playwright-report
-          path: playwright-report/
+          path: packages/design-system/playwright-report/
           retention-days: 7
 
       - name: Upload Generated Snapshots Artifact
@@ -345,7 +369,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: playwright-snapshots
-          path: tests/__snapshots__/
+          path: packages/design-system/tests/__snapshots__/
           retention-days: 7
 
   # One check that stands or falls with all three jobs above.

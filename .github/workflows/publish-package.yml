@@ -36,6 +36,9 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/design-system
     # See AGENTS.md rule 9 — no job runs to the six-hour default.
     timeout-minutes: 20
     permissions:

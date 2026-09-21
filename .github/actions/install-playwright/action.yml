@@ -48,6 +48,16 @@ inputs:
     description: Number of attempts before failing the step.
     required: false
     default: '2'
+  package-dir:
+    description: >-
+      Where to run `pnpm exec` from. A composite action's steps do NOT inherit
+      the calling job's `defaults.run.working-directory`, so after the tree
+      moved under `packages/` this ran at the workspace root — which declares
+      no Playwright, and the step failed with `Command "playwright" not found`
+      twice over before the retry loop gave up. The root install is correct;
+      the directory it was asked from was not.
+    required: false
+    default: packages/design-system
 
 runs:
   using: composite
@@ -125,6 +135,7 @@ runs:
     # `maxDiffPixels: 0` that does not fail loudly, it moves every baseline.
     - name: Install browsers
       shell: bash
+      working-directory: ${{ inputs.package-dir }}
       env:
         BROWSER: ${{ inputs.browser }}
         ATTEMPT_TIMEOUT: ${{ inputs.attempt-timeout }}

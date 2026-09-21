@@ -7,14 +7,16 @@
 // that build environments don't have, turning cold builds into hard failures.
 
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 
-const LOCKFILE = join(
-  dirname(fileURLToPath(import.meta.url)),
-  '..',
-  'pnpm-lock.yaml',
-);
+import { REPO_ROOT } from './repo-root.mjs';
+
+// The repository's lockfile, not the package's: a pnpm workspace writes one
+// `pnpm-lock.yaml` at the root covering every package, and that single file is
+// what `pnpm install --frozen-lockfile` reads. Resolved against the package,
+// this guard read a path that cannot exist and failed before it could check
+// anything.
+const LOCKFILE = join(REPO_ROOT, 'pnpm-lock.yaml');
 
 // Each pattern targets a resolution form that requires unavailable git/SSH auth
 // or out-of-repo local filesystem paths.
