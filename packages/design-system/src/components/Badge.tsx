@@ -5,6 +5,11 @@ import type { AccentToken } from '../lib/theme';
 import { cn } from '../lib/recipe';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  /**
+   * The label — a state, a count, a category. Short by construction: the badge
+   * does not wrap, so anything long enough to need two lines is a `Tag` or
+   * prose, not a badge.
+   */
   children: React.ReactNode;
   /**
    * Semantic role. Accepts an `Emphasis` (`primary`…`quiet`) or an `Intent`
@@ -14,6 +19,18 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   accent?: AccentToken;
 }
 
+/**
+ * A short, inline status marker — `STABLE`, `3 FAILING`, `DRAFT`.
+ *
+ * It states what something *is*, and nothing about it is interactive: no
+ * click, no focus, no keyboard affordance. A badge that needs to be pressed is
+ * a `Button`, and one that needs to be removed is a `Tag`.
+ *
+ * The accent carries the meaning, so choose it by role rather than by colour —
+ * `intent.danger` for a failure, `quiet` for a neutral count. On `midnight`
+ * that is pink and grey; on another level it is whatever those roles resolve
+ * to, and the badge stays correct because it never names a hue.
+ */
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   { children, accent = 'primary', className = '', style, ...props },
   ref,

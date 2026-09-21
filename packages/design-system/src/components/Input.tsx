@@ -70,8 +70,27 @@ const field = recipe({
 
 /** Shared by every control here. */
 interface FieldProps {
+  /**
+   * The visible label, wired to the control by `id` — generated when none is
+   * supplied, so the association holds without the caller arranging it. Omit
+   * it only where a visible label exists elsewhere, and then give the control
+   * an `aria-label`: a field with no name is a field a screen reader cannot
+   * announce.
+   */
   label?: string;
+  /**
+   * The validation message. Its presence is also the invalid state: it sets
+   * `aria-invalid`, switches the border to `intent.danger`, and is announced.
+   * Pass the message, never a boolean — "invalid" without a reason leaves the
+   * reader to guess what to change.
+   */
   error?: string;
+  /**
+   * Standing guidance shown under the control — a format, a constraint, what
+   * the value is for. Always visible, unlike `error`, and replaced by it while
+   * one is set, because two competing instructions under one field is worse
+   * than either.
+   */
   helperText?: string;
   /**
    * Semantic accent for the focus border. Accepts an `Emphasis`
@@ -79,6 +98,10 @@ interface FieldProps {
    * the legacy hue names still resolve to the same values.
    */
   accent?: AccentToken;
+  /**
+   * Merged onto the control itself, not the wrapper — so it sizes the input
+   * (`w-full`) rather than the label-and-error group around it.
+   */
   className?: string;
 }
 
@@ -162,6 +185,19 @@ export interface InputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'>,
     FieldProps {}
 
+/**
+ * A single-line text field, with its label, helper text and error as one unit.
+ *
+ * `Input`, `TextArea` and `Select` share one contract — `label`, `error`,
+ * `helperText`, `accent` — and one recipe, which is why they share a page.
+ * Pick by the shape of the answer, not by styling: one line, several, or one
+ * of a fixed set.
+ *
+ * The field owns its own labelling. Supplying `label` associates it with a
+ * generated `id` when the caller gives none, and `error` does three things at
+ * once — the message, `aria-invalid`, and the danger border — so an invalid
+ * field cannot end up looking wrong while announcing nothing.
+ */
 export function Input({
   label,
   error,
