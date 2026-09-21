@@ -57,6 +57,8 @@
     "check:lint-budget": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-lint-budget.mjs",
     "check:lint-budget:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-lint-budget.mjs --list",
     "check:licences": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-licences.mjs",
+    "check:reference-material": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-reference-material.mjs",
+    "check:reference-material:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-reference-material.mjs --list",
     "check:licences:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-licences.mjs --list",
     "licences:update": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-licences.mjs --update",
     "check:component-docs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-component-docs.mjs",

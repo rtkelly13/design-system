@@ -156,6 +156,12 @@ jobs:
       - name: Shipped licences
         run: pnpm check:licences
 
+      # The licence gate reads `package.json`; this reads the tree. The Book of
+      # Shapes artwork is not a package, carries no licence, and a `.gitignore`
+      # rule is advice to `git add` rather than a property of the repository.
+      - name: Reference Material
+        run: pnpm check:reference-material
+
       # Ratchet, per rule: the general-purpose ruleset reports as warnings, and
       # this fails if any rule's count rises. See #58 for why it is not errors.
       - name: Lint budget

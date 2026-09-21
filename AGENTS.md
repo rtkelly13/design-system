@@ -21,6 +21,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:component-docs` | every component carries a JSDoc — a ratchet, budget **18** |
 | `pnpm check:component-contract` | refs, `displayName`, `recipe`, prop spreading — a per-clause ratchet |
 | `pnpm check:licences` | every shipped package against `licenses.baseline.json`, default-deny |
+| `pnpm check:reference-material` | unlicensed reference artwork stays out of the tree, and its catalogue stays in it |
 | `pnpm check:lint-budget` | `react-hooks`, `jsx-a11y` and `no-explicit-any` as a per-rule ratchet |
 | `pnpm check:api` | the built type surface against the committed `api/index.d.ts` |
 | `pnpm check:dep-cost` | what each runtime dependency costs a consumer, against the recorded baseline — `--list` for the table |
