@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  packages/design-system:
     dependencies:
       '@base-ui/react':
         specifier: ^1.8.0

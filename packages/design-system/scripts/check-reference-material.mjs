@@ -38,9 +38,16 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+import { REPO_ROOT } from './repo-root.mjs';
+
+/*
+ * The repository root, not the package: `reference/` is shipped by no package
+ * — that is the whole point of it — and the `.gitignore` carrying the rule is
+ * the repository's. Resolving this against the package would have made the
+ * gate pass by looking in a directory where the artwork could never be.
+ */
+const ROOT = REPO_ROOT;
 
 /**
  * Paths that must never be tracked, and why.

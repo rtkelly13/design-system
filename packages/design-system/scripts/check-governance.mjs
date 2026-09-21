@@ -44,12 +44,31 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { REPO_ROOT } from './repo-root.mjs';
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+/*
+ * Workflows belong to the repository, not to this package: one `.github/`
+ * drives every package under `packages/`. The rosters this cross-checks —
+ * AGENTS.md, docs/ci.md, docs/workflow.md, package.json — are this package's,
+ * so the two roots are both needed and are deliberately not the same constant.
+ */
+const GITHUB_ROOT = REPO_ROOT;
+
+/**
+ * Resolve a repo-relative path against whichever root owns it.
+ *
+ * One function rather than two constants at eight call sites: the rule is
+ * "`.github` belongs to the repository, everything else to the package", and a
+ * rule stated once cannot be applied inconsistently.
+ */
+const at = (rel) => path.join(rel === '.github' || rel.startsWith('.github/') ? GITHUB_ROOT : ROOT, rel);
 const listing = process.argv.includes('--list');
 const problems = [];
 const census = [];
 
-const read = (rel) => readFileSync(path.join(ROOT, rel), 'utf8');
+const read = (rel) => readFileSync(at(rel), 'utf8');
 const lines = (rel) => read(rel).split('\n');
 const note = (section, ok, text) => census.push({ section, ok, text });
 
@@ -57,9 +76,9 @@ const note = (section, ok, text) => census.push({ section, ok, text });
 function workflowFiles() {
   const found = [];
   const walk = (dir) => {
-    for (const entry of readdirSync(path.join(ROOT, dir))) {
+    for (const entry of readdirSync(at(dir))) {
       const rel = path.join(dir, entry);
-      if (statSync(path.join(ROOT, rel)).isDirectory()) walk(rel);
+      if (statSync(at(rel)).isDirectory()) walk(rel);
       else if (/\.ya?ml$/.test(entry)) found.push(rel);
     }
   };
@@ -460,15 +479,15 @@ const NAMESPACES = new Set(scripts.map((s) => s.split(':')[0]));
 function proseFiles() {
   const found = ['AGENTS.md', 'README.md', 'DESIGN.md', 'CONTEXT.md', 'CHANGELOG.md'];
   const walk = (dir) => {
-    for (const entry of readdirSync(path.join(ROOT, dir))) {
+    for (const entry of readdirSync(at(dir))) {
       const rel = path.join(dir, entry);
-      if (statSync(path.join(ROOT, rel)).isDirectory()) walk(rel);
+      if (statSync(at(rel)).isDirectory()) walk(rel);
       else if (/\.md$/.test(entry)) found.push(rel);
     }
   };
   walk('docs');
   return [...found, ...WORKFLOWS].filter((file) => {
-    try { statSync(path.join(ROOT, file)); return true; } catch { return false; }
+    try { statSync(at(file)); return true; } catch { return false; }
   });
 }
 
@@ -524,10 +543,10 @@ for (const [name, why] of Object.entries(PLANNED)) {
  * is reachable, whatever it does.
  * ------------------------------------------------------------------ */
 
-const SCRIPT_FILES = readdirSync(path.join(ROOT, 'scripts')).filter((f) => /\.mjs$/.test(f));
+const SCRIPT_FILES = readdirSync(at('scripts')).filter((f) => /\.mjs$/.test(f));
 const scriptBodies = SCRIPT_FILES.map((f) => read(path.join('scripts', f)));
 const configFiles = ['eslint.config.mjs', 'tsup.config.ts', 'vitest.config.mts', 'playwright.config.ts', 'knip.json']
-  .filter((f) => { try { statSync(path.join(ROOT, f)); return true; } catch { return false; } })
+  .filter((f) => { try { statSync(at(f)); return true; } catch { return false; } })
   .map((f) => read(f));
 const proseBodies = PROSE.map((f) => read(f));
 

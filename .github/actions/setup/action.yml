@@ -33,7 +33,7 @@ runs:
     # `check:governance` asserts this ordering against the install step.
     - name: Lockfile Protocol Guard
       shell: bash
-      run: node scripts/check-lockfile.mjs
+      run: node packages/design-system/scripts/check-lockfile.mjs
 
     - name: Install Dependencies
       shell: bash

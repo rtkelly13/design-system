@@ -45,6 +45,9 @@ jobs:
   drift:
     name: deployment-drift
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/design-system
     timeout-minutes: 10
 
     steps:
