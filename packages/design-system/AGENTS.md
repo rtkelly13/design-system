@@ -31,6 +31,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:story-conventions` | story title vocabulary, and an autodocs decision per component |
 | `pnpm check:story-docs` | what a component page actually tells a reader — docs page, description, three samples, story captions, prop docs. A ratchet, ceiling **43** |
 | `pnpm check:deployed` | the live Storybook against this build — deliberately **not** a PR gate |
+| `pnpm release:train --dry-run` | why the last train did or did not depart — assessment only, moves nothing |
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |
 | `pnpm ansi:check` | terminal slot coverage **and** the committed fixture diff |
 | `pnpm test:visual` | Playwright snapshots — **Linux only**, see [`docs/visual-regression.md`](./docs/visual-regression.md) |
@@ -40,9 +41,9 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 `pnpm lint` reports colour literals at the site that wrote them. `pnpm check:deps`,
 `pnpm check:css` and `pnpm check:fonts` are ratchets with stated budgets.
 
-## The four rules that are not discoverable
+## The five rules that are not discoverable
 
-Everything else here you can find by reading the code. These four you cannot, and each has
+Everything else here you can find by reading the code. These five you cannot, and each has
 cost real time:
 
 1. **`src/theme.css` is generated.** `src/theme/levels.ts` is the only place a level name or a
@@ -69,6 +70,28 @@ cost real time:
    rationale live in [`docs/adr/0005-chart-rendering-engines.md`](./adr/0005-chart-rendering-engines.md).
    Measured comparison of the interaction layer remains in [`docs/radix-vs-base-ui.md`](./radix-vs-base-ui.md).
 
+5. **Merging to `main` does not deploy. The release train does.** The production domain follows
+   the `production` branch, and only `.github/workflows/release-train.yml` advances it — on a
+   schedule, at **08:00 and 16:00 UTC**, batching the day's merges into two deployments instead
+   of one per merge. That is the whole point of it: the Vercel account is on a build quota, and
+   merging ten times before lunch used to mean ten production builds.
+
+   So `production` being behind `main` is the normal state between trains, not a fault. What
+   *is* a fault is it being days behind — that means no train has departed, and the run log is
+   where to look.
+
+   The train holds rather than deploys when a deployment is already in progress, when CI on
+   `main` failed, or when CI is still running. It departs when the pointer has drifted, when the
+   deployed SHA is behind `main`, or when the last production deployment failed. To send one
+   early, dispatch the workflow; `dry_run` prints the assessment and moves nothing, `force`
+   advances the pointer even when the SHAs already match. `pnpm release:train --dry-run` runs
+   the same assessment locally and is the fastest way to find out why a train did not depart.
+
+   Two checks are deliberately excluded from the CI it consults — `deployment-drift` and
+   `backup-main` — because they observe the deployment rather than judge the code. Leaving
+   `deployment-drift` in is a deadlock: it fails *because* production is stale, which is the
+   thing promoting would fix.
+
 ## Where things are written down
 
 Load these when the task is in them, not before.
@@ -91,7 +114,7 @@ Load these when the task is in them, not before.
 | Unit tests | [`docs/testing.md`](./docs/testing.md) |
 | The published API surface | [`docs/api-surface.md`](./docs/api-surface.md) |
 | Dependencies, and the ones held back | [`docs/dependencies.md`](./docs/dependencies.md) |
-| Hosted Storybook and its domains | [`docs/hosting.md`](./docs/hosting.md) |
+| Hosted Storybook, its domains, and the release train | [`docs/hosting.md`](./docs/hosting.md) |
 | Workflow conventions, with the incidents behind them | [`docs/workflow.md`](./docs/workflow.md) |
 | Outside reading, and what each idea changed here | [`docs/research.md`](./docs/research.md) |
 | **Third-party reference material — licensing** | [`docs/reference-material.md`](./docs/reference-material.md) |

@@ -53,42 +53,57 @@ latest Ready production build matches `origin/main`.
 turns silence into a red mark someone owns, and catches drift within one merge instead
 of thirty.
 
-### The production domain has never tracked `main`
+### The production domain tracks `production`, and the release train moves it
 
-The table above said `main` until 21 September. It was wrong, and it was wrong in the
-direction that costs the most: the site had been serving 12 September for nine days, and
-every check you would reach for said success.
+The table above said `main` until 21 September. It was wrong, and the correction has two
+halves — the second of which was missed on the first pass and is the one that matters.
 
 `shared-utilities` declares this project with **`productionBranch: 'production'`**
 ([`infra/vercel/sites.ts`](https://github.com/rtkelly13/shared-utilities/blob/main/infra/vercel/sites.ts)),
-and `design-system.ryankelly.dev` is that project's production domain. So a merge to
-`main` produces a *preview* deployment of this project — which is why the GitHub
-deployment list shows `Preview – design-system-storybook` for commits on `main`, and why
-every one of them reports success while the domain does not move. Nothing is broken in
-the sense of failing. The branch the domain serves simply stops being advanced.
+and `design-system.ryankelly.dev` is that project's production domain. A merge to `main`
+therefore produces a *preview* deployment — which is why the GitHub deployment list shows
+`Preview – design-system-storybook` for commits on `main`, all green, while the domain does not
+move.
 
-It stopped on 12 September, at `583e08a` — which is, with some irony, the commit that
-documented the *previous* stale-production incident. Eighteen commits later the site was
-still serving the 174 stories that incident ended on, without `AlertDialog`, the four
-chart primitives or `SocialIcon`.
+**That is deliberate.** `.github/workflows/release-train.yml` advances `production` on a
+schedule, at 08:00 and 16:00 UTC, so a day of merges becomes two production builds rather than
+one per merge. The Vercel account is on a build quota; this is what protects it. `production`
+sitting behind `main` between trains is the design working.
 
-**To promote, advance `production`:** it is the same promote-by-merge model the `preview`
-branch uses, and the section below says so for that one.
+### Why it was nine days behind anyway
 
-```sh
-git push origin origin/main:production   # fast-forward; a deploy follows
+The train had never run. The workflow and its script were written on 12 September and left
+**uncommitted** on a working copy — so GitHub had no such workflow, no schedule fired, and the
+pointer stayed where it was. `production` was last advanced to `583e08a`, which is, with some
+irony, the commit documenting the *previous* stale-production incident.
+
+A second fault was waiting behind the first. The train consults CI on `main` and refuses to
+depart when a check has failed — and `deployment-drift` fails precisely *because* production is
+behind `main`. Left in the blocking set it is a deadlock: the first train to find the site stale
+refuses to move, so the site stays stale, so every later train refuses for the same reason. The
+assessment said so in as many words:
+
+```
+CI Status:  failed (deployment-drift, deployment-drift)
+Decision:   ⏸️ SKIP
+Reason:     CI checks failed for 4bb0717. Release blocked.
 ```
 
-Two things follow from this, and both are worth stating rather than rediscovering:
+`deployment-drift` now sits with `release-train` and `backup-main` in the set the train ignores:
+all three observe the deployment rather than judge the code.
 
-1. **`check:deployed` and `deployment-drift` compare the live site against `main`,** not
-   against `production`. Under promote-by-merge that makes them red for as long as
-   anything is unpromoted — which is true, and is not the same claim as "the deployment
-   is broken". Read a red drift run as *there is unpromoted work*, and promote.
-2. **If the intent is that `main` deploys straight to the domain,** the fix is one line
-   of `productionBranch` in `shared-utilities`, not anything in this repo — and then the
-   `production` branch should go, because a branch nothing advances is a trap the next
-   reader falls into exactly as this one did.
+### Reading a train
+
+`pnpm release:train --dry-run` prints the same assessment the workflow does and moves nothing —
+source SHA, pointer SHA, the production deployments and their states, the CI verdict, and the
+decision with its reason. It is the fastest answer to "why is the site not updating". Dispatch
+the workflow with `force` to advance the pointer when the SHAs already match, which is how to
+redeploy without a new commit.
+
+**`check:deployed` and `deployment-drift` compare the live site against `main`,** not against
+`production`. Between trains that makes them red, truthfully: there is merged work the site does
+not have yet. Read a red drift run as *a train is due*, and only investigate if one has departed
+since and the gap remains.
 
 ### Why the Vercel check is not, and cannot be, a required check
 
