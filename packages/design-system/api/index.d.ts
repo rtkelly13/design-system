@@ -420,6 +420,51 @@ interface BadgeProps extends react__default.HTMLAttributes<HTMLSpanElement> {
 }
 declare const Badge: react__default.ForwardRefExoticComponent<BadgeProps & react__default.RefAttributes<HTMLSpanElement>>;
 
+interface ReportMetaItem {
+    label: string;
+    value: ReactNode;
+}
+interface ReportDocumentProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+
+    title: ReactNode;
+
+    subtitle?: ReactNode;
+
+    meta?: readonly ReportMetaItem[];
+
+    children: ReactNode;
+
+    className?: string;
+}
+
+declare const ReportDocument: react.ForwardRefExoticComponent<ReportDocumentProps & react.RefAttributes<HTMLElement>>;
+
+interface ReportSectionProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+
+    title: ReactNode;
+
+    id?: string;
+
+    children: ReactNode;
+
+    className?: string;
+}
+declare const ReportSection: react.ForwardRefExoticComponent<ReportSectionProps & react.RefAttributes<HTMLElement>>;
+
+interface ReportDetailsProps extends HTMLAttributes<HTMLDetailsElement> {
+
+    summary: ReactNode;
+
+    note?: ReactNode;
+
+    open?: boolean;
+
+    children: ReactNode;
+
+    className?: string;
+}
+declare const ReportDetails: react.ForwardRefExoticComponent<ReportDetailsProps & react.RefAttributes<HTMLDetailsElement>>;
+
 interface AvatarProps extends react__default.HTMLAttributes<HTMLDivElement> {
     src?: string;
     alt?: string;
@@ -1442,6 +1487,13 @@ export {
   type RecommendedColourNamespace,
   type RecommendedColourProperty,
   type RecommendedThemeColours,
+  ReportDetails,
+  type ReportDetailsProps,
+  ReportDocument,
+  type ReportDocumentProps,
+  type ReportMetaItem,
+  ReportSection,
+  type ReportSectionProps,
   type Rgb,
   SLIDE_DECK_HOTKEYS,
   SLOTS,

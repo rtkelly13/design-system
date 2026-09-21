@@ -40,16 +40,21 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * bundle past the numbers this file was first written with. A budget recorded
  * before the commits it has to admit is a gate that fails on arrival, so these
  * are re-measured rather than inherited.
+ *
+ * Raised again for the report frame (`ReportDocument`): +118 B raw, +21 B gzip
+ * on the ESM bundle for three components. It is tree-shaken away from anyone
+ * who does not import it, and `check:dep-cost` confirms it adds no dependency
+ * weight at all — it is markup and a recipe over primitives already paid for.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 217_500,
-    maxGzip: 50_700,
+    maxRaw: 218_000,
+    maxGzip: 50_800,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 240_400,
-    maxGzip: 52_800,
+    maxRaw: 241_100,
+    maxGzip: 52_900,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

@@ -40,6 +40,12 @@ export * from './hooks/useActiveHeading';
 export * from './components/Button';
 export * from './components/Card';
 export * from './components/Badge';
+// The report frame — the page a generated report is built in. Separate from
+// the docs components because a report is written by a tool and read once,
+// where a docs page is written by a person and read often: the frame owns the
+// measure, the header strip and the print behaviour, and everything inside it
+// is ordinary composition.
+export * from './components/ReportDocument';
 export * from './components/Avatar';
 export * from './components/PageTitle';
 export * from './components/PageHeader';

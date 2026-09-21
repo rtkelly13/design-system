@@ -149,6 +149,10 @@ const UNSTORIED = {
     'Documented on `Foundations/Input` beside `Input` and `Select`: the three share one label/error/helper contract and one recipe, so three pages would be one component described three times.',
   Select:
     'Same as `TextArea` — a shape of the field contract documented on `Foundations/Input`, not a component of its own.',
+  ReportSection:
+    'A part of the report frame, documented and asserted on `Foundations/ReportDocument`. It is meaningless outside one — a section with no document around it has no measure, no rhythm and nothing to be a section of — so a page of its own would show it in a context no consumer will ever build.',
+  ReportDetails:
+    'Same as `ReportSection`: the disclosure block belongs to the report frame and is shown in place on `Foundations/ReportDocument`, where its collapsed and expanded states are both visible against the surrounding document.',
   ThemeProvider:
     'Renders no markup of its own; what a screenshot of it would show is whatever children it is given. `Foundations/Theme Ladder` documents the behaviour, including `scoped`, which is the part with a visible consequence.',
   DocsLink:
