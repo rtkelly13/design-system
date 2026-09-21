@@ -147,6 +147,13 @@ jobs:
       - name: Documented components
         run: pnpm check:component-docs
 
+      # Reads source, not `storybook-static`, which is why it is here and not
+      # beside `check:story-conventions` in `visual`: whether a page documents
+      # itself is a property of the TSX, so it needs no build and no browser.
+      # A ratchet — see CEILING in the script.
+      - name: Story Documentation
+        run: pnpm check:story-docs
+
       # Ratchet, per clause: refs, displayName, recipe composition, prop
       # spreading. Clause 1 is what #162-#166 wait on.
       - name: Component contract
