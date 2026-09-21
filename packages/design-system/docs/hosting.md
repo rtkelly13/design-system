@@ -89,8 +89,31 @@ Decision:   ⏸️ SKIP
 Reason:     CI checks failed for 4bb0717. Release blocked.
 ```
 
-`deployment-drift` now sits with `release-train` and `backup-main` in the set the train ignores:
-all three observe the deployment rather than judge the code.
+`deployment-drift` now sits with `backup-main` in the set the train ignores: both observe the
+deployment rather than judge the code.
+
+### And a third fault behind the second
+
+The fix above was correct and still did not move the pointer. The train held on every run, with
+every other check green:
+
+```
+CI Status:  in progress (Assess & Release)
+Decision:   ⏸️ SKIP
+Reason:     CI checks still running for 5d46be8. Holding release train.
+```
+
+The name in that list is the train's own job. The ignore set matched on a check run's `name`,
+which is the **job** name — this workflow is `Release Train` but its check reports as
+`Assess & Release`, so the `release-train` entry matched nothing and the train counted itself as
+a check it was waiting for. Not a timing problem: it was permanent, on every schedule, and the
+run still exited 0 and reported success, which is why two green runs left production nine days
+stale.
+
+The train now excludes its own run by `GITHUB_RUN_ID` rather than by name, so a job rename
+cannot silently restore the deadlock. The selection is a pure function in
+`scripts/release-train-checks.mjs` with tests covering both deadlocks — the train's failure mode
+is a green run that did nothing, which no other gate could see.
 
 ### Reading a train
 

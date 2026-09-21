@@ -543,12 +543,41 @@ for (const [name, why] of Object.entries(PLANNED)) {
  * is reachable, whatever it does.
  * ------------------------------------------------------------------ */
 
-const SCRIPT_FILES = readdirSync(at('scripts')).filter((f) => /\.mjs$/.test(f));
+const ALL_MJS = readdirSync(at('scripts')).filter((f) => /\.mjs$/.test(f));
+
+/*
+ * `*.test.mjs` is a test, not a script.
+ *
+ * The two rules below ask of every script "is it kebab-case" and "does
+ * anything reach it", and a test file answers neither the way a script does:
+ * its name carries a `.test.` segment by convention, and nothing imports it
+ * because the runner collects it by glob.
+ *
+ * Exempting it outright would create the hole this section exists to close —
+ * a file nobody runs, sitting in a directory full of gates — so the exemption
+ * is paid for below by asserting the runner really does collect it.
+ */
+const SCRIPT_TEST_FILES = ALL_MJS.filter((f) => /\.test\.mjs$/.test(f));
+const SCRIPT_FILES = ALL_MJS.filter((f) => !/\.test\.mjs$/.test(f));
 const scriptBodies = SCRIPT_FILES.map((f) => read(path.join('scripts', f)));
 const configFiles = ['eslint.config.mjs', 'tsup.config.ts', 'vitest.config.mts', 'playwright.config.ts', 'knip.json']
   .filter((f) => { try { statSync(at(f)); return true; } catch { return false; } })
   .map((f) => read(f));
 const proseBodies = PROSE.map((f) => read(f));
+
+if (SCRIPT_TEST_FILES.length > 0) {
+  const vitestConfig = read('vitest.config.mts');
+  if (!vitestConfig.includes("scripts/**/*.test.mjs")) {
+    problems.push(
+      `scripts/ contains ${SCRIPT_TEST_FILES.join(', ')}, but vitest.config.mts ` +
+        `does not include 'scripts/**/*.test.mjs'. A test the runner never ` +
+        `collects is the unreachable file this section exists to catch, and it ` +
+        `is worse than no test because it reads as coverage.`,
+    );
+  } else {
+    note('scripts', true, `${SCRIPT_TEST_FILES.length} script test(s) — collected by vitest`);
+  }
+}
 
 for (const file of SCRIPT_FILES) {
   if (!/^[a-z0-9]+(-[a-z0-9]+)*\.mjs$/.test(file)) {

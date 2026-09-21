@@ -11,7 +11,14 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     environment: 'jsdom',
-    include: ['src/**/*.test.{ts,tsx}'],
+    /*
+     * `scripts/**` is included for the release train, which had no test at
+     * all and two deadlocks. Both reported success and exited 0 while doing
+     * nothing — a CI script whose failure mode is silence is exactly the thing
+     * worth asserting, and its logic is plain `.mjs`, so it costs no build
+     * step to cover.
+     */
+    include: ['src/**/*.test.{ts,tsx}', 'scripts/**/*.test.mjs'],
     // Testing Library only registers its own `afterEach(cleanup)` under
     // `globals: true`, which this project does not use. See src/test-setup.ts.
     setupFiles: ['src/test-setup.ts'],
