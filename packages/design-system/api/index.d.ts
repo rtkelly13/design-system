@@ -434,6 +434,51 @@ interface BadgeProps extends react__default.HTMLAttributes<HTMLSpanElement> {
 
 declare const Badge: react__default.ForwardRefExoticComponent<BadgeProps & react__default.RefAttributes<HTMLSpanElement>>;
 
+interface ReportMetaItem {
+    label: string;
+    value: ReactNode;
+}
+interface ReportDocumentProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+
+    title: ReactNode;
+
+    subtitle?: ReactNode;
+
+    meta?: readonly ReportMetaItem[];
+
+    children: ReactNode;
+
+    className?: string;
+}
+
+declare const ReportDocument: react.ForwardRefExoticComponent<ReportDocumentProps & react.RefAttributes<HTMLElement>>;
+
+interface ReportSectionProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+
+    title: ReactNode;
+
+    id?: string;
+
+    children: ReactNode;
+
+    className?: string;
+}
+declare const ReportSection: react.ForwardRefExoticComponent<ReportSectionProps & react.RefAttributes<HTMLElement>>;
+
+interface ReportDetailsProps extends HTMLAttributes<HTMLDetailsElement> {
+
+    summary: ReactNode;
+
+    note?: ReactNode;
+
+    open?: boolean;
+
+    children: ReactNode;
+
+    className?: string;
+}
+declare const ReportDetails: react.ForwardRefExoticComponent<ReportDetailsProps & react.RefAttributes<HTMLDetailsElement>>;
+
 interface AvatarProps extends react__default.HTMLAttributes<HTMLDivElement> {
     src?: string;
     alt?: string;
@@ -638,8 +683,10 @@ interface StatCardProps {
 }
 declare function StatCard({ title, value, change, changeType, subtitle, icon: Icon, accent, className, }: StatCardProps): react.JSX.Element;
 
-declare function Table({ className, containerClassName, ...props }: TableHTMLAttributes<HTMLTableElement> & {
+declare function Table({ className, containerClassName, label, ...props }: TableHTMLAttributes<HTMLTableElement> & {
     containerClassName?: string;
+
+    label?: string;
 }): react.JSX.Element;
 declare function TableHeader({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
 declare function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
@@ -1461,6 +1508,13 @@ export {
   type RecommendedColourNamespace,
   type RecommendedColourProperty,
   type RecommendedThemeColours,
+  ReportDetails,
+  type ReportDetailsProps,
+  ReportDocument,
+  type ReportDocumentProps,
+  type ReportMetaItem,
+  ReportSection,
+  type ReportSectionProps,
   type Rgb,
   SLIDE_DECK_HOTKEYS,
   SLOTS,

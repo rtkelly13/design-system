@@ -64,6 +64,13 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-tldr--default', snapshot: 'tldr-default.png' },
   { id: 'foundations-modal--with-footer', snapshot: 'modal-with-footer.png' },
   { id: 'foundations-alertdialog--destructive', snapshot: 'alertdialog-destructive.png' },
+  // `fullPage`: the report frame is a page, and the part most likely to drift
+  // — the header strip against the body rhythm — is only visible whole.
+  {
+    id: 'foundations-reportdocument--quality-gate',
+    snapshot: 'reportdocument-quality-gate.png',
+    fullPage: true,
+  },
   { id: 'foundations-pagination--middle-page', snapshot: 'pagination-middle-page.png' },
   { id: 'foundations-sectioncontainer--default', snapshot: 'sectioncontainer-default.png' },
 

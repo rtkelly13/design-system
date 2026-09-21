@@ -43,6 +43,12 @@ consumer sees it without reading this file.
 | `SaaS/*` | `experimental` | ~20–25%, "screenshots of one specific product" |
 | `Showcase/*` | `experimental` | a sandbox, not a component |
 
+One entry departs from its group. `Foundations/ReportDocument` is tagged `preview`, not
+`stable`: it is gated end to end like everything else in the group, but its only intended
+consumer — the report generator — does not exist in this repository yet, so its API has not
+met a caller. `stable` claims a shape has survived use, and this one has survived a story.
+Retag it when something depends on it.
+
 The vocabulary is Storybook's own feature lifecycle — `stable`, `experimental`, `preview`,
 `deprecated` — rather than a second one to maintain. A group cannot be added to the sidebar
 without a status, because `check:story-conventions` closes both lists at once.

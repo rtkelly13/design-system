@@ -23,11 +23,45 @@ const tableStyles = recipe({
 export function Table({
   className,
   containerClassName,
+  label = 'Table',
   ...props
-}: TableHTMLAttributes<HTMLTableElement> & { containerClassName?: string }) {
+}: TableHTMLAttributes<HTMLTableElement> & {
+  containerClassName?: string;
+  /**
+   * Names the scrollable region a keyboard user lands on before the table
+   * itself. Defaults to `Table`, which is honest but uninformative — pass the
+   * table's subject where it is known.
+   */
+  label?: string;
+}) {
   const styles = tableStyles();
+  /*
+   * `tabIndex={0}` on the container because it is `overflow-x-auto`: any table
+   * wider than its column becomes a scrollable region, and a scrollable region
+   * that cannot take focus cannot be scrolled by keyboard at all — axe's
+   * `scrollable-region-focusable`, and a real trap rather than a technicality,
+   * since the columns off the right edge are then reachable only with a
+   * pointer. `CodeBlock` carries the same attribute for the same reason.
+   *
+   * `role="region"` and a name come with it, and not only to satisfy
+   * `jsx-a11y/no-noninteractive-tabindex`, which is at budget 0. The two rules
+   * are asking for the same thing from opposite ends: axe wants the scroll
+   * container reachable, jsx-a11y wants anything focusable to be worth
+   * landing on. A focus stop a screen reader announces as nothing is the
+   * thing jsx-a11y is right about, so the region is named. `CodeBlock`
+   * settled on exactly this pair for exactly this reason.
+   *
+   * `label` exists so the name can be the table's own — "Failing checks"
+   * rather than "Table" — for the callers that know it.
+   */
   return (
-    <div data-slot="table-container" className={styles.container({ class: containerClassName })}>
+    <div
+      data-slot="table-container"
+      tabIndex={0}
+      role="region"
+      aria-label={label}
+      className={styles.container({ class: containerClassName })}
+    >
       <table data-slot="table" className={styles.table({ class: className })} {...props} />
     </div>
   );
