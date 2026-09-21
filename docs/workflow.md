@@ -56,6 +56,7 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - `pnpm check:visual-coverage` (every story asserted or excluded with a reason)
    - `pnpm check:docgen-props` (every documented component publishes its props)
    - `pnpm check:story-conventions` (title vocabulary, and an autodocs decision per component)
+   - `pnpm check:story-docs` (what a component page tells a reader — a ratchet, ceiling 47)
    - `pnpm typecheck`
    - `pnpm test:coverage` (unit and V8 coverage — see "Unit Tests" below)
    - `pnpm build`

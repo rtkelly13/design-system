@@ -75,6 +75,8 @@
     "check:deployed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deployed.mjs",
     "release:train": "node scripts/release-train.mjs",
     "check:story-conventions": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-conventions.mjs",
+    "check:story-docs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-docs.mjs",
+    "check:story-docs:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-docs.mjs --list",
     "check:story-conventions:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-conventions.mjs --list",
     "check:docgen-props": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-docgen-props.mjs",
     "check:docgen-props:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-docgen-props.mjs --list",
