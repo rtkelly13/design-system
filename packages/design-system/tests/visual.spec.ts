@@ -73,6 +73,11 @@ const CASES: readonly VisualCase[] = [
     fullPage: true,
   },
   { id: 'foundations-pagination--middle-page', snapshot: 'pagination-middle-page.png' },
+  // The ellipsis form, which `MiddlePage`'s five pages never reach: first,
+  // last, a window around current and both gaps, at the fixed seven slots.
+  // In navigation mode deliberately — `MiddlePage` is callback mode, so the
+  // two rows put both of Pagination's element trees in front of axe as well.
+  { id: 'foundations-pagination--as-links-many-pages', snapshot: 'pagination-as-links-many-pages.png' },
   // The general tab set, not the code one: `docs-codetabs--merged` below asserts
   // the same tablist wearing `CodeTabs`, and the pair is what shows the
   // extraction rendering identically in both places.
@@ -217,7 +222,7 @@ const INTERACTIONS: readonly InteractionCase[] = [
  * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
  * to look" at.
  *
- * Deliberately six, not forty-one. Each is a committed PNG a human reviews on
+ * Deliberately seven, not forty-one. Each is a committed PNG a human reviews on
  * every change, and the point is the layout that *differs* at this width — a
  * second copy of a component that renders identically is cost without evidence.
  * `Drawer` is the sixth and the clearest case for the rule: it is the one
@@ -238,6 +243,11 @@ const MOBILE_CASES: readonly VisualCase[] = [
   // which is the layout a mobile nav actually ships as. Asserting only the
   // desktop one would assert the case nobody meets.
   { id: 'foundations-drawer--from-the-left', snapshot: 'drawer-from-the-left-mobile.png' },
+  // Pagination's degraded form. At this width the seven-slot page list gives
+  // way to the `[ 7 / 20 ]` status instead of wrapping onto a second line —
+  // behaviour that exists only below `md`, so asserting it anywhere else
+  // would be assuming it.
+  { id: 'foundations-pagination--many-pages', snapshot: 'pagination-many-pages-mobile.png' },
 ];
 
 test.describe('Design System Visual Regression - Narrow viewport', () => {

@@ -556,14 +556,20 @@ interface TagProps {
 }
 declare const Tag: react.ForwardRefExoticComponent<TagProps & react.RefAttributes<HTMLAnchorElement | HTMLSpanElement>>;
 
-interface PaginationProps {
+interface PaginationProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+
     totalPages: number;
+
     currentPage: number;
+
     onPageChange?: (page: number) => void;
+
     getPageHref?: (page: number) => string;
+
     className?: string;
 }
-declare function Pagination({ totalPages, currentPage, onPageChange, getPageHref, className, }: PaginationProps): react.JSX.Element;
+
+declare const Pagination: react.ForwardRefExoticComponent<PaginationProps & react.RefAttributes<HTMLDivElement>>;
 
 type TabsOrientation = 'horizontal' | 'vertical';
 
