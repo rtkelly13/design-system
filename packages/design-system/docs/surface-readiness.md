@@ -242,6 +242,14 @@ landed `ToastProvider` and `useToast` on `@base-ui/react/toast` — a queue, a
 live region present from mount and a lifetime that pauses for the reader —
 with `AdminDashboardLayout`'s `TRIGGER SYNC` as its first call site.
 
+An application shell was the thing missing underneath all of these until
+[#247](https://github.com/rtkelly13/design-system/issues/247) extracted `AppShell`,
+`AppSidebar`, `AppSidebarNav`, `AppTopbar` and `AppMain`: a persistent sidebar at desktop
+width that becomes a left `Drawer` below it, a consumer-supplied navigation tree, and the
+account area as a slot rather than a signed-in user. `AdminDashboardLayout` itself is not yet
+rebuilt on it — that is [#249](https://github.com/rtkelly13/design-system/issues/249), which
+moves its baselines deliberately.
+
 `Dropdown` / `Menu` and `Tooltip` were on it until
 [#166](https://github.com/rtkelly13/design-system/issues/166) landed `Tooltip`,
 `Popover` and `Menu` on `@base-ui/react` — one floating surface, one layer, and

@@ -87,6 +87,10 @@ export * from './components/Modal';
 export * from './components/AlertDialog';
 export * from './components/Drawer';
 
+// The application layout (#247): sidebar, topbar and main as five composable
+// pieces, with the sidebar off-canvas in a `Drawer` below desktop width.
+export * from './components/AppShell';
+
 // System feedback — the three states an application has besides "loaded".
 // One vocabulary on purpose: the same motion tokens, the same reduced-motion
 // rule, the same muted surface, so a loading card and an empty table read as
