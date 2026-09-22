@@ -204,10 +204,23 @@ function ToastItem({ item }: { item: BaseToast.Root.ToastObject<ToastData> }) {
   const action = item.data?.action;
   const styles = toast({ intent });
   const Icon = ICON[intent];
+  // A `danger` toast is announced by the `role="alert"` copy Base UI renders
+  // beside the region, so its visible text must not *also* be read by the
+  // polite region it sits in. Base UI solves that by hiding the whole root
+  // until it is focused — which hides the action and the dismiss control
+  // with it, and no `aria-hidden={false}` on a descendant can undo an
+  // ancestor's. The result is tabbable buttons the tree says are not there.
+  //
+  // So the root stays exposed, and only the danger toast's text is hidden.
+  // The buttons are reachable; the words are announced once, assertively;
+  // and focusing the toast still reads its title and description, because
+  // `aria-labelledby` and `aria-describedby` name from hidden content.
+  const textHidden = intent === 'danger' ? true : undefined;
 
   return (
     <BaseToast.Root
       toast={item}
+      aria-hidden={intent === 'danger' ? false : undefined}
       data-slot="toast"
       // What the toast *is*, on the element, for a test or a consumer's
       // selector — the classes are a rendering detail.
@@ -222,13 +235,22 @@ function ToastItem({ item }: { item: BaseToast.Root.ToastObject<ToastData> }) {
           * wherever the toast happened to be read. The brackets are the
           * system's typographic cue and nothing a screen reader should spell.
           */}
-        <BaseToast.Title data-slot="toast-title" className={styles.title()} render={<p />}>
+        <BaseToast.Title
+          data-slot="toast-title"
+          aria-hidden={textHidden}
+          className={styles.title()}
+          render={<p />}
+        >
           <span aria-hidden="true">[ </span>
           {item.title}
           <span aria-hidden="true"> ]</span>
         </BaseToast.Title>
         {item.description ? (
-          <BaseToast.Description data-slot="toast-description" className={styles.description()} />
+          <BaseToast.Description
+            data-slot="toast-description"
+            aria-hidden={textHidden}
+            className={styles.description()}
+          />
         ) : null}
         {/*
           * The action sits under the text rather than beside it: beside it, a

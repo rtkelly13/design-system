@@ -126,15 +126,41 @@ describe('Toast — the live region', () => {
     expect(region().contains(alert)).toBe(false);
     const [item] = toasts();
     expect(item.getAttribute('role')).toBe('alertdialog');
-    expect(item.getAttribute('aria-hidden')).toBe('true');
+    // Only the text is hidden from the polite region, never the toast: hiding
+    // the root would hide its controls with it (see the next test).
+    expect(item.getAttribute('aria-hidden')).not.toBe('true');
+    expect(item.querySelector('[data-slot="toast-title"]')?.getAttribute('aria-hidden')).toBe('true');
+    expect(item.querySelector('[data-slot="toast-description"]')?.getAttribute('aria-hidden')).toBe('true');
 
-    // Once focus arrives the visible copy is the one being read, so it stops
-    // being hidden and the alert copy is withdrawn — a keyboard user never
-    // lands on something the tree says is not there.
+    // Focusing the toast still names it from the hidden text, and the alert
+    // copy is withdrawn once the visible toast is the one being read.
     act(() => item.focus());
     fireEvent.focus(item);
-    await waitFor(() => expect(item.getAttribute('aria-hidden')).toBeNull());
-    expect(screen.queryByRole('alert')).toBeNull();
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+    expect(screen.getByRole('alertdialog', { name: /Deploy failed/ })).toBe(item);
+  });
+
+  it('never leaves a focusable control inside a hidden subtree, danger included', async () => {
+    const { api } = mount();
+    await screen.findByRole('region');
+
+    act(() => {
+      api().show({
+        intent: 'danger',
+        title: 'Deploy failed',
+        action: { label: 'Retry', onClick: () => {} },
+        timeout: 0,
+      });
+    });
+
+    const [item] = toasts();
+    const focusable = item.querySelectorAll<HTMLElement>('button, [tabindex]:not([tabindex="-1"])');
+    expect(focusable.length).toBeGreaterThan(0);
+    for (const el of focusable) {
+      expect(el.closest('[aria-hidden="true"]')).toBeNull();
+    }
+    expect(screen.getByRole('button', { name: /Retry/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Dismiss notification' })).toBeTruthy();
   });
 
   /*
