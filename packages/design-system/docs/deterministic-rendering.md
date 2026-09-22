@@ -63,7 +63,7 @@ layer down — silent, plausible-looking, wrong output.
 
 ### 3. Turn the transitions off
 
-There are 43 CSS transitions and **3** `@keyframes`. Most of the transitions are hover- or focus-intent, so they are
+There are 49 CSS transitions and **3** `@keyframes`. Most of the transitions are hover- or focus-intent, so they are
 inert wherever there is no pointer — but since #162 that is no longer all of them. `Modal`,
 `AlertDialog` and `Drawer` fade their backdrop and popup on open and close, driven by Base UI's
 `data-starting-style` / `data-ending-style` attributes rather than by a pointer, so a capture taken
@@ -78,7 +78,12 @@ short rise and leaves with a short slide on the dialogs' two attributes, and it 
 whose trigger is not a prop at all but a **clock**: a toast shown on mount is mid-rise for the
 first frames, and one left on its default lifetime slides out six seconds later whether or not
 anything happened. The transition reset handles the first; only the caller can handle the second,
-by showing the toast with `timeout: 0` — which is what its asserted story does. All of them carry
+by showing the toast with `timeout: 0` — which is what its asserted story does. `Tooltip`,
+`Popover` and `Menu` (#166) fade in and out on the same two attributes, opacity only, from one
+shared surface recipe; a story that opens one on load (`defaultOpen`, which each asserted story
+does) is mid-fade for its first frames, and the popup is placed by the positioning engine after it
+mounts rather than in the same frame, so a capture should wait for the popup to be visible as well
+as suppress the fade. `Popover`'s close control adds a hover colour transition like the dialogs' does. All of them carry
 `motion-reduce:transition-none`, which makes `prefers-reduced-motion` a second and more honest lever
 than the reset below; the reset is still what a capture harness should use, because it does not
 depend on the component having remembered.

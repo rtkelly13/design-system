@@ -1,5 +1,5 @@
 import * as react from 'react';
-import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes, RefObject, SVGProps } from 'react';
+import react__default, { ReactNode, DetailedHTMLProps, ButtonHTMLAttributes, AnchorHTMLAttributes, HTMLAttributes, ElementType, MouseEventHandler, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes, TableHTMLAttributes, TdHTMLAttributes, ThHTMLAttributes, RefObject, ReactElement, SVGProps } from 'react';
 import { Table as Table$1, ColumnDef } from '@tanstack/react-table';
 import { RegisterableHotkey } from '@tanstack/react-hotkeys';
 export { ParentSize as ResponsiveChartContainer } from '@visx/responsive';
@@ -1059,6 +1059,126 @@ interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' |
 
 declare const EmptyState: react.ForwardRefExoticComponent<EmptyStateProps & react.RefAttributes<HTMLDivElement>>;
 
+type OverlaySide = 'top' | 'bottom' | 'left' | 'right';
+
+type OverlayAlign = 'start' | 'center' | 'end';
+interface TooltipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'content' | 'children' | 'className'> {
+
+    content: ReactNode;
+
+    children: ReactElement;
+
+    side?: OverlaySide;
+
+    align?: OverlayAlign;
+
+    delay?: number;
+
+    open?: boolean;
+
+    defaultOpen?: boolean;
+
+    onOpenChange?: (open: boolean) => void;
+
+    disabled?: boolean;
+
+    className?: string;
+}
+
+declare const Tooltip: react.ForwardRefExoticComponent<TooltipProps & react.RefAttributes<HTMLDivElement>>;
+
+interface PopoverProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'className'> {
+
+    trigger: ReactElement;
+
+    title: string;
+
+    children: ReactNode;
+
+    side?: OverlaySide;
+
+    align?: OverlayAlign;
+
+    open?: boolean;
+
+    defaultOpen?: boolean;
+
+    onOpenChange?: (open: boolean) => void;
+
+    className?: string;
+}
+
+declare const Popover: react.ForwardRefExoticComponent<PopoverProps & react.RefAttributes<HTMLDivElement>>;
+
+interface MenuProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'className'> {
+
+    trigger: ReactElement;
+
+    children: ReactNode;
+
+    side?: OverlaySide;
+
+    align?: OverlayAlign;
+
+    open?: boolean;
+
+    defaultOpen?: boolean;
+
+    onOpenChange?: (open: boolean) => void;
+
+    className?: string;
+}
+
+declare const Menu: react.ForwardRefExoticComponent<MenuProps & react.RefAttributes<HTMLDivElement>>;
+interface MenuItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
+
+    children: ReactNode;
+
+    intent?: 'danger';
+
+    disabled?: boolean;
+
+    closeOnClick?: boolean;
+
+    className?: string;
+}
+
+declare const MenuItem: react.ForwardRefExoticComponent<MenuItemProps & react.RefAttributes<HTMLDivElement>>;
+interface MenuRadioGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange' | 'className'> {
+
+    label?: string;
+
+    value?: string;
+
+    defaultValue?: string;
+
+    onValueChange?: (value: string) => void;
+
+    children: ReactNode;
+
+    className?: string;
+}
+
+declare const MenuRadioGroup: react.ForwardRefExoticComponent<MenuRadioGroupProps & react.RefAttributes<HTMLDivElement>>;
+interface MenuRadioItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
+
+    value: string;
+
+    children: ReactNode;
+
+    closeOnClick?: boolean;
+
+    className?: string;
+}
+
+declare const MenuRadioItem: react.ForwardRefExoticComponent<MenuRadioItemProps & react.RefAttributes<HTMLDivElement>>;
+interface MenuSeparatorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
+
+    className?: string;
+}
+
+declare const MenuSeparator: react.ForwardRefExoticComponent<MenuSeparatorProps & react.RefAttributes<HTMLDivElement>>;
+
 type ToastIntent = 'info' | 'success' | 'warning' | 'danger';
 
 interface ToastActionOptions {
@@ -1833,6 +1953,16 @@ export {
   type MdxComponents,
   type Medium,
   type MediumDefinition,
+  Menu,
+  MenuItem,
+  type MenuItemProps,
+  type MenuProps,
+  MenuRadioGroup,
+  type MenuRadioGroupProps,
+  MenuRadioItem,
+  type MenuRadioItemProps,
+  MenuSeparator,
+  type MenuSeparatorProps,
   Modal,
   type ModalProps,
   type Motion,
@@ -1843,6 +1973,8 @@ export {
   type NerdIconProps,
   NoteBlock,
   type NoteBlockProps,
+  type OverlayAlign,
+  type OverlaySide,
   PALETTE_HUES,
   PageHeader,
   type PageHeaderProps,
@@ -1851,6 +1983,8 @@ export {
   Pagination,
   type PaginationProps,
   type Polarity,
+  Popover,
+  type PopoverProps,
   type PricingTier,
   Progress,
   type ProgressProps,
@@ -1958,6 +2092,8 @@ export {
   type ToastProviderProps,
   type TocEntry,
   type TokenRule,
+  Tooltip,
+  type TooltipProps,
   type TypeStep,
   type TypeStepName,
   type UseActiveHeadingOptions,
