@@ -73,6 +73,11 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-alertdialog--destructive', snapshot: 'alertdialog-destructive.png' },
   { id: 'foundations-drawer--from-the-right', snapshot: 'drawer-from-the-right.png' },
   { id: 'foundations-toast--all-intents', snapshot: 'toast-all-intents.png' },
+  // The application shell (issue 247), asked to open its sidebar and at a
+  // width where it must not: the persistent column, no drawer. The same story
+  // is in `MOBILE_CASES` below with the drawer open, so the pair asserts the
+  // desktop and off-canvas layouts as one component.
+  { id: 'foundations-appshell--sidebar-open', snapshot: 'appshell-sidebar-open.png' },
   // The floating set (#166), each open on load: a tooltip, popover or menu
   // asserted closed asserts nothing — the trap #132 names for press states.
   { id: 'foundations-tooltip--on-an-icon-button', snapshot: 'tooltip-on-an-icon-button.png' },
@@ -241,7 +246,7 @@ const INTERACTIONS: readonly InteractionCase[] = [
  * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
  * to look" at.
  *
- * Deliberately ten, not forty-one. Each is a committed PNG a human reviews on
+ * Deliberately twelve, not forty-one. Each is a committed PNG a human reviews on
  * every change, and the point is the layout that *differs* at this width — a
  * second copy of a component that renders identically is cost without evidence.
  * `Drawer` is the sixth and the clearest case for the rule: it is the one
@@ -262,6 +267,16 @@ const MOBILE_CASES: readonly VisualCase[] = [
   // which is the layout a mobile nav actually ships as. Asserting only the
   // desktop one would assert the case nobody meets.
   { id: 'foundations-drawer--from-the-left', snapshot: 'drawer-from-the-left-mobile.png' },
+  // The application shell's other layout (issue 247). Collapsed: no sidebar
+  // column, the toggle at the head of the topbar. Open: the desktop row's
+  // story again, where the same request now puts the sidebar in a left
+  // drawer — `onScreen` asserts the panel is actually in the viewport.
+  { id: 'foundations-appshell--default', snapshot: 'appshell-default-mobile.png' },
+  {
+    id: 'foundations-appshell--sidebar-open',
+    snapshot: 'appshell-sidebar-open-mobile.png',
+    onScreen: '[data-slot="drawer"]',
+  },
   // Pagination's degraded form. At this width the seven-slot page list gives
   // way to the `[ 7 / 20 ]` status instead of wrapping onto a second line —
   // behaviour that exists only below `md`, so asserting it anywhere else

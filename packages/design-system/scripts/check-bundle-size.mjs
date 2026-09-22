@@ -154,16 +154,28 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * `/popover` and `/menu`, external here and weighed by `check:dep-cost`.
  * Re-measured after rebasing onto #279's pager and adding the portal-Level
  * hook (278,682 B / 65,233 B; CommonJS 306,349 B / 67,513 B).
+ *
+ * Raised for the application shell (#247): +9,323 B raw, +1,991 B gzip on
+ * the ESM bundle over `main` with #281's scoped-Level dialogs in it
+ * (279,274 B / 65,299 B → 288,597 B / 67,290 B; CommonJS 306,973 B /
+ * 67,599 B → 317,168 B / 69,624 B, +10,195 B / +2,025 B). Five exported
+ * components — `AppShell`, `AppSidebar`, `AppSidebarNav`, `AppTopbar`,
+ * `AppMain` — their four recipes, the width subscription that keeps the
+ * drawer shut at desktop width, and the navigation tree's link / button /
+ * group rendering. Nothing off-canvas is new: the dialog, focus trap, focus
+ * return, scroll lock and portal Level are `Drawer` on
+ * `@base-ui/react/dialog`, already paid for, and the toggle's icon is one
+ * more named import from `lucide-react`, external here.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 280_100,
-    maxGzip: 65_550,
+    maxRaw: 290_100,
+    maxGzip: 67_650,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 307_900,
-    maxGzip: 67_850,
+    maxRaw: 318_800,
+    maxGzip: 70_000,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

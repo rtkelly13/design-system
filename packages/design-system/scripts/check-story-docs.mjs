@@ -167,6 +167,11 @@ const UNSTORIED = {
   TableHead: 'Part of the `Foundations/Table` compound. See `TableHeader`.',
   TableCell: 'Part of the `Foundations/Table` compound. See `TableHeader`.',
   TableCaption: 'Part of the `Foundations/Table` compound. See `TableHeader`.',
+  AppSidebar:
+    'One of the five `Foundations/AppShell` pieces, documented and asserted there as a subcomponent. A sidebar outside a shell has no drawer and no toggle, so a page of its own would show the half of it that does not collapse.',
+  AppSidebarNav: 'Part of the `Foundations/AppShell` composition. See `AppSidebar`.',
+  AppTopbar: 'Part of the `Foundations/AppShell` composition. See `AppSidebar`.',
+  AppMain: 'Part of the `Foundations/AppShell` composition. See `AppSidebar`.',
 };
 
 /** Read the JSDoc text attached to a node, if any. */

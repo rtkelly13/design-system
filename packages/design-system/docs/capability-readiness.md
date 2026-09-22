@@ -33,8 +33,8 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 ## The matrix
 
 Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` with #243, *Display
-records* with #245, and *Context actions*, *Explain an icon/control* and *Show contextual content*
-with #166.
+records* with #245, *Context actions*, *Explain an icon/control* and *Show contextual content*
+with #166, and *Application layout* with #247.
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -65,7 +65,7 @@ with #166.
 | Long-form content | `Prose` / `BlogPost` | `partial` — `BlogPost`'s author card is hard-coded | [#250](https://github.com/rtkelly13/design-system/issues/250) |
 | Documentation | the docs system (`DocsLayout`, `CodeTabs`, …) | `ready` | |
 | Marketing | composable marketing sections | `partial` — `SaasLandingPage` is one monolith | [#248](https://github.com/rtkelly13/design-system/issues/248) |
-| Application layout | `AppShell` | `absent` | [#247](https://github.com/rtkelly13/design-system/issues/247) |
+| Application layout | `AppShell` + `AppSidebar` / `AppSidebarNav` / `AppTopbar` / `AppMain` — sidebar off-canvas in a `Drawer` below desktop width | `ready` | |
 | General site layout | `SiteHeader` / `SiteFooter` | `absent` | [#246](https://github.com/rtkelly13/design-system/issues/246) |
 
 Two rows are additions to the table #237 proposed, each because a landed component made the

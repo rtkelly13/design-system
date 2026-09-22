@@ -1001,6 +1001,96 @@ interface DrawerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'ch
 
 declare const Drawer: react.ForwardRefExoticComponent<DrawerProps & react.RefAttributes<HTMLDivElement>>;
 
+interface AppShellProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
+
+    sidebar?: ReactNode;
+
+    topbar?: ReactNode;
+
+    children: ReactNode;
+
+    sidebarOpen?: boolean;
+
+    defaultSidebarOpen?: boolean;
+
+    onSidebarOpenChange?: (open: boolean) => void;
+
+    className?: string;
+}
+
+declare const AppShell: react.ForwardRefExoticComponent<AppShellProps & react.RefAttributes<HTMLDivElement>>;
+interface AppSidebarProps extends Omit<HTMLAttributes<HTMLElement>, 'className' | 'children'> {
+
+    label: string;
+
+    header?: ReactNode;
+
+    children: ReactNode;
+
+    footer?: ReactNode;
+
+    className?: string;
+}
+
+declare const AppSidebar: react.ForwardRefExoticComponent<AppSidebarProps & react.RefAttributes<HTMLElement>>;
+
+interface AppNavItem {
+
+    id: string;
+
+    label: ReactNode;
+
+    href?: string;
+
+    icon?: ElementType<{
+        className?: string;
+    }>;
+
+    badge?: ReactNode;
+
+    items?: readonly AppNavItem[];
+}
+interface AppSidebarNavProps extends Omit<HTMLAttributes<HTMLElement>, 'className' | 'children'> {
+
+    label: string;
+
+    items: readonly AppNavItem[];
+
+    activeId?: string;
+
+    onNavigate?: (id: string) => void;
+
+    heading?: ReactNode;
+
+    className?: string;
+}
+
+declare const AppSidebarNav: react.ForwardRefExoticComponent<AppSidebarNavProps & react.RefAttributes<HTMLElement>>;
+interface AppTopbarProps extends Omit<HTMLAttributes<HTMLElement>, 'className'> {
+
+    label?: string;
+
+    children?: ReactNode;
+
+    actions?: ReactNode;
+
+    sidebarToggleLabel?: string;
+
+    className?: string;
+}
+
+declare const AppTopbar: react.ForwardRefExoticComponent<AppTopbarProps & react.RefAttributes<HTMLElement>>;
+interface AppMainProps extends Omit<HTMLAttributes<HTMLElement>, 'className'> {
+
+    label?: string;
+
+    children: ReactNode;
+
+    className?: string;
+}
+
+declare const AppMain: react.ForwardRefExoticComponent<AppMainProps & react.RefAttributes<HTMLElement>>;
+
 interface SpinnerProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'className'> {
 
     label?: string;
@@ -1839,6 +1929,17 @@ export {
   type AnsiHue,
   type AnsiScheme,
   type AnsiSlot,
+  AppMain,
+  type AppMainProps,
+  type AppNavItem,
+  AppShell,
+  type AppShellProps,
+  AppSidebar,
+  AppSidebarNav,
+  type AppSidebarNavProps,
+  type AppSidebarProps,
+  AppTopbar,
+  type AppTopbarProps,
   AsciiDivider,
   type AsciiDividerProps,
   Avatar,
