@@ -159,6 +159,15 @@ describe('AppShell', () => {
       expect(onNavigate).toHaveBeenCalledWith('list');
     });
 
+    it('treats an empty href as present: a same-document link, not a button', () => {
+      render(<AppSidebarNav label="Views" items={[{ id: 'top', label: 'Top', href: '' }]} />);
+      // Queried by element rather than role: the testing library's role map
+      // does not count `<a href="">` as a link, though browsers do.
+      const entry = screen.getByText('Top').closest('a, button');
+      expect(entry?.tagName).toBe('A');
+      expect(entry?.getAttribute('href')).toBe('');
+    });
+
     it('renders an icon component beside the label, hidden from assistive technology', () => {
       const Icon = ({ className }: { className?: string }) => <svg data-testid="icon" className={className} />;
       render(<AppSidebarNav label="Views" items={[{ id: 'a', label: 'Alpha', href: '/a', icon: Icon }]} />);

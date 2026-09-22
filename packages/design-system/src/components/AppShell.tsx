@@ -381,7 +381,7 @@ export const AppSidebarNav = forwardRef<HTMLElement, AppSidebarNavProps>(functio
       </>
     );
 
-    if (item.href) {
+    if (item.href !== undefined) {
       return (
         <a
           href={item.href}
