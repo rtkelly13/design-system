@@ -249,4 +249,84 @@ describe('Tabs', () => {
     );
     quiet.mockRestore();
   });
+
+  it('skips a disabled tab when traversing, so a focusable tab always remains', () => {
+    render(
+      <Tabs defaultValue="profile">
+        <TabsList label="Account settings">
+          <TabsTab value="profile">Profile</TabsTab>
+          <TabsTab value="notifications" disabled>
+            Notifications
+          </TabsTab>
+          <TabsTab value="billing">Billing</TabsTab>
+        </TabsList>
+        <TabsPanel value="profile">Display name</TabsPanel>
+        <TabsPanel value="notifications">Email digest</TabsPanel>
+        <TabsPanel value="billing">Payment method</TabsPanel>
+      </Tabs>,
+    );
+
+    const list = screen.getByRole('tablist');
+    const profile = screen.getByRole('tab', { name: 'Profile' });
+    profile.focus();
+    fireEvent.keyDown(profile, { key: 'ArrowRight' });
+
+    const billing = screen.getByRole('tab', { name: 'Billing' });
+    expect(selectedTab(list)?.textContent).toBe('Billing');
+    expect(document.activeElement).toBe(billing);
+    expect(billing.getAttribute('tabindex')).toBe('0');
+
+    fireEvent.keyDown(billing, { key: 'ArrowLeft' });
+    expect(document.activeElement).toBe(profile);
+  });
+
+  it('gives distinct values distinct ids, even when they differ only by whitespace', () => {
+    render(
+      <Tabs defaultValue="billing info">
+        <TabsList label="Account settings">
+          <TabsTab value="billing info">Billing info</TabsTab>
+          <TabsTab value="billing-info">Billing (legacy)</TabsTab>
+        </TabsList>
+        <TabsPanel value="billing info">New</TabsPanel>
+        <TabsPanel value="billing-info">Legacy</TabsPanel>
+      </Tabs>,
+    );
+
+    const [spaced, hyphenated] = screen.getAllByRole('tab');
+    expect(spaced?.id).not.toBe(hyphenated?.id);
+    expect(spaced?.getAttribute('aria-controls')).not.toBe(
+      hyphenated?.getAttribute('aria-controls'),
+    );
+    // The selected tab's pairing still resolves to its own panel.
+    const panel = screen.getByRole('tabpanel');
+    expect(spaced?.getAttribute('aria-controls')).toBe(panel.id);
+    expect(panel.getAttribute('aria-labelledby')).toBe(spaced?.id);
+  });
+
+  it('names the tablist itself from aria-label or aria-labelledby, not the wrapper', () => {
+    const { unmount } = render(
+      <Tabs defaultValue="profile">
+        <TabsList aria-label="Account settings">
+          <TabsTab value="profile">Profile</TabsTab>
+        </TabsList>
+        <TabsPanel value="profile">Display name</TabsPanel>
+      </Tabs>,
+    );
+    expect(screen.getByRole('tablist', { name: 'Account settings' })).toBeTruthy();
+    unmount();
+
+    render(
+      <>
+        <h2 id="settings-heading">Settings</h2>
+        <Tabs defaultValue="profile">
+          <TabsList aria-labelledby="settings-heading">
+            <TabsTab value="profile">Profile</TabsTab>
+          </TabsList>
+          <TabsPanel value="profile">Display name</TabsPanel>
+        </Tabs>
+      </>,
+    );
+    const list = screen.getByRole('tablist', { name: 'Settings' });
+    expect(list.parentElement?.getAttribute('aria-labelledby')).toBeNull();
+  });
 });

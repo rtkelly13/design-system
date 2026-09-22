@@ -565,10 +565,10 @@ interface PaginationProps {
 }
 declare function Pagination({ totalPages, currentPage, onPageChange, getPageHref, className, }: PaginationProps): react.JSX.Element;
 
-type TabsOrientation = "horizontal" | "vertical";
+type TabsOrientation = 'horizontal' | 'vertical';
 
-type TabsVariant = "merged" | "underline" | "segmented";
-interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
+type TabsVariant = 'merged' | 'underline' | 'segmented';
+interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
 
     value?: string;
 
@@ -600,7 +600,7 @@ interface TabsListProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 declare const TabsList: react.ForwardRefExoticComponent<TabsListProps & react.RefAttributes<HTMLDivElement>>;
-interface TabsTabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value"> {
+interface TabsTabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value'> {
 
     value: string;
 
