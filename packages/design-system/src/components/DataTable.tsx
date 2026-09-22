@@ -375,6 +375,9 @@ export function DataTable<T>({
                 <TableHead
                   key={header.id}
                   colSpan={header.colSpan > 1 ? header.colSpan : undefined}
+                  // A group heading spanning several columns heads all of them;
+                  // `col`, the default, would tie it to the first one only.
+                  scope={header.colSpan > 1 && !header.isPlaceholder ? 'colgroup' : undefined}
                   aria-sort={ariaSort}
                   className={cn(
                     canSort && 'relative cursor-pointer select-none hover:bg-surface-base transition-colors',

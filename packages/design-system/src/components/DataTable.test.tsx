@@ -294,6 +294,28 @@ describe('DataTable semantics', () => {
     expect(sortStates()).toEqual([null, 'ascending']);
   });
 
+  it('scopes a grouped header to its column group, and leaf headers to their column', () => {
+    render(
+      <DataTable
+        data={testData}
+        columns={[
+          {
+            id: 'identity',
+            header: 'Identity',
+            columns: [
+              { accessorKey: 'name', header: 'Name' },
+              { accessorKey: 'count', header: 'Count' },
+            ],
+          },
+        ]}
+      />,
+    );
+    const group = screen.getByRole('columnheader', { name: /Identity/ });
+    expect(group.getAttribute('colspan')).toBe('2');
+    expect(group.getAttribute('scope')).toBe('colgroup');
+    expect(screen.getByRole('columnheader', { name: /Name/ }).getAttribute('scope')).toBe('col');
+  });
+
   it('sorts through a real, focusable button named by its column', () => {
     render(<DataTable columns={columns} data={testData} />);
 
