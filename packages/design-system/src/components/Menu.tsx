@@ -3,6 +3,7 @@ import type { HTMLAttributes, ReactElement, ReactNode } from 'react';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import { Check } from 'lucide-react';
 import { cn, recipe } from '../lib/recipe';
+import { usePortalThemeAttribute } from './portalTheme';
 import { floatingSurface, floatingParts } from './floatingSurface';
 import type { OverlayAlign, OverlaySide } from './Tooltip';
 
@@ -79,6 +80,7 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(function Menu(
 ) {
   const styles = menu();
 
+  const portalTheme = usePortalThemeAttribute();
   return (
     <BaseMenu.Root
       open={open}
@@ -88,6 +90,7 @@ export const Menu = forwardRef<HTMLDivElement, MenuProps>(function Menu(
       <BaseMenu.Trigger render={trigger} />
       <BaseMenu.Portal>
         <BaseMenu.Positioner
+          {...portalTheme}
           side={side}
           align={align}
           sideOffset={6}

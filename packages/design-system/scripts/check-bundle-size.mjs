@@ -152,16 +152,18 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * ships and gzip largely absorbs. Positioning, collision, the dismissal
  * stack, list navigation and typeahead are `@base-ui/react/tooltip`,
  * `/popover` and `/menu`, external here and weighed by `check:dep-cost`.
+ * Re-measured after rebasing onto #279's pager and adding the portal-Level
+ * hook (278,682 B / 65,233 B; CommonJS 306,349 B / 67,513 B).
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 278_500,
-    maxGzip: 65_200,
+    maxRaw: 280_100,
+    maxGzip: 65_550,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 306_300,
-    maxGzip: 67_450,
+    maxRaw: 307_900,
+    maxGzip: 67_850,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

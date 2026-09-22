@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import type { HTMLAttributes, ReactElement, ReactNode } from 'react';
 import { Popover as BasePopover } from '@base-ui/react/popover';
 import { recipe } from '../lib/recipe';
+import { usePortalThemeAttribute } from './portalTheme';
 import { floatingSurface, floatingParts } from './floatingSurface';
 import type { OverlayAlign, OverlaySide } from './Tooltip';
 
@@ -87,6 +88,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
   const styles = popover();
   const parts = floatingParts();
 
+  const portalTheme = usePortalThemeAttribute();
   return (
     <BasePopover.Root
       open={open}
@@ -96,6 +98,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
       <BasePopover.Trigger render={trigger} />
       <BasePopover.Portal>
         <BasePopover.Positioner
+          {...portalTheme}
           side={side}
           align={align}
           sideOffset={8}

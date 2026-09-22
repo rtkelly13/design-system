@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import type { HTMLAttributes, ReactElement, ReactNode } from 'react';
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
 import { recipe } from '../lib/recipe';
+import { usePortalThemeAttribute } from './portalTheme';
 import { floatingSurface } from './floatingSurface';
 
 /**
@@ -106,6 +107,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(function Tooltip
 ) {
   const styles = tooltip();
 
+  const portalTheme = usePortalThemeAttribute();
   return (
     <BaseTooltip.Root
       open={open}
@@ -116,6 +118,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(function Tooltip
       <BaseTooltip.Trigger delay={delay} render={children} />
       <BaseTooltip.Portal>
         <BaseTooltip.Positioner
+          {...portalTheme}
           side={side}
           align={align}
           sideOffset={8}
