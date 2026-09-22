@@ -101,4 +101,18 @@ describe('portalled overlays keep a scoped Level', () => {
     const visible = screen.getAllByText('Toast body')[0]!;
     expect(visible.closest('[data-theme]')?.getAttribute('data-theme')).toBe('sketch');
   });
+
+  it('an unscoped provider leaves the portal to inherit the document Level', async () => {
+    render(
+      <ThemeProvider defaultLevel="sketch" persist={false}>
+        <Modal isOpen onClose={vi.fn()} title="Settings">
+          Unscoped body
+        </Modal>
+      </ThemeProvider>,
+    );
+    await waitFor(() => expect(screen.getByText('Unscoped body')).toBeDefined());
+    expect(screen.getByText('Unscoped body').closest('[data-theme]')).toBe(
+      document.documentElement,
+    );
+  });
 });
