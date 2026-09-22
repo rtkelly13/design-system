@@ -50,7 +50,8 @@ function RowActions() {
 
 /**
  * Context actions, open on load — a menu asserted closed asserts nothing.
- * One disabled item, which the arrow keys pass over; the destructive action
+ * One disabled item, which the arrow keys still reach and announce as
+ * unavailable, and which cannot be chosen; the destructive action
  * last, in the danger ink, after a separator. The story `tests/visual.spec.ts`
  * asserts.
  */

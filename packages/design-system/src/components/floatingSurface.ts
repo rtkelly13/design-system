@@ -71,11 +71,13 @@ export const floatingParts = recipe({
     item:
       'flex w-full cursor-default select-none items-center gap-2 px-3 py-1.5 text-left text-sm '
       + 'text-content-primary data-[highlighted]:bg-accent-primary data-[highlighted]:text-content-inverse',
-    // A disabled item is muted ink on the popup's own ground — the one
-    // state a menu shows that is not a highlight — and never takes the fill.
-    disabledItem:
-      'flex w-full cursor-not-allowed select-none items-center gap-2 px-3 py-1.5 text-left text-sm '
-      + 'text-content-muted',
+    // A disabled item is muted ink, and stays muted when the arrow keys land
+    // on it: the highlight is the page ground (`text.muted on surface.base`)
+    // rather than the accent fill, so a focused disabled item never looks
+    // actionable. The focus ring still marks where the keyboard is.
+    disabled:
+      'cursor-not-allowed text-content-muted data-[highlighted]:bg-surface-base '
+      + 'data-[highlighted]:text-content-muted',
     danger: 'text-intent-danger data-[highlighted]:bg-intent-danger',
     indicator: 'flex w-4 shrink-0 justify-center font-bold',
     groupLabel:

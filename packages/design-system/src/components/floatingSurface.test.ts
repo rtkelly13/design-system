@@ -36,6 +36,8 @@ const PAIRS: ReadonlyArray<{ className: string; pairs: readonly string[] }> = [
   // A highlighted item: the accent fill with the inverse ink.
   { className: 'data-[highlighted]:bg-accent-primary', pairs: ['text.inverse on accent.primary'] },
   { className: 'data-[highlighted]:bg-intent-danger', pairs: ['text.inverse on intent.danger'] },
+  // A disabled item, highlighted: muted ink on the page ground.
+  { className: 'data-[highlighted]:bg-surface-base', pairs: ['text.muted on surface.base'] },
   // The separator is the edge colour drawn as a rule on the popup's fill.
   { className: 'bg-edge-strong', pairs: ['border.strong on surface.raised'] },
 ];
@@ -50,7 +52,7 @@ function allClasses(): string {
     parts.close(),
     parts.body(),
     parts.item(),
-    parts.disabledItem(),
+    parts.disabled(),
     parts.danger(),
     parts.groupLabel(),
     parts.separator(),

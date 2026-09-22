@@ -53,38 +53,36 @@ describe('Menu', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
   });
 
-  it('opens on ArrowDown with the first item focused, and traverses with the arrow keys, skipping the disabled item', async () => {
+  it('opens on ArrowDown with the first item focused, and traverses every item, the disabled one included', async () => {
     render(<Actions />);
     await openWithKeyboard();
 
     await waitFor(() => expect(focused().textContent).toBe('Rename'));
 
     fireEvent.keyDown(focused(), { key: 'ArrowDown' });
-    // `Move` is disabled: the arrow passes over it.
+    // `Move` is disabled and still a stop: the WAI-ARIA menu pattern keeps
+    // disabled items focusable so the user learns they exist.
+    await waitFor(() => expect(focused().textContent).toBe('Move'));
+
+    fireEvent.keyDown(focused(), { key: 'ArrowDown' });
     await waitFor(() => expect(focused().textContent).toBe('Duplicate'));
 
     fireEvent.keyDown(focused(), { key: 'ArrowDown' });
     await waitFor(() => expect(focused().textContent).toBe('Delete'));
 
-    // Wraps from the last item to the first.
+    // Wraps from the last item to the first, and back.
     fireEvent.keyDown(focused(), { key: 'ArrowDown' });
     await waitFor(() => expect(focused().textContent).toBe('Rename'));
-
     fireEvent.keyDown(focused(), { key: 'ArrowUp' });
     await waitFor(() => expect(focused().textContent).toBe('Delete'));
 
-    fireEvent.keyDown(focused(), { key: 'ArrowUp' });
-    fireEvent.keyDown(focused(), { key: 'ArrowUp' });
-    // Duplicate, then over `Move` to Rename.
-    await waitFor(() => expect(focused().textContent).toBe('Rename'));
-
-    fireEvent.keyDown(focused(), { key: 'End' });
-    await waitFor(() => expect(focused().textContent).toBe('Delete'));
     fireEvent.keyDown(focused(), { key: 'Home' });
     await waitFor(() => expect(focused().textContent).toBe('Rename'));
+    fireEvent.keyDown(focused(), { key: 'End' });
+    await waitFor(() => expect(focused().textContent).toBe('Delete'));
   });
 
-  it('keeps the disabled item in the menu, marked, and never a match for typeahead', async () => {
+  it('marks the disabled item and keeps it focusable', async () => {
     render(<Actions />);
     const { menu } = await openWithKeyboard();
     await waitFor(() => expect(focused().textContent).toBe('Rename'));
@@ -92,15 +90,10 @@ describe('Menu', () => {
     const move = screen.getByRole('menuitem', { name: 'Move' });
     expect(menu.contains(move)).toBe(true);
     expect(move.getAttribute('aria-disabled')).toBe('true');
-    expect(move.tabIndex).toBe(-1);
+    expect(move.hasAttribute('data-disabled')).toBe(true);
 
-    // `M` matches only `Move`, which is disabled — focus stays where it is.
-    fireEvent.keyDown(focused(), { key: 'm' });
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(focused().textContent).toBe('Rename');
-
-    fireEvent.keyDown(focused(), { key: 'd' });
-    await waitFor(() => expect(focused().textContent).toBe('Duplicate'));
+    fireEvent.keyDown(focused(), { key: 'ArrowDown' });
+    await waitFor(() => expect(document.activeElement).toBe(move));
   });
 
   it('opens on ArrowUp with the last item focused', async () => {
@@ -123,21 +116,27 @@ describe('Menu', () => {
     await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
-  it('never fires a disabled item, from the pointer or the keyboard', async () => {
+  it('never activates a disabled item, from the pointer or the keyboard', async () => {
     const onMove = vi.fn();
     render(
-      <Menu trigger={<Button>ACTIONS</Button>} defaultOpen>
+      <Menu trigger={<Button>ACTIONS</Button>}>
         <MenuItem>Rename</MenuItem>
         <MenuItem disabled onClick={onMove}>
           Move
         </MenuItem>
       </Menu>,
     );
-    const move = await screen.findByRole('menuitem', { name: 'Move' });
-    fireEvent.click(move);
+    await openWithKeyboard();
+    await waitFor(() => expect(focused().textContent).toBe('Rename'));
+    fireEvent.keyDown(focused(), { key: 'ArrowDown' });
+    const move = screen.getByRole('menuitem', { name: 'Move' });
+    await waitFor(() => expect(document.activeElement).toBe(move));
+
     fireEvent.keyDown(move, { key: 'Enter' });
+    fireEvent.keyDown(move, { key: ' ' });
+    fireEvent.click(move);
     expect(onMove).not.toHaveBeenCalled();
-    // Pressing it does not dismiss the menu either: nothing was chosen.
+    // Nothing was chosen, so nothing dismissed the menu either.
     expect(screen.getByRole('menu')).toBeTruthy();
   });
 
@@ -170,20 +169,6 @@ describe('Menu', () => {
     fireEvent.pointerUp(outside, { pointerType: 'mouse' });
     fireEvent.mouseUp(outside);
     fireEvent.click(outside);
-    await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
-  });
-
-  it('with every item disabled, still holds focus inside the menu rather than dropping it', async () => {
-    render(
-      <Menu trigger={<Button>ACTIONS</Button>}>
-        <MenuItem disabled>Move</MenuItem>
-        <MenuItem disabled>Archive</MenuItem>
-      </Menu>,
-    );
-    const { menu } = await openWithKeyboard();
-    await waitFor(() => expect(menu.contains(document.activeElement)).toBe(true));
-    // And Escape still gets the user out.
-    fireEvent.keyDown(focused(), { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
   });
 

@@ -118,8 +118,8 @@ export interface MenuItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 'cla
    */
   intent?: 'danger';
   /**
-   * Shown, muted, and out of the keyboard path: the arrow keys and typeahead
-   * pass over it, and it cannot be activated.
+   * Shown muted and cannot be activated. It stays in the arrow-key sequence,
+   * announced as unavailable, rather than vanishing from it.
    */
   disabled?: boolean;
   /**
@@ -138,43 +138,27 @@ export interface MenuItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 'cla
  * Space alike — Base UI routes the keyboard through the same handler.
  */
 export const MenuItem = forwardRef<HTMLDivElement, MenuItemProps>(function MenuItem(
-  { children, intent, disabled = false, closeOnClick = true, className, onClick, ...props },
+  { children, intent, disabled = false, closeOnClick = true, className, ...props },
   ref,
 ) {
   const parts = floatingParts();
 
-  // A disabled item is rendered outside Base UI's item list rather than as a
-  // `Menu.Item` with `disabled`. Base UI keeps disabled items in its roving
-  // list — the arrow keys land on them and stop there — which is the WAI-ARIA
-  // practice's reading; this package's arrow-key composites (`Tabs`,
-  // `RadioGroup`) skip a control that cannot act, and a menu traversed the
-  // other way would be the one exception. Outside the list it is still a
-  // `menuitem`, still `aria-disabled`, still read in place by a screen
-  // reader's virtual cursor, and never a stop for the keyboard or a match for
-  // typeahead. `onClick` is withheld, so a pointer cannot fire it either.
-  if (disabled) {
-    return (
-      <div
-        ref={ref}
-        role="menuitem"
-        aria-disabled="true"
-        data-disabled=""
-        data-slot="menu-item"
-        className={cn(parts.disabledItem(), className)}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
-
+  // A disabled item stays in Base UI's roving list, as the WAI-ARIA menu
+  // pattern recommends: the arrow keys still land on it, so a keyboard or
+  // screen-reader user learns the action exists and is unavailable, rather
+  // than finding a gap. Base UI marks it `aria-disabled` and never fires it.
   return (
     <BaseMenu.Item
       ref={ref}
-      onClick={onClick}
+      disabled={disabled}
       closeOnClick={closeOnClick}
       data-slot="menu-item"
-      className={cn(parts.item(), intent === 'danger' && parts.danger(), className)}
+      className={cn(
+        parts.item(),
+        intent === 'danger' && parts.danger(),
+        disabled && parts.disabled(),
+        className,
+      )}
       {...props}
     >
       {children}
