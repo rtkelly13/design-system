@@ -58,6 +58,10 @@ export * from './components/PageTitle';
 export * from './components/PageHeader';
 export * from './components/Tag';
 export * from './components/Pagination';
+// The tablist. There is exactly one in this tree: `CodeTabs` renders through
+// it rather than hand-rolling a second keyboard model — see #240, and #163 for
+// why it is first-party rather than a wrapper over Base UI.
+export * from './components/Tabs';
 export * from './components/SectionContainer';
 export * from './components/Divider';
 export * from './components/AsciiDivider';
