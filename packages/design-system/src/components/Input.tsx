@@ -1,14 +1,12 @@
 import type {
-  CSSProperties,
-  ReactNode,
   InputHTMLAttributes,
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
 import { recipe } from '../lib/recipe';
 import { Field as BaseField } from '@base-ui/react/field';
-import { accentVar } from '../lib/theme';
-import type { AccentToken } from '../lib/theme';
+import { FieldFrame, accentStyle } from './fieldFrame';
+import type { FieldProps } from './fieldFrame';
 
 /**
  * Form controls — the reference for how a component in this system is built.
@@ -25,12 +23,14 @@ import type { AccentToken } from '../lib/theme';
  *   3. **Runtime values stay out of the class string.** The focus accent comes
  *      from a prop, so it travels as a custom property; a utility cannot be
  *      assembled at build time from a value known only at runtime.
+ *
+ * The label, message and ARIA wiring are not here: they are `FieldFrame` in
+ * `./fieldFrame`, shared with `Checkbox` and `Switch` so that one field
+ * implementation serves every control.
  */
 
 const field = recipe({
   slots: {
-    root: 'flex w-full flex-col gap-1.5 font-mono',
-    label: 'text-xs font-bold uppercase tracking-wider text-content-secondary',
     /**
      * No `outline-none` here, deliberately. The focus accent is a *border*
      * swap, and a border swap is invisible under forced-colors — which is why
@@ -41,7 +41,6 @@ const field = recipe({
      */
     control:
       'w-full border-2 border-edge-strong bg-surface-base font-mono text-sm text-content-primary transition-colors placeholder:text-content-muted focus:border-[var(--field-accent)]',
-    message: 'font-mono text-xs',
   },
   variants: {
     /** Padding differs by control: a textarea is a box, the others are lines. */
@@ -52,10 +51,6 @@ const field = recipe({
     invalid: {
       true: {
         control: 'border-intent-danger',
-        message: 'font-bold text-intent-danger',
-      },
-      false: {
-        message: 'text-content-muted',
       },
     },
     interactive: {
@@ -67,119 +62,6 @@ const field = recipe({
     invalid: false,
   },
 });
-
-/** Shared by every control here. */
-interface FieldProps {
-  /**
-   * The visible label, wired to the control by `id` — generated when none is
-   * supplied, so the association holds without the caller arranging it. Omit
-   * it only where a visible label exists elsewhere, and then give the control
-   * an `aria-label`: a field with no name is a field a screen reader cannot
-   * announce.
-   */
-  label?: string;
-  /**
-   * The validation message. Its presence is also the invalid state: it sets
-   * `aria-invalid`, switches the border to `intent.danger`, and is announced.
-   * Pass the message, never a boolean — "invalid" without a reason leaves the
-   * reader to guess what to change.
-   */
-  error?: string;
-  /**
-   * Standing guidance shown under the control — a format, a constraint, what
-   * the value is for. Always visible, unlike `error`, and replaced by it while
-   * one is set, because two competing instructions under one field is worse
-   * than either.
-   */
-  helperText?: string;
-  /**
-   * Semantic accent for the focus border. Accepts an `Emphasis`
-   * (`primary`…`quiet`) or an `Intent` (`info`/`success`/`warning`/`danger`);
-   * the legacy hue names still resolve to the same values.
-   */
-  accent?: AccentToken;
-  /**
-   * Merged onto the control itself, not the wrapper — so it sizes the input
-   * (`w-full`) rather than the label-and-error group around it.
-   */
-  className?: string;
-}
-
-/**
- * Wires label, control, error and helper text together.
- *
- * `useId` rather than a slug of the label text: two fields labelled "Name" on
- * one page produced the same `id`, so clicking one label focused the other.
- * `aria-describedby` and `aria-invalid` make the error something a screen
- * reader announces rather than a visual-only cue.
- */
-/** The accent is known at runtime, so it travels as a custom property. */
-function accentStyle(accent: AccentToken): CSSProperties {
-  return { '--field-accent': accentVar(accent) } as CSSProperties;
-}
-
-/**
- * The label, message and ARIA wiring every control shares.
- *
- * This was a hand-rolled `useField()` returning `id`, `aria-invalid` and
- * `aria-describedby`. Base UI's `Field` is the public equivalent, and it owns
- * two things the hook did not: `aria-describedby` composes when a field carries
- * *both* a description and an error, and the validity state is exposed to
- * descendants — `CheckboxRootState extends FieldRootState`, so controls added
- * later inherit it rather than re-deriving it.
- *
- * `error` here is a prop rather than native constraint validation, so
- * `Field.Root` is told it is `invalid` and `Field.Error` is matched
- * unconditionally. That keeps the control externally driven, which is what the
- * existing API promises.
- *
- * Both parts render a `span` rather than Base UI's default `p`, because a
- * message sits inside a flex column beside the control and a block paragraph
- * would change the layout.
- *
- * A caller's `id` goes on the *control*, never on `Field.Root` — the root's
- * `id` names the wrapper, and passing it there silently leaves the control on
- * a generated id while the label still points at it. The symptom is an `id`
- * prop that appears to do nothing.
- */
-function FieldFrame({
-  label,
-  error,
-  helperText,
-  styles,
-  children,
-}: {
-  label?: string;
-  error?: string;
-  helperText?: string;
-  styles: { root: () => string; label: () => string; message: () => string };
-  children: ReactNode;
-}) {
-  return (
-    <BaseField.Root data-slot="field" className={styles.root()} invalid={Boolean(error)}>
-      {label && (
-        <BaseField.Label data-slot="field-label" className={styles.label()}>
-          {label}
-        </BaseField.Label>
-      )}
-      {children}
-      {error ? (
-        <BaseField.Error
-          match
-          data-slot="field-error"
-          className={styles.message()}
-          render={<span role="alert" />}
-        >
-          &gt; {error}
-        </BaseField.Error>
-      ) : helperText ? (
-        <BaseField.Description data-slot="field-description" className={styles.message()} render={<span />}>
-          &gt; {helperText}
-        </BaseField.Description>
-      ) : null}
-    </BaseField.Root>
-  );
-}
 
 export interface InputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className'>,
@@ -202,7 +84,13 @@ export function Input({
   label,
   error,
   helperText,
+  /**
+   * Semantic accent for the focus border, as on every control here. Declared
+   * on `FieldProps` in `./fieldFrame`, and named again at the default so the
+   * generated props table has a description rather than a blank cell.
+   */
   accent = 'primary',
+  /** Merged onto the control itself, not the label-and-error group. */
   className = '',
   id,
   ...props
@@ -210,7 +98,7 @@ export function Input({
   const styles = field({ invalid: Boolean(error) });
 
   return (
-    <FieldFrame label={label} error={error} helperText={helperText} styles={styles}>
+    <FieldFrame label={label} error={error} helperText={helperText}>
       <BaseField.Control
         id={id}
         data-slot="field-control"
@@ -232,7 +120,13 @@ export function TextArea({
   label,
   error,
   helperText,
+  /**
+   * Semantic accent for the focus border, as on every control here. Declared
+   * on `FieldProps` in `./fieldFrame`, and named again at the default so the
+   * generated props table has a description rather than a blank cell.
+   */
   accent = 'primary',
+  /** Merged onto the control itself, not the label-and-error group. */
   className = '',
   id,
   ...props
@@ -240,7 +134,7 @@ export function TextArea({
   const styles = field({ shape: 'box', invalid: Boolean(error) });
 
   return (
-    <FieldFrame label={label} error={error} helperText={helperText} styles={styles}>
+    <FieldFrame label={label} error={error} helperText={helperText}>
       {/*
         The function form of `render`, not the element form, because
         `Field.Control` is typed to `HTMLInputElement` — spreading a
@@ -279,7 +173,13 @@ export function Select({
   error,
   helperText,
   options,
+  /**
+   * Semantic accent for the focus border, as on every control here. Declared
+   * on `FieldProps` in `./fieldFrame`, and named again at the default so the
+   * generated props table has a description rather than a blank cell.
+   */
   accent = 'primary',
+  /** Merged onto the control itself, not the label-and-error group. */
   className = '',
   id,
   ...props
@@ -287,7 +187,7 @@ export function Select({
   const styles = field({ invalid: Boolean(error), interactive: true });
 
   return (
-    <FieldFrame label={label} error={error} helperText={helperText} styles={styles}>
+    <FieldFrame label={label} error={error} helperText={helperText}>
       <BaseField.Control
         render={(controlProps) => (
           <select

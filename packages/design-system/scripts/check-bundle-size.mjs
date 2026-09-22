@@ -77,16 +77,23 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * dialog primitive `Modal` already pays for, so `check:dep-cost` does not move.
  * The alternative is #246 and #247 each hand-rolling their own drawer, which
  * costs more than this and ships two.
+ *
+ * Raised again for `Checkbox` and `Switch`: +6,614 B raw, +1,288 B gzip on
+ * the ESM bundle over `main` with Drawer in it (230,666 B / 53,727 B;
+ * CommonJS 254,507 B / 55,934 B). Most of it is the `fieldFrame` both
+ * controls share and the `booleanControl` recipe. The Base UI checkbox and
+ * switch entry points they sit on are external to this bundle and are
+ * weighed by `check:dep-cost` instead, which records the rise.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 225_200,
-    maxGzip: 52_700,
+    maxRaw: 231_800,
+    maxGzip: 54_000,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 248_800,
-    maxGzip: 54_900,
+    maxRaw: 255_800,
+    maxGzip: 56_200,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

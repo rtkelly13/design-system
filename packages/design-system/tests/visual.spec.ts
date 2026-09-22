@@ -94,6 +94,11 @@ const CASES: readonly VisualCase[] = [
   // rather than budgeting the gap.
   { id: 'foundations-avatar--default', snapshot: 'avatar-default.png' },
   { id: 'foundations-input--default-input', snapshot: 'input-default.png' },
+  // The booleans, one row each and both on their `AllStates` story: box,
+  // mark, track, thumb travel, disabled treatment and error border in a
+  // single reviewed PNG rather than eight almost-identical ones.
+  { id: 'foundations-checkbox--all-states', snapshot: 'checkbox-all-states.png' },
+  { id: 'foundations-switch--all-states', snapshot: 'switch-all-states.png' },
   { id: 'foundations-statcard--system-health', snapshot: 'statcard-system-health.png' },
   { id: 'foundations-datatable--virtualized', snapshot: 'datatable-virtualized.png' },
   { id: 'foundations-semantic-tokens--roles', snapshot: 'semantic-tokens-roles.png', fullPage: true },
