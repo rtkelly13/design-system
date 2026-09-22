@@ -9,6 +9,41 @@ Proper release notes start at 1.0. Until then this file records only what a
 consumer has to *do*, newest first. The reasoning lives in the pull requests and
 in [`docs/adr/`](./docs/adr/).
 
+## Unreleased
+
+`Select` themed on Base UI's select: the open list is painted by the Level, not the operating
+system (#164).
+
+### You have to do something
+
+- **`onChange(event)` is removed. Use `onValueChange(value: string)`.** It is called with the newly
+  chosen option's `value` — a string, not a `ChangeEvent` — so `onChange={(e) => set(e.target.value)}`
+  becomes `onValueChange={set}`. There is no alias and no shim.
+- **`multiple` and `size` are removed.** `Select` chooses exactly one option from a closed list.
+  Choosing several is `Checkbox`; showing a visible set is `RadioGroup`.
+- **`value` and `defaultValue` are strings only.** `number` and `string[]` are no longer accepted.
+  With neither given, the first enabled option is chosen, as on a native `<select>`; pass
+  `placeholder` to start from nothing instead.
+- **Options still come from `options`, never from children.** `children` is no longer part of
+  `SelectProps` at all; `<option>` elements passed as children were never rendered and are now a
+  type error. A row that cannot be chosen is `{ label, value, disabled: true }`.
+- **The control is a button with `role="combobox"`, not a `<select>`.** `SelectProps` extends
+  `HTMLAttributes<HTMLElement>` instead of `SelectHTMLAttributes<HTMLSelectElement>`, and the ref
+  (`Select` now forwards one) is the trigger. The field label is no longer a `<label>`: it names the
+  trigger by `aria-labelledby`, and clicking it focuses the trigger without opening the list.
+  Tests that drove it with `fireEvent.change` on a `<select>` should find it with
+  `getByRole('combobox', { name })`, open it, and choose a row by `getByRole('option', { name })`.
+- **If you need the platform picker, pass `native`.** It renders the `<select>` element, with the
+  same props and the same `onValueChange` — not the removed native API.
+- **A `name` still submits.** Base UI keeps a hidden input under `name`, so `FormData` carries the
+  chosen `value` as before. `form` and `autoComplete` are now explicit props.
+
+### Rendering changed
+
+- **The closed `Select` gains a chevron, and its open list is drawn from roles** — `surface.raised`
+  rows, an accent fill on the highlighted row, an accent `>` on the chosen one. The
+  `errorsummary-account-settings*` baselines move with it, and `select-*` rows are new.
+
 ## 0.10.0
 
 The capability release: every row in [`docs/capability-readiness.md`](./docs/capability-readiness.md)

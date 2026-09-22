@@ -1,8 +1,4 @@
-import type {
-  InputHTMLAttributes,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-} from 'react';
+import type { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { recipe } from '../lib/recipe';
 import { Field as BaseField } from '@base-ui/react/field';
 import { FieldFrame, accentStyle } from './fieldFrame';
@@ -29,7 +25,17 @@ import type { FieldProps } from './fieldFrame';
  * implementation serves every control.
  */
 
-const field = recipe({
+/**
+ * The control every text-shaped field wears: `Input`, `TextArea`, and both of
+ * `Select`'s presentations — the native `<select>` and the listbox trigger.
+ *
+ * Exported for `./Select` (#164), whose closed trigger has to look like the
+ * native control it replaced — one recipe is what makes that true rather than
+ * approximately true. `src/index.ts` names this module's exports rather than
+ * re-exporting it wholesale, so the recipe, and the `tailwind-variants` type
+ * it carries, stays out of the published `.d.ts`.
+ */
+export const fieldControl = recipe({
   slots: {
     /**
      * No `outline-none` here, deliberately. The focus accent is a *border*
@@ -71,9 +77,9 @@ export interface InputProps
  * A single-line text field, with its label, helper text and error as one unit.
  *
  * `Input`, `TextArea` and `Select` share one contract — `label`, `error`,
- * `helperText`, `accent` — and one recipe, which is why they share a page.
- * Pick by the shape of the answer, not by styling: one line, several, or one
- * of a fixed set.
+ * `helperText`, `accent` — and one recipe. The first two share a page; `Select`
+ * has its own, for the list it opens. Pick by the shape of the answer, not by
+ * styling: one line, several, or one of a fixed set.
  *
  * The field owns its own labelling. Supplying `label` associates it with a
  * generated `id` when the caller gives none, and `error` does three things at
@@ -96,7 +102,7 @@ export function Input({
   style,
   ...props
 }: InputProps) {
-  const styles = field({ invalid: Boolean(error) });
+  const styles = fieldControl({ invalid: Boolean(error) });
 
   return (
     <FieldFrame label={label} error={error} helperText={helperText}>
@@ -133,7 +139,7 @@ export function TextArea({
   style,
   ...props
 }: TextAreaProps) {
-  const styles = field({ shape: 'box', invalid: Boolean(error) });
+  const styles = fieldControl({ shape: 'box', invalid: Boolean(error) });
 
   // `id` goes to `Field.Control`, not onto the element `render` returns. Set
   // there, it overwrote the id the label's `for` points at — with the
@@ -157,67 +163,6 @@ export function TextArea({
             style={accentStyle(accent, style)}
             className={styles.control({ class: className })}
           />
-        )}
-      />
-    </FieldFrame>
-  );
-}
-
-export interface SelectOption {
-  label: string;
-  value: string;
-}
-
-export interface SelectProps
-  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'className'>,
-    FieldProps {
-  options: SelectOption[];
-}
-
-export function Select({
-  label,
-  error,
-  helperText,
-  options,
-  /**
-   * Semantic accent for the focus border, as on every control here. Declared
-   * on `FieldProps` in `./fieldFrame`, and named again at the default so the
-   * generated props table has a description rather than a blank cell.
-   */
-  accent = 'primary',
-  /** Merged onto the control itself, not the label-and-error group. */
-  className = '',
-  id,
-  style,
-  ...props
-}: SelectProps) {
-  const styles = field({ invalid: Boolean(error), interactive: true });
-
-  // `id` on `Field.Control`, for the reason `TextArea` gives.
-  return (
-    <FieldFrame label={label} error={error} helperText={helperText}>
-      <BaseField.Control
-        id={id}
-        render={(controlProps) => (
-          <select
-            {...controlProps}
-            {...props}
-            style={accentStyle(accent, style)}
-            className={styles.control({ class: className })}
-          >
-            {options.map((opt) => (
-              // Most platforms paint the open dropdown natively rather than from
-              // CSS. `color-scheme`, which each level declares, is what actually
-              // makes it match — another reason polarity is a declared field.
-              <option
-                key={opt.value}
-                value={opt.value}
-                className="bg-surface-raised text-content-primary"
-              >
-                {opt.label}
-              </option>
-            ))}
-          </select>
         )}
       />
     </FieldFrame>

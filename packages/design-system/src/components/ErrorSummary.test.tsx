@@ -6,8 +6,9 @@ import { describe, expect, it } from 'vitest';
 import { Checkbox } from './Checkbox';
 import { ErrorSummary } from './ErrorSummary';
 import type { ErrorSummaryError } from './ErrorSummary';
-import { Input, Select, TextArea } from './Input';
+import { Input, TextArea } from './Input';
 import { Radio, RadioGroup } from './RadioGroup';
+import { Select } from './Select';
 import { Switch } from './Switch';
 
 const ERRORS: ErrorSummaryError[] = [
@@ -180,6 +181,44 @@ describe('ErrorSummary', () => {
       expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Bio' }));
       click(link('Choose a zone'));
       expect(document.activeElement).toBe(screen.getByRole('combobox', { name: 'Zone' }));
+    });
+
+    // Issue 164: the themed Select puts its id on the listbox trigger, a
+    // button, so the link lands on the element the field label names — and
+    // neither on Base UI's hidden form input nor on an open list.
+    it('focuses the themed Select trigger its id is on, without opening the list', () => {
+      render(
+        <>
+          <ErrorSummary errors={[{ id: 'region', message: 'Choose a region' }]} />
+          <Select
+            id="region"
+            name="region"
+            label="Region"
+            placeholder="Pick one"
+            error="Choose a region"
+            options={[{ value: 'eu-west-1', label: 'EU West' }]}
+          />
+        </>,
+      );
+
+      const trigger = screen.getByRole('combobox', { name: 'Region' });
+      expect(trigger.id).toBe('region');
+      expect(click(link('Choose a region'))).toBe(true);
+      expect(document.activeElement).toBe(trigger);
+      expect(screen.queryByRole('listbox')).toBeNull();
+    });
+
+    it('focuses a native Select by its id', () => {
+      render(
+        <>
+          <ErrorSummary errors={[{ id: 'region', message: 'Choose a region' }]} />
+          <Select native id="region" label="Region" options={[{ value: 'eu-west-1', label: 'EU West' }]} />
+        </>,
+      );
+
+      expect(click(link('Choose a region'))).toBe(true);
+      expect(document.activeElement).toBe(screen.getByRole('combobox', { name: 'Region' }));
+      expect((document.activeElement as HTMLElement).tagName).toBe('SELECT');
     });
 
     // The id lands on Base UI's hidden input, which is aria-hidden and out of

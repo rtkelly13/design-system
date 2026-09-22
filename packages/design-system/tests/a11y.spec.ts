@@ -308,3 +308,44 @@ test('the focus-guard exclusion still reports a real aria-hidden-focus', async (
   expect(targets.some((html) => html.includes('planted-wrapper'))).toBe(true);
   expect(targets.some((html) => html.includes('data-base-ui-focus-guard'))).toBe(false);
 });
+
+/**
+ * Popups, open.
+ *
+ * The pass above scans each asserted story at rest, and a `Select` at rest is
+ * a closed trigger: its listbox exists only once opened, portalled to `body`.
+ * So the one surface #164 moved from the operating system to this palette
+ * would be the one surface axe never saw. This opens it the way a keyboard
+ * user does, then scans the same scope as above — the root plus every portal
+ * surface (`markScope`), without Base UI's focus guards (`scan`). No `KNOWN`
+ * budget: this is new, and starts at zero.
+ */
+const OPEN_POPUPS = [
+  { id: 'foundations-select--disabled-option', trigger: '#storybook-root [role="combobox"]', popup: 'listbox' },
+] as const;
+
+test.describe('Accessibility — open popups', () => {
+  for (const level of LEVELS) {
+    for (const { id, trigger, popup } of OPEN_POPUPS) {
+      test(`${id} open — ${level}`, async ({ page }) => {
+        await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=level:${level}`);
+        await waitForStoryRendered(page, id);
+        await page.evaluate(() => document.fonts.ready);
+        await page.addStyleTag({
+          content: '*,*::before,*::after{transition:none!important;animation:none!important}',
+        });
+
+        await page.locator(trigger).focus();
+        await page.keyboard.press('ArrowDown');
+        await expect(page.getByRole(popup)).toBeVisible();
+        await page.keyboard.press('ArrowDown');
+
+        await markScope(page);
+        const serious = (await scan(page)).filter(
+          (v) => v.impact === 'serious' || v.impact === 'critical',
+        );
+        expect(serious.map((v) => `${v.id} (${v.impact}, ${v.nodes.length}): ${v.help}`)).toEqual([]);
+      });
+    }
+  }
+});
