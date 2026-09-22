@@ -34,12 +34,25 @@ export const booleanControl = recipe({
   },
   variants: {
     shape: {
-      /** A square box with a mark in it: the checkbox. */
+      // A square box with a mark in it: the checkbox.
+      //
+      // Disabled and checked are both attribute variants, so which background
+      // won used to be CSS source order — and it was the disabled one, leaving
+      // `text-content-inverse`, an ink chosen for the accent fill, nearly
+      // invisible on `surface-sunken` (#270). The compound selectors below make
+      // the disabled surface win on purpose, and the mark drops to
+      // `text-content-muted`, the pair `check:contrast` verifies on every
+      // surface. That is how `dot` already handles it: the state stays legible,
+      // only the emphasis goes.
       box: {
         control:
           'size-6 cursor-pointer items-center justify-center '
-          + 'data-[checked]:bg-[var(--field-accent)] data-[indeterminate]:bg-[var(--field-accent)]',
-        mark: 'font-mono text-sm font-bold leading-none text-content-inverse',
+          + 'data-[checked]:bg-[var(--field-accent)] data-[indeterminate]:bg-[var(--field-accent)] '
+          + 'data-[checked]:data-[disabled]:bg-surface-sunken '
+          + 'data-[indeterminate]:data-[disabled]:bg-surface-sunken',
+        mark:
+          'font-mono text-sm font-bold leading-none text-content-inverse '
+          + 'data-[disabled]:text-content-muted',
       },
       /**
        * The same box holding a solid square: the radio. One option of a set

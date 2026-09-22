@@ -232,4 +232,18 @@ describe('Checkbox in a form', () => {
     expect(styled).toBeDefined();
     expect(styled?.style.getPropertyValue('--field-accent')).not.toBe('');
   });
+
+  it('keeps a disabled checked box legibly checked (issue 270)', () => {
+    const { container } = render(<Checkbox label="Locked on" defaultChecked disabled />);
+    const control = container.querySelector<HTMLElement>('[data-slot="checkbox"]')!;
+    const mark = container.querySelector<HTMLElement>('[data-slot="checkbox-indicator"]')!;
+    expect(control.hasAttribute('data-checked')).toBe(true);
+    expect(control.hasAttribute('data-disabled')).toBe(true);
+    // The disabled surface wins by selector, not by CSS source order, and the
+    // mark changes ink so it stays visible on it.
+    expect(control.className).toContain('data-[checked]:data-[disabled]:bg-surface-sunken');
+    expect(mark.hasAttribute('data-disabled')).toBe(true);
+    expect(mark.className).toContain('data-[disabled]:text-content-muted');
+    expect(mark.textContent).not.toBe('');
+  });
 });
