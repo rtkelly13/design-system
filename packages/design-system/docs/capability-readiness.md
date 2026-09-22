@@ -32,7 +32,7 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 
 ## The matrix
 
-Assessed against `main` after #268 (`Tabs`), with *Paginate* moved by #244.
+Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` with #243.
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -52,7 +52,7 @@ Assessed against `main` after #268 (`Tabs`), with *Paginate* moved by #244.
 | Confirm a destructive action | `AlertDialog` | `ready` | |
 | Display a modal workflow | `Modal` | `ready` | |
 | Show an off-canvas panel | `Drawer` | `ready` | |
-| Notify | `NoteBlock` + `Toast` | `partial` — `NoteBlock` is the inline alert, no toast | [#243](https://github.com/rtkelly13/design-system/issues/243) |
+| Notify | `NoteBlock` + `ToastProvider` / `useToast` | `ready` | |
 | Loading | `Spinner` / `Skeleton` | `ready` | |
 | Progress | `Progress` | `ready` | |
 | No content | `EmptyState` | `ready` | |

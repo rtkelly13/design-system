@@ -65,6 +65,7 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-modal--with-footer', snapshot: 'modal-with-footer.png' },
   { id: 'foundations-alertdialog--destructive', snapshot: 'alertdialog-destructive.png' },
   { id: 'foundations-drawer--from-the-right', snapshot: 'drawer-from-the-right.png' },
+  { id: 'foundations-toast--all-intents', snapshot: 'toast-all-intents.png' },
   // `fullPage`: the report frame is a page, and the part most likely to drift
   // — the header strip against the body rhythm — is only visible whole.
   {

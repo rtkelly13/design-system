@@ -7,6 +7,7 @@ import { Badge } from '../Badge';
 import { Card } from '../Card';
 import { Avatar } from '../Avatar';
 import { useOptionalTheme } from '../ThemeProvider';
+import { useOptionalToast } from '../Toast';
 import { LEVELS } from '../../theme/levels';
 
 export interface AdminNavItem {
@@ -56,6 +57,12 @@ export interface AdminDashboardLayoutProps {
   statusBadges?: AdminStatusBadge[];
   activeNavId?: string;
   onNavSelect?: (id: string) => void;
+  /**
+   * Called when `TRIGGER SYNC` is pressed. Inside a `ToastProvider` the press
+   * is also confirmed with a toast, so the request is acknowledged whether or
+   * not the page has anything else to show for it yet.
+   */
+  onTriggerSync?: () => void;
   children?: React.ReactNode;
 }
 
@@ -65,6 +72,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
   statusBadges = DEFAULT_ADMIN_STATUS,
   activeNavId = 'dashboard',
   onNavSelect,
+  onTriggerSync,
   children,
 }) => {
   const [currentNav, setCurrentNav] = useState(activeNavId);
@@ -75,6 +83,23 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
    * for why a consumer may theme with the attribute alone.
    */
   const theme = useOptionalTheme();
+  /*
+   * The same adapt-rather-than-require for notifications. A sync is the
+   * canonical toast: the user asked for something that finishes elsewhere,
+   * and the page has nothing of its own to show for it yet. With no provider
+   * there is nowhere to announce it, and the button still works.
+   */
+  const toast = useOptionalToast();
+
+  const handleSync = () => {
+    onTriggerSync?.();
+    toast?.show({
+      id: 'admin-sync',
+      intent: 'info',
+      title: 'SYNC REQUESTED',
+      description: 'Records refresh when the sync completes.',
+    });
+  };
 
   const handleSelect = (id: string) => {
     setCurrentNav(id);
@@ -209,7 +234,7 @@ export const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <Button bracketed variant="tertiary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
+            <Button bracketed variant="tertiary" onClick={handleSync} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
               <RefreshCw size={14} /> TRIGGER SYNC
             </Button>
           </div>

@@ -96,6 +96,11 @@ export * from './components/Skeleton';
 export * from './components/Progress';
 export * from './components/EmptyState';
 
+// Transient notifications. Not an overlay: a toast shares neither the
+// positioning nor the dismissal model of Tooltip/Popover/Menu — it is a queue,
+// a live region and a lifetime (#243).
+export * from './components/Toast';
+
 export * from './components/NerdIcon';
 export * from './components/SocialIcon';
 export * from './components/Glyph';
