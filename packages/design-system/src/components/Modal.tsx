@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import type { HTMLAttributes, ReactNode } from 'react';
 import { Dialog } from '@base-ui/react/dialog';
 import { cn } from '../lib/recipe';
+import { usePortalThemeAttribute } from './portalTheme';
 import { dialogSurface } from './dialogSurface';
 import { usePopupRef } from './dialogPopupRef';
 import { Button } from './Button';
@@ -79,6 +80,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
   const slots = dialogSurface();
   const [popup, attachPopup] = usePopupRef(ref);
 
+  const portalTheme = usePortalThemeAttribute();
   return (
     <Dialog.Root
       open={isOpen}
@@ -90,7 +92,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
       // way round, and the published API is the one that stays.
       disablePointerDismissal={!closeOnBackdropClick}
     >
-      <Dialog.Portal>
+      <Dialog.Portal {...portalTheme}>
         <Dialog.Backdrop data-slot="modal-backdrop" className={slots.backdrop()} />
         <Dialog.Viewport data-slot="modal-viewport" className={slots.viewport()}>
           <Dialog.Popup
