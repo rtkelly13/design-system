@@ -1,14 +1,22 @@
-import { createContext, forwardRef, useCallback, useContext, useId, useMemo, useState } from 'react';
+import {
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useId,
+  useMemo,
+  useState,
+} from "react";
 import type {
   ButtonHTMLAttributes,
   CSSProperties,
   HTMLAttributes,
   KeyboardEvent,
   ReactNode,
-} from 'react';
-import { cn, recipe } from '../lib/recipe';
-import { accentVar } from '../lib/theme';
-import type { AccentToken } from '../lib/theme';
+} from "react";
+import { cn, recipe } from "../lib/recipe";
+import { accentVar } from "../lib/theme";
+import type { AccentToken } from "../lib/theme";
 
 /**
  * The tab model this package has proven, promoted out of the one component
@@ -27,49 +35,50 @@ import type { AccentToken } from '../lib/theme';
  * tree, and this is it.
  *
  * Typeahead is still the one genuine gap, still out of scope here, and still
- * cheapest as an addition to the one `onKeyDown` below.
+ * cheapest as an addition to `moveBetweenTabs` below.
  */
 
 /** Which way the strip runs, and therefore which arrow keys traverse it. */
-export type TabsOrientation = 'horizontal' | 'vertical';
+export type TabsOrientation = "horizontal" | "vertical";
 
 /**
  * The three tab-strip shapes, loudest first. Named for the part rather than
  * the colour, because the accent is a separate axis.
  */
-export type TabsVariant = 'merged' | 'underline' | 'segmented';
+export type TabsVariant = "merged" | "underline" | "segmented";
 
 const tabs_ = recipe({
   slots: {
     // The root owns no spacing: a page margin is the caller's decision, and
     // `CodeTabs` supplies its own `my-6`.
-    root: '',
-    strip: 'relative z-10 flex border-2 border-edge-strong',
+    root: "",
+    strip: "relative z-10 flex border-2 border-edge-strong",
     caption:
-      'truncate font-mono text-xs font-bold uppercase tracking-widest text-content-secondary',
-    list: 'flex items-end',
-    tab: 'shrink-0 whitespace-nowrap font-mono text-xs font-bold uppercase tracking-widest transition-colors focus-visible:ring-2 focus-visible:ring-[var(--tabs-accent)] focus-visible:ring-inset',
+      "truncate font-mono text-xs font-bold uppercase tracking-widest text-content-secondary",
+    list: "flex items-end",
+    tab: "shrink-0 whitespace-nowrap font-mono text-xs font-bold uppercase tracking-widest transition-colors focus-visible:ring-2 focus-visible:ring-[var(--tabs-accent)] focus-visible:ring-inset",
   },
   variants: {
     variant: {
       // The loudest: a solid accent tab standing on the panel, its bottom rule
       // dropped so the fill runs into what it labels.
       merged: {
-        strip: 'items-end overflow-x-auto bg-surface-raised px-1.5 pt-1.5',
-        list: 'gap-1',
-        tab: '-mb-0.5 border-2 px-4 py-2',
+        strip: "items-end overflow-x-auto bg-surface-raised px-1.5 pt-1.5",
+        list: "gap-1",
+        tab: "-mb-0.5 border-2 px-4 py-2",
       },
       // The quietest: no tab shapes, a 4px accent rule on the seam.
       underline: {
-        strip: 'items-end overflow-x-auto bg-surface-base px-3 pt-2',
-        list: 'gap-1',
-        tab: '-mb-0.5 border-b-4 px-4 py-2.5',
+        strip: "items-end overflow-x-auto bg-surface-base px-3 pt-2",
+        list: "gap-1",
+        tab: "-mb-0.5 border-b-4 px-4 py-2.5",
       },
       // A title bar with a caption slot; the tabs are a segmented control.
       segmented: {
-        strip: 'items-center justify-between gap-4 bg-surface-raised px-3 py-2.5',
-        list: 'gap-0 border-2 border-edge-strong',
-        tab: 'border-r-2 border-edge-strong px-4 py-2 last:border-r-0',
+        strip:
+          "items-center justify-between gap-4 bg-surface-raised px-3 py-2.5",
+        list: "gap-0 border-2 border-edge-strong",
+        tab: "border-r-2 border-edge-strong px-4 py-2 last:border-r-0",
       },
     },
     /*
@@ -83,10 +92,10 @@ const tabs_ = recipe({
     orientation: {
       horizontal: {},
       vertical: {
-        root: 'flex items-start',
-        strip: 'flex-col items-stretch self-stretch overflow-x-visible',
-        list: 'flex-col items-stretch',
-        tab: 'w-full text-left',
+        root: "flex items-start",
+        strip: "flex-col items-stretch self-stretch overflow-x-visible",
+        list: "flex-col items-stretch",
+        tab: "w-full text-left",
       },
     },
     selected: {
@@ -96,76 +105,84 @@ const tabs_ = recipe({
   },
   compoundVariants: [
     {
-      variant: 'merged',
+      variant: "merged",
       selected: true,
       class: {
-        tab: 'relative z-10 border-edge-strong border-b-0 bg-[var(--tabs-accent)] text-content-inverse',
+        tab: "relative z-10 border-edge-strong border-b-0 bg-[var(--tabs-accent)] text-content-inverse",
       },
     },
     {
-      variant: 'merged',
+      variant: "merged",
       selected: false,
       class: {
-        tab: 'border-transparent text-content-muted hover:border-edge-strong hover:text-content-primary',
+        tab: "border-transparent text-content-muted hover:border-edge-strong hover:text-content-primary",
       },
     },
     {
-      variant: 'underline',
+      variant: "underline",
       selected: true,
-      class: { tab: 'border-b-[var(--tabs-accent)] text-content-primary' },
+      class: { tab: "border-b-[var(--tabs-accent)] text-content-primary" },
     },
     {
-      variant: 'underline',
+      variant: "underline",
       selected: false,
-      class: { tab: 'border-b-transparent text-content-muted hover:text-content-primary' },
+      class: {
+        tab: "border-b-transparent text-content-muted hover:text-content-primary",
+      },
     },
     {
-      variant: 'segmented',
+      variant: "segmented",
       selected: true,
-      class: { tab: 'bg-[var(--tabs-accent)] text-content-inverse' },
+      class: { tab: "bg-[var(--tabs-accent)] text-content-inverse" },
     },
     {
-      variant: 'segmented',
+      variant: "segmented",
       selected: false,
-      class: { tab: 'bg-surface-base text-content-muted hover:text-content-primary' },
+      class: {
+        tab: "bg-surface-base text-content-muted hover:text-content-primary",
+      },
     },
 
     // Vertical: the seam a variant draws along the bottom of a tab moves to its
     // trailing edge, so the strip reads as a column rather than a row that has
     // been rotated and left with a dangling rule.
-    { variant: 'merged', orientation: 'vertical', class: { tab: 'mb-0 -mr-0.5' } },
     {
-      variant: 'merged',
-      orientation: 'vertical',
+      variant: "merged",
+      orientation: "vertical",
+      class: { tab: "mb-0 -mr-0.5" },
+    },
+    {
+      variant: "merged",
+      orientation: "vertical",
       selected: true,
-      class: { tab: 'border-b-2 border-r-0' },
+      class: { tab: "border-b-2 border-r-0" },
     },
     {
-      variant: 'underline',
-      orientation: 'vertical',
-      class: { tab: 'mb-0 border-b-0 border-r-4' },
+      variant: "underline",
+      orientation: "vertical",
+      class: { tab: "mb-0 border-b-0 border-r-4" },
     },
     {
-      variant: 'underline',
-      orientation: 'vertical',
+      variant: "underline",
+      orientation: "vertical",
       selected: true,
-      class: { tab: 'border-r-[var(--tabs-accent)]' },
+      class: { tab: "border-r-[var(--tabs-accent)]" },
     },
     {
-      variant: 'underline',
-      orientation: 'vertical',
+      variant: "underline",
+      orientation: "vertical",
       selected: false,
-      class: { tab: 'border-r-transparent' },
+      class: { tab: "border-r-transparent" },
     },
     {
-      variant: 'segmented',
-      orientation: 'vertical',
-      class: { tab: 'border-b-2 border-r-0 last:border-b-0' },
+      variant: "segmented",
+      orientation: "vertical",
+      class: { tab: "border-b-2 border-r-0 last:border-b-0" },
     },
   ],
   defaultVariants: {
-    variant: 'merged',
-    orientation: 'horizontal',
+    variant: "merged",
+    orientation: "horizontal",
     selected: false,
   },
 });
@@ -196,10 +213,13 @@ function useTabsContext(part: string): TabsContextValue {
  * thing that needs replacing.
  */
 function idPart(value: string): string {
-  return value.replace(/\s+/g, '-');
+  return value.replace(/\s+/g, "-");
 }
 
-export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+export interface TabsProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "onChange"
+> {
   /**
    * The selected tab's `value`, when the caller owns the selection. Supplying
    * it makes the component controlled: it renders what it is given and never
@@ -276,9 +296,9 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     value,
     defaultValue,
     onValueChange,
-    orientation = 'horizontal',
-    variant = 'merged',
-    accent = 'primary',
+    orientation = "horizontal",
+    variant = "merged",
+    accent = "primary",
     children,
     className,
     style,
@@ -287,7 +307,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   ref,
 ) {
   const uid = useId();
-  const [uncontrolled, setUncontrolled] = useState(defaultValue ?? '');
+  const [uncontrolled, setUncontrolled] = useState(defaultValue ?? "");
   const selected = value ?? uncontrolled;
 
   const select = useCallback(
@@ -318,7 +338,10 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   // The accent is a runtime value, so it travels as a custom property that the
   // fill and edge utilities read — a utility cannot be assembled at build time
   // from a prop, because Tailwind's scanner reads source text.
-  const accented = { '--tabs-accent': accentVar(accent), ...style } as CSSProperties;
+  const accented = {
+    "--tabs-accent": accentVar(accent),
+    ...style,
+  } as CSSProperties;
 
   return (
     <TabsContext.Provider value={context}>
@@ -335,6 +358,59 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     </TabsContext.Provider>
   );
 });
+
+/**
+ * Arrow-key traversal for one tab set, bound on each tab rather than the
+ * tablist: a `tablist` is not itself focusable, and a key handler on an
+ * element that never takes focus is what `jsx-a11y/interactive-supports-focus`
+ * rejects. Still one function, and it still walks the DOM from the tab's own
+ * `tablist`, so the traversal order is the order a reader sees with no
+ * registry to fall out of step. Which keys traverse follows the orientation
+ * set on `Tabs`; `Home` and `End` always work.
+ */
+function moveBetweenTabs(
+  event: KeyboardEvent<HTMLButtonElement>,
+  orientation: TabsOrientation,
+  select: (value: string) => void,
+) {
+  const current = event.currentTarget;
+  const tablist = current.closest('[role="tablist"]');
+  if (!tablist) return;
+
+  const list = Array.from(
+    tablist.querySelectorAll<HTMLElement>('[role="tab"]'),
+  );
+  const index = list.indexOf(current);
+  if (index === -1) return;
+
+  const [back, forward] =
+    orientation === "vertical"
+      ? ["ArrowUp", "ArrowDown"]
+      : ["ArrowLeft", "ArrowRight"];
+  const last = list.length - 1;
+  const next =
+    event.key === forward
+      ? index === last
+        ? 0
+        : index + 1
+      : event.key === back
+        ? index === 0
+          ? last
+          : index - 1
+        : event.key === "Home"
+          ? 0
+          : event.key === "End"
+            ? last
+            : null;
+
+  if (next === null) return;
+  event.preventDefault();
+  const target = list[next];
+  if (!target) return;
+  const value = target.dataset.value;
+  if (value !== undefined) select(value);
+  target.focus();
+}
 
 export interface TabsListProps extends HTMLAttributes<HTMLDivElement> {
   /**
@@ -354,90 +430,47 @@ export interface TabsListProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * The strip a tab set's tabs stand in, and the element that owns the keyboard
- * model.
- *
- * The arrow keys are handled here rather than on each tab so there is one
- * handler regardless of how many tabs there are, and so the traversal order is
- * the DOM order a reader actually sees. Which keys traverse follows the
- * orientation set on `Tabs`; `Home` and `End` always work.
+ * The strip a tab set's tabs stand in, holding the `tablist` whose DOM order
+ * is the keyboard traversal order (see `moveBetweenTabs`).
  */
-export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(function TabsList(
-  { label, caption, children, className, onKeyDown, ...props },
-  ref,
-) {
-  const { orientation, variant, select } = useTabsContext('TabsList');
-  const styles = tabs_({ variant, orientation });
+export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
+  function TabsList({ label, caption, children, className, ...props }, ref) {
+    const { orientation, variant } = useTabsContext("TabsList");
+    const styles = tabs_({ variant, orientation });
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    onKeyDown?.(event);
-    if (event.defaultPrevented) return;
-
-    const current = (event.target as HTMLElement | null)?.closest('[role="tab"]');
-    if (!current) return;
-
-    const strip = event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]');
-    const list = Array.from(strip);
-    const index = list.indexOf(current as HTMLElement);
-    if (index === -1) return;
-
-    const [back, forward] =
-      orientation === 'vertical' ? ['ArrowUp', 'ArrowDown'] : ['ArrowLeft', 'ArrowRight'];
-    const last = list.length - 1;
-    const next =
-      event.key === forward
-        ? index === last
-          ? 0
-          : index + 1
-        : event.key === back
-          ? index === 0
-            ? last
-            : index - 1
-          : event.key === 'Home'
-            ? 0
-            : event.key === 'End'
-              ? last
-              : null;
-
-    if (next === null) return;
-    event.preventDefault();
-    const target = list[next];
-    if (!target) return;
-    const value = target.dataset.value;
-    if (value !== undefined) select(value);
-    target.focus();
-  };
-
-  return (
-    <div
-      ref={ref}
-      {...props}
-      data-slot="tabs-list"
-      className={cn(styles.strip(), className)}
-    >
-      {caption ? (
-        <span data-slot="tabs-caption" className={styles.caption()}>
-          {caption}
-        </span>
-      ) : null}
+    return (
       <div
-        role="tablist"
-        aria-label={label}
-        // Only stated when it is not the default: an `aria-orientation` of
-        // `horizontal` on a tablist says nothing a screen reader did not
-        // already assume.
-        aria-orientation={orientation === 'vertical' ? 'vertical' : undefined}
-        data-orientation={orientation}
-        className={styles.list()}
-        onKeyDown={handleKeyDown}
+        ref={ref}
+        {...props}
+        data-slot="tabs-list"
+        className={cn(styles.strip(), className)}
       >
-        {children}
+        {caption ? (
+          <span data-slot="tabs-caption" className={styles.caption()}>
+            {caption}
+          </span>
+        ) : null}
+        <div
+          role="tablist"
+          aria-label={label}
+          // Only stated when it is not the default: an `aria-orientation` of
+          // `horizontal` on a tablist says nothing a screen reader did not
+          // already assume.
+          aria-orientation={orientation === "vertical" ? "vertical" : undefined}
+          data-orientation={orientation}
+          className={styles.list()}
+        >
+          {children}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
-export interface TabsTabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value'> {
+export interface TabsTabProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "value"
+> {
   /**
    * Identifies the tab, and pairs it with the `TabsPanel` carrying the same
    * value. Unique within one tab set; it also becomes part of the element ids
@@ -459,43 +492,50 @@ export interface TabsTabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElemen
  * never by a surface swap: `pnpm check:contrast` asserts both devices clear 3:1
  * on every rung of the ladder and reports the surface pair that does not.
  */
-export const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(function TabsTab(
-  { value, children, className, onClick, ...props },
-  ref,
-) {
-  const context = useTabsContext('TabsTab');
-  const selected = context.value === value;
-  const styles = tabs_({
-    variant: context.variant,
-    orientation: context.orientation,
-    selected,
-  });
+export const TabsTab = forwardRef<HTMLButtonElement, TabsTabProps>(
+  function TabsTab(
+    { value, children, className, onClick, onKeyDown, ...props },
+    ref,
+  ) {
+    const context = useTabsContext("TabsTab");
+    const selected = context.value === value;
+    const styles = tabs_({
+      variant: context.variant,
+      orientation: context.orientation,
+      selected,
+    });
 
-  return (
-    <button
-      ref={ref}
-      {...props}
-      type="button"
-      role="tab"
-      id={context.tabId(value)}
-      data-slot="tabs-tab"
-      // Read back by the keyboard handler on the list, which walks the DOM
-      // rather than a registry: the tabs a reader can arrow between are exactly
-      // the ones rendered, with no bookkeeping to fall out of step.
-      data-value={value}
-      aria-selected={selected}
-      aria-controls={context.panelId(value)}
-      tabIndex={selected ? 0 : -1}
-      onClick={(event) => {
-        onClick?.(event);
-        context.select(value);
-      }}
-      className={cn(styles.tab(), className)}
-    >
-      {children}
-    </button>
-  );
-});
+    return (
+      <button
+        ref={ref}
+        {...props}
+        type="button"
+        role="tab"
+        id={context.tabId(value)}
+        data-slot="tabs-tab"
+        // Read back by `moveBetweenTabs`, which walks the DOM
+        // rather than a registry: the tabs a reader can arrow between are exactly
+        // the ones rendered, with no bookkeeping to fall out of step.
+        data-value={value}
+        aria-selected={selected}
+        aria-controls={context.panelId(value)}
+        tabIndex={selected ? 0 : -1}
+        onClick={(event) => {
+          onClick?.(event);
+          context.select(value);
+        }}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (event.defaultPrevented) return;
+          moveBetweenTabs(event, context.orientation, context.select);
+        }}
+        className={cn(styles.tab(), className)}
+      >
+        {children}
+      </button>
+    );
+  },
+);
 
 export interface TabsPanelProps extends HTMLAttributes<HTMLDivElement> {
   /** The {@link TabsTab} value this panel belongs to. */
@@ -524,29 +564,31 @@ export interface TabsPanelProps extends HTMLAttributes<HTMLDivElement> {
  * styling of its own: what a panel looks like is the surface it holds, and a
  * primitive that padded it would be wrong for half its uses.
  */
-export const TabsPanel = forwardRef<HTMLDivElement, TabsPanelProps>(function TabsPanel(
-  { value, keepMounted = false, children, className, ...props },
-  ref,
-) {
-  const context = useTabsContext('TabsPanel');
-  const selected = context.value === value;
+export const TabsPanel = forwardRef<HTMLDivElement, TabsPanelProps>(
+  function TabsPanel(
+    { value, keepMounted = false, children, className, ...props },
+    ref,
+  ) {
+    const context = useTabsContext("TabsPanel");
+    const selected = context.value === value;
 
-  if (!selected && !keepMounted) return null;
+    if (!selected && !keepMounted) return null;
 
-  const classes = cn(className);
+    const classes = cn(className);
 
-  return (
-    <div
-      ref={ref}
-      {...props}
-      role="tabpanel"
-      id={context.panelId(value)}
-      data-slot="tabs-panel"
-      aria-labelledby={context.tabId(value)}
-      hidden={!selected}
-      className={classes || undefined}
-    >
-      {children}
-    </div>
-  );
-});
+    return (
+      <div
+        ref={ref}
+        {...props}
+        role="tabpanel"
+        id={context.panelId(value)}
+        data-slot="tabs-panel"
+        aria-labelledby={context.tabId(value)}
+        hidden={!selected}
+        className={classes || undefined}
+      >
+        {children}
+      </div>
+    );
+  },
+);
