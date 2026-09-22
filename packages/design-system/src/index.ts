@@ -107,6 +107,27 @@ export * from './components/Tooltip';
 export * from './components/Popover';
 export * from './components/Menu';
 
+// Site chrome (issue 246): the banner, the navigation in its two widths, and
+// the footer — layouts and landmarks that hold no items of their own. The
+// link adapter is the package's one, shared with the docs chrome: a router's
+// `Link` and its current-route test are injected once and reach both.
+export {
+  LinkProvider,
+  SiteLink,
+  isExternalHref,
+  useIsCurrentHref,
+  useLinkComponent,
+} from './components/LinkProvider';
+export type {
+  LinkComponentProps,
+  LinkProviderProps,
+  SiteLinkProps,
+} from './components/LinkProvider';
+export * from './components/SiteHeader';
+export * from './components/SiteNav';
+export * from './components/MobileNav';
+export * from './components/SiteFooter';
+
 // Transient notifications. Not an overlay: a toast shares neither the
 // positioning nor the dismissal model of Tooltip/Popover/Menu — it is a queue,
 // a live region and a lifetime (#243).

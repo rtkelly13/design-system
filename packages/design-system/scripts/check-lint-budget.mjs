@@ -42,7 +42,6 @@ const BUDGET = {
   'jsx-a11y/no-static-element-interactions': 2,
   'jsx-a11y/click-events-have-key-events': 2,
   'react-hooks/incompatible-library': 1,
-  'react-hooks/static-components': 1,
   'jsx-a11y/anchor-ambiguous-text': 1,
 };
 

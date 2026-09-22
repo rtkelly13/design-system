@@ -159,6 +159,12 @@ const UNSTORIED = {
     'The indirection point for a host router, injected through `DocsLinkProvider`. Its whole behaviour is which element it delegates to, which renders identically either way.',
   DocsLinkProvider:
     'Context only, no markup. Every `Docs/*` story renders inside the default (plain `<a>`) behaviour, which is the case worth showing.',
+  LinkProvider:
+    'Context only, no markup — the package-wide form of `DocsLinkProvider`, and the same context. The `Foundations/SiteHeader` pages render inside one, with `isCurrent` standing in for a router, which is the case worth showing.',
+  SiteLink:
+    'The site chrome’s indirection point for a host router, as `DocsLink` is the docs chrome’s. Its behaviour is which element it delegates to and whether it carries `aria-current`, both shown on every `Foundations/Site*` page.',
+  SiteNavItem:
+    'One entry of `SiteNav`, documented on `Foundations/SiteNav` as a subcomponent. An item outside a nav has no list to be in and no landmark to belong to, so a page of its own would show it in a context no consumer builds.',
   TableHeader:
     'One of eight parts of a single primitive, all documented together on `Foundations/Table` — a table part shown on its own is a `<thead>` with a border, and eight such pages would be one component described eight times.',
   TableBody: 'Part of the `Foundations/Table` compound. See `TableHeader`.',

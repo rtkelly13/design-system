@@ -1269,6 +1269,138 @@ interface MenuSeparatorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'class
 
 declare const MenuSeparator: react.ForwardRefExoticComponent<MenuSeparatorProps & react.RefAttributes<HTMLDivElement>>;
 
+type LinkComponentProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+    href: string;
+};
+interface LinkProviderProps {
+
+    component?: ElementType<LinkComponentProps>;
+
+    isCurrent?: (href: string) => boolean;
+    children: ReactNode;
+}
+
+declare function LinkProvider({ component, isCurrent, children }: LinkProviderProps): react.JSX.Element;
+
+declare function useLinkComponent(): ElementType<LinkComponentProps>;
+
+declare function isExternalHref(href: string): boolean;
+
+declare function useIsCurrentHref(href: string): boolean;
+interface SiteLinkProps extends LinkComponentProps {
+
+    current?: boolean;
+
+    className?: string;
+}
+
+declare const SiteLink: react.ForwardRefExoticComponent<SiteLinkProps & react.RefAttributes<HTMLAnchorElement>>;
+
+type SiteHeaderCollapse = 'sm' | 'md' | 'lg';
+interface SiteHeaderProps extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'className'> {
+
+    brand: ReactNode;
+
+    brandHref?: string;
+
+    nav?: ReactNode;
+
+    mobileNav?: ReactNode;
+
+    actions?: ReactNode;
+
+    collapseAt?: SiteHeaderCollapse;
+
+    skipTo?: string | false;
+
+    skipLabel?: string;
+
+    sticky?: boolean;
+
+    className?: string;
+}
+
+declare const SiteHeader: react.ForwardRefExoticComponent<SiteHeaderProps & react.RefAttributes<HTMLElement>>;
+
+type SiteNavOrientation = 'horizontal' | 'vertical';
+interface SiteNavProps extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'className' | 'aria-label'> {
+
+    label: string;
+
+    children: ReactNode;
+
+    orientation?: SiteNavOrientation;
+
+    className?: string;
+}
+
+declare const SiteNav: react.ForwardRefExoticComponent<SiteNavProps & react.RefAttributes<HTMLElement>>;
+
+interface SiteNavLinkItemProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'children' | 'className'> {
+
+    href: string;
+
+    children: ReactNode;
+
+    current?: boolean;
+
+    className?: string;
+    label?: never;
+    defaultOpen?: never;
+}
+
+interface SiteNavGroupItemProps {
+
+    label: string;
+
+    children: ReactNode;
+
+    defaultOpen?: boolean;
+
+    className?: string;
+    href?: never;
+    current?: never;
+}
+type SiteNavItemProps = SiteNavLinkItemProps | SiteNavGroupItemProps;
+
+declare const SiteNavItem: react.ForwardRefExoticComponent<SiteNavItemProps & react.RefAttributes<HTMLButtonElement | HTMLAnchorElement>>;
+
+interface MobileNavProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title' | 'className'> {
+
+    label: string;
+
+    children: ReactNode;
+
+    title?: string;
+
+    triggerLabel?: string;
+
+    open?: boolean;
+
+    defaultOpen?: boolean;
+
+    onOpenChange?: (open: boolean) => void;
+
+    footer?: ReactNode;
+
+    className?: string;
+}
+
+declare const MobileNav: react.ForwardRefExoticComponent<MobileNavProps & react.RefAttributes<HTMLDivElement>>;
+
+interface SiteFooterProps extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'className'> {
+
+    children?: ReactNode;
+
+    nav?: ReactNode;
+
+    meta?: ReactNode;
+
+    className?: string;
+}
+
+declare const SiteFooter: react.ForwardRefExoticComponent<SiteFooterProps & react.RefAttributes<HTMLElement>>;
+
 type ToastIntent = 'info' | 'success' | 'warning' | 'danger';
 
 interface ToastActionOptions {
@@ -1802,20 +1934,17 @@ interface DocsLayoutProps {
 
 declare function DocsLayout({ header, sidebar, toc, children, sidebarOpen, onCloseSidebar, className, }: DocsLayoutProps): react.JSX.Element;
 
-type DocsLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
-    href: string;
-};
+type DocsLinkProps = LinkComponentProps;
 interface DocsLinkProviderProps {
 
     component: ElementType<DocsLinkProps>;
     children: ReactNode;
 }
+
 declare function DocsLinkProvider({ component, children }: DocsLinkProviderProps): react.JSX.Element;
 declare function useDocsLinkComponent(): ElementType<DocsLinkProps>;
 
-declare function isExternalHref(href: string): boolean;
-
-declare function DocsLink({ href, children, ...rest }: DocsLinkProps): react.JSX.Element;
+declare function DocsLink(props: DocsLinkProps): react.JSX.Element;
 
 interface DocsNavNode {
     label: string;
@@ -2044,6 +2173,9 @@ export {
   Legend,
   type LegendProps,
   type LevelDefinition,
+  type LinkComponentProps,
+  LinkProvider,
+  type LinkProviderProps,
   LinkedInIcon,
   LoremIpsumPost,
   MAXIMUM_NEUTRAL_CHROMA,
@@ -2064,6 +2196,8 @@ export {
   type MenuRadioItemProps,
   MenuSeparator,
   type MenuSeparatorProps,
+  MobileNav,
+  type MobileNavProps,
   Modal,
   type ModalProps,
   type Motion,
@@ -2125,6 +2259,20 @@ export {
   type SelectProps,
   type SelectionDevice,
   type SelectionDeviceCheck,
+  SiteFooter,
+  type SiteFooterProps,
+  SiteHeader,
+  type SiteHeaderCollapse,
+  type SiteHeaderProps,
+  SiteLink,
+  type SiteLinkProps,
+  SiteNav,
+  type SiteNavGroupItemProps,
+  SiteNavItem,
+  type SiteNavItemProps,
+  type SiteNavLinkItemProps,
+  type SiteNavOrientation,
+  type SiteNavProps,
   Skeleton,
   type SkeletonProps,
   Slide,
@@ -2234,6 +2382,8 @@ export {
   useActiveHeading,
   useCopyToClipboard,
   useDocsLinkComponent,
+  useIsCurrentHref,
+  useLinkComponent,
   useOptionalTheme,
   useOptionalToast,
   useTheme,
