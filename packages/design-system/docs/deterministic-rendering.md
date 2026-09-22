@@ -63,11 +63,13 @@ layer down — silent, plausible-looking, wrong output.
 
 ### 3. Turn the transitions off
 
-There are 27 CSS transitions and **zero** `@keyframes`. Most are hover- or focus-intent, so they are
-inert wherever there is no pointer — but since #162 that is no longer all of them. `Modal` and
-`AlertDialog` fade their backdrop and popup on open and close, driven by Base UI's
+There are 36 CSS transitions and **zero** `@keyframes`. Most are hover- or focus-intent, so they are
+inert wherever there is no pointer — but since #162 that is no longer all of them. `Modal`,
+`AlertDialog` and `Drawer` fade their backdrop and popup on open and close, driven by Base UI's
 `data-starting-style` / `data-ending-style` attributes rather than by a pointer, so a capture taken
-while a dialog is opening catches it mid-fade with nothing having been hovered. Those two carry
+while a dialog is opening catches it mid-fade with nothing having been hovered. `Drawer` (#241) is
+the one that also *moves*: its panel translates a full panel-width in from the edge, so a capture
+taken mid-transition is not a slightly-wrong opacity but a panel in the wrong place. All three carry
 `motion-reduce:transition-none`, which makes `prefers-reduced-motion` a second and more honest lever
 than the reset below; the reset is still what a capture harness should use, because it does not
 depend on the component having remembered.

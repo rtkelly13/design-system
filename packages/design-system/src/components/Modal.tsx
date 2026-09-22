@@ -1,44 +1,10 @@
-import { forwardRef, useCallback, useRef } from 'react';
-import type { ForwardedRef, HTMLAttributes, ReactNode } from 'react';
+import { forwardRef } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import { Dialog } from '@base-ui/react/dialog';
 import { cn } from '../lib/recipe';
 import { dialogSurface } from './dialogSurface';
+import { usePopupRef } from './dialogPopupRef';
 import { Button } from './Button';
-
-/**
- * Module scope on purpose: written inline, the assignment reads to the
- * compiler lint as a component mutating a value it captured during render.
- */
-function assignRef<T>(ref: ForwardedRef<T>, node: T | null) {
-  if (typeof ref === 'function') {
-    ref(node);
-    return;
-  }
-  if (ref) {
-    ref.current = node;
-  }
-}
-
-/**
- * Keeps a local handle on the popup while still honouring a caller's ref.
- *
- * `initialFocus` needs the popup *element*, and the only ref slot Base UI
- * offers is the one the caller may also have asked for. Merging them here is
- * cheaper than making the caller give theirs up.
- */
-function usePopupRef(forwarded: ForwardedRef<HTMLDivElement>) {
-  const popup = useRef<HTMLDivElement | null>(null);
-
-  const attach = useCallback(
-    (node: HTMLDivElement | null) => {
-      popup.current = node;
-      assignRef(forwarded, node);
-    },
-    [forwarded],
-  );
-
-  return [popup, attach] as const;
-}
 
 export interface ModalProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'className'> {

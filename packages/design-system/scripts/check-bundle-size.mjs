@@ -68,16 +68,25 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * of it — `sideEffects` is declared and the module is shaken out — but this
  * ceiling weighs the whole file, so the number moves and is justified here
  * rather than quietly widened.
+ *
+ * Raised again for `Drawer` (#241): +4,384 B raw, +811 B gzip on the ESM
+ * bundle, measured against `main` on ubuntu-latest (224,052 B / 52,439 B;
+ * CommonJS 247,563 B / 54,602 B). That is the component, the `placement`
+ * variant on `dialogSurface` and the shared `usePopupRef` — class strings and
+ * wiring, not behaviour. Every piece of off-canvas behaviour comes from the
+ * dialog primitive `Modal` already pays for, so `check:dep-cost` does not move.
+ * The alternative is #246 and #247 each hand-rolling their own drawer, which
+ * costs more than this and ships two.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 220_500,
-    maxGzip: 52_000,
+    maxRaw: 225_200,
+    maxGzip: 52_700,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 243_600,
-    maxGzip: 54_100,
+    maxRaw: 248_800,
+    maxGzip: 54_900,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

@@ -64,6 +64,7 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-tldr--default', snapshot: 'tldr-default.png' },
   { id: 'foundations-modal--with-footer', snapshot: 'modal-with-footer.png' },
   { id: 'foundations-alertdialog--destructive', snapshot: 'alertdialog-destructive.png' },
+  { id: 'foundations-drawer--from-the-right', snapshot: 'drawer-from-the-right.png' },
   // `fullPage`: the report frame is a page, and the part most likely to drift
   // — the header strip against the body rhythm — is only visible whole.
   {
@@ -187,9 +188,11 @@ const INTERACTIONS: readonly InteractionCase[] = [
  * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
  * to look" at.
  *
- * Deliberately five, not forty-one. Each is a committed PNG a human reviews on
+ * Deliberately six, not forty-one. Each is a committed PNG a human reviews on
  * every change, and the point is the layout that *differs* at this width — a
  * second copy of a component that renders identically is cost without evidence.
+ * `Drawer` is the sixth and the clearest case for the rule: it is the one
+ * component in the package whose reason for existing is this viewport.
  *
  * The `-mobile` filenames are load-bearing: `snapshotPathTemplate` carries no
  * `{projectName}`, so both projects resolve to the same path. Naming them here
@@ -201,6 +204,11 @@ const MOBILE_CASES: readonly VisualCase[] = [
   { id: 'saas-landingpage--dark-mode', snapshot: 'saas-landing-mobile.png', fullPage: true },
   { id: 'foundations-pageheader--default', snapshot: 'pageheader-mobile.png' },
   { id: 'foundations-card--default', snapshot: 'card-mobile.png' },
+  // The drawer, at the width it exists for. The desktop row above captures a
+  // 384px panel against 1280px of backdrop; at 412px it is most of the screen,
+  // which is the layout a mobile nav actually ships as. Asserting only the
+  // desktop one would assert the case nobody meets.
+  { id: 'foundations-drawer--from-the-left', snapshot: 'drawer-from-the-left-mobile.png' },
 ];
 
 test.describe('Design System Visual Regression - Narrow viewport', () => {
