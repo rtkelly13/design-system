@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { waitForStoryRendered } from './story-ready';
+import { IS_STORY_SURFACE, waitForStoryRendered } from './story-ready';
 
 /**
  * An axe pass over every asserted story, on both Levels.
@@ -117,8 +117,25 @@ test.describe('Accessibility', () => {
           content: '*,*::before,*::after{transition:none!important;animation:none!important}',
         });
 
+        // The root, plus anything the story portalled to `body`: `Modal`,
+        // `AlertDialog`, `Drawer` and `Toast` all render outside the root by
+        // design, and a scope of `#storybook-root` alone scanned an empty box
+        // for every one of them (#273). The portal test is `IS_STORY_SURFACE`,
+        // the one `waitForStoryRendered` uses, so the two cannot disagree about
+        // what the story rendered. Page-level rules an isolated story trips —
+        // no `main`, no `h1` — are moderate, below the serious bar this counts.
+        await page.evaluate(`(() => {
+          const isStorySurface = ${IS_STORY_SURFACE};
+          document.getElementById('storybook-root')?.setAttribute('data-a11y-scope', '');
+          for (const el of Array.from(document.body.children)) {
+            if (el.id !== 'storybook-root' && isStorySurface(el)) {
+              el.setAttribute('data-a11y-scope', '');
+            }
+          }
+        })()`);
+
         const { violations } = await new AxeBuilder({ page })
-          .include('#storybook-root')
+          .include('[data-a11y-scope]')
           .options({ resultTypes: ['violations'] })
           .analyze();
 
