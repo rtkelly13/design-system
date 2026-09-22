@@ -34,6 +34,7 @@ export const Switch = forwardRef<HTMLSpanElement, SwitchProps>(function Switch(
     helperText,
     accent = 'primary',
     className = '',
+    style,
     checked,
     defaultChecked,
     onCheckedChange,
@@ -66,7 +67,7 @@ export const Switch = forwardRef<HTMLSpanElement, SwitchProps>(function Switch(
         // published surface names none.
         onCheckedChange={(next) => onCheckedChange?.(next)}
         data-slot="switch"
-        style={accentStyle(accent)}
+        style={accentStyle(accent, style)}
         // `cn`, for the reason `Checkbox` states: the merge is what makes a
         // caller's utility replace the recipe's rather than race it.
         className={cn(styles.control(), className)}

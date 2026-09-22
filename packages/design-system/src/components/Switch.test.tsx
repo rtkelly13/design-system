@@ -216,4 +216,17 @@ describe('Switch in a form', () => {
     expect(data.get('terms')).toBe('on');
     expect(data.get('telemetry')).toBe('on');
   });
+
+  it('merges a caller style with the accent rather than replacing it', () => {
+    const { container } = render(
+      <Switch label="Telemetry" defaultChecked style={{ width: '320px' }} />,
+    );
+    // The element carrying the caller's style must still carry the accent:
+    // without it the checked fill has no colour and the state is invisible.
+    const styled = Array.from(container.querySelectorAll<HTMLElement>('[style]')).find(
+      (el) => el.style.width === '320px',
+    );
+    expect(styled).toBeDefined();
+    expect(styled?.style.getPropertyValue('--field-accent')).not.toBe('');
+  });
 });

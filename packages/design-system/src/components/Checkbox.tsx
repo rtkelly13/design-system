@@ -47,6 +47,7 @@ export const Checkbox = forwardRef<HTMLSpanElement, CheckboxProps>(function Chec
     helperText,
     accent = 'primary',
     className = '',
+    style,
     indeterminate = false,
     checked,
     defaultChecked,
@@ -81,7 +82,7 @@ export const Checkbox = forwardRef<HTMLSpanElement, CheckboxProps>(function Chec
         // UI type in the published `.d.ts`.
         onCheckedChange={(next) => onCheckedChange?.(next)}
         data-slot="checkbox"
-        style={accentStyle(accent)}
+        style={accentStyle(accent, style)}
         // `cn`, not an appended string: the merge is what makes a caller's
         // utility actually replace the recipe's rather than race it in CSS
         // source order. Same composition `Modal` uses over `dialogSurface`.

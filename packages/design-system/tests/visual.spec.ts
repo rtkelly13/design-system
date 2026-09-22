@@ -103,6 +103,12 @@ const CASES: readonly VisualCase[] = [
   // single reviewed PNG rather than eight almost-identical ones.
   { id: 'foundations-checkbox--all-states', snapshot: 'checkbox-all-states.png' },
   { id: 'foundations-switch--all-states', snapshot: 'switch-all-states.png' },
+  // The groups (#239), on their `AllStates` stories for the same reason: the
+  // legend, the group message, the invalid border and group- and option-level
+  // disabled in one reviewed PNG each. `Fieldset`'s row is a checkbox set and
+  // an input pair, so the frame is asserted around something other than radios.
+  { id: 'foundations-radiogroup--all-states', snapshot: 'radiogroup-all-states.png' },
+  { id: 'foundations-fieldset--all-states', snapshot: 'fieldset-all-states.png' },
   { id: 'foundations-statcard--system-health', snapshot: 'statcard-system-health.png' },
   { id: 'foundations-datatable--virtualized', snapshot: 'datatable-virtualized.png' },
   { id: 'foundations-semantic-tokens--roles', snapshot: 'semantic-tokens-roles.png', fullPage: true },
