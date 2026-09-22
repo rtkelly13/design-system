@@ -152,9 +152,17 @@ export interface BooleanFieldProps
   id?: string;
 }
 
-/** The accent is known at runtime, so it travels as a custom property. */
-export function accentStyle(accent: AccentToken): CSSProperties {
-  return { '--field-accent': accentVar(accent) } as CSSProperties;
+/**
+ * The accent is known at runtime, so it travels as a custom property.
+ *
+ * The caller's `style` is merged in rather than left to a later prop spread:
+ * spread after `style={accentStyle(…)}`, any `style={{ width: 320 }}` replaced
+ * the whole object and took `--field-accent` with it, leaving a checked
+ * control with no fill. The accent is set last so a caller cannot unset it by
+ * accident.
+ */
+export function accentStyle(accent: AccentToken, style?: CSSProperties): CSSProperties {
+  return { ...style, '--field-accent': accentVar(accent) } as CSSProperties;
 }
 
 export interface FieldFrameProps

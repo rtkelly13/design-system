@@ -93,6 +93,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(function R
     helperText,
     accent = 'primary',
     className,
+    style,
     value,
     defaultValue,
     onValueChange,
@@ -113,7 +114,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(function R
       helperText={helperText}
       disabled={disabled}
       className={className}
-      style={accentStyle(accent)}
+      style={accentStyle(accent, style)}
       render={
         <BaseRadioGroup<string>
           name={name}
