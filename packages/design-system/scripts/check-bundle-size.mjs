@@ -101,16 +101,26 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * context that pairs tabs with panels, controlled and uncontrolled value,
  * the vertical orientation's compound variants, and `TabsPanel`. No new
  * dependency: `Tabs` imports no primitive, per #163's rejection.
+ *
+ * Raised again for `Fieldset`, `Legend`, `RadioGroup` and `Radio` (#239):
+ * +5,820 B raw, +1,306 B gzip on the ESM bundle, measured against `main`
+ * before `Tabs` landed and additive on top of it (251,166 B / 59,008 B with
+ * both; CommonJS 276,403 B / 61,255 B). Most of it is `GroupFrame`,
+ * `FieldItem` and the `FieldMessage` extracted from `FieldFrame` — the group
+ * arrangement of the one field implementation, rather than a second
+ * implementation beside it — and the `dot` shape on `booleanControl`. The
+ * Base UI fieldset, radio-group and radio entry points are external to this
+ * bundle and are weighed by `check:dep-cost` instead.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 246_700,
-    maxGzip: 58_100,
+    maxRaw: 252_400,
+    maxGzip: 59_300,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 271_400,
-    maxGzip: 60_300,
+    maxRaw: 277_800,
+    maxGzip: 61_600,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
