@@ -230,6 +230,30 @@ describe('DataTable', () => {
     expect(bodyRows()[0]?.getAttribute('aria-rowindex')).toBe('27');
   });
 
+  it('follows a pageSize that changes after mount, starting again at page one', () => {
+    const thirty: TestItem[] = Array.from({ length: 30 }, (_, i) => ({
+      id: `id-${i}`,
+      name: `row-${i}`,
+      count: i,
+    }));
+    const props = {
+      columns: [{ header: 'Name', accessor: 'name' as const }],
+      data: thirty,
+      keyExtractor: (row: TestItem) => row.id,
+    };
+    const { container, rerender } = render(<DataTable {...props} pageSize={5} />);
+    const bodyRows = () => container.querySelectorAll('[data-slot="table-body"] tr');
+    expect(bodyRows()).toHaveLength(5);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Page 3' }));
+    expect(screen.getByText('row-10')).toBeDefined();
+
+    // initialState is read once; the prop must win on every render.
+    rerender(<DataTable {...props} pageSize={20} />);
+    expect(bodyRows()).toHaveLength(20);
+    expect(screen.getByText('row-0')).toBeDefined();
+  });
+
   it('renders no pager when everything fits on one page', () => {
     render(
       <DataTable columns={[{ header: 'Name', accessor: 'name' }]} data={testData} pageSize={25} />,

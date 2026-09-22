@@ -216,17 +216,30 @@ export function DataTable<T>({
   }, [columns]);
 
   // `pageSize` used to switch the pagination model on and nothing else, so
-  // TanStack's default of 10 applied whatever was asked for (#276).
+  // TanStack's default of 10 applied whatever was asked for (#276). It is read
+  // from the prop on every render, not handed to `initialState` once, so a
+  // later change is honoured; only the page index is state. A new size starts
+  // again at page one rather than stranding the reader past the last page.
   const paginated = !virtualization && 'pageSize' in rest && Boolean(rest.pageSize);
+  const requestedPageSize = paginated ? (rest as { pageSize: number }).pageSize : 10;
+  const [pageIndexState, setPageIndexState] = useState(0);
+  const [pageSizeSeen, setPageSizeSeen] = useState(requestedPageSize);
+  if (pageSizeSeen !== requestedPageSize) {
+    setPageSizeSeen(requestedPageSize);
+    setPageIndexState(0);
+  }
+  const pagination = { pageIndex: pageIndexState, pageSize: requestedPageSize };
   const defaultTable = useReactTable<T>({
     data: data || [],
-    initialState: paginated
-      ? { pagination: { pageIndex: 0, pageSize: (rest as { pageSize: number }).pageSize } }
-      : undefined,
     columns: tanstackColumns,
     state: {
       sorting,
       globalFilter,
+      ...(paginated ? { pagination } : {}),
+    },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater;
+      setPageIndexState(next.pageIndex);
     },
     enableSorting: 'enableSorting' in rest ? rest.enableSorting !== false : true,
     onSortingChange: setSorting,
