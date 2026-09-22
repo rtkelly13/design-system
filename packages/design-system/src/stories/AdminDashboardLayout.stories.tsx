@@ -2,6 +2,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AdminDashboardLayout } from '../components/admin/AdminDashboardLayout';
 import { ThemeProvider } from '../components/ThemeProvider';
+import { ToastProvider } from '../components/Toast';
 
 const meta: Meta<typeof AdminDashboardLayout> = {
   title: 'SaaS/AdminDashboardLayout',
@@ -35,6 +36,24 @@ export const SketchMode: Story = {
       <div>
         <AdminDashboardLayout />
       </div>
+    </ThemeProvider>
+  ),
+};
+
+/**
+ * Inside a `ToastProvider`, the way an application mounts it. `TRIGGER SYNC`
+ * is acknowledged with an `info` toast in the bottom-right corner — the
+ * dashboard adapts to the provider rather than requiring one, so the two
+ * stories above render unchanged without it.
+ */
+export const WithNotifications: Story = {
+  render: () => (
+    <ThemeProvider defaultLevel="midnight" persist={false} followSystem={false}>
+      <ToastProvider>
+        <div className="bg-surface-base min-h-screen text-content-primary">
+          <AdminDashboardLayout />
+        </div>
+      </ToastProvider>
     </ThemeProvider>
   ),
 };

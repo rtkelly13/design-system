@@ -63,7 +63,7 @@ layer down — silent, plausible-looking, wrong output.
 
 ### 3. Turn the transitions off
 
-There are 40 CSS transitions and **3** `@keyframes`. Most of the transitions are hover- or focus-intent, so they are
+There are 43 CSS transitions and **3** `@keyframes`. Most of the transitions are hover- or focus-intent, so they are
 inert wherever there is no pointer — but since #162 that is no longer all of them. `Modal`,
 `AlertDialog` and `Drawer` fade their backdrop and popup on open and close, driven by Base UI's
 `data-starting-style` / `data-ending-style` attributes rather than by a pointer, so a capture taken
@@ -73,7 +73,12 @@ taken mid-transition is not a slightly-wrong opacity but a panel in the wrong pl
 `Switch` are the same case in miniature: the box takes its fill and the thumb travels on
 `data-checked`, which a story can set before anything is hovered. `Radio` (#239) wears the same box
 and so inherits its colour transition, but adds none of its own: its selected mark is mounted and
-unmounted rather than faded, so a selection lands in one frame. All of them carry
+unmounted rather than faded, so a selection lands in one frame. `Toast` (#243) enters with a
+short rise and leaves with a short slide on the dialogs' two attributes, and it is the one of these
+whose trigger is not a prop at all but a **clock**: a toast shown on mount is mid-rise for the
+first frames, and one left on its default lifetime slides out six seconds later whether or not
+anything happened. The transition reset handles the first; only the caller can handle the second,
+by showing the toast with `timeout: 0` — which is what its asserted story does. All of them carry
 `motion-reduce:transition-none`, which makes `prefers-reduced-motion` a second and more honest lever
 than the reset below; the reset is still what a capture harness should use, because it does not
 depend on the component having remembered.

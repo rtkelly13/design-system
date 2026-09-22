@@ -1051,6 +1051,57 @@ interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' |
 
 declare const EmptyState: react.ForwardRefExoticComponent<EmptyStateProps & react.RefAttributes<HTMLDivElement>>;
 
+type ToastIntent = 'info' | 'success' | 'warning' | 'danger';
+
+interface ToastActionOptions {
+
+    label: string;
+
+    onClick: () => void;
+}
+
+interface ToastOptions {
+
+    title: string;
+
+    description?: ReactNode;
+
+    intent?: ToastIntent;
+
+    action?: ToastActionOptions;
+
+    timeout?: number;
+
+    id?: string;
+
+    onClose?: () => void;
+}
+
+interface ToastApi {
+
+    show: (options: ToastOptions) => string;
+
+    dismiss: (id?: string) => void;
+}
+interface ToastProviderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'className'> {
+
+    children?: ReactNode;
+
+    timeout?: number;
+
+    limit?: number;
+
+    label?: string;
+
+    className?: string;
+}
+
+declare const ToastProvider: react.ForwardRefExoticComponent<ToastProviderProps & react.RefAttributes<HTMLDivElement>>;
+
+declare function useToast(): ToastApi;
+
+declare function useOptionalToast(): ToastApi | null;
+
 declare const NERD_GLYPHS: {
     readonly sort: "";
     readonly 'sort-asc': "";
@@ -1394,6 +1445,8 @@ interface AdminDashboardLayoutProps {
     statusBadges?: AdminStatusBadge[];
     activeNavId?: string;
     onNavSelect?: (id: string) => void;
+
+    onTriggerSync?: () => void;
     children?: react__default.ReactNode;
 }
 declare const AdminDashboardLayout: react__default.FC<AdminDashboardLayoutProps>;
@@ -1889,6 +1942,12 @@ export {
   type ThemeLevel,
   ThemeProvider,
   type ThemeProviderProps,
+  type ToastActionOptions,
+  type ToastApi,
+  type ToastIntent,
+  type ToastOptions,
+  ToastProvider,
+  type ToastProviderProps,
   type TocEntry,
   type TokenRule,
   type TypeStep,
@@ -1931,5 +1990,7 @@ export {
   useCopyToClipboard,
   useDocsLinkComponent,
   useOptionalTheme,
+  useOptionalToast,
   useTheme,
+  useToast,
 };
