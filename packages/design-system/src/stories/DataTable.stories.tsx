@@ -157,6 +157,36 @@ export const HeadlessTanStackTable: Story = {
   },
 };
 
+/**
+ * The semantics at rest, sorted. A `caption` states what the table is of and
+ * names it; the branch column is a row header (`meta.rowHeader`), so moving
+ * across a row announces whose row it is; and the commits column is sorted, so
+ * its header carries `aria-sort="descending"` — the only header that does.
+ * Every sortable header is a real button: Tab to it, Enter or Space to sort.
+ */
+export const SortedWithCaption: Story = {
+  render: () => {
+    function SortedExample() {
+      const table = useReactTable({
+        data: rows,
+        columns: [
+          { accessorKey: 'branch', header: 'BRANCH', meta: { rowHeader: true } },
+          { accessorKey: 'state', header: 'STATE' },
+          { accessorKey: 'commits', header: 'COMMITS' },
+          { accessorKey: 'duration', header: 'DURATION', enableSorting: false },
+        ],
+        initialState: { sorting: [{ id: 'commits', desc: true }] },
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+      });
+
+      return <DataTable table={table} caption="Deployments by commit count" />;
+    }
+
+    return <SortedExample />;
+  },
+};
+
 /** Direct use of compound <Table> primitives. */
 export const CompoundTable: Story = {
   render: () => (

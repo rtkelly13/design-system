@@ -32,7 +32,8 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 
 ## The matrix
 
-Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` with #243.
+Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` with #243, *Display
+records* with #245.
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -58,7 +59,7 @@ Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` wit
 | No content | `EmptyState` | `ready` | |
 | Validation | field `error` + `ErrorSummary` | `partial` — per-field errors only, no summary | [#50](https://github.com/rtkelly13/design-system/issues/50) |
 | Paginate | `Pagination` — numbered pages, callback or `href` mode | `ready` | |
-| Display records | `Table` / `DataTable` | `partial` — sorts and virtualises, semantics incomplete | [#245](https://github.com/rtkelly13/design-system/issues/245) |
+| Display records | `Table` / `DataTable` — sorting, virtualisation, `caption`, row headers | `ready` | |
 | Display metrics | `StatCard` and the chart family | `ready` | |
 | Long-form content | `Prose` / `BlogPost` | `partial` — `BlogPost`'s author card is hard-coded | [#250](https://github.com/rtkelly13/design-system/issues/250) |
 | Documentation | the docs system (`DocsLayout`, `CodeTabs`, …) | `ready` | |

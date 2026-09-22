@@ -895,7 +895,8 @@ declare function TableHeader({ className, ...props }: HTMLAttributes<HTMLTableSe
 declare function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
 declare function TableFooter({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>): react.JSX.Element;
 declare function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>): react.JSX.Element;
-declare function TableHead({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>): react.JSX.Element;
+
+declare function TableHead({ className, scope, ...props }: ThHTMLAttributes<HTMLTableCellElement>): react.JSX.Element;
 declare function TableCell({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>): react.JSX.Element;
 declare function TableCaption({ className, ...props }: HTMLAttributes<HTMLTableCaptionElement>): react.JSX.Element;
 
@@ -905,6 +906,8 @@ interface Column<T> {
     className?: string;
     enableSorting?: boolean;
     sortValue?: (row: T) => any;
+
+    rowHeader?: boolean;
 }
 
 interface DataTableVirtualization {
@@ -918,7 +921,10 @@ interface DataTableVirtualization {
     scrollElementRef?: RefObject<HTMLElement | null>;
 }
 type DataTableSharedProps<T> = {
+
     keyExtractor?: (row: T, index: number) => string | number;
+
+    caption?: ReactNode;
     emptyText?: string;
     className?: string;
     containerClassName?: string;
@@ -935,10 +941,12 @@ type DataTableProps<T> = DataTableSharedProps<T> & ({
 
     columns: Column<T>[] | ColumnDef<T, any>[];
     data: T[];
+
     enableSorting?: boolean;
     pageSize?: number;
 });
-declare function DataTable<T>({ table: providedTable, columns, data, keyExtractor, emptyText, className, containerClassName, virtualize, ...rest }: DataTableProps<T>): react.JSX.Element;
+
+declare function DataTable<T>({ table: providedTable, columns, data, keyExtractor, caption, emptyText, className, containerClassName, virtualize, ...rest }: DataTableProps<T>): react.JSX.Element;
 
 interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'className'> {
     isOpen: boolean;

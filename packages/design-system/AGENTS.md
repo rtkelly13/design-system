@@ -18,7 +18,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:docs` | figures written in prose against the source they describe — `--list` for the census |
 | `pnpm check:skills` | the agent-facing skills tree (`skills/**/SKILL.md`) parses and its frontmatter is schema-valid |
 | `pnpm check:doc-snippets` | props and level names in documentation code fences against `api/index.d.ts` |
-| `pnpm check:component-docs` | every component carries a JSDoc — a ratchet, budget **14** |
+| `pnpm check:component-docs` | every component carries a JSDoc — a ratchet, budget **12** |
 | `pnpm check:component-contract` | refs, `displayName`, `recipe`, prop spreading — a per-clause ratchet |
 | `pnpm check:licences` | every shipped package against `licenses.baseline.json`, default-deny |
 | `pnpm check:reference-material` | unlicensed reference artwork stays out of the tree, and its catalogue stays in it |
