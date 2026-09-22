@@ -130,16 +130,26 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * are `@base-ui/react/toast`, external to this bundle and weighed by
  * `check:dep-cost` — the alternative, hand-rolling a live region and a timer
  * that yields to the reader, is exactly the part #243 says not to write.
+ *
+ * Raised again for `DataTable`'s semantics (#245): +2,473 B raw, +704 B gzip
+ * on the ESM bundle over `main` with `Toast` in it, and additive with the
+ * disabled-checkbox fix (#274) that landed beside it (265,997 B / 62,908 B;
+ * CommonJS 292,271 B / 65,114 B). That is the per-header sort button with its
+ * description, `aria-sort` for the primary sort key, `scope` on every header
+ * and the row-header cell, `caption`, and the `aria-rowcount` /
+ * `aria-rowindex` arithmetic for a windowed body. TanStack supplies none of
+ * it — it has no markup — so it is written here or nowhere, and no
+ * dependency moves: `check:dep-cost` is unchanged.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 263_800,
-    maxGzip: 62_200,
+    maxRaw: 267_300,
+    maxGzip: 63_300,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 290_100,
-    maxGzip: 64_500,
+    maxRaw: 293_700,
+    maxGzip: 65_500,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

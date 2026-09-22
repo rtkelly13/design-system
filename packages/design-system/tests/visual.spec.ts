@@ -117,6 +117,10 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-fieldset--all-states', snapshot: 'fieldset-all-states.png' },
   { id: 'foundations-statcard--system-health', snapshot: 'statcard-system-health.png' },
   { id: 'foundations-datatable--virtualized', snapshot: 'datatable-virtualized.png' },
+  // The semantics at rest (#245): a caption, a row-header column in the body
+  // cell's geometry, and a sorted column's icon. Also the a11y suite's sorted,
+  // non-virtualized case, since that suite reads its story list from here.
+  { id: 'foundations-datatable--sorted-with-caption', snapshot: 'datatable-sorted-with-caption.png' },
   { id: 'foundations-semantic-tokens--roles', snapshot: 'semantic-tokens-roles.png', fullPage: true },
   { id: 'docs-docslayout--default', snapshot: 'docslayout-default.png', fullPage: true },
   { id: 'docs-portal--full-portal', snapshot: 'portal-full.png', fullPage: true },

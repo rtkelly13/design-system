@@ -53,9 +53,11 @@ const EXCLUDED = {
  * The count of undocumented components. Lowered from 17 with #238: `Checkbox`,
  * `Switch` and the extracted `fieldFrame` all arrived documented, so the gap
  * shrank rather than merely not growing. Lowered to 14 with #244: `Pagination`
- * gained its JSDoc when it gained a page list.
+ * gained its JSDoc when it gained a page list. Lowered to 12 with #245:
+ * `DataTable` and `Table` (on `TableHead`) were documented with their
+ * semantics.
  */
-const BUDGET = 14;
+const BUDGET = 12;
 
 function componentFiles(dir = COMPONENTS) {
   return readdirSync(dir).flatMap((entry) => {

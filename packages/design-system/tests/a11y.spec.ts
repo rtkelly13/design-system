@@ -154,3 +154,82 @@ test.describe('Accessibility', () => {
     }
   }
 });
+
+/**
+ * `DataTable`'s semantics (#245), in a real browser rather than jsdom.
+ *
+ * The loop above axes a story at rest, and a table at rest is unsorted. These
+ * drive the sort from the keyboard — Tab to the header's button, Enter, then
+ * Space — and read the result back through role locators, which resolve
+ * against the browser's accessibility tree rather than the DOM. Chromium's
+ * CDP tree does not surface `aria-sort` or `aria-rowcount` as properties, so
+ * the attribute is read off the node that tree says is the column header or
+ * the table — the element carrying the role, which is where both must land.
+ *
+ * Axe runs twice per case, unsorted and sorted, on both Levels, on a table
+ * that renders every row and on one that windows ten thousand.
+ */
+const DATATABLE_CASES = [
+  { id: 'foundations-datatable--default', rowcount: null },
+  { id: 'foundations-datatable--virtualized', rowcount: '10001' },
+] as const;
+
+test.describe('DataTable semantics', () => {
+  for (const level of LEVELS) {
+    for (const { id, rowcount } of DATATABLE_CASES) {
+      test(`${id} — keyboard sort — ${level}`, async ({ page }) => {
+        await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=level:${level}`);
+        await waitForStoryRendered(page, id);
+        await page.evaluate(() => document.fonts.ready);
+        await page.addStyleTag({
+          content: '*,*::before,*::after{transition:none!important;animation:none!important}',
+        });
+
+        const axe = async () => {
+          const { violations } = await new AxeBuilder({ page })
+            .include('#storybook-root')
+            .options({ resultTypes: ['violations'] })
+            .analyze();
+          return violations
+            .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+            .map((v) => `${v.id} (${v.impact}, ${v.nodes.length}): ${v.help}`);
+        };
+
+        const root = page.locator('#storybook-root');
+        const table = root.getByRole('table');
+        const branch = root.getByRole('columnheader', { name: 'BRANCH' });
+        const button = branch.getByRole('button', { name: 'BRANCH' });
+
+        // Unsorted: no header claims an order.
+        await expect(root.locator('th[aria-sort]')).toHaveCount(0);
+        expect(await axe()).toEqual([]);
+
+        // The keyboard path: Tab until the sort button has focus. The scroll
+        // regions come first, so a bounded number of presses, not one.
+        for (let i = 0; i < 6 && !(await button.evaluate((el) => el === document.activeElement)); i++) {
+          await page.keyboard.press('Tab');
+        }
+        await expect(button).toBeFocused();
+
+        await page.keyboard.press('Enter');
+        await expect(branch).toHaveAttribute('aria-sort', 'ascending');
+        await expect(root.locator('th[aria-sort]')).toHaveCount(1);
+        await expect(button).toBeFocused();
+
+        await page.keyboard.press('Space');
+        await expect(branch).toHaveAttribute('aria-sort', 'descending');
+        await expect(root.locator('th[aria-sort]')).toHaveCount(1);
+
+        if (rowcount) {
+          // The window is a few dozen rows; the table reports all of them.
+          await expect(table).toHaveAttribute('aria-rowcount', rowcount);
+          await expect(root.getByRole('row').nth(1)).toHaveAttribute('aria-rowindex', '2');
+        } else {
+          await expect(table).not.toHaveAttribute('aria-rowcount');
+        }
+
+        expect(await axe()).toEqual([]);
+      });
+    }
+  }
+});
