@@ -32,7 +32,7 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 
 ## The matrix
 
-Assessed against `main` after #266 (the feedback primitives).
+Assessed against `main` after #268 (`Tabs`).
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -40,7 +40,7 @@ Assessed against `main` after #266 (the feedback primitives).
 | Primary site navigation | `SiteNav` | `absent` | [#246](https://github.com/rtkelly13/design-system/issues/246) |
 | Mobile navigation | `Drawer` + `MobileNav` | `partial` — `Drawer` exists, `MobileNav` does not | [#246](https://github.com/rtkelly13/design-system/issues/246) |
 | Context actions | `Menu` | `absent` | [#166](https://github.com/rtkelly13/design-system/issues/166) |
-| Switch sections | `Tabs` | `partial` — `CodeTabs` only, no public `Tabs` | [#240](https://github.com/rtkelly13/design-system/issues/240) |
+| Switch sections | `Tabs` | `ready` | |
 | Explain an icon/control | `Tooltip` | `absent` | [#166](https://github.com/rtkelly13/design-system/issues/166) |
 | Show contextual content | `Popover` | `absent` | [#166](https://github.com/rtkelly13/design-system/issues/166) |
 | Enter text | `Input` / `TextArea` | `ready` | |
