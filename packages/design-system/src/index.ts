@@ -96,6 +96,13 @@ export * from './components/Skeleton';
 export * from './components/Progress';
 export * from './components/EmptyState';
 
+// The floating set (#166): anchored to a trigger, positioned by the same
+// engine, dismissed by the same stack as the dialogs above. `Tooltip` labels,
+// `Popover` shows content, `Menu` offers actions.
+export * from './components/Tooltip';
+export * from './components/Popover';
+export * from './components/Menu';
+
 // Transient notifications. Not an overlay: a toast shares neither the
 // positioning nor the dismissal model of Tooltip/Popover/Menu — it is a queue,
 // a live region and a lifetime (#243).

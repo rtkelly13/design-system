@@ -140,16 +140,30 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * `aria-rowindex` arithmetic for a windowed body. TanStack supplies none of
  * it — it has no markup — so it is written here or nowhere, and no
  * dependency moves: `check:dep-cost` is unchanged.
+ *
+ * Raised again for `Tooltip`, `Popover` and `Menu` (#166): +11,042 B raw,
+ * +1,932 B gzip on the ESM bundle over `main` with `DataTable`'s semantics
+ * in it (277,175 B / 64,855 B; CommonJS 304,756 B / 67,129 B). That is seven
+ * exported components — the three roots and `MenuItem`, `MenuRadioGroup`,
+ * `MenuRadioItem`, `MenuSeparator` — their prop JSDoc, the one
+ * `floatingSurface` recipe all three wear, and the two first consumers:
+ * `DocsHeader`'s level chooser and `SlideDeck`'s control hints. More of the
+ * raw rise than the gzip is documentation, which the unminified bundle
+ * ships and gzip largely absorbs. Positioning, collision, the dismissal
+ * stack, list navigation and typeahead are `@base-ui/react/tooltip`,
+ * `/popover` and `/menu`, external here and weighed by `check:dep-cost`.
+ * Re-measured after rebasing onto #279's pager and adding the portal-Level
+ * hook (278,682 B / 65,233 B; CommonJS 306,349 B / 67,513 B).
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 267_300,
-    maxGzip: 63_300,
+    maxRaw: 280_100,
+    maxGzip: 65_550,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 293_700,
-    maxGzip: 65_500,
+    maxRaw: 307_900,
+    maxGzip: 67_850,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

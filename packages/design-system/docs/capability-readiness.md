@@ -33,17 +33,18 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 ## The matrix
 
 Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` with #243, *Display
-records* with #245.
+records* with #245, and *Context actions*, *Explain an icon/control* and *Show contextual content*
+with #166.
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
 | Navigate somewhere | `Button` with `href` (renders `<a>`); inline links styled by `Prose` | `ready` | |
 | Primary site navigation | `SiteNav` | `absent` | [#246](https://github.com/rtkelly13/design-system/issues/246) |
 | Mobile navigation | `Drawer` + `MobileNav` | `partial` — `Drawer` exists, `MobileNav` does not | [#246](https://github.com/rtkelly13/design-system/issues/246) |
-| Context actions | `Menu` | `absent` | [#166](https://github.com/rtkelly13/design-system/issues/166) |
+| Context actions | `Menu` — items, a radio group, a separator | `ready` | |
 | Switch sections | `Tabs` | `ready` | |
-| Explain an icon/control | `Tooltip` | `absent` | [#166](https://github.com/rtkelly13/design-system/issues/166) |
-| Show contextual content | `Popover` | `absent` | [#166](https://github.com/rtkelly13/design-system/issues/166) |
+| Explain an icon/control | `Tooltip` | `ready` | |
+| Show contextual content | `Popover` | `ready` | |
 | Enter text | `Input` / `TextArea` | `ready` | |
 | Choose one | `Select` / `RadioGroup` | `partial` — `RadioGroup` covers a visible set; `Select` is still the native list | [#164](https://github.com/rtkelly13/design-system/issues/164) |
 | Choose many | `Checkbox` | `ready` | |
