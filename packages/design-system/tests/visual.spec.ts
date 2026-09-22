@@ -73,6 +73,10 @@ const CASES: readonly VisualCase[] = [
     fullPage: true,
   },
   { id: 'foundations-pagination--middle-page', snapshot: 'pagination-middle-page.png' },
+  // The general tab set, not the code one: `docs-codetabs--merged` below asserts
+  // the same tablist wearing `CodeTabs`, and the pair is what shows the
+  // extraction rendering identically in both places.
+  { id: 'foundations-tabs--default', snapshot: 'tabs-default.png' },
   { id: 'foundations-sectioncontainer--default', snapshot: 'sectioncontainer-default.png' },
 
   { id: 'docs-breadcrumbs--default', snapshot: 'breadcrumbs-default.png' },
