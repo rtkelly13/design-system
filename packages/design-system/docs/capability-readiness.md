@@ -34,13 +34,14 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 
 Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` with #243, *Display
 records* with #245, *Context actions*, *Explain an icon/control* and *Show contextual content*
-with #166, and *Application layout* with #247.
+with #166, *Application layout* with #247, and *Primary site navigation*, *Mobile
+navigation* and *General site layout* with #246.
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
 | Navigate somewhere | `Button` with `href` (renders `<a>`); inline links styled by `Prose` | `ready` | |
-| Primary site navigation | `SiteNav` | `absent` | [#246](https://github.com/rtkelly13/design-system/issues/246) |
-| Mobile navigation | `Drawer` + `MobileNav` | `partial` — `Drawer` exists, `MobileNav` does not | [#246](https://github.com/rtkelly13/design-system/issues/246) |
+| Primary site navigation | `SiteNav` + `SiteNavItem` — groups open in `Menu`; the current page comes from the consumer's route via `LinkProvider` | `ready` | |
+| Mobile navigation | `MobileNav` — the same `SiteNavItem`s in a left `Drawer` | `ready` | |
 | Context actions | `Menu` — items, a radio group, a separator | `ready` | |
 | Switch sections | `Tabs` | `ready` | |
 | Explain an icon/control | `Tooltip` | `ready` | |
@@ -66,7 +67,7 @@ with #166, and *Application layout* with #247.
 | Documentation | the docs system (`DocsLayout`, `CodeTabs`, …) | `ready` | |
 | Marketing | composable marketing sections | `partial` — `SaasLandingPage` is one monolith | [#248](https://github.com/rtkelly13/design-system/issues/248) |
 | Application layout | `AppShell` + `AppSidebar` / `AppSidebarNav` / `AppTopbar` / `AppMain` — sidebar off-canvas in a `Drawer` below desktop width | `ready` | |
-| General site layout | `SiteHeader` / `SiteFooter` | `absent` | [#246](https://github.com/rtkelly13/design-system/issues/246) |
+| General site layout | `SiteHeader` (skip link, breakpoint swap to `MobileNav`) / `SiteFooter` | `ready` | |
 
 Two rows are additions to the table #237 proposed, each because a landed component made the
 capability separable: *Group fields* (the half of #239 that is not radio-specific — a set of

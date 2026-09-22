@@ -166,16 +166,33 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * return, scroll lock and portal Level are `Drawer` on
  * `@base-ui/react/dialog`, already paid for, and the toggle's icon is one
  * more named import from `lucide-react`, external here.
+ *
+ * Raised again for the site chrome (issue 246): +12,502 B raw, +2,442 B gzip
+ * on the ESM bundle over the application shell's measurement above
+ * (288,597 B / 67,290 B → 301,099 B / 69,732 B; CommonJS 317,168 B /
+ * 69,624 B → 330,928 B / 72,136 B, +13,760 B / +2,512 B). That is five
+ * exported components — `SiteHeader`, `SiteNav`, `SiteNavItem`, `MobileNav`,
+ * `SiteFooter` — their three recipes with the per-breakpoint and
+ * per-orientation class strings written out in full for Tailwind's scanner,
+ * and the link adapter lifted out of `components/docs/` into
+ * `LinkProvider` / `SiteLink` so both chromes share one context. None of
+ * the prop JSDoc ships; the rise is code and class strings. Off-canvas
+ * behaviour is `Drawer` and the group popup is `Menu`, both already in the
+ * bundle, and no dependency moves: `check:dep-cost` is unchanged.
+ * Re-measured after closing `MobileNav`'s portalled drawer at the header's
+ * breakpoint and keeping it open on a cancelled click (302,861 B /
+ * 70,208 B; CommonJS 332,713 B / 72,598 B): a media-query subscription and
+ * the context that carries `collapseAt` into the slot.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 290_100,
-    maxGzip: 67_650,
+    maxRaw: 304_400,
+    maxGzip: 70_600,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 318_800,
-    maxGzip: 70_000,
+    maxRaw: 334_400,
+    maxGzip: 73_000,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

@@ -100,6 +100,17 @@ const CASES: readonly VisualCase[] = [
   // the same tablist wearing `CodeTabs`, and the pair is what shows the
   // extraction rendering identically in both places.
   { id: 'foundations-tabs--default', snapshot: 'tabs-default.png' },
+  // The site chrome (issue 246), on the four sites the issue says the same
+  // four components must build unmodified: each is a whole page — header,
+  // main, footer — so a prop that one site needed and another broke shows up
+  // here. The desktop row; the narrow-viewport half is in MOBILE_CASES.
+  { id: 'foundations-siteheader--portfolio', snapshot: 'siteheader-portfolio.png' },
+  { id: 'foundations-siteheader--blog', snapshot: 'siteheader-blog.png' },
+  { id: 'foundations-siteheader--marketing', snapshot: 'siteheader-marketing.png' },
+  { id: 'foundations-siteheader--project-site', snapshot: 'siteheader-project-site.png' },
+  // A group open on load: the `Menu` its links open in, anchored to the nav.
+  { id: 'foundations-sitenav--with-children', snapshot: 'sitenav-with-children.png' },
+  { id: 'foundations-sitefooter--columns', snapshot: 'sitefooter-columns.png' },
   { id: 'foundations-sectioncontainer--default', snapshot: 'sectioncontainer-default.png' },
 
   { id: 'docs-breadcrumbs--default', snapshot: 'breadcrumbs-default.png' },
@@ -246,7 +257,7 @@ const INTERACTIONS: readonly InteractionCase[] = [
  * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
  * to look" at.
  *
- * Deliberately twelve, not forty-one. Each is a committed PNG a human reviews on
+ * Deliberately fifteen, not forty-one. Each is a committed PNG a human reviews on
  * every change, and the point is the layout that *differs* at this width — a
  * second copy of a component that renders identically is cost without evidence.
  * `Drawer` is the sixth and the clearest case for the rule: it is the one
@@ -300,6 +311,22 @@ const MOBILE_CASES: readonly VisualCase[] = [
     id: 'foundations-menu--at-the-viewport-edge',
     snapshot: 'menu-at-the-viewport-edge-mobile.png',
     onScreen: '[data-slot="menu"]',
+  },
+  // The site chrome's breakpoint (issue 246), which is the whole point of
+  // `MobileNav`: a desktop-only baseline asserts none of it. The marketing
+  // header closed — the row gone, the `MENU` trigger in its place — and two
+  // pages with the drawer open, one of them holding a group's `Menu` trigger.
+  // The a11y suite reads these ids too, so the nav is axed open and closed.
+  { id: 'foundations-siteheader--marketing', snapshot: 'siteheader-marketing-mobile.png' },
+  {
+    id: 'foundations-mobilenav--open',
+    snapshot: 'mobilenav-open-mobile.png',
+    onScreen: '[data-slot="drawer"]',
+  },
+  {
+    id: 'foundations-mobilenav--with-group',
+    snapshot: 'mobilenav-with-group-mobile.png',
+    onScreen: '[data-slot="drawer"]',
   },
 ];
 
