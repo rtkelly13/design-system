@@ -32,7 +32,7 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 
 ## The matrix
 
-Assessed against `main` after #265 (Checkbox and Switch).
+Assessed against `main` after #266 (the feedback primitives).
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -53,9 +53,9 @@ Assessed against `main` after #265 (Checkbox and Switch).
 | Display a modal workflow | `Modal` | `ready` | |
 | Show an off-canvas panel | `Drawer` | `ready` | |
 | Notify | `NoteBlock` + `Toast` | `partial` — `NoteBlock` is the inline alert, no toast | [#243](https://github.com/rtkelly13/design-system/issues/243) |
-| Loading | `Spinner` / `Skeleton` | `absent` | [#242](https://github.com/rtkelly13/design-system/issues/242) |
-| Progress | `Progress` | `absent` | [#242](https://github.com/rtkelly13/design-system/issues/242) |
-| No content | `EmptyState` | `absent` | [#242](https://github.com/rtkelly13/design-system/issues/242) |
+| Loading | `Spinner` / `Skeleton` | `ready` | |
+| Progress | `Progress` | `ready` | |
+| No content | `EmptyState` | `ready` | |
 | Validation | field `error` + `ErrorSummary` | `partial` — per-field errors only, no summary | [#50](https://github.com/rtkelly13/design-system/issues/50) |
 | Paginate | `Pagination` | `partial` — previous/next only | [#244](https://github.com/rtkelly13/design-system/issues/244) |
 | Display records | `Table` / `DataTable` | `partial` — sorts and virtualises, semantics incomplete | [#245](https://github.com/rtkelly13/design-system/issues/245) |
