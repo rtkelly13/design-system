@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import type { HTMLAttributes, ReactNode } from 'react';
 import { recipe } from '../lib/recipe';
 import { SiteLink } from './LinkProvider';
+import { SiteHeaderCollapseContext } from './siteNavContext';
 
 /**
  * The breakpoint at which a `SiteHeader` swaps its `mobileNav` for its `nav`.
@@ -167,7 +168,9 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
         ) : null}
         {mobileNav ? (
           <div data-slot="site-header-mobile-nav" className={styles.mobile()}>
-            {mobileNav}
+            <SiteHeaderCollapseContext.Provider value={collapseAt}>
+              {mobileNav}
+            </SiteHeaderCollapseContext.Provider>
           </div>
         ) : null}
       </div>

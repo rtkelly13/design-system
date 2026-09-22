@@ -207,7 +207,9 @@ export const SiteNavItem = forwardRef<HTMLAnchorElement | HTMLButtonElement, Sit
     const { href, children, current, className, onClick, ...rest } = props as SiteNavLinkItemProps;
     const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
       onClick?.(event);
-      context.onNavigate?.();
+      // A consumer that cancels the click has kept the reader on this page,
+      // so the drawer they navigated from stays open.
+      if (!event.defaultPrevented) context.onNavigate?.();
     };
 
     if (context.inMenu) {

@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import type { SiteHeaderCollapse } from './SiteHeader';
 import type { SiteNavOrientation } from './SiteNav';
 
 // Where a `SiteNavItem` is being rendered, which decides what it renders as.
@@ -28,3 +29,15 @@ export const SiteNavContext = createContext<SiteNavContextValue>({
 export function useSiteNavContext(): SiteNavContextValue {
   return useContext(SiteNavContext);
 }
+
+// The width at which a `SiteHeader` swaps its `mobileNav` slot out for `nav`,
+// given to a `MobileNav` inside that slot. The slot is hidden by CSS there, but
+// the drawer is portalled to `body` and outside it, so the `MobileNav` has to
+// close itself: the same queries Tailwind's `sm:` / `md:` / `lg:` compile to.
+export const COLLAPSE_QUERY: Record<SiteHeaderCollapse, string> = {
+  sm: '(min-width: 40rem)',
+  md: '(min-width: 48rem)',
+  lg: '(min-width: 64rem)',
+};
+
+export const SiteHeaderCollapseContext = createContext<SiteHeaderCollapse | undefined>(undefined);

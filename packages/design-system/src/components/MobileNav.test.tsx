@@ -1,8 +1,9 @@
-import { createRef, useState } from 'react';
+import { act, createRef, useState } from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LinkProvider } from './LinkProvider';
 import { MobileNav } from './MobileNav';
+import { SiteHeader } from './SiteHeader';
 import { SiteNavItem } from './SiteNav';
 import { ThemeProvider } from './ThemeProvider';
 
@@ -59,6 +60,87 @@ describe('MobileNav', () => {
     fireEvent.click(within(drawer).getByRole('link', { name: 'Writing' }));
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('stays open when an item click is cancelled, since the reader has not left', async () => {
+    const onOpenChange = vi.fn();
+    render(
+      <MobileNav label="Primary" defaultOpen onOpenChange={onOpenChange}>
+        <SiteNavItem href="#work" onClick={(event) => event.preventDefault()}>
+          Work
+        </SiteNavItem>
+      </MobileNav>,
+    );
+    const drawer = await screen.findByRole('dialog');
+    fireEvent.click(within(drawer).getByRole('link', { name: 'Work' }));
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog')).toBeDefined();
+  });
+
+  describe("inside a SiteHeader's mobileNav slot", () => {
+    // A controllable `matchMedia`: jsdom ships none. `set` flips the width
+    // and fires the listeners, as a resize or rotation past the query does.
+    function mockWidth(wide: boolean) {
+      const listeners = new Set<() => void>();
+      let matches = wide;
+      const media: string[] = [];
+      Object.defineProperty(window, 'matchMedia', {
+        configurable: true,
+        writable: true,
+        value: (query: string) => {
+          media.push(query);
+          return {
+            get matches() {
+              return matches;
+            },
+            media: query,
+            addEventListener: (_: string, fn: () => void) => listeners.add(fn),
+            removeEventListener: (_: string, fn: () => void) => listeners.delete(fn),
+          };
+        },
+      });
+      return {
+        media,
+        set(next: boolean) {
+          matches = next;
+          act(() => listeners.forEach((fn) => fn()));
+        },
+      };
+    }
+
+    afterEach(() => {
+      delete (window as { matchMedia?: unknown }).matchMedia;
+    });
+
+    const header = (props: { onOpenChange?: (open: boolean) => void } = {}) => (
+      <SiteHeader
+        brand="Site"
+        collapseAt="lg"
+        mobileNav={
+          <MobileNav label="Primary" defaultOpen {...props}>
+            <Items />
+          </MobileNav>
+        }
+      />
+    );
+
+    it("closes an open drawer when the viewport widens past the header's collapseAt", async () => {
+      const width = mockWidth(false);
+      const onOpenChange = vi.fn();
+      render(header({ onOpenChange }));
+      await screen.findByRole('dialog');
+      expect(width.media).toContain('(min-width: 64rem)');
+
+      width.set(true);
+      expect(onOpenChange).toHaveBeenLastCalledWith(false);
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    });
+
+    it('never opens its drawer at or past collapseAt, where the slot is hidden', () => {
+      mockWidth(true);
+      render(header());
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
   });
 
   it('shares the Drawer dismissal: Escape closes it and focus returns to the trigger', async () => {

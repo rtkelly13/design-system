@@ -1,11 +1,43 @@
-import { forwardRef, useCallback, useMemo, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import type { HTMLAttributes, ReactNode } from 'react';
 import { Menu as MenuIcon } from 'lucide-react';
 import { cn } from '../lib/recipe';
 import { Button } from './Button';
 import { Drawer } from './Drawer';
 import { SiteNav } from './SiteNav';
-import { SiteNavContext } from './siteNavContext';
+import { COLLAPSE_QUERY, SiteHeaderCollapseContext, SiteNavContext } from './siteNavContext';
+
+function canMatchMedia(): boolean {
+  return typeof window !== 'undefined' && typeof window.matchMedia === 'function';
+}
+
+// Whether the viewport is at or past `query`; false with no query, on the
+// server, and where there is no `matchMedia`.
+function useMatches(query: string | undefined): boolean {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      if (!query || !canMatchMedia()) return () => {};
+      const list = window.matchMedia(query);
+      list.addEventListener('change', onChange);
+      return () => list.removeEventListener('change', onChange);
+    },
+    [query],
+  );
+  return useSyncExternalStore(
+    subscribe,
+    () => Boolean(query) && canMatchMedia() && window.matchMedia(query as string).matches,
+    () => false,
+  );
+}
 
 export interface MobileNavProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title' | 'className'> {
@@ -80,14 +112,41 @@ export const MobileNav = forwardRef<HTMLDivElement, MobileNavProps>(function Mob
 ) {
   const [uncontrolled, setUncontrolled] = useState(defaultOpen);
   const isOpen = open ?? uncontrolled;
+  // Inside a `SiteHeader`, past its `collapseAt` the trigger is hidden by CSS
+  // but the portalled drawer is not, so the drawer is kept shut there and an
+  // open one is closed as the viewport widens past it.
+  const collapseAt = useContext(SiteHeaderCollapseContext);
+  const collapseQuery = collapseAt ? COLLAPSE_QUERY[collapseAt] : undefined;
+  const collapsed = useMatches(collapseQuery);
+  const drawerOpen = isOpen && !collapsed;
+
+  // The latest callback, read at call time, so `setOpen` keeps one identity
+  // and the effect below does not re-report a close on every render.
+  const onChange = useRef(onOpenChange);
+  useEffect(() => {
+    onChange.current = onOpenChange;
+  });
+  const controlled = open !== undefined;
 
   const setOpen = useCallback(
     (next: boolean) => {
-      if (open === undefined) setUncontrolled(next);
-      onOpenChange?.(next);
+      if (!controlled) setUncontrolled(next);
+      onChange.current?.(next);
     },
-    [open, onOpenChange],
+    [controlled],
   );
+
+  // Closed from the media query's own change event rather than from a render,
+  // so a widening reports one close to the owner.
+  useEffect(() => {
+    if (!isOpen || !collapseQuery || !canMatchMedia()) return undefined;
+    const list = window.matchMedia(collapseQuery);
+    const onWiden = () => {
+      if (list.matches) setOpen(false);
+    };
+    list.addEventListener('change', onWiden);
+    return () => list.removeEventListener('change', onWiden);
+  }, [isOpen, collapseQuery, setOpen]);
 
   const close = useCallback(() => setOpen(false), [setOpen]);
   const context = useMemo(
@@ -102,7 +161,7 @@ export const MobileNav = forwardRef<HTMLDivElement, MobileNavProps>(function Mob
         size="sm"
         data-slot="mobile-nav-trigger"
         aria-haspopup="dialog"
-        aria-expanded={isOpen}
+        aria-expanded={drawerOpen}
         onClick={() => setOpen(true)}
       >
         <MenuIcon size={16} strokeWidth={3} aria-hidden="true" />
@@ -110,7 +169,7 @@ export const MobileNav = forwardRef<HTMLDivElement, MobileNavProps>(function Mob
       </Button>
       <Drawer
         ref={ref}
-        isOpen={isOpen}
+        isOpen={drawerOpen}
         onClose={close}
         placement="left"
         title={title}

@@ -179,16 +179,20 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * the prop JSDoc ships; the rise is code and class strings. Off-canvas
  * behaviour is `Drawer` and the group popup is `Menu`, both already in the
  * bundle, and no dependency moves: `check:dep-cost` is unchanged.
+ * Re-measured after closing `MobileNav`'s portalled drawer at the header's
+ * breakpoint and keeping it open on a cancelled click (302,861 B /
+ * 70,208 B; CommonJS 332,713 B / 72,598 B): a media-query subscription and
+ * the context that carries `collapseAt` into the slot.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 302_600,
-    maxGzip: 70_100,
+    maxRaw: 304_400,
+    maxGzip: 70_600,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 332_600,
-    maxGzip: 72_500,
+    maxRaw: 334_400,
+    maxGzip: 73_000,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
