@@ -31,6 +31,13 @@ interface VisualCase {
   /** Baseline filename. Stable — renaming one orphans its committed PNG. */
   snapshot: string;
   fullPage?: boolean;
+  /**
+   * A selector that must lie wholly inside the viewport before the capture —
+   * for the floating elements, whose failure mode is rendering off-screen.
+   * A screenshot of a clipped popup is still a screenshot, so the bounds are
+   * asserted as numbers rather than left for a reviewer to notice.
+   */
+  onScreen?: string;
 }
 
 /**
@@ -66,6 +73,9 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-alertdialog--destructive', snapshot: 'alertdialog-destructive.png' },
   { id: 'foundations-drawer--from-the-right', snapshot: 'drawer-from-the-right.png' },
   { id: 'foundations-toast--all-intents', snapshot: 'toast-all-intents.png' },
+  // The floating set (#166), each open on load: a floating element
+  // asserted closed asserts nothing — the trap #132 names for press states.
+  { id: 'foundations-tooltip--on-an-icon-button', snapshot: 'tooltip-on-an-icon-button.png' },
   // `fullPage`: the report frame is a page, and the part most likely to drift
   // — the header strip against the body rhythm — is only visible whole.
   {
@@ -229,7 +239,7 @@ const INTERACTIONS: readonly InteractionCase[] = [
  * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
  * to look" at.
  *
- * Deliberately seven, not forty-one. Each is a committed PNG a human reviews on
+ * Deliberately eight, not forty-one. Each is a committed PNG a human reviews on
  * every change, and the point is the layout that *differs* at this width — a
  * second copy of a component that renders identically is cost without evidence.
  * `Drawer` is the sixth and the clearest case for the rule: it is the one
@@ -255,14 +265,35 @@ const MOBILE_CASES: readonly VisualCase[] = [
   // behaviour that exists only below `md`, so asserting it anywhere else
   // would be assuming it.
   { id: 'foundations-pagination--many-pages', snapshot: 'pagination-many-pages-mobile.png' },
+  // Collision (#166). Each trigger sits hard against the right edge asking to
+  // open rightward, which at 412px has no room: the positioning engine must
+  // flip or shift it back on-screen, and `onScreen` asserts that it did rather
+  // than trusting the library to.
+  {
+    id: 'foundations-tooltip--at-the-viewport-edge',
+    snapshot: 'tooltip-at-the-viewport-edge-mobile.png',
+    onScreen: '[data-slot="tooltip"]',
+  },
 ];
 
 test.describe('Design System Visual Regression - Narrow viewport', () => {
-  for (const { id, snapshot, fullPage } of MOBILE_CASES) {
+  for (const { id, snapshot, fullPage, onScreen } of MOBILE_CASES) {
     test(`${id} — mobile`, async ({ page }, testInfo) => {
       test.skip(testInfo.project.name !== 'mobile', 'Narrow-viewport cases run in the mobile project');
       await page.goto(`/iframe.html?id=${id}&viewMode=story`);
       await waitForStoryReady(page, id);
+      if (onScreen) {
+        const box = await page.locator(onScreen).boundingBox();
+        const viewport = page.viewportSize();
+        expect(box, `${onScreen} rendered`).not.toBeNull();
+        expect(viewport).not.toBeNull();
+        if (box && viewport) {
+          expect(box.x).toBeGreaterThanOrEqual(0);
+          expect(box.y).toBeGreaterThanOrEqual(0);
+          expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+          expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+        }
+      }
       await expect(page).toHaveScreenshot(snapshot, fullPage ? { fullPage: true } : undefined);
     });
   }
