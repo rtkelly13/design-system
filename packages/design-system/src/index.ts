@@ -101,6 +101,7 @@ export * from './components/EmptyState';
 // `Popover` shows content, `Menu` offers actions.
 export * from './components/Tooltip';
 export * from './components/Popover';
+export * from './components/Menu';
 
 // Transient notifications. Not an overlay: a toast shares neither the
 // positioning nor the dismissal model of Tooltip/Popover/Menu — it is a queue,

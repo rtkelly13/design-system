@@ -52,8 +52,8 @@ export const floatingSurface = recipe({
   },
 });
 
-// The parts `Popover` renders. Kept beside the surface so the header a
-// popover wears is visibly the dialogs' header at a smaller scale.
+// The parts only `Popover` and `Menu` render. Kept beside the surface so the
+// header a popover wears is visibly the dialogs' header at a smaller scale.
 export const floatingParts = recipe({
   slots: {
     header:
@@ -64,5 +64,22 @@ export const floatingParts = recipe({
       + 'text-content-primary transition-colors hover:bg-surface-base hover:text-accent-tertiary '
       + 'motion-reduce:transition-none',
     body: 'px-4 py-3 font-sans text-sm leading-relaxed text-content-primary',
+    // A highlighted item is marked by the accent *fill* and the inverse ink —
+    // `text.inverse on accent.primary`, a pair `check:contrast` audits on
+    // every Level. Not a surface pair: `docs/theming.md` § Selection State is
+    // why a raised-against-base highlight is ruled out.
+    item:
+      'flex w-full cursor-default select-none items-center gap-2 px-3 py-1.5 text-left text-sm '
+      + 'text-content-primary data-[highlighted]:bg-accent-primary data-[highlighted]:text-content-inverse',
+    // A disabled item is muted ink on the popup's own ground — the one
+    // state a menu shows that is not a highlight — and never takes the fill.
+    disabledItem:
+      'flex w-full cursor-not-allowed select-none items-center gap-2 px-3 py-1.5 text-left text-sm '
+      + 'text-content-muted',
+    danger: 'text-intent-danger data-[highlighted]:bg-intent-danger',
+    indicator: 'flex w-4 shrink-0 justify-center font-bold',
+    groupLabel:
+      'px-3 pt-2 pb-1 text-xs font-bold uppercase tracking-wider text-content-secondary',
+    separator: 'my-1 h-0.5 bg-edge-strong',
   },
 });

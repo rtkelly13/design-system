@@ -30,6 +30,14 @@ const PAIRS: ReadonlyArray<{ className: string; pairs: readonly string[] }> = [
   // The popover header's ground, and the close control's hover ink on it.
   { className: 'bg-surface-base', pairs: ['text.primary on surface.base'] },
   { className: 'hover:text-accent-tertiary', pairs: ['accent.tertiary on surface.base'] },
+  { className: 'text-content-secondary', pairs: ['text.secondary on surface.raised'] },
+  { className: 'text-content-muted', pairs: ['text.muted on surface.raised'] },
+  { className: 'text-intent-danger', pairs: ['intent.danger on surface.raised'] },
+  // A highlighted item: the accent fill with the inverse ink.
+  { className: 'data-[highlighted]:bg-accent-primary', pairs: ['text.inverse on accent.primary'] },
+  { className: 'data-[highlighted]:bg-intent-danger', pairs: ['text.inverse on intent.danger'] },
+  // The separator is the edge colour drawn as a rule on the popup's fill.
+  { className: 'bg-edge-strong', pairs: ['border.strong on surface.raised'] },
 ];
 
 function allClasses(): string {
@@ -41,6 +49,11 @@ function allClasses(): string {
     parts.title(),
     parts.close(),
     parts.body(),
+    parts.item(),
+    parts.disabledItem(),
+    parts.danger(),
+    parts.groupLabel(),
+    parts.separator(),
   ];
   return [...surfaces, ...partClasses].join(' ');
 }
