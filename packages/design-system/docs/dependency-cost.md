@@ -15,9 +15,9 @@ bundled by esbuild with `react` and `react-dom` external. See the header of
 
 | | gzip |
 |---|---|
-| Authored code — `dist/index.mjs` | 62.6 KB |
+| Authored code — `dist/index.mjs` | 63.3 KB |
 | Dependencies, all together | 151.2 KB |
-| A consumer importing everything | 213.8 KB |
+| A consumer importing everything | 214.5 KB |
 
 That last row is a ceiling, not a toll. `package.json` declares `sideEffects: ["**/*.css"]`,
 so a consumer's bundler drops the specifiers their imports never reach — someone using only

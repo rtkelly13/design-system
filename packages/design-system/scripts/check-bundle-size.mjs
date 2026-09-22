@@ -141,10 +141,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * it — it has no markup — so it is written here or nowhere, and no
  * dependency moves: `check:dep-cost` is unchanged.
  *
- * Raised again for `Tooltip`, `Popover` and `Menu` (#166): +11,156 B raw,
- * +1,910 B gzip on the ESM bundle, measured against `main` before #274's
- * checkbox fix landed and additive on top of it (274,680 B / 64,112 B with
- * both; CommonJS 302,193 B / 66,452 B). That is seven
+ * Raised again for `Tooltip`, `Popover` and `Menu` (#166): +11,042 B raw,
+ * +1,932 B gzip on the ESM bundle over `main` with `DataTable`'s semantics
+ * in it (277,175 B / 64,855 B; CommonJS 304,756 B / 67,129 B). That is seven
  * exported components — the three roots and `MenuItem`, `MenuRadioGroup`,
  * `MenuRadioItem`, `MenuSeparator` — their prop JSDoc, the one
  * `floatingSurface` recipe all three wear, and the two first consumers:
@@ -156,13 +155,13 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 276_000,
-    maxGzip: 64_400,
+    maxRaw: 278_500,
+    maxGzip: 65_200,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 303_700,
-    maxGzip: 66_750,
+    maxRaw: 306_300,
+    maxGzip: 67_450,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
