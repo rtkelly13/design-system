@@ -859,6 +859,64 @@ interface DrawerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'ch
 
 declare const Drawer: react.ForwardRefExoticComponent<DrawerProps & react.RefAttributes<HTMLDivElement>>;
 
+interface SpinnerProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'className'> {
+
+    label?: string;
+
+    size?: 'sm' | 'md' | 'lg';
+
+    accent?: AccentToken;
+
+    className?: string;
+}
+
+declare const Spinner: react.ForwardRefExoticComponent<SpinnerProps & react.RefAttributes<HTMLSpanElement>>;
+
+interface SkeletonProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
+
+    shape?: 'text' | 'heading' | 'block' | 'avatar';
+
+    className?: string;
+}
+
+declare const Skeleton: react.ForwardRefExoticComponent<SkeletonProps & react.RefAttributes<HTMLDivElement>>;
+
+interface ProgressProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className' | 'children'> {
+
+    value?: number | null;
+
+    max?: number;
+
+    label: string;
+
+    hideLabel?: boolean;
+
+    showValue?: boolean;
+
+    accent?: AccentToken;
+
+    className?: string;
+}
+
+declare const Progress: react.ForwardRefExoticComponent<ProgressProps & react.RefAttributes<HTMLDivElement>>;
+
+interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'className'> {
+
+    icon?: ReactNode;
+
+    title: string;
+
+    description?: ReactNode;
+
+    action?: ReactNode;
+
+    children?: ReactNode;
+
+    className?: string;
+}
+
+declare const EmptyState: react.ForwardRefExoticComponent<EmptyStateProps & react.RefAttributes<HTMLDivElement>>;
+
 declare const NERD_GLYPHS: {
     readonly sort: "";
     readonly 'sort-asc': "";
@@ -1545,6 +1603,8 @@ export {
   type DrawerPlacement,
   type DrawerProps,
   type Emphasis,
+  EmptyState,
+  type EmptyStateProps,
   type ExperimentItem,
   ExperimentsView,
   type ExperimentsViewProps,
@@ -1593,6 +1653,8 @@ export {
   type PaginationProps,
   type Polarity,
   type PricingTier,
+  Progress,
+  type ProgressProps,
   Prose,
   type ProseProps,
   RECOMMENDED_COLOURS,
@@ -1625,6 +1687,8 @@ export {
   type SelectProps,
   type SelectionDevice,
   type SelectionDeviceCheck,
+  Skeleton,
+  type SkeletonProps,
   Slide,
   SlideDeck,
   type SlideDeckHotkey,
@@ -1636,6 +1700,8 @@ export {
   type SocialIconProps,
   Sparkline,
   type SparklineProps,
+  Spinner,
+  type SpinnerProps,
   StatCard,
   type StatCardAccent,
   type StatCardProps,

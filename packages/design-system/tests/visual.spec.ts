@@ -127,6 +127,20 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-bulletchart--primary-benchmark', snapshot: 'bulletchart-primary-benchmark.png' },
   { id: 'foundations-charttooltip--primary', snapshot: 'charttooltip-primary.png' },
   { id: 'foundations-socialicon--brand-marks', snapshot: 'socialicon-brand-marks.png' },
+
+  // System feedback. Each row is the state that rots unseen — a loading card
+  // nobody looks at until the network is slow, an empty table nobody looks at
+  // until the filter matches nothing.
+  //
+  // The two animated ones are captured at rest by construction:
+  // `animations: 'disabled'` resets an infinite animation to its first frame,
+  // so `Spinner`'s mark and the indeterminate sweep are the same pixels every
+  // run. The representative chosen for each is therefore the one with the most
+  // structure rather than the one that moves least.
+  { id: 'foundations-spinner--sizes', snapshot: 'spinner-sizes.png' },
+  { id: 'foundations-skeleton--loading-card', snapshot: 'skeleton-loading-card.png' },
+  { id: 'foundations-progress--accents', snapshot: 'progress-accents.png' },
+  { id: 'foundations-emptystate--first-run', snapshot: 'emptystate-first-run.png' },
 ];
 
 /**
