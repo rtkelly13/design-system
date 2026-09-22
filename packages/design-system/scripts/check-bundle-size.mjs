@@ -92,16 +92,25 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * new dependency edge is `Progress` taking `@base-ui/react/progress` rather
  * than hand-rolling `role="progressbar"` and its value maths, which #242
  * asks for; that cost is recorded by `check:dep-cost`, not here.
+ *
+ * Raised again for the public `Tabs` primitive (#240): +6,066 B raw, +1,665 B
+ * gzip on the ESM bundle (245,437 B / 57,754 B; CommonJS 270,010 B /
+ * 59,955 B). This is an extraction, not a second tablist — the built bundle
+ * still carries exactly one arrow-key traversal, and `CodeTabs` lost ~200
+ * lines to it. What grows is the surface a consumer can now reach: the
+ * context that pairs tabs with panels, controlled and uncontrolled value,
+ * the vertical orientation's compound variants, and `TabsPanel`. No new
+ * dependency: `Tabs` imports no primitive, per #163's rejection.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 240_600,
-    maxGzip: 56_400,
+    maxRaw: 246_700,
+    maxGzip: 58_100,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 265_100,
-    maxGzip: 58_600,
+    maxRaw: 271_400,
+    maxGzip: 60_300,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

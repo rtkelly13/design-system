@@ -565,6 +565,64 @@ interface PaginationProps {
 }
 declare function Pagination({ totalPages, currentPage, onPageChange, getPageHref, className, }: PaginationProps): react.JSX.Element;
 
+type TabsOrientation = "horizontal" | "vertical";
+
+type TabsVariant = "merged" | "underline" | "segmented";
+interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
+
+    value?: string;
+
+    defaultValue?: string;
+
+    onValueChange?: (value: string) => void;
+
+    orientation?: TabsOrientation;
+
+    variant?: TabsVariant;
+
+    accent?: AccentToken;
+
+    children: ReactNode;
+
+    className?: string;
+}
+
+declare const Tabs: react.ForwardRefExoticComponent<TabsProps & react.RefAttributes<HTMLDivElement>>;
+interface TabsListProps extends HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    caption?: ReactNode;
+
+    children: ReactNode;
+
+    className?: string;
+}
+
+declare const TabsList: react.ForwardRefExoticComponent<TabsListProps & react.RefAttributes<HTMLDivElement>>;
+interface TabsTabProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value"> {
+
+    value: string;
+
+    children: ReactNode;
+
+    className?: string;
+}
+
+declare const TabsTab: react.ForwardRefExoticComponent<TabsTabProps & react.RefAttributes<HTMLButtonElement>>;
+interface TabsPanelProps extends HTMLAttributes<HTMLDivElement> {
+
+    value: string;
+
+    keepMounted?: boolean;
+
+    children: ReactNode;
+
+    className?: string;
+}
+
+declare const TabsPanel: react.ForwardRefExoticComponent<TabsPanelProps & react.RefAttributes<HTMLDivElement>>;
+
 interface SectionContainerProps {
     children: ReactNode;
     className?: string;
@@ -1313,7 +1371,7 @@ declare const CodeBlockAttachment: react.Context<boolean>;
 
 declare function CodeBlock({ children, title, language, copyable, attached, className, ...rest }: CodeBlockProps): react.JSX.Element;
 
-type CodeTabsVariant = 'merged' | 'underline' | 'segmented';
+type CodeTabsVariant = TabsVariant;
 interface CodeTabProps {
 
     label: string;
@@ -1728,6 +1786,16 @@ export {
   TableOfContents,
   type TableOfContentsProps,
   TableRow,
+  Tabs,
+  TabsList,
+  type TabsListProps,
+  type TabsOrientation,
+  TabsPanel,
+  type TabsPanelProps,
+  type TabsProps,
+  TabsTab,
+  type TabsTabProps,
+  type TabsVariant,
   Tag,
   type TagProps,
   TextArea,
