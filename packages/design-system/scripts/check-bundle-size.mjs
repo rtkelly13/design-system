@@ -119,16 +119,27 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * items, each rendered in both the button and the anchor mode because the
  * component still never imports a router. No dependency moves:
  * `check:dep-cost` is unchanged.
+ *
+ * Raised again for `Toast` (#243): +8,349 B raw, +2,201 B gzip on the ESM
+ * bundle, measured before `Pagination` landed and additive on top of it
+ * (262,411 B / 61,907 B with both; CommonJS 288,593 B / 64,172 B). That is
+ * `ToastProvider`, the toast item and its intent recipe, the lifetime policy
+ * in `toastLifetime.ts`, the two hooks, and `AdminDashboardLayout` wiring its
+ * sync button to them as the first consumer. The queue, the timers, the
+ * pause-on-hover and pause-on-focus, F6 and the live-region announcements
+ * are `@base-ui/react/toast`, external to this bundle and weighed by
+ * `check:dep-cost` — the alternative, hand-rolling a live region and a timer
+ * that yields to the reader, is exactly the part #243 says not to write.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 255_400,
-    maxGzip: 60_000,
+    maxRaw: 263_800,
+    maxGzip: 62_200,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 281_000,
-    maxGzip: 62_300,
+    maxRaw: 290_100,
+    maxGzip: 64_500,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
