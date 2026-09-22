@@ -113,6 +113,25 @@ export const Virtualized: Story = {
   },
 };
 
+/**
+ * `pageSize` shows that many rows and puts the system's `Pagination` under the
+ * table, so every page is reachable. The table still states the full row count
+ * and each row's real position to assistive tech.
+ */
+export const Paginated: Story = {
+  args: {
+    data: bigRows.slice(0, 60),
+    keyExtractor: (row) => row.id,
+    columns: [
+      { header: 'BRANCH', accessor: 'branch' },
+      { header: 'STATE', accessor: 'state' },
+      { header: 'DURATION', accessor: 'duration' },
+      { header: 'COMMITS', accessor: 'commits' },
+    ],
+    pageSize: 8,
+  },
+};
+
 /** Controlled TanStack Table with multi-column sorting. */
 export const HeadlessTanStackTable: Story = {
   render: () => {

@@ -199,6 +199,44 @@ describe('DataTable', () => {
     expect(screen.getByText('row-5')).toBeDefined();
   });
 
+  it('honours pageSize and reaches every page through Pagination (issue 276)', () => {
+    const thirty: TestItem[] = Array.from({ length: 30 }, (_, i) => ({
+      id: `id-${i}`,
+      name: `row-${i}`,
+      count: i,
+    }));
+    const { container } = render(
+      <DataTable
+        columns={[{ header: 'Name', accessor: 'name' }]}
+        data={thirty}
+        keyExtractor={(row) => row.id}
+        pageSize={25}
+      />,
+    );
+    const bodyRows = () => container.querySelectorAll('[data-slot="table-body"] tr');
+
+    // 25, not TanStack's default of 10.
+    expect(bodyRows()).toHaveLength(25);
+    expect(screen.getByText('row-24')).toBeDefined();
+    expect(screen.queryByText('row-25')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
+    expect(bodyRows()).toHaveLength(5);
+    expect(screen.getByText('row-29')).toBeDefined();
+
+    // The windowed-body semantics still tell the truth on page 2.
+    const table = container.querySelector('table')!;
+    expect(table.getAttribute('aria-rowcount')).toBe('31');
+    expect(bodyRows()[0]?.getAttribute('aria-rowindex')).toBe('27');
+  });
+
+  it('renders no pager when everything fits on one page', () => {
+    render(
+      <DataTable columns={[{ header: 'Name', accessor: 'name' }]} data={testData} pageSize={25} />,
+    );
+    expect(screen.queryByRole('navigation')).toBeNull();
+  });
+
   it('renders every row unchanged when not virtualized', () => {
     const manyData: TestItem[] = Array.from({ length: 200 }, (_, i) => ({
       id: `id-${i}`,

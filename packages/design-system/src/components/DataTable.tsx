@@ -21,6 +21,7 @@ import {
 } from 'react';
 import { cn } from '../lib/recipe';
 import { NerdIcon } from './NerdIcon';
+import { Pagination } from './Pagination';
 import {
   Table,
   TableBody,
@@ -214,8 +215,14 @@ export function DataTable<T>({
     });
   }, [columns]);
 
+  // `pageSize` used to switch the pagination model on and nothing else, so
+  // TanStack's default of 10 applied whatever was asked for (#276).
+  const paginated = !virtualization && 'pageSize' in rest && Boolean(rest.pageSize);
   const defaultTable = useReactTable<T>({
     data: data || [],
+    initialState: paginated
+      ? { pagination: { pageIndex: 0, pageSize: (rest as { pageSize: number }).pageSize } }
+      : undefined,
     columns: tanstackColumns,
     state: {
       sorting,
@@ -227,10 +234,7 @@ export function DataTable<T>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel:
-      !virtualization && 'pageSize' in rest && rest.pageSize
-        ? getPaginationRowModel()
-        : undefined,
+    getPaginationRowModel: paginated ? getPaginationRowModel() : undefined,
   });
 
   const activeTable = providedTable || defaultTable;
@@ -427,6 +431,24 @@ export function DataTable<T>({
       </TableBody>
     </Table>
   );
+
+  // A paginated body needs a way to the other pages, or every row past the
+  // first page is unreachable. It is the system's own `Pagination`, in its
+  // callback mode, rather than a second pager written here. Only for the
+  // table this component builds: a caller passing `table` owns its state.
+  const pageCount = activeTable.getPageCount();
+  if (paginated && !providedTable && pageCount > 1) {
+    return (
+      <div data-slot="datatable-paginated" className="flex flex-col gap-4">
+        {table}
+        <Pagination
+          totalPages={pageCount}
+          currentPage={pageIndex + 1}
+          onPageChange={(page) => activeTable.setPageIndex(page - 1)}
+        />
+      </div>
+    );
+  }
 
   if (!virtualization || scrollElementRef) return table;
 

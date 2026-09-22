@@ -121,6 +121,8 @@ const CASES: readonly VisualCase[] = [
   // cell's geometry, and a sorted column's icon. Also the a11y suite's sorted,
   // non-virtualized case, since that suite reads its story list from here.
   { id: 'foundations-datatable--sorted-with-caption', snapshot: 'datatable-sorted-with-caption.png' },
+  // The pager under a paginated body (issue 276): the table and `Pagination` together.
+  { id: 'foundations-datatable--paginated', snapshot: 'datatable-paginated.png' },
   { id: 'foundations-semantic-tokens--roles', snapshot: 'semantic-tokens-roles.png', fullPage: true },
   { id: 'docs-docslayout--default', snapshot: 'docslayout-default.png', fullPage: true },
   { id: 'docs-portal--full-portal', snapshot: 'portal-full.png', fullPage: true },
