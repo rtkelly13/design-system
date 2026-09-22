@@ -84,16 +84,24 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * controls share and the `booleanControl` recipe. The Base UI checkbox and
  * switch entry points they sit on are external to this bundle and are
  * weighed by `check:dep-cost` instead, which records the rise.
+ *
+ * Raised again for the feedback primitives — `Spinner`, `Skeleton`,
+ * `Progress`, `EmptyState` (#242): +8,705 B raw, +2,362 B gzip on the ESM
+ * bundle (239,371 B / 56,089 B; CommonJS 263,736 B / 58,307 B). Four
+ * components' recipes and the reduced-motion handling each carries. The one
+ * new dependency edge is `Progress` taking `@base-ui/react/progress` rather
+ * than hand-rolling `role="progressbar"` and its value maths, which #242
+ * asks for; that cost is recorded by `check:dep-cost`, not here.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 231_800,
-    maxGzip: 54_000,
+    maxRaw: 240_600,
+    maxGzip: 56_400,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 255_800,
-    maxGzip: 56_200,
+    maxRaw: 265_100,
+    maxGzip: 58_600,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
