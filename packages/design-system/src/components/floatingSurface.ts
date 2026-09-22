@@ -51,3 +51,18 @@ export const floatingSurface = recipe({
       + 'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 motion-reduce:transition-none',
   },
 });
+
+// The parts `Popover` renders. Kept beside the surface so the header a
+// popover wears is visibly the dialogs' header at a smaller scale.
+export const floatingParts = recipe({
+  slots: {
+    header:
+      'flex items-center justify-between gap-3 border-b-2 border-edge-strong bg-surface-base px-4 py-2',
+    title: 'font-display text-sm font-bold uppercase tracking-wider text-content-primary',
+    close:
+      'border-2 border-edge-strong bg-surface-raised px-1.5 font-mono text-base font-bold leading-none '
+      + 'text-content-primary transition-colors hover:bg-surface-base hover:text-accent-tertiary '
+      + 'motion-reduce:transition-none',
+    body: 'px-4 py-3 font-sans text-sm leading-relaxed text-content-primary',
+  },
+});

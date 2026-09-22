@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { auditContrast } from '../theme/contrast';
 import { LEVELS, THEME_LEVELS } from '../theme/levels';
-import { floatingSurface } from './floatingSurface';
+import { floatingParts, floatingSurface } from './floatingSurface';
 
 /**
  * `check:contrast` covering the overlay surfaces against each ground (#166).
@@ -27,12 +27,22 @@ const PAIRS: ReadonlyArray<{ className: string; pairs: readonly string[] }> = [
   { className: 'border-edge-strong', pairs: GROUNDS.map((g) => `border.strong on ${g}`) },
   // Ink on the popup's own fill.
   { className: 'text-content-primary', pairs: ['text.primary on surface.raised'] },
+  // The popover header's ground, and the close control's hover ink on it.
+  { className: 'bg-surface-base', pairs: ['text.primary on surface.base'] },
+  { className: 'hover:text-accent-tertiary', pairs: ['accent.tertiary on surface.base'] },
 ];
 
 function allClasses(): string {
   const s = floatingSurface();
   const surfaces = [s.positioner(), s.popup()];
-  return surfaces.join(' ');
+  const parts = floatingParts();
+  const partClasses = [
+    parts.header(),
+    parts.title(),
+    parts.close(),
+    parts.body(),
+  ];
+  return [...surfaces, ...partClasses].join(' ');
 }
 
 describe('the floating surface', () => {
@@ -70,5 +80,7 @@ describe('the floating surface', () => {
     expect(popup).toContain('data-[starting-style]:opacity-0');
     expect(popup).toContain('data-[ending-style]:opacity-0');
     expect(popup).toContain('motion-reduce:transition-none');
+    // The close control's colour transition too.
+    expect(floatingParts().close()).toContain('motion-reduce:transition-none');
   });
 });

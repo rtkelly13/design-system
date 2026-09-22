@@ -73,9 +73,10 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-alertdialog--destructive', snapshot: 'alertdialog-destructive.png' },
   { id: 'foundations-drawer--from-the-right', snapshot: 'drawer-from-the-right.png' },
   { id: 'foundations-toast--all-intents', snapshot: 'toast-all-intents.png' },
-  // The floating set (#166), each open on load: a floating element
+  // The floating set (#166), each open on load: a tooltip or popover
   // asserted closed asserts nothing — the trap #132 names for press states.
   { id: 'foundations-tooltip--on-an-icon-button', snapshot: 'tooltip-on-an-icon-button.png' },
+  { id: 'foundations-popover--open', snapshot: 'popover-open.png' },
   // `fullPage`: the report frame is a page, and the part most likely to drift
   // — the header strip against the body rhythm — is only visible whole.
   {
@@ -239,7 +240,7 @@ const INTERACTIONS: readonly InteractionCase[] = [
  * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
  * to look" at.
  *
- * Deliberately eight, not forty-one. Each is a committed PNG a human reviews on
+ * Deliberately nine, not forty-one. Each is a committed PNG a human reviews on
  * every change, and the point is the layout that *differs* at this width — a
  * second copy of a component that renders identically is cost without evidence.
  * `Drawer` is the sixth and the clearest case for the rule: it is the one
@@ -273,6 +274,11 @@ const MOBILE_CASES: readonly VisualCase[] = [
     id: 'foundations-tooltip--at-the-viewport-edge',
     snapshot: 'tooltip-at-the-viewport-edge-mobile.png',
     onScreen: '[data-slot="tooltip"]',
+  },
+  {
+    id: 'foundations-popover--at-the-viewport-edge',
+    snapshot: 'popover-at-the-viewport-edge-mobile.png',
+    onScreen: '[data-slot="popover"]',
   },
 ];
 

@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { Button } from './Button';
+import { Popover } from './Popover';
 import { Tooltip } from './Tooltip';
 
 function tooltip() {
@@ -57,6 +58,32 @@ describe('Tooltip', () => {
     await waitFor(() => expect(tooltip()).toBeNull());
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
     expect(document.activeElement).toBe(trigger);
+  });
+
+  it('closes only itself on Escape when it is open inside a Popover', async () => {
+    const onPopoverChange = vi.fn();
+    render(
+      <Popover
+        defaultOpen
+        onOpenChange={onPopoverChange}
+        title="Build 1482"
+        trigger={<Button>DETAILS</Button>}
+      >
+        <Tooltip content="Re-run the failed gate">
+          <Button aria-label="Re-run">↻</Button>
+        </Tooltip>
+      </Popover>,
+    );
+
+    const rerun = await screen.findByRole('button', { name: 'Re-run' });
+    act(() => rerun.focus());
+    await waitFor(() => expect(tooltip()).not.toBeNull());
+
+    fireEvent.keyDown(rerun, { key: 'Escape' });
+
+    await waitFor(() => expect(tooltip()).toBeNull());
+    expect(onPopoverChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: 'Build 1482' })).toBeTruthy();
   });
 
   it('renders nothing while disabled', async () => {
