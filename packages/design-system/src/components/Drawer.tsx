@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import type { HTMLAttributes, ReactNode } from 'react';
 import { Dialog } from '@base-ui/react/dialog';
 import { cn } from '../lib/recipe';
+import { usePortalThemeAttribute } from './portalTheme';
 import { dialogSurface } from './dialogSurface';
 import { usePopupRef } from './dialogPopupRef';
 import { Button } from './Button';
@@ -134,6 +135,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
   const slots = dialogSurface({ placement });
   const [popup, attachPopup] = usePopupRef(ref);
 
+  const portalTheme = usePortalThemeAttribute();
   return (
     <Dialog.Root
       open={isOpen}
@@ -146,7 +148,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(function Drawer(
       // published API is the one that stays.
       disablePointerDismissal={!closeOnBackdropClick}
     >
-      <Dialog.Portal>
+      <Dialog.Portal {...portalTheme}>
         <Dialog.Backdrop data-slot="drawer-backdrop" className={slots.backdrop()} />
         <Dialog.Viewport data-slot="drawer-viewport" className={slots.viewport()}>
           <Dialog.Popup

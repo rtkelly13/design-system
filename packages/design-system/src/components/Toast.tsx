@@ -3,6 +3,7 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import { Toast as BaseToast } from '@base-ui/react/toast';
 import { AlertCircle, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { recipe } from '../lib/recipe';
+import { usePortalThemeAttribute } from './portalTheme';
 import { Button } from './Button';
 import { DEFAULT_TIMEOUT, resolveLifetime } from './toastLifetime';
 
@@ -351,10 +352,11 @@ export const ToastProvider = forwardRef<HTMLDivElement, ToastProviderProps>(func
 ) {
   const styles = toast();
 
+  const portalTheme = usePortalThemeAttribute();
   return (
     <BaseToast.Provider timeout={timeout} limit={limit}>
       <ToastBridge timeout={timeout}>{children}</ToastBridge>
-      <BaseToast.Portal>
+      <BaseToast.Portal {...portalTheme}>
         <BaseToast.Viewport
           ref={ref}
           aria-label={label}

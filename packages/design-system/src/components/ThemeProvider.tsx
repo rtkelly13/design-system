@@ -8,6 +8,7 @@ import {
   THEME_LEVELS,
 } from '../theme/levels';
 import type { Polarity, ThemeLevel } from '../theme/levels';
+import { ScopedLevelContext } from './themeScope';
 
 /** Where the chosen level is persisted. Shared with {@link getThemeInitScript}. */
 export const THEME_STORAGE_KEY = 'ds-theme-level';
@@ -172,7 +173,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     children
   );
 
-  return <ThemeContext.Provider value={value}>{content}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>
+      <ScopedLevelContext.Provider value={scoped ? level : undefined}>
+        {content}
+      </ScopedLevelContext.Provider>
+    </ThemeContext.Provider>
+  );
 };
 
 export const useTheme = (): ThemeContextValue => {
