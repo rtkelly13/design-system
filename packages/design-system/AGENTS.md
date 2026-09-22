@@ -99,6 +99,7 @@ Load these when the task is in them, not before.
 | Topic | |
 |---|---|
 | **The brand outline — start here** | [`DESIGN.md`](./DESIGN.md) |
+| **Is the system complete? The 1.0 capability matrix** | [`docs/capability-readiness.md`](./docs/capability-readiness.md) |
 | The vocabulary in plain terms, if the glossary reads as jargon | [`docs/orientation.md`](./docs/orientation.md) |
 | Domain vocabulary | [`CONTEXT.md`](./CONTEXT.md) |
 | Architectural decisions | [`docs/adr/`](./docs/adr/) |
