@@ -152,4 +152,16 @@ describe('Pagination', () => {
     expect(ref.current).toBe(screen.getByTestId('pager'));
     expect(ref.current?.getAttribute('data-slot')).toBe('pagination');
   });
+
+  it('derives the end controls and the status from the clamped page, not the raw one', () => {
+    // A filter shrank the result set to 3 pages while the caller still says 10.
+    const onPageChange = vi.fn();
+    render(<Pagination totalPages={3} currentPage={10} onPageChange={onPageChange} />);
+
+    expect(screen.getByRole('button', { name: 'Page 3' }).getAttribute('aria-current')).toBe('page');
+    fireEvent.click(screen.getByRole('button', { name: 'Previous Page' }));
+    expect(onPageChange).toHaveBeenCalledWith(2);
+    expect(screen.getByRole('button', { name: 'Next Page' }).getAttribute('aria-disabled')).toBe('true');
+    expect(screen.getByText('[ 3 / 3 ]')).toBeTruthy();
+  });
 });

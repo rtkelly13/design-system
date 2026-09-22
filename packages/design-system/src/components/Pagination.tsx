@@ -84,12 +84,15 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>(function P
   { totalPages, currentPage, onPageChange, getPageHref, className = '', ...props },
   ref,
 ) {
-  const hasPrev = currentPage > 1;
-  const hasNext = currentPage < totalPages;
-  const prevPageNum = currentPage - 1;
-  const nextPageNum = currentPage + 1;
-  const items = paginationRange(totalPages, currentPage);
+  // Normalised once, and everything below derives from it: the list, the end
+  // controls and the compact status. Clamping only the list left PREV asking
+  // for page 9 of 3 when a filter shrank `totalPages` under the caller.
   const current = Math.min(Math.max(currentPage, 1), totalPages);
+  const hasPrev = current > 1;
+  const hasNext = current < totalPages;
+  const prevPageNum = current - 1;
+  const nextPageNum = current + 1;
+  const items = paginationRange(totalPages, current);
 
   const go = (page: number) => {
     if (onPageChange) onPageChange(page);
@@ -181,7 +184,7 @@ export const Pagination = forwardRef<HTMLDivElement, PaginationProps>(function P
           ? renderEnd(prevPageNum, 'prev', 'Previous Page', <>&lt;&lt; PREV</>, 'bg-accent-primary')
           : renderDisabledEnd('Previous Page', <>&lt;&lt; PREV</>)}
         <span data-slot="pagination-status" className="md:hidden whitespace-nowrap text-content-primary font-bold border-2 border-edge-strong px-3 py-3 bg-surface-base">
-          [ {currentPage} / {totalPages} ]
+          [ {current} / {totalPages} ]
         </span>
         <ul data-slot="pagination-list" className="hidden md:flex items-center gap-2">
           {items.map((item) =>
