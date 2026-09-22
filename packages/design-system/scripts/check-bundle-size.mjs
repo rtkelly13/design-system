@@ -111,16 +111,24 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * implementation beside it — and the `dot` shape on `booleanControl`. The
  * Base UI fieldset, radio-group and radio entry points are external to this
  * bundle and are weighed by `check:dep-cost` instead.
+ *
+ * Raised again for `Pagination`'s page list (#244): +2,855 B raw, +703 B gzip
+ * on the ESM bundle, additive with the groups above (254,086 B / 59,706 B
+ * with both; CommonJS 279,632 B / 61,996 B). That is the ellipsis algorithm
+ * in `paginationRange` — a pure function of two numbers — and the numbered
+ * items, each rendered in both the button and the anchor mode because the
+ * component still never imports a router. No dependency moves:
+ * `check:dep-cost` is unchanged.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 252_400,
-    maxGzip: 59_300,
+    maxRaw: 255_400,
+    maxGzip: 60_000,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 277_800,
-    maxGzip: 61_600,
+    maxRaw: 281_000,
+    maxGzip: 62_300,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

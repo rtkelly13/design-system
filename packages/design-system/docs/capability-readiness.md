@@ -32,7 +32,7 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 
 ## The matrix
 
-Assessed against `main` after #268 (`Tabs`).
+Assessed against `main` after #268 (`Tabs`), with *Paginate* moved by #244.
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -57,7 +57,7 @@ Assessed against `main` after #268 (`Tabs`).
 | Progress | `Progress` | `ready` | |
 | No content | `EmptyState` | `ready` | |
 | Validation | field `error` + `ErrorSummary` | `partial` — per-field errors only, no summary | [#50](https://github.com/rtkelly13/design-system/issues/50) |
-| Paginate | `Pagination` | `partial` — previous/next only | [#244](https://github.com/rtkelly13/design-system/issues/244) |
+| Paginate | `Pagination` — numbered pages, callback or `href` mode | `ready` | |
 | Display records | `Table` / `DataTable` | `partial` — sorts and virtualises, semantics incomplete | [#245](https://github.com/rtkelly13/design-system/issues/245) |
 | Display metrics | `StatCard` and the chart family | `ready` | |
 | Long-form content | `Prose` / `BlogPost` | `partial` — `BlogPost`'s author card is hard-coded | [#250](https://github.com/rtkelly13/design-system/issues/250) |
