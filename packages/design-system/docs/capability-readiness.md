@@ -44,10 +44,10 @@ Assessed against `main` after #268 (`Tabs`).
 | Explain an icon/control | `Tooltip` | `absent` | [#166](https://github.com/rtkelly13/design-system/issues/166) |
 | Show contextual content | `Popover` | `absent` | [#166](https://github.com/rtkelly13/design-system/issues/166) |
 | Enter text | `Input` / `TextArea` | `ready` | |
-| Choose one | `Select` / `RadioGroup` | `partial` — native `Select` list, no `RadioGroup` | [#164](https://github.com/rtkelly13/design-system/issues/164), [#239](https://github.com/rtkelly13/design-system/issues/239) |
+| Choose one | `Select` / `RadioGroup` | `partial` — `RadioGroup` covers a visible set; `Select` is still the native list | [#164](https://github.com/rtkelly13/design-system/issues/164) |
 | Choose many | `Checkbox` | `ready` | |
 | Toggle state | `Switch` | `ready` | |
-| Group fields | `Fieldset` + `Legend` | `absent` | [#239](https://github.com/rtkelly13/design-system/issues/239) |
+| Group fields | `Fieldset` + `Legend` | `ready` | |
 | Submit an action | `Button` | `ready` | |
 | Confirm a destructive action | `AlertDialog` | `ready` | |
 | Display a modal workflow | `Modal` | `ready` | |

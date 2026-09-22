@@ -71,7 +71,9 @@ while a dialog is opening catches it mid-fade with nothing having been hovered. 
 the one that also *moves*: its panel translates a full panel-width in from the edge, so a capture
 taken mid-transition is not a slightly-wrong opacity but a panel in the wrong place. `Checkbox` and
 `Switch` are the same case in miniature: the box takes its fill and the thumb travels on
-`data-checked`, which a story can set before anything is hovered. All five carry
+`data-checked`, which a story can set before anything is hovered. `Radio` (#239) wears the same box
+and so inherits its colour transition, but adds none of its own: its selected mark is mounted and
+unmounted rather than faded, so a selection lands in one frame. All of them carry
 `motion-reduce:transition-none`, which makes `prefers-reduced-motion` a second and more honest lever
 than the reset below; the reset is still what a capture harness should use, because it does not
 depend on the component having remembered.

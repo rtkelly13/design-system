@@ -74,6 +74,11 @@ export * from './components/Input';
 // composing the same Field as the text controls above.
 export * from './components/Checkbox';
 export * from './components/Switch';
+// The groups (#239): `Fieldset` and `Legend` are the set's label, description
+// and error on the same Field contract, and `RadioGroup` / `Radio` are the
+// choose-one control built on that frame rather than beside it.
+export * from './components/Fieldset';
+export * from './components/RadioGroup';
 export * from './components/Swatch';
 export * from './components/StatCard';
 export * from './components/Table';

@@ -1,6 +1,7 @@
-import { forwardRef } from 'react';
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import { forwardRef, useId } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactElement, ReactNode } from 'react';
 import { Field as BaseField } from '@base-ui/react/field';
+import { Fieldset as BaseFieldset } from '@base-ui/react/fieldset';
 import { recipe } from '../lib/recipe';
 import { accentVar } from '../lib/theme';
 import type { AccentToken } from '../lib/theme';
@@ -15,6 +16,13 @@ import type { AccentToken } from '../lib/theme';
  * "second field implementation" #238 exists to prevent. One implementation is
  * also what makes a boolean and a text input agree about what `error` means.
  *
+ * It carries three arrangements of that one contract: `FieldFrame` for a
+ * single control, `GroupFrame` for a set of controls that answer one question
+ * together (#239), and `FieldItem` for one option inside such a set. The group
+ * is the reason the message moved into `FieldMessage`: a radio group's error
+ * and a text input's error are the same element, wired the same way, and a
+ * second copy is the drift this module exists to stop.
+ *
  * Nothing exports this from `src/index.ts`, deliberately, for the reason
  * `dialogSurface.ts` states: it holds a `recipe`, whose type comes from
  * `tailwind-variants`, and publishing it would put that library back into the
@@ -26,6 +34,13 @@ const frame = recipe({
     root: 'flex w-full flex-col gap-1.5 font-mono',
     label: 'text-xs font-bold uppercase tracking-wider text-content-secondary',
     message: 'font-mono text-xs',
+    /**
+     * The grouping element — a `<fieldset>`, or the `radiogroup` a `RadioGroup`
+     * renders in its place. The reset is the browser's fieldset chrome: the
+     * groove border, the padding and the `min-inline-size: min-content` that
+     * lets a fieldset overflow its column.
+     */
+    group: 'm-0 flex min-w-0 flex-col gap-3 border-0 p-0',
   },
   variants: {
     invalid: {
@@ -221,20 +236,195 @@ export const FieldFrame = forwardRef<HTMLDivElement, FieldFrameProps>(function F
           {children}
         </>
       )}
-      {error ? (
-        <BaseField.Error
-          match
-          data-slot="field-error"
-          className={styles.message()}
-          render={<span role="alert" />}
-        >
-          &gt; {error}
-        </BaseField.Error>
-      ) : helperText ? (
-        <BaseField.Description data-slot="field-description" className={styles.message()} render={<span />}>
-          &gt; {helperText}
-        </BaseField.Description>
-      ) : null}
+      <FieldMessage error={error} helperText={helperText} />
     </BaseField.Root>
   );
 });
+
+export interface FieldMessageProps {
+  error?: string;
+  helperText?: string;
+  /** Names the rendered message, for a group that must point at it by hand. */
+  id?: string;
+  /** `field` for a single control's message, `fieldset` for a group's. */
+  slot?: 'field' | 'fieldset';
+}
+
+/**
+ * The message under a field: the error when there is one, the standing
+ * guidance otherwise, and nothing when neither is set.
+ *
+ * Its own component because two frames render it. Both parts register their
+ * `id` with the enclosing `Field.Root`, which is what puts them in the
+ * control's `aria-describedby` — for a group, in the `radiogroup`'s, and in
+ * every option's through `Field.Item`'s inherited message ids.
+ */
+export function FieldMessage({ error, helperText, id, slot = 'field' }: FieldMessageProps) {
+  const styles = frame({ invalid: Boolean(error) });
+
+  if (error) {
+    return (
+      <BaseField.Error
+        match
+        id={id}
+        data-slot={`${slot}-error`}
+        className={styles.message()}
+        render={<span role="alert" />}
+      >
+        &gt; {error}
+      </BaseField.Error>
+    );
+  }
+  if (helperText) {
+    return (
+      <BaseField.Description id={id} data-slot={`${slot}-description`} className={styles.message()} render={<span />}>
+        &gt; {helperText}
+      </BaseField.Description>
+    );
+  }
+  return null;
+}
+
+/**
+ * The label typography, for the one label this module does not render: the
+ * public `Legend`, which lives beside `Fieldset` so its type is published under
+ * its own name. A group's name and a field's name are the same kind of text,
+ * and reading the class from here is what keeps them the same.
+ */
+export function labelClassName(className?: string): string {
+  return frame().label({ class: className });
+}
+
+export interface GroupFrameProps
+  extends Omit<HTMLAttributes<HTMLElement>, 'className' | 'children'> {
+  /** The group's name — a rendered `Legend`, placed first inside the group. */
+  legend?: ReactNode;
+  error?: string;
+  helperText?: string;
+  /** Disables the whole group: the fieldset, and every `Field` inside it. */
+  disabled?: boolean;
+  /** Merged onto the grouping element, not the wrapper around it and its message. */
+  className?: string;
+  /**
+   * What the group renders as. Omitted, it is a `<fieldset>`. `RadioGroup`
+   * passes Base UI's `RadioGroup` here, so the `radiogroup` role, the roving
+   * focus and the fieldset's legend wiring land on one element rather than two
+   * nested ones each claiming to be the group.
+   */
+  render?: ReactElement;
+  children: ReactNode;
+}
+
+/**
+ * The label, message and ARIA wiring for a *set* of controls.
+ *
+ * `FieldFrame` models one control with one label, one description and one
+ * error. A group needs all three for the set, and the failure when it does
+ * not have them is specific: each option gets a label, the group gets none,
+ * and the group's error is announced against whichever option carried it.
+ *
+ * So the set is a `Field.Root` of its own, wrapping a Base UI `Fieldset.Root`:
+ *
+ * - The legend names the group. `Fieldset.Legend` registers its id and the
+ *   fieldset (or the `radiogroup` rendered in its place) takes it as
+ *   `aria-labelledby` — one accessible name for the set.
+ * - The message is `FieldMessage`, registered with the group's `Field.Root`.
+ *   A `radiogroup` is that field's control and composes it into its own
+ *   `aria-describedby`; a plain `<fieldset>` is not a Base UI control, so the
+ *   id is also written onto it here by hand. Either way the error describes
+ *   the group rather than one option.
+ * - `aria-invalid` is left to the control. It is permitted on `radiogroup`,
+ *   which Base UI sets from the field's validity, and not on `group` — the
+ *   role a `<fieldset>` has — so a plain fieldset carries `data-invalid` for
+ *   styling and announces its error through the description alone.
+ * - `disabled` goes to both the field and the fieldset. The fieldset's context
+ *   is what every `Field.Root` inside it reads, so a `Checkbox` in a disabled
+ *   `Fieldset` greys and refuses input without being told.
+ *
+ * The message sits *after* the grouping element, inside the wrapper, because a
+ * `radiogroup` owns radios and an `alert` among them is a child the role does
+ * not allow.
+ */
+export const GroupFrame = forwardRef<HTMLElement, GroupFrameProps>(function GroupFrame(
+  { legend, error, helperText, disabled, className, render, children, ...props },
+  ref,
+) {
+  const styles = frame({ invalid: Boolean(error) });
+  const messageId = useId();
+  const hasMessage = Boolean(error || helperText);
+
+  return (
+    <BaseField.Root
+      data-slot="fieldset-field"
+      className={styles.root()}
+      invalid={Boolean(error)}
+      disabled={disabled}
+    >
+      <BaseFieldset.Root
+        ref={ref}
+        render={render}
+        disabled={disabled}
+        data-slot="fieldset"
+        data-invalid={error ? '' : undefined}
+        aria-describedby={hasMessage ? messageId : undefined}
+        className={styles.group({ class: className })}
+        {...props}
+      >
+        {legend}
+        {children}
+      </BaseFieldset.Root>
+      <FieldMessage error={error} helperText={helperText} id={messageId} slot="fieldset" />
+    </BaseField.Root>
+  );
+});
+
+export interface FieldItemProps {
+  label?: string;
+  /** Guidance for this one option, described on it alone. */
+  helperText?: string;
+  /** Disables this option without disabling the rest of the group. */
+  disabled?: boolean;
+  children: ReactNode;
+}
+
+/**
+ * One option inside a group: its own label and description, the group's
+ * error.
+ *
+ * A `Field.Item`, not a nested `Field.Root`. A second root would give the
+ * option a field of its own, and the group's control — the `radiogroup` —
+ * would stop seeing the option's hidden input, which is the half that makes
+ * the selected value appear in `FormData`. `Field.Item` scopes only the label
+ * and description, and inherits the group's message ids, so the group error
+ * still reaches each option's `aria-describedby` while the option's own
+ * guidance reaches that option only.
+ *
+ * The label is the `inline` one `FieldFrame` gives a boolean — the control
+ * inside it, so the words are the hit target.
+ */
+export function FieldItem({ label, helperText, disabled, children }: FieldItemProps) {
+  const styles = frame({ layout: 'inline' });
+
+  return (
+    <BaseField.Item data-slot="field-item" className="flex flex-col gap-1" disabled={disabled}>
+      {label ? (
+        <BaseField.Label data-slot="field-label" className={styles.label()}>
+          {children}
+          {label}
+        </BaseField.Label>
+      ) : (
+        children
+      )}
+      {helperText && (
+        <BaseField.Description
+          data-slot="field-description"
+          // Indented past the control, so the guidance sits under its words.
+          className={styles.message({ class: 'pl-9' })}
+          render={<span />}
+        >
+          &gt; {helperText}
+        </BaseField.Description>
+      )}
+    </BaseField.Item>
+  );
+}

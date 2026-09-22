@@ -3,7 +3,8 @@ import { recipe } from '../lib/recipe';
 /**
  * The surface a boolean control wears, in its two presentations.
  *
- * `Checkbox` and `Switch` are one capability — a boolean — drawn twice, so the
+ * `Checkbox` and `Switch` are one capability — a boolean — drawn twice (and
+ * `Radio` is one option of a set, drawn a third time), so the
  * border weight, the checked fill, the disabled treatment and the invalid
  * border are declared **once** and selected by `shape`. Two recipes would
  * drift, and the drift would show up as a switch that disagrees with the
@@ -39,6 +40,21 @@ export const booleanControl = recipe({
           'size-6 cursor-pointer items-center justify-center '
           + 'data-[checked]:bg-[var(--field-accent)] data-[indeterminate]:bg-[var(--field-accent)]',
         mark: 'font-mono text-sm font-bold leading-none text-content-inverse',
+      },
+      /**
+       * The same box holding a solid square: the radio. One option of a set
+       * is a boolean too — selected or not — so it wears this surface rather
+       * than a third one.
+       *
+       * Square, not round, because the radius is zero everywhere (DESIGN.md)
+       * and a circle would be the one exception. What tells it from a checkbox
+       * is the mark instead: a checkbox *fills* with the accent and carries an
+       * `X`; a radio stays on the base surface and carries a smaller solid
+       * square, so a set of them never reads as a set of ticks.
+       */
+      dot: {
+        control: 'size-6 cursor-pointer items-center justify-center',
+        mark: 'size-2.5 bg-[var(--field-accent)] data-[disabled]:bg-content-muted',
       },
       /** A track the thumb travels along: the switch. */
       track: {

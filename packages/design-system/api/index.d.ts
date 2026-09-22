@@ -774,6 +774,76 @@ interface SwitchProps extends BooleanFieldProps {
 
 declare const Switch: react.ForwardRefExoticComponent<SwitchProps & react.RefAttributes<HTMLSpanElement>>;
 
+interface LegendProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
+
+    className?: string;
+
+    children?: ReactNode;
+}
+
+declare const Legend: react.ForwardRefExoticComponent<LegendProps & react.RefAttributes<HTMLDivElement>>;
+interface FieldsetProps extends Omit<HTMLAttributes<HTMLFieldSetElement>, 'className' | 'children'> {
+
+    legend?: string;
+
+    error?: string;
+
+    helperText?: string;
+
+    disabled?: boolean;
+
+    className?: string;
+
+    children: ReactNode;
+}
+
+declare const Fieldset: react.ForwardRefExoticComponent<FieldsetProps & react.RefAttributes<HTMLFieldSetElement>>;
+
+interface RadioGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className' | 'children' | 'defaultValue' | 'onChange'> {
+
+    legend?: string;
+
+    error?: string;
+
+    helperText?: string;
+
+    accent?: AccentToken;
+
+    value?: string;
+
+    defaultValue?: string;
+
+    onValueChange?: (value: string) => void;
+
+    name?: string;
+
+    disabled?: boolean;
+
+    readOnly?: boolean;
+
+    required?: boolean;
+
+    className?: string;
+
+    children: ReactNode;
+}
+
+declare const RadioGroup: react.ForwardRefExoticComponent<RadioGroupProps & react.RefAttributes<HTMLDivElement>>;
+interface RadioProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'className' | 'onChange'> {
+
+    value: string;
+
+    label?: string;
+
+    helperText?: string;
+
+    disabled?: boolean;
+
+    className?: string;
+}
+
+declare const Radio: react.ForwardRefExoticComponent<RadioProps & react.RefAttributes<HTMLSpanElement>>;
+
 interface SwatchProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
 
     value: string;
@@ -1667,6 +1737,8 @@ export {
   ExperimentsView,
   type ExperimentsViewProps,
   FIXED_COLOURS,
+  Fieldset,
+  type FieldsetProps,
   type Finding,
   type FixedColour,
   GitHubIcon,
@@ -1681,6 +1753,8 @@ export {
   type InputProps,
   type Intent,
   LEVELS,
+  Legend,
+  type LegendProps,
   type LevelDefinition,
   LinkedInIcon,
   LoremIpsumPost,
@@ -1721,6 +1795,10 @@ export {
   RECOMMENDED_COLOUR_PROPERTIES,
   RECOMMENDED_COLOUR_ROLES,
   RECOMMENDED_COLOUR_VARS,
+  Radio,
+  RadioGroup,
+  type RadioGroupProps,
+  type RadioProps,
   type RecommendedColourClass,
   type RecommendedColourNamespace,
   type RecommendedColourProperty,
