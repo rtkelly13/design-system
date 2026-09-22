@@ -93,6 +93,7 @@ export function Input({
   /** Merged onto the control itself, not the label-and-error group. */
   className = '',
   id,
+  style,
   ...props
 }: InputProps) {
   const styles = field({ invalid: Boolean(error) });
@@ -102,7 +103,7 @@ export function Input({
       <BaseField.Control
         id={id}
         data-slot="field-control"
-        style={accentStyle(accent)}
+        style={accentStyle(accent, style)}
         // `class` is the recipe's override slot: it merges in rather than being
         // appended after, so a caller's utility actually wins.
         className={styles.control({ class: className })}
@@ -129,6 +130,7 @@ export function TextArea({
   /** Merged onto the control itself, not the label-and-error group. */
   className = '',
   id,
+  style,
   ...props
 }: TextAreaProps) {
   const styles = field({ shape: 'box', invalid: Boolean(error) });
@@ -148,7 +150,7 @@ export function TextArea({
             {...controlProps}
             {...props}
             id={id}
-            style={accentStyle(accent)}
+            style={accentStyle(accent, style)}
             className={styles.control({ class: className })}
           />
         )}
@@ -182,6 +184,7 @@ export function Select({
   /** Merged onto the control itself, not the label-and-error group. */
   className = '',
   id,
+  style,
   ...props
 }: SelectProps) {
   const styles = field({ invalid: Boolean(error), interactive: true });
@@ -194,7 +197,7 @@ export function Select({
             {...controlProps}
             {...props}
             id={id}
-            style={accentStyle(accent)}
+            style={accentStyle(accent, style)}
             className={styles.control({ class: className })}
           >
             {options.map((opt) => (

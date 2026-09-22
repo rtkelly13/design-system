@@ -181,4 +181,20 @@ describe('form controls address roles, not colours', () => {
       expect(node.className, `${node.tagName} pins a palette entry`).not.toMatch(FORBIDDEN);
     }
   });
+
+  it.each([
+    ['Input', () => <Input label="Name" style={{ width: '320px' }} />],
+    ['TextArea', () => <TextArea label="Notes" style={{ width: '320px' }} />],
+    [
+      'Select',
+      () => <Select label="Plan" options={[{ value: 'a', label: 'A' }]} style={{ width: '320px' }} />,
+    ],
+  ])('%s merges a caller style with the accent rather than either replacing the other', (_, ui) => {
+    const { container } = render(ui());
+    const styled = Array.from(container.querySelectorAll<HTMLElement>('[style]')).find(
+      (el) => el.style.width === '320px',
+    );
+    expect(styled).toBeDefined();
+    expect(styled?.style.getPropertyValue('--field-accent')).not.toBe('');
+  });
 });

@@ -747,14 +747,14 @@ declare function Input({ label, error, helperText,
 
 accent,
 
-className, id, ...props }: InputProps): react.JSX.Element;
+className, id, style, ...props }: InputProps): react.JSX.Element;
 interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'>, FieldProps {
 }
 declare function TextArea({ label, error, helperText,
 
 accent,
 
-className, id, ...props }: TextAreaProps): react.JSX.Element;
+className, id, style, ...props }: TextAreaProps): react.JSX.Element;
 interface SelectOption {
     label: string;
     value: string;
@@ -766,7 +766,7 @@ declare function Select({ label, error, helperText, options,
 
 accent,
 
-className, id, ...props }: SelectProps): react.JSX.Element;
+className, id, style, ...props }: SelectProps): react.JSX.Element;
 
 interface CheckboxProps extends BooleanFieldProps {
 
