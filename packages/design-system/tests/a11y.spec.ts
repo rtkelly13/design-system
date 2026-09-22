@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -89,6 +89,52 @@ function pinsItsOwnLevel(id: string): boolean {
   return /--(dark|sketch|midnight)-mode$|--all-levels$/.test(id);
 }
 
+/**
+ * Base UI's focus guards, and nothing else.
+ *
+ * Every Base UI popup (Menu, Popover, the dialogs) plants these beside its
+ * trigger and around its popup: `aria-hidden="true"` `tabindex="0"` spans
+ * whose only job is to catch Tab and redirect focus into or out of the popup
+ * on the same event. Focus never rests on one, and a screen reader's virtual
+ * cursor never lands on one because it is hidden. axe cannot see the
+ * redirect, so it reports `aria-hidden-focus` whenever no dialog is open —
+ * an open `Menu`, say. With a dialog open it marks the same spans
+ * needs-review instead, which is why `Modal` and `Popover` never tripped it.
+ *
+ * Excluded by the attribute Base UI stamps on them rather than budgeted in
+ * `KNOWN`, because a count would also hide a real `aria-hidden-focus`, like
+ * the dismiss control #272 fixed. The test below plants one of those inside
+ * an open menu and asserts it is still reported.
+ */
+const FOCUS_GUARD = '[data-base-ui-focus-guard]';
+
+/** The asserted scope, minus Base UI's focus guards, serious or not. */
+async function scan(page: Page) {
+  const { violations } = await new AxeBuilder({ page })
+    .include('[data-a11y-scope]')
+    // Focus guards only: see `FOCUS_GUARD` above.
+    .exclude(FOCUS_GUARD)
+    .options({ resultTypes: ['violations'] })
+    .analyze();
+  return violations;
+}
+
+/**
+ * Mark the story root and every surface the story portalled to `body` as the
+ * scope `scan` reads.
+ */
+async function markScope(page: Page) {
+  await page.evaluate(`(() => {
+    const isStorySurface = ${IS_STORY_SURFACE};
+    document.getElementById('storybook-root')?.setAttribute('data-a11y-scope', '');
+    for (const el of Array.from(document.body.children)) {
+      if (el.id !== 'storybook-root' && isStorySurface(el)) {
+        el.setAttribute('data-a11y-scope', '');
+      }
+    }
+  })()`);
+}
+
 test.describe('Accessibility', () => {
   for (const level of LEVELS) {
     for (const id of assertedStoryIds()) {
@@ -124,20 +170,9 @@ test.describe('Accessibility', () => {
         // the one `waitForStoryRendered` uses, so the two cannot disagree about
         // what the story rendered. Page-level rules an isolated story trips —
         // no `main`, no `h1` — are moderate, below the serious bar this counts.
-        await page.evaluate(`(() => {
-          const isStorySurface = ${IS_STORY_SURFACE};
-          document.getElementById('storybook-root')?.setAttribute('data-a11y-scope', '');
-          for (const el of Array.from(document.body.children)) {
-            if (el.id !== 'storybook-root' && isStorySurface(el)) {
-              el.setAttribute('data-a11y-scope', '');
-            }
-          }
-        })()`);
+        await markScope(page);
 
-        const { violations } = await new AxeBuilder({ page })
-          .include('[data-a11y-scope]')
-          .options({ resultTypes: ['violations'] })
-          .analyze();
+        const violations = await scan(page);
 
         const serious = violations.filter(
           (v) => v.impact === 'serious' || v.impact === 'critical',
@@ -232,4 +267,44 @@ test.describe('DataTable semantics', () => {
       });
     }
   }
+});
+
+/**
+ * The exclusion is narrow: it removes Base UI's focus guards and nothing else.
+ *
+ * An open menu carries six guards, which is what the exclusion exists for.
+ * Planted beside them are the two shapes of the real defect — a focusable
+ * element that is itself `aria-hidden`, and a button under an `aria-hidden`
+ * ancestor — and both must still be reported, while no guard is.
+ */
+test('the focus-guard exclusion still reports a real aria-hidden-focus', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'One project is enough to prove the scope');
+  const id = 'foundations-menu--actions';
+  await page.goto(`/iframe.html?id=${id}&viewMode=story`);
+  await waitForStoryRendered(page, id);
+  await expect(page.locator('[data-slot="menu"]')).toBeVisible();
+  expect(await page.locator(FOCUS_GUARD).count()).toBeGreaterThan(0);
+
+  await page.evaluate(() => {
+    const menu = document.querySelector('[data-slot="menu"]');
+    const span = document.createElement('span');
+    span.setAttribute('aria-hidden', 'true');
+    span.tabIndex = 0;
+    span.id = 'planted-span';
+    const wrapper = document.createElement('div');
+    wrapper.setAttribute('aria-hidden', 'true');
+    wrapper.id = 'planted-wrapper';
+    const button = document.createElement('button');
+    button.id = 'planted-button';
+    button.textContent = 'Hidden';
+    wrapper.append(button);
+    menu?.append(span, wrapper);
+  });
+  await markScope(page);
+
+  const hidden = (await scan(page)).find((v) => v.id === 'aria-hidden-focus');
+  const targets = (hidden?.nodes ?? []).map((n) => n.html);
+  expect(targets.some((html) => html.includes('planted-span'))).toBe(true);
+  expect(targets.some((html) => html.includes('planted-wrapper'))).toBe(true);
+  expect(targets.some((html) => html.includes('data-base-ui-focus-guard'))).toBe(false);
 });
