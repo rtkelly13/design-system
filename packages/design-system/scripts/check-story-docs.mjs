@@ -107,7 +107,7 @@ const MIN_STORIES = 3;
  * never rise. Lower it in the same commit that documents a component. This gate
  * is finished when the number is 0 and this constant is deleted.
  */
-const CEILING = 43;
+const CEILING = 42;
 
 const EXCLUDED = {
   'Showcase/DesignSandbox': {

@@ -18,7 +18,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:docs` | figures written in prose against the source they describe — `--list` for the census |
 | `pnpm check:skills` | the agent-facing skills tree (`skills/**/SKILL.md`) parses and its frontmatter is schema-valid |
 | `pnpm check:doc-snippets` | props and level names in documentation code fences against `api/index.d.ts` |
-| `pnpm check:component-docs` | every component carries a JSDoc — a ratchet, budget **18** |
+| `pnpm check:component-docs` | every component carries a JSDoc — a ratchet, budget **14** |
 | `pnpm check:component-contract` | refs, `displayName`, `recipe`, prop spreading — a per-clause ratchet |
 | `pnpm check:licences` | every shipped package against `licenses.baseline.json`, default-deny |
 | `pnpm check:reference-material` | unlicensed reference artwork stays out of the tree, and its catalogue stays in it |
@@ -29,7 +29,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:visual-coverage` | every component has an asserted story, or a stated reason |
 | `pnpm check:docgen-props` | every documented component publishes its props, and the components manifest carries them |
 | `pnpm check:story-conventions` | story title vocabulary, and an autodocs decision per component |
-| `pnpm check:story-docs` | what a component page actually tells a reader — docs page, description, three samples, story captions, prop docs. A ratchet, ceiling **43** |
+| `pnpm check:story-docs` | what a component page actually tells a reader — docs page, description, three samples, story captions, prop docs. A ratchet, ceiling **42** |
 | `pnpm check:deployed` | the live Storybook against this build — deliberately **not** a PR gate |
 | `pnpm release:train --dry-run` | why the last train did or did not depart — assessment only, moves nothing |
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |

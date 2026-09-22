@@ -58,10 +58,10 @@ const PROVIDERS = {
 const BUDGET = {
   untested: 24,
   inlineStyle: 170,
-  ref: 34,
+  ref: 33,
   displayName: 0,
   recipe: 11,
-  spread: 23,
+  spread: 21,
 };
 
 const CLAUSE = {
