@@ -132,8 +132,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * that yields to the reader, is exactly the part #243 says not to write.
  *
  * Raised again for `DataTable`'s semantics (#245): +2,473 B raw, +704 B gzip
- * on the ESM bundle over `main` with `Toast` in it (265,279 B / 62,659 B;
- * CommonJS 291,553 B / 64,888 B). That is the per-header sort button with its
+ * on the ESM bundle over `main` with `Toast` in it, and additive with the
+ * disabled-checkbox fix (#274) that landed beside it (265,997 B / 62,908 B;
+ * CommonJS 292,271 B / 65,114 B). That is the per-header sort button with its
  * description, `aria-sort` for the primary sort key, `scope` on every header
  * and the row-header cell, `caption`, and the `aria-rowcount` /
  * `aria-rowindex` arithmetic for a windowed body. TanStack supplies none of
@@ -142,13 +143,13 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 266_300,
-    maxGzip: 62_900,
+    maxRaw: 267_300,
+    maxGzip: 63_300,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 292_600,
-    maxGzip: 65_100,
+    maxRaw: 293_700,
+    maxGzip: 65_500,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
