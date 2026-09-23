@@ -9,6 +9,57 @@ Proper release notes start at 1.0. Until then this file records only what a
 consumer has to *do*, newest first. The reasoning lives in the pull requests and
 in [`docs/adr/`](./docs/adr/).
 
+## 0.10.0
+
+The capability release: every row in [`docs/capability-readiness.md`](./docs/capability-readiness.md)
+but *Choose one* is `ready`, so a site can be built without inventing its own interaction
+behaviour. The themed `Select` that finishes that row is a breaking change and follows in 0.11.0.
+
+### You have to do something
+
+- **Nothing, for imports.** No export was removed or renamed; 120 were added. The entry points,
+  `files`, runtime dependencies and peer dependencies are the same as 0.9.0.
+- **If you pass `BlogPost` an `author` string other than the default name**, the card now shows that
+  author — their own initials, no description — instead of the default author's initials and bio.
+  Pass a `BlogAuthor` object (`name`, `initials`, `avatar`, `url`, `description`) to describe them,
+  or `authorCard` to replace the card. Omitting `author` is unchanged.
+- **If you pass `SaasLandingPage` `deployLog=""`**, the terminal preview is now hidden, as the prop
+  always documented.
+
+### Rendering changed
+
+- **`Pagination` renders a numbered page list** rather than previous/next alone.
+- **A `DataTable` with `pageSize` now paginates:** one page of rows, with `Pagination` beneath when
+  there is more than one page. It also renders `caption`, row headers, `scope` and `aria-sort`.
+- **Portalled surfaces follow a scoped `ThemeProvider`.** `Modal`, `AlertDialog`, `Drawer`, `Toast`,
+  `Tooltip`, `Popover` and `Menu` rendered inside `<ThemeProvider scoped>` take that provider's Level,
+  not the document's. Under an unscoped provider nothing changes.
+- **`SaasLandingPage`** is now composed from the marketing sections. Its prices use the display
+  face (they had fallen back to the system sans-serif), and its grids drop to one column below `md`
+  instead of overflowing a phone's width.
+
+### New
+
+- **Forms:** `Checkbox`, `Switch`, `Fieldset` + `Legend`, `RadioGroup` + `Radio`, and
+  `ErrorSummary` — a form-level summary that links to each invalid field and takes focus when it
+  appears.
+- **Feedback:** `Spinner`, `Skeleton`, `Progress`, `EmptyState`, and `ToastProvider` / `useToast`.
+- **Overlays:** `Drawer`, `Tooltip`, `Popover` and `Menu`, all on Base UI.
+- **Navigation:** `Tabs`, `SiteHeader` (skip link, breakpoint swap), `SiteNav` + `SiteNavItem`,
+  `MobileNav` and `SiteFooter`, with `LinkProvider` / `SiteLink` to inject a router's link and its
+  current-route test once. `DocsLinkProvider` keeps its API and now shares that context.
+- **Layout:** `AppShell` with `AppSidebar`, `AppSidebarNav`, `AppTopbar` and `AppMain`.
+- **Marketing:** `Hero`, `FeatureGrid` + `Feature`, `PricingGrid` + `PricingTier`, `CTASection`.
+- **Reports:** `ReportDocument`, `ReportSection`, `ReportDetails`.
+- **`BlogPost`:** `BlogAuthor` and the `authorCard` slot.
+
+### Fixed
+
+- `Input`, `TextArea` and `Select` merge a caller's `style` with the accent instead of losing it.
+- `TextArea` and `Select` put their `id` on the control, so the label's `for` points at it and a
+  click on the label focuses the field.
+- `Card` forwards its ref.
+
 ## 0.9.0
 
 `Modal` on Base UI's dialog, and the `AlertDialog` that had to ship with it.
