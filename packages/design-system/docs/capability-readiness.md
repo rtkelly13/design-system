@@ -34,8 +34,8 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 
 Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` with #243, *Display
 records* with #245, *Context actions*, *Explain an icon/control* and *Show contextual content*
-with #166, *Application layout* with #247, and *Primary site navigation*, *Mobile
-navigation* and *General site layout* with #246.
+with #166, *Application layout* with #247, *Primary site navigation*, *Mobile
+navigation* and *General site layout* with #246, and *Long-form content* with #250.
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -63,7 +63,7 @@ navigation* and *General site layout* with #246.
 | Paginate | `Pagination` — numbered pages, callback or `href` mode | `ready` | |
 | Display records | `Table` / `DataTable` — sorting, virtualisation, `caption`, row headers | `ready` | |
 | Display metrics | `StatCard` and the chart family | `ready` | |
-| Long-form content | `Prose` / `BlogPost` | `partial` — `BlogPost`'s author card is hard-coded | [#250](https://github.com/rtkelly13/design-system/issues/250) |
+| Long-form content | `Prose` / `BlogPost` — the author card from a `BlogAuthor` (name, initials, `Avatar`, link, description) or the `authorCard` slot | `ready` | |
 | Documentation | the docs system (`DocsLayout`, `CodeTabs`, …) | `ready` | |
 | Marketing | composable marketing sections | `partial` — `SaasLandingPage` is one monolith | [#248](https://github.com/rtkelly13/design-system/issues/248) |
 | Application layout | `AppShell` + `AppSidebar` / `AppSidebarNav` / `AppTopbar` / `AppMain` — sidebar off-canvas in a `Drawer` below desktop width | `ready` | |

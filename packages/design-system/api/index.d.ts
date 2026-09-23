@@ -1700,15 +1700,35 @@ interface SlideDeckProps {
 
 declare const SlideDeck: react__default.FC<SlideDeckProps>;
 
+interface BlogAuthor {
+
+    name: string;
+
+    initials?: string;
+
+    avatar?: ReactNode;
+
+    url?: string;
+
+    description?: string;
+}
+
 interface BlogPostProps {
+
     title: string;
+
     subtitle?: string;
-    author?: string;
+
+    author?: string | BlogAuthor;
+
+    authorCard?: react__default.ReactNode;
+
     date: string;
 
     readingTime?: string;
 
     tags?: string[];
+
     children: react__default.ReactNode;
 }
 
@@ -2078,6 +2098,7 @@ export {
   BarChart,
   type BarChartDatum,
   type BarChartProps,
+  type BlogAuthor,
   BlogPost,
   type BlogPostProps,
   BlueskyIcon,
