@@ -79,6 +79,9 @@ export * from './components/Switch';
 // choose-one control built on that frame rather than beside it.
 export * from './components/Fieldset';
 export * from './components/RadioGroup';
+// The form-level half of validation (issue 50): the field errors above,
+// gathered at the top of the form as links that move focus to each field.
+export * from './components/ErrorSummary';
 export * from './components/Swatch';
 export * from './components/StatCard';
 export * from './components/Table';

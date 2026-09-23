@@ -183,16 +183,28 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * breakpoint and keeping it open on a cancelled click (302,861 B /
  * 70,208 B; CommonJS 332,713 B / 72,598 B): a media-query subscription and
  * the context that carries `collapseAt` into the slot.
+ *
+ * Raised again for `ErrorSummary` (issue 50): +4,231 B raw, +1,061 B gzip on
+ * the ESM bundle over `main` with the site chrome in it (302,861 B /
+ * 70,208 B → 307,092 B / 71,269 B; CommonJS 332,713 B / 72,598 B →
+ * 337,126 B / 73,733 B, +4,413 B / +1,135 B). That is one exported
+ * component, its recipe's class strings, the focus-on-appear effect, and the
+ * link handler that resolves an id to the control that should take focus —
+ * the visible `Checkbox` or `Switch` rather than the hidden input the id sits
+ * on, and a `RadioGroup`'s roving radio — then scrolls its label into view.
+ * `TextArea` and `Select` move their `id` onto `Field.Control`, which is a
+ * few bytes either way. No comment ships and no dependency moves:
+ * `check:dep-cost` is unchanged.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 304_400,
-    maxGzip: 70_600,
+    maxRaw: 308_600,
+    maxGzip: 71_600,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 334_400,
-    maxGzip: 73_000,
+    maxRaw: 338_800,
+    maxGzip: 74_100,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

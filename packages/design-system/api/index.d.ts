@@ -850,6 +850,29 @@ interface RadioProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'className' |
 
 declare const Radio: react.ForwardRefExoticComponent<RadioProps & react.RefAttributes<HTMLSpanElement>>;
 
+interface ErrorSummaryError {
+
+    id: string;
+
+    message: string;
+}
+interface ErrorSummaryProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'className' | 'children'> {
+
+    errors: readonly ErrorSummaryError[];
+
+    title?: string;
+
+    headingLevel?: 2 | 3 | 4 | 5 | 6;
+
+    focusOnAppear?: boolean;
+
+    children?: ReactNode;
+
+    className?: string;
+}
+
+declare const ErrorSummary: react.ForwardRefExoticComponent<ErrorSummaryProps & react.RefAttributes<HTMLElement>>;
+
 interface SwatchProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
 
     value: string;
@@ -2171,6 +2194,9 @@ export {
   type Emphasis,
   EmptyState,
   type EmptyStateProps,
+  ErrorSummary,
+  type ErrorSummaryError,
+  type ErrorSummaryProps,
   type ExperimentItem,
   ExperimentsView,
   type ExperimentsViewProps,
