@@ -5,7 +5,8 @@ import { Checkbox } from '../../components/Checkbox';
 import { ErrorSummary } from '../../components/ErrorSummary';
 import type { ErrorSummaryError } from '../../components/ErrorSummary';
 import { Fieldset } from '../../components/Fieldset';
-import { Input, Select, TextArea } from '../../components/Input';
+import { Input, TextArea } from '../../components/Input';
+import { Select } from '../../components/Select';
 import { Radio, RadioGroup } from '../../components/RadioGroup';
 import { Switch } from '../../components/Switch';
 
@@ -205,7 +206,7 @@ export function AccountSettingsForm({
             label="Time zone"
             options={TIMEZONES}
             value={values.timezone}
-            onChange={(e) => update('timezone', e.target.value)}
+            onValueChange={(next) => update('timezone', next)}
             helperText="Used for the dates in notifications"
           />
           <RadioGroup

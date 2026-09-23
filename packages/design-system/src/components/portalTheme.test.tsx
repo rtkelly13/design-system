@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useEffect } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AlertDialog } from './AlertDialog';
@@ -7,6 +7,7 @@ import { Drawer } from './Drawer';
 import { Menu, MenuItem } from './Menu';
 import { Modal } from './Modal';
 import { Popover } from './Popover';
+import { Select } from './Select';
 import { ThemeProvider } from './ThemeProvider';
 import { ToastProvider, useToast } from './Toast';
 import { Tooltip } from './Tooltip';
@@ -78,6 +79,20 @@ describe('portalled overlays keep a scoped Level', () => {
     );
     await waitFor(() => expect(screen.getByText(text)).toBeDefined());
     expect(levelOf(text)).toBe('sketch');
+  });
+
+  // `Select` has no `defaultOpen` to pass, so the list is opened the way a
+  // reader opens it.
+  it('Select resolves its colours from the scoped provider, not the document', async () => {
+    document.documentElement.setAttribute('data-theme', 'midnight');
+    render(
+      <ThemeProvider scoped defaultLevel="sketch">
+        <Select label="Region" options={[{ label: 'EU West', value: 'eu-west-1' }]} />
+      </ThemeProvider>,
+    );
+    fireEvent.click(screen.getByRole('combobox', { name: 'Region' }));
+    const list = await screen.findByRole('listbox');
+    expect(list.closest('[data-theme]')?.getAttribute('data-theme')).toBe('sketch');
   });
 
   it('Toast resolves its colours from the scoped provider, not the document', async () => {

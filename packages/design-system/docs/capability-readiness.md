@@ -36,7 +36,8 @@ Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` wit
 records* with #245, *Context actions*, *Explain an icon/control* and *Show contextual content*
 with #166, *Application layout* with #247, *Primary site navigation*, *Mobile
 navigation* and *General site layout* with #246, *Long-form content* with #250, *Validation* with
-#50, and *Marketing* with #248.
+#50, *Marketing* with #248, and *Choose one* with #164 (`Select`'s list painted by the palette, with
+`native` kept for the platform picker).
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -48,7 +49,7 @@ navigation* and *General site layout* with #246, *Long-form content* with #250, 
 | Explain an icon/control | `Tooltip` | `ready` | |
 | Show contextual content | `Popover` | `ready` | |
 | Enter text | `Input` / `TextArea` | `ready` | |
-| Choose one | `Select` / `RadioGroup` | `partial` — `RadioGroup` covers a visible set; `Select` is still the native list | [#164](https://github.com/rtkelly13/design-system/issues/164) |
+| Choose one | `Select` / `RadioGroup` | `ready` | |
 | Choose many | `Checkbox` | `ready` | |
 | Toggle state | `Switch` | `ready` | |
 | Group fields | `Fieldset` + `Legend` | `ready` | |
