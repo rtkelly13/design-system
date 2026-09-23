@@ -115,6 +115,27 @@ cannot silently restore the deadlock. The selection is a pure function in
 `scripts/release-train-checks.mjs` with tests covering both deadlocks — the train's failure mode
 is a green run that did nothing, which no other gate could see.
 
+### And a fourth: `production` was never allowed to deploy
+
+With all three fixed, the train departed on 23 September — `production` moved from `f7cefd3` to
+`157cf3d` — and the domain still served the 21 September build. No deployment was created at all:
+the GitHub deployment list went on showing only `Preview – design-system-storybook` builds of
+`main`.
+
+`vercel.json` gated creation to `main`, `preview` and `slot/*`, with `"**": false` for everything
+else, and `ignoreCommand` repeated the same list. Both were written (#212) while the domain still
+followed `main`; when `shared-utilities` moved it to `productionBranch: 'production'`, nothing here
+added that branch. So the train could advance the pointer forever and Vercel would refuse every
+push to it — the pointer moving was never evidence of a deployment.
+
+`production` is now in both lists. Vercel reads `vercel.json` from the commit it is deploying, so
+the fix reaches the domain only once a train has carried it onto `production`.
+
+The train's own health check did not notice either. It reads the latest deployment of every
+environment whose name contains `production` among the last 15, and the storybook project's had
+long fallen out of that window behind previews — so it saw `Production – design-system`, a
+different project that deploys `main`, report success, and read that as this site being healthy.
+
 ### Reading a train
 
 `pnpm release:train --dry-run` prints the same assessment the workflow does and moves nothing —
@@ -135,7 +156,7 @@ the repository, for two independent reasons:
 
 1. **Feature branches do not deploy at all, and that is two gates, not one.**
    `git.deploymentEnabled` in `vercel.json` refuses to *create* a deployment for any
-   branch outside `main`, `preview` and `slot/N`; `ignoreCommand` is the same list
+   branch outside `main`, `production`, `preview` and `slot/N`; `ignoreCommand` is the same list
    again, as a skip for anything that reaches the build step anyway. Only the first
    one saves the quota: a skipped deployment is still created, still shows as
    canceled, and still spends one of the 100 deployments per day. Before the creation
