@@ -1917,8 +1917,11 @@ declare const DEFAULT_PRICING_TIERS: PricingTier[];
 
 declare const DEFAULT_DEPLOY_LOG = "$ platform deploy --environment production\n[\u2713] Connecting to local datastore... OK\n[\u2713] Verifying 1,420 records against checksum... OK\n[\u2713] Running automation rules... APPLIED\n[\u2713] Versioned backup written to ./backups/2026-01-01/\n[*] Surface ready! Server active on http://localhost:8000";
 interface SaasLandingPageProps {
+
     title?: string;
+
     subtitle?: string;
+
     pricingTiers?: PricingTier[];
 
     deployLog?: string;
