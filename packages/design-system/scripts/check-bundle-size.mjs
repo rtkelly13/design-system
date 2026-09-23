@@ -197,6 +197,20 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * `check:dep-cost` is unchanged. Re-measured after rebasing onto #284's
  * author card, which landed first inside the old ceilings (308,218 B /
  * 71,610 B; CommonJS 338,276 B / 74,083 B).
+ *
+ * Raised again for the marketing sections (issue 248): +1,736 B raw, +960 B
+ * gzip on the ESM bundle over the site chrome's measurement above
+ * (302,861 B / 70,208 B → 304,597 B / 71,168 B; CommonJS 332,713 B /
+ * 72,598 B → 335,044 B / 73,637 B, +2,331 B / +1,039 B). Six exported
+ * components — `Hero`, `FeatureGrid`, `Feature`, `PricingGrid`,
+ * `PricingTier`, `CTASection` — over one internal `SectionGrid`, with their
+ * four recipes and the per-column and per-accent class strings written out
+ * for Tailwind's scanner. Part of it is offset by `SaasLandingPage`, whose
+ * hero, feature cards and price tiers were inline-style objects and are now
+ * those components, which is the likeliest reason the raw rise is small
+ * against the gzip one. `Card` gains
+ * `forwardRef`, which the cells need to forward theirs. No dependency moves:
+ * the tick is one more named import from `lucide-react`, external here.
  */
 const BUDGETS = {
   'dist/index.mjs': {

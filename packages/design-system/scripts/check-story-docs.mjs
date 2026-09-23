@@ -178,6 +178,10 @@ const UNSTORIED = {
   AppSidebarNav: 'Part of the `Foundations/AppShell` composition. See `AppSidebar`.',
   AppTopbar: 'Part of the `Foundations/AppShell` composition. See `AppSidebar`.',
   AppMain: 'Part of the `Foundations/AppShell` composition. See `AppSidebar`.',
+  Feature:
+    'The cell of `Foundations/FeatureGrid`, documented and asserted there as a subcomponent. A feature outside its grid is a `Card` panel with an icon, which `Foundations/Card` already shows; the grid is where its accent and spacing mean anything.',
+  PricingTier:
+    'The cell of `Foundations/PricingGrid`, documented and asserted there as a subcomponent. A tier on its own page loses the thing it is built for — its action lining up with its neighbours’ however long each feature list is.',
 };
 
 /** Read the JSDoc text attached to a node, if any. */
