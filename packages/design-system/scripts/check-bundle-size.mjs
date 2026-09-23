@@ -211,16 +211,30 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * against the gzip one. `Card` gains
  * `forwardRef`, which the cells need to forward theirs. No dependency moves:
  * the tick is one more named import from `lucide-react`, external here.
+ *
+ * Raised again for the themed `Select` (issue 164): +7,428 B raw, +1,630 B
+ * gzip on the ESM bundle over `main` with the marketing sections in it
+ * (309,954 B / 72,573 B → 317,382 B / 74,203 B; CommonJS 340,607 B /
+ * 75,133 B → 348,556 B / 76,745 B, +7,949 B / +1,612 B). Measured locally
+ * on Linux, where `main` reproduced the runner's figures above to the byte.
+ * That is `Select.tsx`: both presentations — the listbox and the `native`
+ * `<select>` — the list recipe with its row states and the disabled-row
+ * keydown filter. `FieldFrame` gains the non-native label the
+ * trigger needs, and `Input.tsx` loses the old native `Select`. The listbox,
+ * its typeahead, positioning and hidden form input are
+ * `@base-ui/react/select`, external here and weighed by `check:dep-cost`,
+ * which records the rise; the chevron is one more named import from
+ * `lucide-react`.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 311_600,
-    maxGzip: 73_000,
+    maxRaw: 319_000,
+    maxGzip: 74_600,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 342_400,
-    maxGzip: 75_600,
+    maxRaw: 350_400,
+    maxGzip: 77_150,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
