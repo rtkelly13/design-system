@@ -131,6 +131,12 @@ push to it — the pointer moving was never evidence of a deployment.
 `production` is now in both lists. Vercel reads `vercel.json` from the commit it is deploying, so
 the fix reaches the domain only once a train has carried it onto `production`.
 
+The first attempt at that (#288) broke every deployment instead. Spelling `production` out as one
+more `==` took `ignoreCommand` to 279 characters; Vercel caps it at 256 and rejects the whole config
+past that, so both projects failed on every commit — previews of `main` included — with nothing but
+"Deployment failed". The branch list is now one anchored regex, and
+`scripts/vercel-config.test.mjs` pins the length and which refs build.
+
 The train's own health check did not notice either. It reads the latest deployment of every
 environment whose name contains `production` among the last 15, and the storybook project's had
 long fallen out of that window behind previews — so it saw `Production – design-system`, a
