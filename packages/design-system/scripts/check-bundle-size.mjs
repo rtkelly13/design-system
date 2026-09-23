@@ -198,10 +198,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * author card, which landed first inside the old ceilings (308,218 B /
  * 71,610 B; CommonJS 338,276 B / 74,083 B).
  *
- * Raised again for the marketing sections (issue 248): +1,736 B raw, +960 B
- * gzip on the ESM bundle over the site chrome's measurement above
- * (302,861 B / 70,208 B → 304,597 B / 71,168 B; CommonJS 332,713 B /
- * 72,598 B → 335,044 B / 73,637 B, +2,331 B / +1,039 B). Six exported
+ * Raised again for the marketing sections (issue 248): +1,736 B raw, +963 B
+ * gzip on the ESM bundle over `ErrorSummary`'s measurement above
+ * (308,218 B / 71,610 B → 309,954 B / 72,573 B; CommonJS 338,276 B /
+ * 74,083 B → 340,607 B / 75,133 B, +2,331 B / +1,050 B). Six exported
  * components — `Hero`, `FeatureGrid`, `Feature`, `PricingGrid`,
  * `PricingTier`, `CTASection` — over one internal `SectionGrid`, with their
  * four recipes and the per-column and per-accent class strings written out
@@ -214,13 +214,13 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 309_800,
-    maxGzip: 72_000,
+    maxRaw: 311_600,
+    maxGzip: 73_000,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 340_000,
-    maxGzip: 74_500,
+    maxRaw: 342_400,
+    maxGzip: 75_600,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
