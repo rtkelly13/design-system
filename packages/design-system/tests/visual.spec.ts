@@ -149,6 +149,16 @@ const CASES: readonly VisualCase[] = [
   // an input pair, so the frame is asserted around something other than radios.
   { id: 'foundations-radiogroup--all-states', snapshot: 'radiogroup-all-states.png' },
   { id: 'foundations-fieldset--all-states', snapshot: 'fieldset-all-states.png' },
+  // The form layer's proof (issue 50): one account-settings form holding every
+  // control, a disabled one, required ones, helper text and field errors, in
+  // the state after a failed save — so `ErrorSummary` is asserted with focus
+  // on it and five links, and the a11y suite axes the error state, which is
+  // the one that fails. `fullPage`: the form runs past the fold.
+  {
+    id: 'foundations-errorsummary--account-settings',
+    snapshot: 'errorsummary-account-settings.png',
+    fullPage: true,
+  },
   { id: 'foundations-statcard--system-health', snapshot: 'statcard-system-health.png' },
   { id: 'foundations-datatable--virtualized', snapshot: 'datatable-virtualized.png' },
   // The semantics at rest (#245): a caption, a row-header column in the body
@@ -263,7 +273,7 @@ const INTERACTIONS: readonly InteractionCase[] = [
  * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
  * to look" at.
  *
- * Deliberately fifteen, not forty-one. Each is a committed PNG a human reviews on
+ * Deliberately sixteen, not forty-one. Each is a committed PNG a human reviews on
  * every change, and the point is the layout that *differs* at this width — a
  * second copy of a component that renders identically is cost without evidence.
  * `Drawer` is the sixth and the clearest case for the rule: it is the one
@@ -333,6 +343,14 @@ const MOBILE_CASES: readonly VisualCase[] = [
     id: 'foundations-mobilenav--with-group',
     snapshot: 'mobilenav-with-group-mobile.png',
     onScreen: '[data-slot="drawer"]',
+  },
+  // The account-settings proof (issue 50) at a phone's width: the profile row's
+  // two columns stack, and the summary's links and the long field errors wrap —
+  // a layout the desktop row never reaches.
+  {
+    id: 'foundations-errorsummary--account-settings',
+    snapshot: 'errorsummary-account-settings-mobile.png',
+    fullPage: true,
   },
 ];
 

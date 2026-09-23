@@ -114,6 +114,22 @@ describe('TextArea', () => {
     expect(screen.getByText('> Required')).toBeDefined();
   });
 
+  // Regression: the element `render` returned set its own `id` after Base
+  // UI's, so the label's `for` named an id no element had. The accessible
+  // name survived through `aria-labelledby`, which is why the test above
+  // passed; a click on the label focused nothing.
+  it('points the label at the control, with or without an explicit id', () => {
+    const { container, rerender } = render(<TextArea label="Notes" />);
+    const label = () => container.querySelector('label') as HTMLLabelElement;
+
+    expect(label().htmlFor).toBe(container.querySelector('textarea')?.id);
+    expect(label().htmlFor).not.toBe('');
+
+    rerender(<TextArea label="Notes" id="notes" />);
+    expect(container.querySelector('textarea')?.id).toBe('notes');
+    expect(label().htmlFor).toBe('notes');
+  });
+
   it('forwards textarea attributes', () => {
     render(<TextArea label="Notes" rows={7} />);
 
@@ -137,6 +153,19 @@ describe('Select', () => {
     render(<Select label="Mode" options={options} />);
 
     expect(screen.getByLabelText('Mode').tagName).toBe('SELECT');
+  });
+
+  // Same label regression as TextArea.
+  it('points the label at the control, with or without an explicit id', () => {
+    const { container, rerender } = render(<Select label="Mode" options={options} />);
+    const label = () => container.querySelector('label') as HTMLLabelElement;
+
+    expect(label().htmlFor).toBe(container.querySelector('select')?.id);
+    expect(label().htmlFor).not.toBe('');
+
+    rerender(<Select label="Mode" options={options} id="mode" />);
+    expect(container.querySelector('select')?.id).toBe('mode');
+    expect(label().htmlFor).toBe('mode');
   });
 
   // Same regression as TextArea.

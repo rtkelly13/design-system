@@ -35,7 +35,8 @@ icon/control* row. A row is `ready` only against what is on `main`, never agains
 Assessed against `main` after #271 (`Pagination`); *Notify* moved to `ready` with #243, *Display
 records* with #245, *Context actions*, *Explain an icon/control* and *Show contextual content*
 with #166, *Application layout* with #247, *Primary site navigation*, *Mobile
-navigation* and *General site layout* with #246, and *Long-form content* with #250.
+navigation* and *General site layout* with #246, *Long-form content* with #250, and *Validation*
+with #50.
 
 | Capability | System answer | Status | Issue |
 |---|---|---|---|
@@ -59,7 +60,7 @@ navigation* and *General site layout* with #246, and *Long-form content* with #2
 | Loading | `Spinner` / `Skeleton` | `ready` | |
 | Progress | `Progress` | `ready` | |
 | No content | `EmptyState` | `ready` | |
-| Validation | field `error` + `ErrorSummary` | `partial` — per-field errors only, no summary | [#50](https://github.com/rtkelly13/design-system/issues/50) |
+| Validation | field `error` + `ErrorSummary` — links to each invalid field, focus moves to the summary when it appears | `ready` | |
 | Paginate | `Pagination` — numbered pages, callback or `href` mode | `ready` | |
 | Display records | `Table` / `DataTable` — sorting, virtualisation, `caption`, row headers | `ready` | |
 | Display metrics | `StatCard` and the chart family | `ready` | |

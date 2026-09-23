@@ -135,6 +135,10 @@ export function TextArea({
 }: TextAreaProps) {
   const styles = field({ shape: 'box', invalid: Boolean(error) });
 
+  // `id` goes to `Field.Control`, not onto the element `render` returns. Set
+  // there, it overwrote the id the label's `for` points at — with the
+  // caller's, or with `undefined` when none was given — so a click on the
+  // words focused nothing. The name survived only through `aria-labelledby`.
   return (
     <FieldFrame label={label} error={error} helperText={helperText}>
       {/*
@@ -145,11 +149,11 @@ export function TextArea({
         of the right type.
       */}
       <BaseField.Control
+        id={id}
         render={(controlProps) => (
           <textarea
             {...controlProps}
             {...props}
-            id={id}
             style={accentStyle(accent, style)}
             className={styles.control({ class: className })}
           />
@@ -189,14 +193,15 @@ export function Select({
 }: SelectProps) {
   const styles = field({ invalid: Boolean(error), interactive: true });
 
+  // `id` on `Field.Control`, for the reason `TextArea` gives.
   return (
     <FieldFrame label={label} error={error} helperText={helperText}>
       <BaseField.Control
+        id={id}
         render={(controlProps) => (
           <select
             {...controlProps}
             {...props}
-            id={id}
             style={accentStyle(accent, style)}
             className={styles.control({ class: className })}
           >
