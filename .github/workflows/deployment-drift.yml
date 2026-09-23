@@ -10,7 +10,7 @@
 # Two reasons, and both are structural rather than preference.
 #
 # 1. **`vercel.json` deliberately does not build feature branches.** Its
-#    `ignoreCommand` exits 1 (build) only for `main`, `preview`, `slot/N`, or a
+#    `ignoreCommand` exits 1 (build) only for `main`, `production`, `preview`, `slot/N`, or a
 #    commit message tagged `[deploy]`/`[preview]`/`[storybook]`; everything else
 #    exits 0 (skip). A Vercel check made required would therefore never turn
 #    green on an ordinary branch, and every pull request would block forever.
