@@ -4,11 +4,33 @@ import { PageTitle } from '../PageTitle';
 import { Card } from '../Card';
 import { Badge } from '../Badge';
 import { AsciiDivider } from '../AsciiDivider';
+import { SiteLink } from '../LinkProvider';
+import { deriveInitials, resolveAuthor } from './author';
+import type { Author } from './author';
+
+export type { Author } from './author';
 
 export interface BlogPostProps {
+  /** The post's title, set as a bracketed `PageTitle`. */
   title: string;
+  /** A line under the title — the standfirst. Omitted when not supplied. */
   subtitle?: string;
-  author?: string;
+  /**
+   * Who wrote it. Omit it for the site's own author — the byline and author
+   * card render exactly as they always have. A string is a name: the default
+   * author's name gets the default card whole, any other gets just that name,
+   * with derived initials and no description. An `Author` object sets every
+   * field the card shows, and only those it sets are shown.
+   */
+  author?: string | Author;
+  /**
+   * Replaces the author card under the body — the slot for anything an
+   * `Author` cannot express, such as a bio with links or several authors. It
+   * is rendered inside the post's `<footer>`; `null` or `false` removes the
+   * footer. The byline row still reads `author`.
+   */
+  authorCard?: React.ReactNode;
+  /** The publication date, shown in the byline row exactly as given. */
   date: string;
   /**
    * Reading time, e.g. `'9 min read'`. Omitted from the byline row when not
@@ -18,6 +40,7 @@ export interface BlogPostProps {
   readingTime?: string;
   /** Topic tags in the header. Omitted entirely when not supplied or empty. */
   tags?: string[];
+  /** The article body. Wrap Markdown output in `Prose`; this applies no typography. */
   children: React.ReactNode;
 }
 
@@ -34,14 +57,22 @@ export interface BlogPostProps {
  * made — a nine-thousand-word article confidently advertising "5 min read".
  * Each is simply omitted from the header when absent.
  *
- * `author` *does* default, to `'Ryan Kelly'`. That is defensible where the
- * other two are not: the byline of a personal site is the same on almost every
- * post, where a reading time and a topic list differ on all of them. Override
- * it for a guest post.
+ * `author` *does* default, to the site's own author. That is defensible where
+ * the other two are not: the byline of a personal site is the same on almost
+ * every post, where a reading time and a topic list differ on all of them. The
+ * default lives outside this file, and every field of it — name, initials,
+ * avatar, link, description — is overridable: pass an `Author` for a guest
+ * post, or `authorCard` for a card an `Author` cannot describe.
  *
  * ```tsx
  * <BlogPost title="Where a theme stops applying" date="2026-08-11"
  *           readingTime="9 min read" tags={['CSS', 'Design systems']}>
+ *   <Prose>{content}</Prose>
+ * </BlogPost>
+ *
+ * <BlogPost title="A guest post" date="2026-09-01"
+ *           author={{ name: 'Ada King Lovelace', url: 'https://example.com',
+ *                     description: 'Analyst, Analytical Engine' }}>
  *   <Prose>{content}</Prose>
  * </BlogPost>
  * ```
@@ -49,12 +80,15 @@ export interface BlogPostProps {
 export const BlogPost: React.FC<BlogPostProps> = ({
   title,
   subtitle,
-  author = 'Ryan Kelly',
+  author: authorProp,
+  authorCard,
   date,
   readingTime,
   tags,
   children,
 }) => {
+  const author = resolveAuthor(authorProp);
+  const initials = author.initials ?? deriveInitials(author.name);
   return (
     <article
       style={{
@@ -87,7 +121,7 @@ export const BlogPost: React.FC<BlogPostProps> = ({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <User size={15} />
-            <span>{author}</span>
+            <span>{author.name}</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -128,35 +162,51 @@ export const BlogPost: React.FC<BlogPostProps> = ({
       <AsciiDivider />
 
       {/* Author Bio Footer */}
-      <footer style={{ marginTop: '3rem' }}>
-        <Card style={{ borderColor: 'var(--ds-accent-primary)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                backgroundColor: 'var(--ds-accent-primary)',
-                color: 'var(--ds-text-inverse)',
-                fontWeight: 900,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
-              }}
-            >
-              RK
-            </div>
-            <div>
-              <h4 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', margin: 0, fontSize: '1.1rem', fontWeight: 800, textTransform: 'uppercase' }}>
-                Written by {author}
-              </h4>
-              <span style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.8rem', color: 'var(--ds-accent-secondary)' }}>
-                ryankelly.dev • Systems Architecture & Brutalist UI
-              </span>
-            </div>
-          </div>
-        </Card>
-      </footer>
+      {authorCard !== null && authorCard !== false && (
+        <footer style={{ marginTop: '3rem' }}>
+          {authorCard === undefined ? (
+            <Card style={{ borderColor: 'var(--ds-accent-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                {author.avatar ?? (
+                  <div
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: 'var(--ds-accent-primary)',
+                      color: 'var(--ds-text-inverse)',
+                      fontWeight: 900,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif',
+                    }}
+                  >
+                    {initials}
+                  </div>
+                )}
+                <div>
+                  <h4 style={{ fontFamily: 'var(--font-space-grotesk, "Space Grotesk"), sans-serif', margin: 0, fontSize: '1.1rem', fontWeight: 800, textTransform: 'uppercase' }}>
+                    Written by {author.url ? (
+                      <SiteLink href={author.url} className="text-inherit underline decoration-2 underline-offset-4">
+                        {author.name}
+                      </SiteLink>
+                    ) : (
+                      author.name
+                    )}
+                  </h4>
+                  {author.description ? (
+                    <span style={{ fontFamily: 'var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace', fontSize: '0.8rem', color: 'var(--ds-accent-secondary)' }}>
+                      {author.description}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            </Card>
+          ) : (
+            authorCard
+          )}
+        </footer>
+      )}
     </article>
   );
 };

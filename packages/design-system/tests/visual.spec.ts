@@ -124,6 +124,12 @@ const CASES: readonly VisualCase[] = [
   { id: 'docs-docssidebar--default', snapshot: 'docssidebar-default.png' },
 
   { id: 'blog-blogpost--full-metadata', snapshot: 'blogpost-full-metadata.png', fullPage: true },
+  // The author card as data and as a slot (issue 250): a guest's derived
+  // initials, link and bio; an `Avatar` in the initials' place; and the
+  // `authorCard` slot replacing the card. The default card is the row above.
+  { id: 'blog-blogpost--guest-author', snapshot: 'blogpost-guest-author.png', fullPage: true },
+  { id: 'blog-blogpost--with-avatar', snapshot: 'blogpost-with-avatar.png', fullPage: true },
+  { id: 'blog-blogpost--custom-author-card', snapshot: 'blogpost-custom-author-card.png', fullPage: true },
   { id: 'presentation-slide--with-subtitle', snapshot: 'slide-with-subtitle.png' },
   { id: 'showcase-experimentsview--default', snapshot: 'experimentsview-default.png', fullPage: true },
 
