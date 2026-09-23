@@ -42,13 +42,15 @@ export const DEFAULT_AUTHOR: BlogAuthor = {
 // Lovelace` is `AL`. Words split on whitespace only, so `Jean-Luc Picard` is
 // `JP`. Letters are taken by code point rather than UTF-16 unit, so a name
 // beginning outside the BMP is not cut in half. An empty name gives `''`.
+// Uppercased without a locale, so a server and the browser hydrating its
+// markup agree whatever their locales are: `ipek` is `I`, never Turkish `İ`.
 export function deriveInitials(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (words.length === 0) return '';
   const first = (word: string) => Array.from(word)[0] ?? '';
   const letters =
     words.length === 1 ? first(words[0]) : first(words[0]) + first(words[words.length - 1]);
-  return letters.toLocaleUpperCase();
+  return letters.toUpperCase();
 }
 
 // A string is a name. Naming the default author gets the default author

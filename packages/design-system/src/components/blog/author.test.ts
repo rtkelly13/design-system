@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_AUTHOR, deriveInitials, resolveAuthor } from './author';
 
 describe('deriveInitials', () => {
@@ -24,6 +24,20 @@ describe('deriveInitials', () => {
 
   it('takes a whole code point, not half a surrogate pair', () => {
     expect(deriveInitials('\u{1D49C}da Lovelace')).toBe('\u{1D49C}L');
+  });
+
+  it("uppercases without the runtime's locale, so server and client agree", () => {
+    // A Turkish runtime maps `i` to dotted `İ` under locale-aware casing.
+    const spy = vi
+      .spyOn(String.prototype, 'toLocaleUpperCase')
+      .mockImplementation(function (this: string) {
+        return this.replace(/i/g, 'İ').toUpperCase();
+      });
+    try {
+      expect(deriveInitials('ipek yilmaz')).toBe('IY');
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   it('gives an empty name no initials', () => {
