@@ -9,10 +9,12 @@ Proper release notes start at 1.0. Until then this file records only what a
 consumer has to *do*, newest first. The reasoning lives in the pull requests and
 in [`docs/adr/`](./docs/adr/).
 
-## Unreleased
+## 0.11.0
 
 `Select` themed on Base UI's select: the open list is painted by the Level, not the operating
-system (#164).
+system (#164). With it the last row of [`docs/capability-readiness.md`](./docs/capability-readiness.md)
+is `ready`. Breaking only for `Select`: no export was added or removed, and the entry points,
+dependencies and peer dependencies are the same as 0.10.0.
 
 ### You have to do something
 
