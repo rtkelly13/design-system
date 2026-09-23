@@ -6,9 +6,9 @@ import { Badge } from '../Badge';
 import { AsciiDivider } from '../AsciiDivider';
 import { SiteLink } from '../LinkProvider';
 import { deriveInitials, resolveAuthor } from './author';
-import type { Author } from './author';
+import type { BlogAuthor } from './author';
 
-export type { Author } from './author';
+export type { BlogAuthor } from './author';
 
 export interface BlogPostProps {
   /** The post's title, set as a bracketed `PageTitle`. */
@@ -19,13 +19,13 @@ export interface BlogPostProps {
    * Who wrote it. Omit it for the site's own author — the byline and author
    * card render exactly as they always have. A string is a name: the default
    * author's name gets the default card whole, any other gets just that name,
-   * with derived initials and no description. An `Author` object sets every
+   * with derived initials and no description. A `BlogAuthor` object sets every
    * field the card shows, and only those it sets are shown.
    */
-  author?: string | Author;
+  author?: string | BlogAuthor;
   /**
    * Replaces the author card under the body — the slot for anything an
-   * `Author` cannot express, such as a bio with links or several authors. It
+   * `BlogAuthor` cannot express, such as a bio with links or several authors. It
    * is rendered inside the post's `<footer>`; `null` or `false` removes the
    * footer. The byline row still reads `author`.
    */
@@ -61,8 +61,8 @@ export interface BlogPostProps {
  * the other two are not: the byline of a personal site is the same on almost
  * every post, where a reading time and a topic list differ on all of them. The
  * default lives outside this file, and every field of it — name, initials,
- * avatar, link, description — is overridable: pass an `Author` for a guest
- * post, or `authorCard` for a card an `Author` cannot describe.
+ * avatar, link, description — is overridable: pass a `BlogAuthor` for a guest
+ * post, or `authorCard` for a card a `BlogAuthor` cannot describe.
  *
  * ```tsx
  * <BlogPost title="Where a theme stops applying" date="2026-08-11"

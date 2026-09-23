@@ -79,7 +79,7 @@ export const PartialMetadata: Story = {
 };
 
 /**
- * A guest post: an `Author` object names someone else, and the whole card
+ * A guest post: a `BlogAuthor` object names someone else, and the whole card
  * follows it. The initials are derived — first and last word, so `Ada King
  * Lovelace` is `AL` — the name links to `url`, and the line under it is the
  * guest's own `description` rather than the site owner's.
@@ -144,7 +144,7 @@ export const WithoutUrl: Story = {
 };
 
 /**
- * The `authorCard` slot, for what an `Author` cannot express — here two
+ * The `authorCard` slot, for what a `BlogAuthor` cannot express — here two
  * authors. It replaces the whole card inside the post's footer; the byline row
  * still reads `author`. Pass `null` to drop the footer altogether.
  */

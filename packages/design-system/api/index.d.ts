@@ -1700,7 +1700,7 @@ interface SlideDeckProps {
 
 declare const SlideDeck: react__default.FC<SlideDeckProps>;
 
-interface Author {
+interface BlogAuthor {
 
     name: string;
 
@@ -1719,7 +1719,7 @@ interface BlogPostProps {
 
     subtitle?: string;
 
-    author?: string | Author;
+    author?: string | BlogAuthor;
 
     authorCard?: react__default.ReactNode;
 
@@ -2091,7 +2091,6 @@ export {
   type AppTopbarProps,
   AsciiDivider,
   type AsciiDividerProps,
-  type Author,
   Avatar,
   type AvatarProps,
   Badge,
@@ -2099,6 +2098,7 @@ export {
   BarChart,
   type BarChartDatum,
   type BarChartProps,
+  type BlogAuthor,
   BlogPost,
   type BlogPostProps,
   BlueskyIcon,

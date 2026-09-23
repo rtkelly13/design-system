@@ -63,7 +63,7 @@ navigation* and *General site layout* with #246, and *Long-form content* with #2
 | Paginate | `Pagination` — numbered pages, callback or `href` mode | `ready` | |
 | Display records | `Table` / `DataTable` — sorting, virtualisation, `caption`, row headers | `ready` | |
 | Display metrics | `StatCard` and the chart family | `ready` | |
-| Long-form content | `Prose` / `BlogPost` — the author card from an `Author` (name, initials, `Avatar`, link, description) or the `authorCard` slot | `ready` | |
+| Long-form content | `Prose` / `BlogPost` — the author card from a `BlogAuthor` (name, initials, `Avatar`, link, description) or the `authorCard` slot | `ready` | |
 | Documentation | the docs system (`DocsLayout`, `CodeTabs`, …) | `ready` | |
 | Marketing | composable marketing sections | `partial` — `SaasLandingPage` is one monolith | [#248](https://github.com/rtkelly13/design-system/issues/248) |
 | Application layout | `AppShell` + `AppSidebar` / `AppSidebarNav` / `AppTopbar` / `AppMain` — sidebar off-canvas in a `Drawer` below desktop width | `ready` | |

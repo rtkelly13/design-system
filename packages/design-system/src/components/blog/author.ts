@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 /** Who wrote a post, as `BlogPost`'s byline and author card display it. */
-export interface Author {
+export interface BlogAuthor {
   /** Shown in the byline row and after "Written by" in the author card. */
   name: string;
   /**
@@ -32,7 +32,7 @@ export interface Author {
 // `initials` is left to derivation, which gives `RK`, and there is no `url`:
 // the card has never linked the name, and a link would move the default's
 // rendering.
-export const DEFAULT_AUTHOR: Author = {
+export const DEFAULT_AUTHOR: BlogAuthor = {
   name: 'Ryan Kelly',
   description: 'ryankelly.dev • Systems Architecture & Brutalist UI',
 };
@@ -55,7 +55,7 @@ export function deriveInitials(name: string): string {
 // whole, so `author="Ryan Kelly"` renders exactly as omitting the prop does;
 // any other name gets only itself, so a guest is never given the default's
 // description.
-export function resolveAuthor(author: string | Author | undefined): Author {
+export function resolveAuthor(author: string | BlogAuthor | undefined): BlogAuthor {
   if (author === undefined) return DEFAULT_AUTHOR;
   if (typeof author === 'string') {
     return author === DEFAULT_AUTHOR.name ? DEFAULT_AUTHOR : { name: author };
