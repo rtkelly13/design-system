@@ -131,6 +131,14 @@ export * from './components/SiteNav';
 export * from './components/MobileNav';
 export * from './components/SiteFooter';
 
+// Marketing sections (issue 248): the parts a landing page is composed from.
+// Layouts that hold no copy — `SaasLandingPage` below is one composition of
+// them, and the `SaaS/LandingPage` stories build two more.
+export * from './components/marketing/Hero';
+export * from './components/marketing/FeatureGrid';
+export * from './components/marketing/PricingGrid';
+export * from './components/marketing/CTASection';
+
 // Transient notifications. Not an overlay: a toast shares neither the
 // positioning nor the dismissal model of Tooltip/Popover/Menu — it is a queue,
 // a live region and a lifetime (#243).

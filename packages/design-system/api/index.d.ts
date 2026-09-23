@@ -423,7 +423,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
     variant?: CardVariant;
 }
 
-declare function Card({ title, description, imgSrc, href, asciiArt, filename, children, className, accent, badge, panel, variant, style, ...props }: CardProps): react.JSX.Element;
+declare const Card: react.ForwardRefExoticComponent<CardProps & react.RefAttributes<HTMLDivElement>>;
 
 interface BadgeProps extends react__default.HTMLAttributes<HTMLSpanElement> {
 
@@ -1424,6 +1424,133 @@ interface SiteFooterProps extends Omit<HTMLAttributes<HTMLElement>, 'children' |
 
 declare const SiteFooter: react.ForwardRefExoticComponent<SiteFooterProps & react.RefAttributes<HTMLElement>>;
 
+type SectionColumns = 2 | 3 | 4;
+
+type SectionAlign = 'center' | 'start';
+
+interface HeroProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'children' | 'className'> {
+
+    title: ReactNode;
+
+    subtitle?: string;
+
+    eyebrow?: ReactNode;
+
+    actions?: ReactNode;
+
+    children?: ReactNode;
+
+    bracketed?: boolean;
+
+    align?: SectionAlign;
+
+    className?: string;
+}
+
+declare const Hero: react.ForwardRefExoticComponent<HeroProps & react.RefAttributes<HTMLElement>>;
+
+interface FeatureGridProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'className'> {
+
+    title?: ReactNode;
+
+    description?: ReactNode;
+
+    columns?: SectionColumns;
+
+    align?: SectionAlign;
+
+    children?: ReactNode;
+
+    className?: string;
+}
+
+declare const FeatureGrid: react.ForwardRefExoticComponent<FeatureGridProps & react.RefAttributes<HTMLElement>>;
+interface FeatureProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+
+    title: string;
+
+    icon?: ReactNode;
+
+    accent?: AccentToken;
+
+    children?: ReactNode;
+
+    className?: string;
+}
+
+declare const Feature: react.ForwardRefExoticComponent<FeatureProps & react.RefAttributes<HTMLDivElement>>;
+
+interface PricingGridProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'className'> {
+
+    title?: ReactNode;
+
+    description?: ReactNode;
+
+    columns?: SectionColumns;
+
+    align?: SectionAlign;
+
+    children?: ReactNode;
+
+    className?: string;
+}
+
+declare const PricingGrid: react.ForwardRefExoticComponent<PricingGridProps & react.RefAttributes<HTMLElement>>;
+
+type PricingTierAccent = 'primary' | 'secondary' | 'tertiary';
+interface PricingTierProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+
+    name: ReactNode;
+
+    price: ReactNode;
+
+    period?: ReactNode;
+
+    description?: ReactNode;
+
+    features?: readonly ReactNode[];
+
+    accent?: PricingTierAccent;
+
+    badge?: string;
+
+    action?: ReactNode;
+
+    className?: string;
+}
+
+interface PricingTier {
+    name: string;
+    price: string;
+    period?: string;
+    description: string;
+    features: string[];
+
+    accent: PricingTierAccent;
+    highlighted?: boolean;
+    ctaText?: string;
+}
+
+declare const PricingTier: react.ForwardRefExoticComponent<PricingTierProps & react.RefAttributes<HTMLDivElement>>;
+
+type CTASectionAccent = 'primary' | 'secondary' | 'tertiary';
+interface CTASectionProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'children' | 'className'> {
+
+    title: ReactNode;
+
+    children?: ReactNode;
+
+    actions?: ReactNode;
+
+    accent?: CTASectionAccent;
+
+    align?: SectionAlign;
+
+    className?: string;
+}
+
+declare const CTASection: react.ForwardRefExoticComponent<CTASectionProps & react.RefAttributes<HTMLElement>>;
+
 type ToastIntent = 'info' | 'success' | 'warning' | 'danger';
 
 interface ToastActionOptions {
@@ -1786,28 +1913,20 @@ declare const ExperimentsView: react__default.FC<ExperimentsViewProps>;
 
 declare const DesignSandbox: react__default.FC;
 
-interface PricingTier {
-    name: string;
-    price: string;
-    period?: string;
-    description: string;
-    features: string[];
-
-    accent: 'primary' | 'secondary' | 'tertiary';
-    highlighted?: boolean;
-    ctaText?: string;
-}
-
 declare const DEFAULT_PRICING_TIERS: PricingTier[];
 
 declare const DEFAULT_DEPLOY_LOG = "$ platform deploy --environment production\n[\u2713] Connecting to local datastore... OK\n[\u2713] Verifying 1,420 records against checksum... OK\n[\u2713] Running automation rules... APPLIED\n[\u2713] Versioned backup written to ./backups/2026-01-01/\n[*] Surface ready! Server active on http://localhost:8000";
 interface SaasLandingPageProps {
+
     title?: string;
+
     subtitle?: string;
+
     pricingTiers?: PricingTier[];
 
     deployLog?: string;
 }
+
 declare const SaasLandingPage: react__default.FC<SaasLandingPageProps>;
 
 interface AdminNavItem {
@@ -2077,7 +2196,7 @@ declare const mdxComponents: {
     NoteBlock: react.FC<NoteBlockProps>;
     TLDR: react.FC<TLDRProps>;
     Badge: react.ForwardRefExoticComponent<BadgeProps & react.RefAttributes<HTMLSpanElement>>;
-    Card: typeof Card;
+    Card: react.ForwardRefExoticComponent<CardProps & react.RefAttributes<HTMLDivElement>>;
     Tag: react.ForwardRefExoticComponent<TagProps & react.RefAttributes<HTMLAnchorElement | HTMLSpanElement>>;
     AsciiDivider: react.FC<DividerProps>;
     CodeBlock: typeof CodeBlock;
@@ -2139,6 +2258,9 @@ export {
   type ButtonProps,
   type ButtonVariant,
   CSS_MEDIUM,
+  CTASection,
+  type CTASectionAccent,
+  type CTASectionProps,
   Card,
   type CardProps,
   type CardVariant,
@@ -2201,6 +2323,10 @@ export {
   ExperimentsView,
   type ExperimentsViewProps,
   FIXED_COLOURS,
+  Feature,
+  FeatureGrid,
+  type FeatureGridProps,
+  type FeatureProps,
   Fieldset,
   type FieldsetProps,
   type Finding,
@@ -2210,6 +2336,8 @@ export {
   type GlyphProps,
   HEADING_EMPHASIS,
   type HeadingLevel,
+  Hero,
+  type HeroProps,
   type Hue,
   type HueAgreementCheck,
   type HueRef,
@@ -2267,7 +2395,11 @@ export {
   type Polarity,
   Popover,
   type PopoverProps,
-  type PricingTier,
+  PricingGrid,
+  type PricingGridProps,
+  PricingTier,
+  type PricingTierAccent,
+  type PricingTierProps,
   Progress,
   type ProgressProps,
   Prose,
@@ -2299,6 +2431,8 @@ export {
   SYSTEM_LEVEL,
   SaasLandingPage,
   type SaasLandingPageProps,
+  type SectionAlign,
+  type SectionColumns,
   SectionContainer,
   type SectionContainerProps,
   Select,

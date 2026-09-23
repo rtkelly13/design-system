@@ -111,6 +111,12 @@ const CASES: readonly VisualCase[] = [
   // A group open on load: the `Menu` its links open in, anchored to the nav.
   { id: 'foundations-sitenav--with-children', snapshot: 'sitenav-with-children.png' },
   { id: 'foundations-sitefooter--columns', snapshot: 'sitefooter-columns.png' },
+  // The marketing sections (issue 248), one row per section, each a layout
+  // holding only the fixture copy its story passes it.
+  { id: 'foundations-hero--default', snapshot: 'hero-default.png' },
+  { id: 'foundations-featuregrid--default', snapshot: 'featuregrid-default.png', fullPage: true },
+  { id: 'foundations-pricinggrid--default', snapshot: 'pricinggrid-default.png', fullPage: true },
+  { id: 'foundations-ctasection--default', snapshot: 'ctasection-default.png' },
   { id: 'foundations-sectioncontainer--default', snapshot: 'sectioncontainer-default.png' },
 
   { id: 'docs-breadcrumbs--default', snapshot: 'breadcrumbs-default.png' },
@@ -186,6 +192,11 @@ const CASES: readonly VisualCase[] = [
   { id: 'saas-admindashboardlayout--sketch-mode', snapshot: 'admin-dashboard-sketch.png', fullPage: true },
   { id: 'saas-landingpage--dark-mode', snapshot: 'saas-landing-midnight.png', fullPage: true },
   { id: 'saas-landingpage--sketch-mode', snapshot: 'saas-landing-sketch.png', fullPage: true },
+  // Two more landing pages from the same sections as `SaasLandingPage` (issue
+  // 248): a different order and a different set, one with pricing and one
+  // without. Neither pins a Level, so the a11y suite axes both on both.
+  { id: 'saas-landingpage--product-launch', snapshot: 'saas-landing-product-launch.png', fullPage: true },
+  { id: 'saas-landingpage--project-site', snapshot: 'saas-landing-project-site.png', fullPage: true },
 
   // Chart Primitives
   { id: 'foundations-barchart--vertical', snapshot: 'barchart-vertical.png' },
@@ -273,7 +284,7 @@ const INTERACTIONS: readonly InteractionCase[] = [
  * `AGENTS.md` says plainly that it is not a gate and its report is "nobody's job
  * to look" at.
  *
- * Deliberately sixteen, not forty-one. Each is a committed PNG a human reviews on
+ * Deliberately eighteen, not forty-one. Each is a committed PNG a human reviews on
  * every change, and the point is the layout that *differs* at this width — a
  * second copy of a component that renders identically is cost without evidence.
  * `Drawer` is the sixth and the clearest case for the rule: it is the one
@@ -352,6 +363,11 @@ const MOBILE_CASES: readonly VisualCase[] = [
     snapshot: 'errorsummary-account-settings-mobile.png',
     fullPage: true,
   },
+  // The marketing sections' breakpoint (issue 248): every grid drops to one
+  // column below `md` and the hero's actions wrap. Both composed pages, since
+  // the point of the issue is that two different pages survive this width.
+  { id: 'saas-landingpage--product-launch', snapshot: 'saas-landing-product-launch-mobile.png', fullPage: true },
+  { id: 'saas-landingpage--project-site', snapshot: 'saas-landing-project-site-mobile.png', fullPage: true },
 ];
 
 test.describe('Design System Visual Regression - Narrow viewport', () => {
