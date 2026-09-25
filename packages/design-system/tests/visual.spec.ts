@@ -222,6 +222,32 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-skeleton--loading-card', snapshot: 'skeleton-loading-card.png' },
   { id: 'foundations-progress--accents', snapshot: 'progress-accents.png' },
   { id: 'foundations-emptystate--first-run', snapshot: 'emptystate-first-run.png' },
+  // mdxcn-derived documentation visuals. Each renderer gets a representative
+  // capture on both levels. Compositions prove that related visuals share one frame.
+  { id: 'docs-figureframe--editorial-figure', snapshot: 'figureframe-editorial.png' },
+  { id: 'docs-figureframe--sketch-theme', snapshot: 'figureframe-sketch.png' },
+  { id: 'docs-flowdiagram--optimistic-ui', snapshot: 'flowdiagram-optimistic.png' },
+  { id: 'docs-flowdiagram--sketch-theme', snapshot: 'flowdiagram-sketch.png' },
+  { id: 'docs-timeline--shipped', snapshot: 'timeline-shipped.png' },
+  { id: 'docs-timeline--sketch-theme', snapshot: 'timeline-sketch.png' },
+  { id: 'docs-changesummary--default', snapshot: 'changesummary-default.png' },
+  { id: 'docs-changesummary--sketch-theme', snapshot: 'changesummary-sketch.png' },
+  { id: 'docs-beforeafter--default', snapshot: 'beforeafter-default.png' },
+  { id: 'docs-beforeafter--sketch-theme', snapshot: 'beforeafter-sketch.png' },
+  { id: 'docs-uptimestrip--default', snapshot: 'uptimestrip-default.png' },
+  { id: 'docs-uptimestrip--sketch-theme', snapshot: 'uptimestrip-sketch.png' },
+  { id: 'docs-treediagram--default', snapshot: 'treediagram-default.png' },
+  { id: 'docs-treediagram--sketch-theme', snapshot: 'treediagram-sketch.png' },
+  { id: 'docs-activitygrid--blog-posting-cadence', snapshot: 'activitygrid-blog.png' },
+  { id: 'docs-activitygrid--sketch-theme', snapshot: 'activitygrid-sketch.png' },
+  { id: 'docs-ganttchart--editorial-calendar', snapshot: 'ganttchart-editorial.png' },
+  { id: 'docs-ganttchart--sketch-theme', snapshot: 'ganttchart-sketch.png' },
+  { id: 'docs-figurecompositions--incident-report', snapshot: 'figurecompositions-incident.png' },
+  { id: 'docs-figurecompositions--editorial-plan', snapshot: 'figurecompositions-editorial.png' },
+  { id: 'docs-terminal--default', snapshot: 'terminal-default.png' },
+  { id: 'docs-terminal--sketch-theme', snapshot: 'terminal-sketch.png' },
+  { id: 'docs-steps--default', snapshot: 'steps-default.png' },
+  { id: 'docs-steps--sketch-theme', snapshot: 'steps-sketch.png' },
 ];
 
 /**

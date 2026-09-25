@@ -10,6 +10,25 @@ import { Badge } from '../Badge';
 import { Card } from '../Card';
 import { Tag } from '../Tag';
 import { AsciiDivider } from '../AsciiDivider';
+import {
+  FigureFrame,
+  ActivityGrid,
+  BeforeAfter,
+  ChangeSummary,
+  FlowDiagram,
+  GanttChart,
+  Timeline,
+  TreeDiagram,
+  UptimeStrip,
+  Event,
+  Line,
+  Node,
+  Path,
+  Slope,
+  Step,
+  Steps,
+  Terminal,
+} from './figures';
 
 /**
  * Pull `language-ts` off the `<code>` child that MDX nests inside every `<pre>`,
@@ -78,6 +97,23 @@ export const mdxComponents = {
   CodeBlock,
   CodeTabs,
   CodeTab,
+  FigureFrame,
+  ActivityGrid,
+  BeforeAfter,
+  ChangeSummary,
+  FlowDiagram,
+  GanttChart,
+  Timeline,
+  TreeDiagram,
+  UptimeStrip,
+  Terminal,
+  Steps,
+  Path,
+  Event,
+  Line,
+  Slope,
+  Node,
+  Step,
 };
 
 export type MdxComponents = typeof mdxComponents;

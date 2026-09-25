@@ -2187,6 +2187,307 @@ declare function TableOfContents({ toc, fromDepth, toDepth, label, spy, classNam
 
 declare function collectHeadings(container: ParentNode | null | undefined, selector?: string): TocEntry[];
 
+type FigurePalette$1 = 'mono' | 'duo' | 'multi';
+declare const GLYPH_SETS: {
+    readonly shade: readonly ["·", "░", "▒", "▓", "█"];
+    readonly ascii: readonly [".", "-", "=", "#", "@"];
+    readonly hash: readonly [".", ":", "+", "#", "█"];
+    readonly bar: readonly ["▁", "▂", "▃", "▅", "█"];
+};
+type GlyphSetName = keyof typeof GLYPH_SETS;
+type Glyphs$1 = GlyphSetName | readonly string[];
+interface FigureFrameProps extends Omit<react.ComponentProps<'figure'>, 'title'> {
+
+    title?: string;
+
+    corner?: string;
+}
+
+declare const FigureFrame: react.ForwardRefExoticComponent<Omit<FigureFrameProps, "ref"> & react.RefAttributes<HTMLElement>>;
+
+type FlowTone = 'default' | 'accent' | 'muted';
+interface FlowNode {
+
+    label: string;
+
+    tone?: FlowTone;
+
+    stretch?: boolean;
+}
+interface FlowRow {
+
+    nodes: FlowNode[];
+}
+interface FlowPathProps {
+
+    children?: ReactNode;
+}
+interface FlowDiagramProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    rows?: FlowRow[];
+
+    children?: ReactNode;
+
+    palette?: FigurePalette$1;
+
+    className?: string;
+}
+
+declare const Path: ((props: FlowPathProps & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare const FlowDiagram: react.ForwardRefExoticComponent<FlowDiagramProps & react.RefAttributes<HTMLDivElement>>;
+
+type TimelineState = 'done' | 'now' | 'next';
+interface TimelineEvent {
+
+    date: string;
+
+    label?: string;
+    state?: TimelineState;
+}
+interface TimelineProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    events?: TimelineEvent[];
+
+    children?: ReactNode;
+
+    palette?: FigurePalette$1;
+
+    className?: string;
+}
+
+declare const Event: ((props: TimelineEvent & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare const Timeline: react.ForwardRefExoticComponent<TimelineProps & react.RefAttributes<HTMLDivElement>>;
+
+type DiffSign = 'add' | 'remove' | 'keep';
+interface DiffRow {
+
+    label?: string;
+    value: string;
+    sign?: DiffSign;
+}
+interface DiffLineProps extends DiffRow {
+
+    total?: boolean;
+}
+interface ChangeSummaryProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    rows?: DiffRow[];
+
+    footer?: DiffRow;
+
+    children?: ReactNode;
+
+    palette?: FigurePalette$1;
+
+    className?: string;
+}
+
+declare const Line: ((props: DiffLineProps & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare const ChangeSummary: react.ForwardRefExoticComponent<ChangeSummaryProps & react.RefAttributes<HTMLDivElement>>;
+
+interface SlopeItem {
+
+    label?: string;
+    from: number | string;
+    to: number | string;
+}
+interface BeforeAfterProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    fromLabel: string;
+
+    toLabel: string;
+
+    items?: SlopeItem[];
+
+    children?: ReactNode;
+
+    palette?: FigurePalette$1;
+
+    className?: string;
+}
+
+declare const Slope: ((props: SlopeItem & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare const BeforeAfter: react.ForwardRefExoticComponent<BeforeAfterProps & react.RefAttributes<HTMLDivElement>>;
+
+type UptimeStatus = 'ok' | 'degraded' | 'down' | 'empty';
+interface UptimeStripProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    days: UptimeStatus[] | string;
+
+    from?: string;
+
+    to?: string;
+
+    columns?: number;
+
+    glyphs?: Glyphs$1;
+
+    palette?: FigurePalette$1;
+
+    className?: string;
+}
+
+declare const UptimeStrip: react.ForwardRefExoticComponent<UptimeStripProps & react.RefAttributes<HTMLDivElement>>;
+
+interface TreeNode {
+    label: string;
+    meta?: string;
+    accent?: boolean;
+    children?: TreeNode[];
+}
+interface NodeProps {
+
+    label?: string;
+    meta?: string;
+    accent?: boolean;
+    children?: ReactNode;
+}
+interface TreeDiagramProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    nodes?: TreeNode[];
+
+    children?: ReactNode;
+
+    className?: string;
+}
+
+declare const Node: ((props: NodeProps & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare const TreeDiagram: react.ForwardRefExoticComponent<TreeDiagramProps & react.RefAttributes<HTMLDivElement>>;
+
+type Glyphs = 'shade' | 'ascii' | 'hash' | 'bar' | readonly string[];
+type FigurePalette = 'mono' | 'duo' | 'multi';
+interface ActivityDay {
+
+    date: string;
+
+    count: number;
+}
+interface ActivityGridProps extends react.HTMLAttributes<HTMLElement> {
+
+    data: ActivityDay[];
+
+    weekStartsOn?: 0 | 1;
+
+    max?: number;
+
+    legend?: boolean;
+
+    glyphs?: Glyphs;
+
+    palette?: FigurePalette;
+
+    className?: string;
+}
+
+declare const ActivityGrid: react.ForwardRefExoticComponent<ActivityGridProps & react.RefAttributes<HTMLElement>>;
+
+interface GanttItem {
+    label: string;
+
+    start: string;
+
+    end: string;
+
+    complete?: number;
+}
+interface GanttChartProps extends react.HTMLAttributes<HTMLElement> {
+
+    items: GanttItem[];
+
+    range?: {
+        start: string;
+        end: string;
+    };
+
+    columns?: number;
+
+    className?: string;
+}
+
+declare const GanttChart: react.ForwardRefExoticComponent<GanttChartProps & react.RefAttributes<HTMLElement>>;
+
+interface TerminalProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    prompt?: string;
+
+    children?: ReactNode;
+
+    className?: string;
+}
+
+declare const Terminal: react.ForwardRefExoticComponent<TerminalProps & react.RefAttributes<HTMLDivElement>>;
+
+type StepState = 'done' | 'now' | 'next';
+interface StepProps {
+
+    title?: string;
+
+    state?: StepState;
+
+    children?: ReactNode;
+}
+interface StepsProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
+
+    children?: ReactNode;
+
+    className?: string;
+}
+
+declare const Step: ((props: StepProps & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare const Steps: react.ForwardRefExoticComponent<StepsProps & react.RefAttributes<HTMLDivElement>>;
+
 declare function MdxPre({ children, ...rest }: HTMLAttributes<HTMLPreElement>): react.JSX.Element;
 declare function MdxAnchor({ href, children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>): react.JSX.Element;
 
@@ -2227,12 +2528,62 @@ declare const mdxComponents: {
     CodeBlock: typeof CodeBlock;
     CodeTabs: typeof CodeTabs;
     CodeTab: typeof CodeTab;
+    FigureFrame: react.ForwardRefExoticComponent<Omit<FigureFrameProps, "ref"> & react.RefAttributes<HTMLElement>>;
+    ActivityGrid: react.ForwardRefExoticComponent<ActivityGridProps & react.RefAttributes<HTMLElement>>;
+    BeforeAfter: react.ForwardRefExoticComponent<BeforeAfterProps & react.RefAttributes<HTMLDivElement>>;
+    ChangeSummary: react.ForwardRefExoticComponent<ChangeSummaryProps & react.RefAttributes<HTMLDivElement>>;
+    FlowDiagram: react.ForwardRefExoticComponent<FlowDiagramProps & react.RefAttributes<HTMLDivElement>>;
+    GanttChart: react.ForwardRefExoticComponent<GanttChartProps & react.RefAttributes<HTMLElement>>;
+    Timeline: react.ForwardRefExoticComponent<TimelineProps & react.RefAttributes<HTMLDivElement>>;
+    TreeDiagram: react.ForwardRefExoticComponent<TreeDiagramProps & react.RefAttributes<HTMLDivElement>>;
+    UptimeStrip: react.ForwardRefExoticComponent<UptimeStripProps & react.RefAttributes<HTMLDivElement>>;
+    Terminal: react.ForwardRefExoticComponent<TerminalProps & react.RefAttributes<HTMLDivElement>>;
+    Steps: react.ForwardRefExoticComponent<StepsProps & react.RefAttributes<HTMLDivElement>>;
+    Path: ((props: FlowPathProps & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Event: ((props: TimelineEvent & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Line: ((props: DiffLineProps & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Slope: ((props: SlopeItem & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Node: ((props: NodeProps & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Step: ((props: StepProps & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
 };
 type MdxComponents = typeof mdxComponents;
 
 export {
   ANSI_SLOTS,
   type AccentToken,
+  type ActivityDay,
+  ActivityGrid,
+  type ActivityGridProps,
   AdminDashboardLayout,
   type AdminDashboardLayoutProps,
   type AdminNavItem,
@@ -2265,6 +2616,8 @@ export {
   BarChart,
   type BarChartDatum,
   type BarChartProps,
+  BeforeAfter,
+  type BeforeAfterProps,
   type BlogAuthor,
   BlogPost,
   type BlogPostProps,
@@ -2289,6 +2642,8 @@ export {
   Card,
   type CardProps,
   type CardVariant,
+  ChangeSummary,
+  type ChangeSummaryProps,
   ChartTooltip,
   type ChartTooltipProps,
   Checkbox,
@@ -2317,6 +2672,9 @@ export {
   type DataTableProps,
   type DataTableVirtualization,
   DesignSandbox,
+  type DiffLineProps,
+  type DiffRow,
+  type DiffSign,
   Divider,
   type DividerProps,
   type DividerVariant,
@@ -2344,6 +2702,7 @@ export {
   ErrorSummary,
   type ErrorSummaryError,
   type ErrorSummaryProps,
+  Event,
   type ExperimentItem,
   ExperimentsView,
   type ExperimentsViewProps,
@@ -2354,8 +2713,19 @@ export {
   type FeatureProps,
   Fieldset,
   type FieldsetProps,
+  FigureFrame,
+  type FigureFrameProps,
   type Finding,
   type FixedColour,
+  FlowDiagram,
+  type FlowDiagramProps,
+  type FlowNode,
+  type FlowPathProps,
+  type FlowRow,
+  type FlowTone,
+  GanttChart,
+  type GanttChartProps,
+  type GanttItem,
   GitHubIcon,
   Glyph,
   type GlyphProps,
@@ -2373,6 +2743,7 @@ export {
   Legend,
   type LegendProps,
   type LevelDefinition,
+  Line,
   type LinkComponentProps,
   LinkProvider,
   type LinkProviderProps,
@@ -2406,6 +2777,8 @@ export {
   type NerdIconAccent,
   type NerdIconName,
   type NerdIconProps,
+  Node,
+  type NodeProps,
   NoteBlock,
   type NoteBlockProps,
   type OverlayAlign,
@@ -2417,6 +2790,7 @@ export {
   type PageTitleProps,
   Pagination,
   type PaginationProps,
+  Path,
   type Polarity,
   Popover,
   type PopoverProps,
@@ -2486,6 +2860,8 @@ export {
   type SlideDeckHotkey,
   type SlideDeckProps,
   type SlideProps,
+  Slope,
+  type SlopeItem,
   Slugger,
   SocialIcon,
   type SocialIconName,
@@ -2497,6 +2873,11 @@ export {
   StatCard,
   type StatCardAccent,
   type StatCardProps,
+  Step,
+  type StepProps,
+  type StepState,
+  Steps,
+  type StepsProps,
   type Surface,
   Swatch,
   SwatchGroup,
@@ -2532,6 +2913,8 @@ export {
   type TabsVariant,
   Tag,
   type TagProps,
+  Terminal,
+  type TerminalProps,
   TextArea,
   type TextAreaProps,
   type TextTone,
@@ -2539,6 +2922,10 @@ export {
   type ThemeLevel,
   ThemeProvider,
   type ThemeProviderProps,
+  Timeline,
+  type TimelineEvent,
+  type TimelineProps,
+  type TimelineState,
   type ToastActionOptions,
   type ToastApi,
   type ToastIntent,
@@ -2549,8 +2936,14 @@ export {
   type TokenRule,
   Tooltip,
   type TooltipProps,
+  TreeDiagram,
+  type TreeDiagramProps,
+  type TreeNode,
   type TypeStep,
   type TypeStepName,
+  type UptimeStatus,
+  UptimeStrip,
+  type UptimeStripProps,
   type UseActiveHeadingOptions,
   type UseCopyToClipboardResult,
   WEB_FLOOR,

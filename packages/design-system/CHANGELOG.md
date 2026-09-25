@@ -9,6 +9,17 @@ Proper release notes start at 1.0. Until then this file records only what a
 consumer has to *do*, newest first. The reasoning lives in the pull requests and
 in [`docs/adr/`](./docs/adr/).
 
+## 0.12.0
+
+New documentation visuals adapted from mdxcn: `ActivityGrid`, `GanttChart`,
+`UptimeStrip`, `FlowDiagram`, `Timeline`, `TreeDiagram`, `ChangeSummary`, and
+`BeforeAfter`. `Steps` and `Terminal` are available as unframed blocks. Wrap one
+or more of them in `FigureFrame` when the content needs a shared caption and
+border. Each adapted component links to its upstream source in its file header.
+
+No mdxcn package dependency is required. Existing published components and
+their props are unchanged.
+
 ## 0.11.0
 
 `Select` themed on Base UI's select: the open list is painted by the Level, not the operating
@@ -96,7 +107,6 @@ behaviour. The themed `Select` that finishes that row is a breaking change and f
 - `TextArea` and `Select` put their `id` on the control, so the label's `for` points at it and a
   click on the label focuses the field.
 - `Card` forwards its ref.
-
 ## 0.9.0
 
 `Modal` on Base UI's dialog, and the `AlertDialog` that had to ship with it.
