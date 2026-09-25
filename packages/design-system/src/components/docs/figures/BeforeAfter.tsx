@@ -47,10 +47,14 @@ export interface BeforeAfterProps extends React.HTMLAttributes<HTMLDivElement> {
 /** MDX-only slope item, for example `<Slope from={8200} to={12400}>docs</Slope>`. */
 export const Slope = defineAsciiItem<SlopeItem>('Slope');
 
-type SlopeRow = { label: string; from: number; to: number };
+type SlopeRow = { label: string; from: number; to: number; fromDisplay: string; toDisplay: string };
 
 function format(value: number): string {
   return value.toLocaleString('en-US', { maximumFractionDigits: Number.isInteger(value) ? 0 : 1 });
+}
+
+function displayOf(value: number | string): string {
+  return typeof value === 'number' ? format(value) : value.trim();
 }
 
 function itemsOf(children: ReactNode): SlopeItem[] {
@@ -65,7 +69,13 @@ function itemsOf(children: ReactNode): SlopeItem[] {
 
 /** Renders paired values with directional change and an accessible row label. */
 export const BeforeAfter = React.forwardRef<HTMLDivElement, BeforeAfterProps>(function BeforeAfter({ label = 'Before and after', fromLabel, toLabel, items: itemsProp, children, palette, className, ...rest }, ref) {
-  const items: SlopeRow[] = (itemsProp ?? itemsOf(children)).map((entry) => ({ label: entry.label ?? '', from: numberOf(entry.from), to: numberOf(entry.to) }));
+  const items: SlopeRow[] = (itemsProp ?? itemsOf(children)).map((entry) => ({
+    label: entry.label ?? '',
+    from: numberOf(entry.from),
+    to: numberOf(entry.to),
+    fromDisplay: displayOf(entry.from),
+    toDisplay: displayOf(entry.to),
+  }));
 
   return (
       <AsciiFrameBody ref={ref} {...rest} className={cn('flex flex-col gap-3', className)}>
@@ -81,11 +91,11 @@ export const BeforeAfter = React.forwardRef<HTMLDivElement, BeforeAfterProps>(fu
             const down = row.to < row.from;
             const tone = up ? 'text-accent-primary' : down ? palette === 'multi' ? 'text-accent-secondary' : 'text-content-secondary' : 'text-content-primary';
             return (
-              <li className="grid grid-cols-[minmax(0,1fr)_6.5rem_2rem_6.5rem] items-baseline gap-x-3" key={`${row.label}-${index}`} aria-label={`${row.label} from ${format(row.from)} to ${format(row.to)}`}>
+              <li className="grid grid-cols-[minmax(0,1fr)_6.5rem_2rem_6.5rem] items-baseline gap-x-3" key={`${row.label}-${index}`} aria-label={`${row.label} from ${row.fromDisplay} to ${row.toDisplay}`}>
                 <span className="truncate text-content-primary">{row.label}</span>
-                <span className="text-right tabular-nums text-content-muted">{format(row.from)}</span>
+                <span className="text-right tabular-nums text-content-muted">{row.fromDisplay}</span>
                 <span aria-hidden="true" className={cn('select-none text-center', tone)}>{up || down ? '→' : '–'}</span>
-                <span className={cn('text-right tabular-nums', tone)}>{format(row.to)}</span>
+                <span className={cn('text-right tabular-nums', tone)}>{row.toDisplay}</span>
               </li>
             );
           })}
