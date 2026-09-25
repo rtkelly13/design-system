@@ -48,6 +48,33 @@ see [AGENTS.md](./AGENTS.md#-hosted-storybook).
 
 ---
 
+## Documentation figures
+
+`FigureFrame` supplies a caption and border. The visual components do not create
+their own frame, so related views can share one. For example:
+
+```tsx
+import { FigureFrame, Timeline, UptimeStrip } from '@rtkelly13/design-system';
+
+<FigureFrame title="SERVICE INCIDENT">
+	<Timeline events={[{ date: '14:02', label: 'Latency rose' }, { date: '14:11', label: 'Rolled back' }]} />
+	<UptimeStrip days="ok degraded down ok" />
+</FigureFrame>
+```
+
+Use `ActivityGrid` for dated counts such as commits or blog posts, and
+`GanttChart` for work with start and end dates. `FlowDiagram`, `TreeDiagram`,
+`ChangeSummary`, and `BeforeAfter` cover relationships and comparisons.
+`Steps` and `Terminal` remain documentation blocks. See
+[ADR 0006](./docs/adr/0006-document-visual-taxonomy.md) for the naming rules.
+
+These components are adapted from [mdxcn](https://github.com/keshav-exe/mdxcn)
+as source code, not imported from an mdxcn npm package. Every adapted component
+links to its upstream source in the file header. See the
+[license and attribution](./docs/attributions/mdxcn.md).
+
+---
+
 ## 📸 Visual Regression Layer
 
 The design system incorporates a **Playwright Visual Snapshot Testing Layer** matching the architecture of **ryankelly.dev**:

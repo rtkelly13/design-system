@@ -225,16 +225,22 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * `@base-ui/react/select`, external here and weighed by `check:dep-cost`,
  * which records the rise; the chevron is one more named import from
  * `lucide-react`.
+ *
+ * Raised for the mdxcn-derived documentation figures and blocks. Eleven new
+ * public components add pure rendering and dated chart layout code; no new
+ * runtime dependency was added. Re-measured against the 0.11.0 base: ESM
+ * 362,938 B raw / 84,112 B gzip, CommonJS 397,911 B raw / 86,900 B gzip
+ * locally; the ceilings allow a small Linux gzip variance.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 319_000,
-    maxGzip: 74_600,
+    maxRaw: 365_000,
+    maxGzip: 85_000,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 350_400,
-    maxGzip: 77_150,
+    maxRaw: 400_000,
+    maxGzip: 88_000,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {

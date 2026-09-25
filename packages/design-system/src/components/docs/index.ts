@@ -12,4 +12,4 @@ export * from './DocsSidebar';
 export * from './Prose';
 export * from './TableOfContents';
 export * from './mdxComponents';
-export * from './graphs';
+export * from './figures';

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Terminal } from '../components/docs/graphs/Terminal';
+import { Terminal } from '../components/docs/figures/Terminal';
+import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof Terminal> = {
   title: 'Docs/Terminal',
@@ -12,11 +13,10 @@ export default meta;
 type Story = StoryObj<typeof Terminal>;
 
 /** Commands, comments, output, and success lines receive distinct roles. */
-export const Default: Story = { args: { title: 'SHELL', children: `$ pnpm test\n# running focused checks\n✓ 483 tests passed\nDone in 4.2s` } };
+export const Default: Story = { args: { children: `$ pnpm test\n# running focused checks\n✓ 483 tests passed\nDone in 4.2s` }, render: (args) => <FigureFrame title="SHELL"><Terminal {...args} /></FigureFrame> };
 
 /** The prompt can match a different shell or local terminal convention. */
-export const CustomPrompt: Story = { args: { title: 'ZSH', prompt: '❯', children: `❯ git diff --check\n✓ clean\n` } };
+export const CustomPrompt: Story = { args: { prompt: '❯', children: `❯ git diff --check\n✓ clean\n` }, render: (args) => <FigureFrame title="ZSH"><Terminal {...args} /></FigureFrame> };
 
 /** Long output remains horizontally scrollable in the sketch level. */
-export const SketchTheme: Story = { args: { title: 'SKETCH', children: `$ pnpm build-storybook\nOutput is intentionally preserved on one line for copying.` }, globals: { level: 'sketch' } };
-
+export const SketchTheme: Story = { args: { children: `$ pnpm build-storybook\nOutput is intentionally preserved on one line for copying.` }, render: (args) => <FigureFrame title="SKETCH"><Terminal {...args} /></FigureFrame>, globals: { level: 'sketch' } };

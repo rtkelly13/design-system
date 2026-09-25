@@ -2187,9 +2187,7 @@ declare function TableOfContents({ toc, fromDepth, toDepth, label, spy, classNam
 
 declare function collectHeadings(container: ParentNode | null | undefined, selector?: string): TocEntry[];
 
-type GraphPalette = 'mono' | 'duo' | 'multi';
-type GraphTone = 'primary' | 'secondary' | 'tertiary' | 'idle' | 'empty';
-declare const DIM_OPACITY = 0.4;
+type FigurePalette$1 = 'mono' | 'duo' | 'multi';
 declare const GLYPH_SETS: {
     readonly shade: readonly ["·", "░", "▒", "▓", "█"];
     readonly ascii: readonly [".", "-", "=", "#", "@"];
@@ -2197,68 +2195,15 @@ declare const GLYPH_SETS: {
     readonly bar: readonly ["▁", "▂", "▃", "▅", "█"];
 };
 type GlyphSetName = keyof typeof GLYPH_SETS;
-type Glyphs = GlyphSetName | readonly string[];
-declare function resolveGlyphs(glyphs?: Glyphs): readonly string[];
-declare function toneClass(palette: GraphPalette | undefined, tone: GraphTone): string;
-declare function intensityClass(level: number, palette?: GraphPalette): string;
-declare function intensityLevel(value: number, max: number): number;
-declare function intensityGlyph(level: number, glyphs?: readonly string[]): string;
-declare function words<T extends string>(value: T[] | string): T[];
-interface GraphProps extends Omit<react.ComponentProps<'figure'>, 'title'> {
+type Glyphs$1 = GlyphSetName | readonly string[];
+interface FigureFrameProps extends Omit<react.ComponentProps<'figure'>, 'title'> {
 
-    title: string;
+    title?: string;
 
     corner?: string;
 }
 
-declare function Graph({ title, corner, className, children, ...rest }: GraphProps): react.JSX.Element;
-
-declare function GraphBody({ className, ...props }: react.ComponentProps<'div'>): react.JSX.Element;
-
-declare function GraphProse({ className, ...props }: react.ComponentProps<'div'>): react.JSX.Element;
-
-declare function GraphRule({ className, ...props }: react.ComponentProps<'div'>): react.JSX.Element;
-
-declare function GraphRuleY({ className, ...props }: react.ComponentProps<'div'>): react.JSX.Element;
-
-declare function GraphTrack({ className, ...props }: react.ComponentProps<'span'>): react.JSX.Element;
-
-declare function GraphTick({ className, ...props }: react.ComponentProps<'span'>): react.JSX.Element;
-
-declare function GraphArrow({ accent, stretch, className }: {
-    accent?: boolean;
-    stretch?: boolean;
-    className?: string;
-}): react.JSX.Element;
-type WithChildren<P> = P & {
-    children?: ReactNode;
-};
-type GraphItemComponent<P extends object> = ((props: WithChildren<P>) => null) & {
-    graphItem: string;
-    displayName?: string;
-};
-
-declare function defineItem<P extends object>(name: string): GraphItemComponent<P>;
-declare function isHost(element: ReactElement, tags: string | readonly string[]): boolean;
-declare function elementsOf(children: ReactNode): ReactElement[];
-declare function textOf(children: ReactNode): string;
-declare function itemText(item: ReactElement): string;
-declare function listItems(children: ReactNode): ReactElement[];
-declare function nestedList(item: ReactElement): ReactElement[];
-declare function paragraphsOf(children: ReactNode): ReactElement[];
-declare function hasHost(children: ReactNode, tags: string | readonly string[]): boolean;
-declare function childItems<P extends object>(children: ReactNode, item: GraphItemComponent<P>): (P & {
-    children?: ReactNode;
-})[];
-declare function splitLabel(value: string): {
-    label: string;
-    rest: string;
-};
-declare function splitDash(value: string): {
-    label: string;
-    rest: string;
-};
-declare function numberOf(value: number | string): number;
+declare const FigureFrame: react.ForwardRefExoticComponent<Omit<FigureFrameProps, "ref"> & react.RefAttributes<HTMLElement>>;
 
 type FlowTone = 'default' | 'accent' | 'muted';
 interface FlowNode {
@@ -2273,33 +2218,31 @@ interface FlowRow {
 
     nodes: FlowNode[];
 }
-interface PathProps {
+interface FlowPathProps {
 
     children?: ReactNode;
 }
-interface GraphFlowProps {
+interface FlowDiagramProps extends react.HTMLAttributes<HTMLDivElement> {
 
-    title: string;
+    label?: string;
 
     rows?: FlowRow[];
 
     children?: ReactNode;
 
-    palette?: GraphPalette;
-
-    corner?: string;
+    palette?: FigurePalette$1;
 
     className?: string;
 }
 
-declare const Path: ((props: PathProps & {
+declare const Path: ((props: FlowPathProps & {
     children?: ReactNode;
 }) => null) & {
     graphItem: string;
     displayName?: string;
 };
 
-declare function GraphFlow({ title, rows: rowsProp, children, palette, corner, className }: GraphFlowProps): react.JSX.Element;
+declare const FlowDiagram: react.ForwardRefExoticComponent<FlowDiagramProps & react.RefAttributes<HTMLDivElement>>;
 
 type TimelineState = 'done' | 'now' | 'next';
 interface TimelineEvent {
@@ -2309,17 +2252,15 @@ interface TimelineEvent {
     label?: string;
     state?: TimelineState;
 }
-interface GraphTimelineProps {
+interface TimelineProps extends react.HTMLAttributes<HTMLDivElement> {
 
-    title: string;
+    label?: string;
 
     events?: TimelineEvent[];
 
     children?: ReactNode;
 
-    palette?: GraphPalette;
-
-    corner?: string;
+    palette?: FigurePalette$1;
 
     className?: string;
 }
@@ -2331,7 +2272,7 @@ declare const Event: ((props: TimelineEvent & {
     displayName?: string;
 };
 
-declare function GraphTimeline({ title, events: eventsProp, children, palette, corner, className }: GraphTimelineProps): react.JSX.Element;
+declare const Timeline: react.ForwardRefExoticComponent<TimelineProps & react.RefAttributes<HTMLDivElement>>;
 
 type DiffSign = 'add' | 'remove' | 'keep';
 interface DiffRow {
@@ -2344,9 +2285,9 @@ interface DiffLineProps extends DiffRow {
 
     total?: boolean;
 }
-interface GraphDiffProps {
+interface ChangeSummaryProps extends react.HTMLAttributes<HTMLDivElement> {
 
-    title: string;
+    label?: string;
 
     rows?: DiffRow[];
 
@@ -2354,9 +2295,7 @@ interface GraphDiffProps {
 
     children?: ReactNode;
 
-    palette?: GraphPalette;
-
-    corner?: string;
+    palette?: FigurePalette$1;
 
     className?: string;
 }
@@ -2368,7 +2307,7 @@ declare const Line: ((props: DiffLineProps & {
     displayName?: string;
 };
 
-declare function GraphDiff({ title, rows: rowsProp, footer: footerProp, children, palette, corner, className }: GraphDiffProps): react.JSX.Element;
+declare const ChangeSummary: react.ForwardRefExoticComponent<ChangeSummaryProps & react.RefAttributes<HTMLDivElement>>;
 
 interface SlopeItem {
 
@@ -2376,9 +2315,9 @@ interface SlopeItem {
     from: number | string;
     to: number | string;
 }
-interface GraphSlopeProps {
+interface BeforeAfterProps extends react.HTMLAttributes<HTMLDivElement> {
 
-    title: string;
+    label?: string;
 
     fromLabel: string;
 
@@ -2388,9 +2327,7 @@ interface GraphSlopeProps {
 
     children?: ReactNode;
 
-    palette?: GraphPalette;
-
-    corner?: string;
+    palette?: FigurePalette$1;
 
     className?: string;
 }
@@ -2402,12 +2339,12 @@ declare const Slope: ((props: SlopeItem & {
     displayName?: string;
 };
 
-declare function GraphSlope({ title, fromLabel, toLabel, items: itemsProp, children, palette, corner, className }: GraphSlopeProps): react.JSX.Element;
+declare const BeforeAfter: react.ForwardRefExoticComponent<BeforeAfterProps & react.RefAttributes<HTMLDivElement>>;
 
 type UptimeStatus = 'ok' | 'degraded' | 'down' | 'empty';
-interface GraphUptimeProps {
+interface UptimeStripProps extends react.HTMLAttributes<HTMLDivElement> {
 
-    title: string;
+    label?: string;
 
     days: UptimeStatus[] | string;
 
@@ -2417,16 +2354,14 @@ interface GraphUptimeProps {
 
     columns?: number;
 
-    glyphs?: Glyphs;
+    glyphs?: Glyphs$1;
 
-    palette?: GraphPalette;
-
-    corner?: string;
+    palette?: FigurePalette$1;
 
     className?: string;
 }
 
-declare function GraphUptime({ title, days: daysProp, from, to, columns, glyphs, palette, corner, className }: GraphUptimeProps): react.JSX.Element;
+declare const UptimeStrip: react.ForwardRefExoticComponent<UptimeStripProps & react.RefAttributes<HTMLDivElement>>;
 
 interface TreeNode {
     label: string;
@@ -2441,15 +2376,13 @@ interface NodeProps {
     accent?: boolean;
     children?: ReactNode;
 }
-interface GraphTreeProps {
+interface TreeDiagramProps extends react.HTMLAttributes<HTMLDivElement> {
 
-    title: string;
+    label?: string;
 
     nodes?: TreeNode[];
 
     children?: ReactNode;
-
-    corner?: string;
 
     className?: string;
 }
@@ -2461,22 +2394,72 @@ declare const Node: ((props: NodeProps & {
     displayName?: string;
 };
 
-declare function GraphTree({ title, nodes, children, corner, className }: GraphTreeProps): react.JSX.Element;
+declare const TreeDiagram: react.ForwardRefExoticComponent<TreeDiagramProps & react.RefAttributes<HTMLDivElement>>;
 
-interface TerminalProps {
+type Glyphs = 'shade' | 'ascii' | 'hash' | 'bar' | readonly string[];
+type FigurePalette = 'mono' | 'duo' | 'multi';
+interface ActivityDay {
 
-    title?: string;
+    date: string;
+
+    count: number;
+}
+interface ActivityGridProps extends react.HTMLAttributes<HTMLElement> {
+
+    data: ActivityDay[];
+
+    weekStartsOn?: 0 | 1;
+
+    max?: number;
+
+    legend?: boolean;
+
+    glyphs?: Glyphs;
+
+    palette?: FigurePalette;
+
+    className?: string;
+}
+
+declare const ActivityGrid: react.ForwardRefExoticComponent<ActivityGridProps & react.RefAttributes<HTMLElement>>;
+
+interface GanttItem {
+    label: string;
+
+    start: string;
+
+    end: string;
+
+    complete?: number;
+}
+interface GanttChartProps extends react.HTMLAttributes<HTMLElement> {
+
+    items: GanttItem[];
+
+    range?: {
+        start: string;
+        end: string;
+    };
+
+    columns?: number;
+
+    className?: string;
+}
+
+declare const GanttChart: react.ForwardRefExoticComponent<GanttChartProps & react.RefAttributes<HTMLElement>>;
+
+interface TerminalProps extends react.HTMLAttributes<HTMLDivElement> {
+
+    label?: string;
 
     prompt?: string;
 
     children?: ReactNode;
 
-    corner?: string;
-
     className?: string;
 }
 
-declare function Terminal({ title, prompt, children, corner, className }: TerminalProps): react.JSX.Element;
+declare const Terminal: react.ForwardRefExoticComponent<TerminalProps & react.RefAttributes<HTMLDivElement>>;
 
 type StepState = 'done' | 'now' | 'next';
 interface StepProps {
@@ -2487,13 +2470,11 @@ interface StepProps {
 
     children?: ReactNode;
 }
-interface StepsProps {
+interface StepsProps extends react.HTMLAttributes<HTMLDivElement> {
 
-    title?: string;
+    label?: string;
 
     children?: ReactNode;
-
-    corner?: string;
 
     className?: string;
 }
@@ -2505,7 +2486,7 @@ declare const Step: ((props: StepProps & {
     displayName?: string;
 };
 
-declare function Steps({ title, children, corner, className }: StepsProps): react.JSX.Element;
+declare const Steps: react.ForwardRefExoticComponent<StepsProps & react.RefAttributes<HTMLDivElement>>;
 
 declare function MdxPre({ children, ...rest }: HTMLAttributes<HTMLPreElement>): react.JSX.Element;
 declare function MdxAnchor({ href, children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>): react.JSX.Element;
@@ -2547,16 +2528,18 @@ declare const mdxComponents: {
     CodeBlock: typeof CodeBlock;
     CodeTabs: typeof CodeTabs;
     CodeTab: typeof CodeTab;
-    Graph: typeof Graph;
-    GraphDiff: typeof GraphDiff;
-    GraphFlow: typeof GraphFlow;
-    GraphSlope: typeof GraphSlope;
-    GraphTimeline: typeof GraphTimeline;
-    GraphTree: typeof GraphTree;
-    GraphUptime: typeof GraphUptime;
-    Terminal: typeof Terminal;
-    Steps: typeof Steps;
-    Path: ((props: PathProps & {
+    FigureFrame: react.ForwardRefExoticComponent<Omit<FigureFrameProps, "ref"> & react.RefAttributes<HTMLElement>>;
+    ActivityGrid: react.ForwardRefExoticComponent<ActivityGridProps & react.RefAttributes<HTMLElement>>;
+    BeforeAfter: react.ForwardRefExoticComponent<BeforeAfterProps & react.RefAttributes<HTMLDivElement>>;
+    ChangeSummary: react.ForwardRefExoticComponent<ChangeSummaryProps & react.RefAttributes<HTMLDivElement>>;
+    FlowDiagram: react.ForwardRefExoticComponent<FlowDiagramProps & react.RefAttributes<HTMLDivElement>>;
+    GanttChart: react.ForwardRefExoticComponent<GanttChartProps & react.RefAttributes<HTMLElement>>;
+    Timeline: react.ForwardRefExoticComponent<TimelineProps & react.RefAttributes<HTMLDivElement>>;
+    TreeDiagram: react.ForwardRefExoticComponent<TreeDiagramProps & react.RefAttributes<HTMLDivElement>>;
+    UptimeStrip: react.ForwardRefExoticComponent<UptimeStripProps & react.RefAttributes<HTMLDivElement>>;
+    Terminal: react.ForwardRefExoticComponent<TerminalProps & react.RefAttributes<HTMLDivElement>>;
+    Steps: react.ForwardRefExoticComponent<StepsProps & react.RefAttributes<HTMLDivElement>>;
+    Path: ((props: FlowPathProps & {
         children?: ReactNode;
     }) => null) & {
         graphItem: string;
@@ -2598,6 +2581,9 @@ type MdxComponents = typeof mdxComponents;
 export {
   ANSI_SLOTS,
   type AccentToken,
+  type ActivityDay,
+  ActivityGrid,
+  type ActivityGridProps,
   AdminDashboardLayout,
   type AdminDashboardLayoutProps,
   type AdminNavItem,
@@ -2630,6 +2616,8 @@ export {
   BarChart,
   type BarChartDatum,
   type BarChartProps,
+  BeforeAfter,
+  type BeforeAfterProps,
   type BlogAuthor,
   BlogPost,
   type BlogPostProps,
@@ -2654,6 +2642,8 @@ export {
   Card,
   type CardProps,
   type CardVariant,
+  ChangeSummary,
+  type ChangeSummaryProps,
   ChartTooltip,
   type ChartTooltipProps,
   Checkbox,
@@ -2677,7 +2667,6 @@ export {
   DEFAULT_EXPERIMENTS,
   DEFAULT_LEVEL,
   DEFAULT_PRICING_TIERS,
-  DIM_OPACITY,
   DIVIDER_PATTERNS,
   DataTable,
   type DataTableProps,
@@ -2724,40 +2713,22 @@ export {
   type FeatureProps,
   Fieldset,
   type FieldsetProps,
+  FigureFrame,
+  type FigureFrameProps,
   type Finding,
   type FixedColour,
+  FlowDiagram,
+  type FlowDiagramProps,
   type FlowNode,
+  type FlowPathProps,
   type FlowRow,
   type FlowTone,
-  GLYPH_SETS,
+  GanttChart,
+  type GanttChartProps,
+  type GanttItem,
   GitHubIcon,
   Glyph,
   type GlyphProps,
-  type GlyphSetName,
-  type Glyphs,
-  Graph,
-  GraphArrow,
-  GraphBody,
-  GraphDiff,
-  type GraphDiffProps,
-  GraphFlow,
-  type GraphFlowProps,
-  type GraphPalette,
-  type GraphProps,
-  GraphProse,
-  GraphRule,
-  GraphRuleY,
-  GraphSlope,
-  type GraphSlopeProps,
-  GraphTick,
-  GraphTimeline,
-  type GraphTimelineProps,
-  type GraphTone,
-  GraphTrack,
-  GraphTree,
-  type GraphTreeProps,
-  GraphUptime,
-  type GraphUptimeProps,
   HEADING_EMPHASIS,
   type HeadingLevel,
   Hero,
@@ -2820,7 +2791,6 @@ export {
   Pagination,
   type PaginationProps,
   Path,
-  type PathProps,
   type Polarity,
   Popover,
   type PopoverProps,
@@ -2952,7 +2922,9 @@ export {
   type ThemeLevel,
   ThemeProvider,
   type ThemeProviderProps,
+  Timeline,
   type TimelineEvent,
+  type TimelineProps,
   type TimelineState,
   type ToastActionOptions,
   type ToastApi,
@@ -2964,10 +2936,14 @@ export {
   type TokenRule,
   Tooltip,
   type TooltipProps,
+  TreeDiagram,
+  type TreeDiagramProps,
   type TreeNode,
   type TypeStep,
   type TypeStepName,
   type UptimeStatus,
+  UptimeStrip,
+  type UptimeStripProps,
   type UseActiveHeadingOptions,
   type UseCopyToClipboardResult,
   WEB_FLOOR,
@@ -2979,47 +2955,29 @@ export {
   auditHueAgreement,
   auditSelectionDevices,
   borderVar,
-  childItems,
   childrenToText,
   cn,
   collectHeadings,
   composite,
   contrastRatio,
   createAnchorHeading,
-  defineItem,
-  elementsOf,
   fontVar,
   getRecommendedColours,
   getThemeInitScript,
-  hasHost,
-  intensityClass,
-  intensityGlyph,
-  intensityLevel,
   isExternalHref,
-  isHost,
   isMedium,
   isRecommendedColourClass,
   isThemeLevel,
-  itemText,
-  listItems,
   mdxComponents,
-  nestedList,
   nextLevel,
-  numberOf,
-  paragraphsOf,
   parseColor,
   relativeLuminance,
-  resolveGlyphs,
   scanRules,
   scanTokenRules,
   semanticTokens,
   slugify,
-  splitDash,
-  splitLabel,
   surfaceVar,
-  textOf,
   textVar,
-  toneClass,
   useActiveHeading,
   useCopyToClipboard,
   useDocsLinkComponent,
@@ -3029,5 +2987,4 @@ export {
   useOptionalToast,
   useTheme,
   useToast,
-  words,
 };

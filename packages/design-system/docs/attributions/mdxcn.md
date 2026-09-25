@@ -16,6 +16,8 @@ Copied/adapted upstream paths:
 - `registry/default/graph-slope/graph-slope.tsx`
 - `registry/default/graph-uptime/graph-uptime.tsx`
 - `registry/default/graph-tree/graph-tree.tsx`
+- `registry/default/graph-activity/graph-activity.tsx`
+- `registry/default/graph-gantt/graph-gantt.tsx`
 - `registry/default/terminal/terminal.tsx`
 - `registry/default/steps/steps.tsx`
 
