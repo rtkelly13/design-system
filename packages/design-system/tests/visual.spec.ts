@@ -222,6 +222,27 @@ const CASES: readonly VisualCase[] = [
   { id: 'foundations-skeleton--loading-card', snapshot: 'skeleton-loading-card.png' },
   { id: 'foundations-progress--accents', snapshot: 'progress-accents.png' },
   { id: 'foundations-emptystate--first-run', snapshot: 'emptystate-first-run.png' },
+  // mdxcn-derived docs diagrams. Each component is asserted on both the
+  // default midnight level and its explicit sketch story so a token change
+  // cannot be healthy in one palette while broken in the other.
+  { id: 'docs-graphframe--default', snapshot: 'graphframe-default.png' },
+  { id: 'docs-graphframe--sketch-theme', snapshot: 'graphframe-sketch.png' },
+  { id: 'docs-graphflow--default', snapshot: 'graphflow-default.png' },
+  { id: 'docs-graphflow--sketch-theme', snapshot: 'graphflow-sketch.png' },
+  { id: 'docs-graphtimeline--default', snapshot: 'graphtimeline-default.png' },
+  { id: 'docs-graphtimeline--sketch-theme', snapshot: 'graphtimeline-sketch.png' },
+  { id: 'docs-graphdiff--default', snapshot: 'graphdiff-default.png' },
+  { id: 'docs-graphdiff--sketch-theme', snapshot: 'graphdiff-sketch.png' },
+  { id: 'docs-graphslope--default', snapshot: 'graphslope-default.png' },
+  { id: 'docs-graphslope--sketch-theme', snapshot: 'graphslope-sketch.png' },
+  { id: 'docs-graphuptime--default', snapshot: 'graphuptime-default.png' },
+  { id: 'docs-graphuptime--sketch-theme', snapshot: 'graphuptime-sketch.png' },
+  { id: 'docs-graphtree--default', snapshot: 'graphtree-default.png' },
+  { id: 'docs-graphtree--sketch-theme', snapshot: 'graphtree-sketch.png' },
+  { id: 'docs-terminal--default', snapshot: 'terminal-default.png' },
+  { id: 'docs-terminal--sketch-theme', snapshot: 'terminal-sketch.png' },
+  { id: 'docs-steps--default', snapshot: 'steps-default.png' },
+  { id: 'docs-steps--sketch-theme', snapshot: 'steps-sketch.png' },
 ];
 
 /**

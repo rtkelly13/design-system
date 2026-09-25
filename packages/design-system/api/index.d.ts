@@ -2187,6 +2187,326 @@ declare function TableOfContents({ toc, fromDepth, toDepth, label, spy, classNam
 
 declare function collectHeadings(container: ParentNode | null | undefined, selector?: string): TocEntry[];
 
+type GraphPalette = 'mono' | 'duo' | 'multi';
+type GraphTone = 'primary' | 'secondary' | 'tertiary' | 'idle' | 'empty';
+declare const DIM_OPACITY = 0.4;
+declare const GLYPH_SETS: {
+    readonly shade: readonly ["·", "░", "▒", "▓", "█"];
+    readonly ascii: readonly [".", "-", "=", "#", "@"];
+    readonly hash: readonly [".", ":", "+", "#", "█"];
+    readonly bar: readonly ["▁", "▂", "▃", "▅", "█"];
+};
+type GlyphSetName = keyof typeof GLYPH_SETS;
+type Glyphs = GlyphSetName | readonly string[];
+declare function resolveGlyphs(glyphs?: Glyphs): readonly string[];
+declare function toneClass(palette: GraphPalette | undefined, tone: GraphTone): string;
+declare function intensityClass(level: number, palette?: GraphPalette): string;
+declare function intensityLevel(value: number, max: number): number;
+declare function intensityGlyph(level: number, glyphs?: readonly string[]): string;
+declare function words<T extends string>(value: T[] | string): T[];
+interface GraphProps extends Omit<react.ComponentProps<'figure'>, 'title'> {
+
+    title: string;
+
+    corner?: string;
+}
+
+declare function Graph({ title, corner, className, children, ...rest }: GraphProps): react.JSX.Element;
+
+declare function GraphBody({ className, ...props }: react.ComponentProps<'div'>): react.JSX.Element;
+
+declare function GraphProse({ className, ...props }: react.ComponentProps<'div'>): react.JSX.Element;
+
+declare function GraphRule({ className, ...props }: react.ComponentProps<'div'>): react.JSX.Element;
+
+declare function GraphRuleY({ className, ...props }: react.ComponentProps<'div'>): react.JSX.Element;
+
+declare function GraphTrack({ className, ...props }: react.ComponentProps<'span'>): react.JSX.Element;
+
+declare function GraphTick({ className, ...props }: react.ComponentProps<'span'>): react.JSX.Element;
+
+declare function GraphArrow({ accent, stretch, className }: {
+    accent?: boolean;
+    stretch?: boolean;
+    className?: string;
+}): react.JSX.Element;
+type WithChildren<P> = P & {
+    children?: ReactNode;
+};
+type GraphItemComponent<P extends object> = ((props: WithChildren<P>) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare function defineItem<P extends object>(name: string): GraphItemComponent<P>;
+declare function isHost(element: ReactElement, tags: string | readonly string[]): boolean;
+declare function elementsOf(children: ReactNode): ReactElement[];
+declare function textOf(children: ReactNode): string;
+declare function itemText(item: ReactElement): string;
+declare function listItems(children: ReactNode): ReactElement[];
+declare function nestedList(item: ReactElement): ReactElement[];
+declare function paragraphsOf(children: ReactNode): ReactElement[];
+declare function hasHost(children: ReactNode, tags: string | readonly string[]): boolean;
+declare function childItems<P extends object>(children: ReactNode, item: GraphItemComponent<P>): (P & {
+    children?: ReactNode;
+})[];
+declare function splitLabel(value: string): {
+    label: string;
+    rest: string;
+};
+declare function splitDash(value: string): {
+    label: string;
+    rest: string;
+};
+declare function numberOf(value: number | string): number;
+
+type FlowTone = 'default' | 'accent' | 'muted';
+interface FlowNode {
+
+    label: string;
+
+    tone?: FlowTone;
+
+    stretch?: boolean;
+}
+interface FlowRow {
+
+    nodes: FlowNode[];
+}
+interface PathProps {
+
+    children?: ReactNode;
+}
+interface GraphFlowProps {
+
+    title: string;
+
+    rows?: FlowRow[];
+
+    children?: ReactNode;
+
+    palette?: GraphPalette;
+
+    corner?: string;
+
+    className?: string;
+}
+
+declare const Path: ((props: PathProps & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare function GraphFlow({ title, rows: rowsProp, children, palette, corner, className }: GraphFlowProps): react.JSX.Element;
+
+type TimelineState = 'done' | 'now' | 'next';
+interface TimelineEvent {
+
+    date: string;
+
+    label?: string;
+    state?: TimelineState;
+}
+interface GraphTimelineProps {
+
+    title: string;
+
+    events?: TimelineEvent[];
+
+    children?: ReactNode;
+
+    palette?: GraphPalette;
+
+    corner?: string;
+
+    className?: string;
+}
+
+declare const Event: ((props: TimelineEvent & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare function GraphTimeline({ title, events: eventsProp, children, palette, corner, className }: GraphTimelineProps): react.JSX.Element;
+
+type DiffSign = 'add' | 'remove' | 'keep';
+interface DiffRow {
+
+    label?: string;
+    value: string;
+    sign?: DiffSign;
+}
+interface DiffLineProps extends DiffRow {
+
+    total?: boolean;
+}
+interface GraphDiffProps {
+
+    title: string;
+
+    rows?: DiffRow[];
+
+    footer?: DiffRow;
+
+    children?: ReactNode;
+
+    palette?: GraphPalette;
+
+    corner?: string;
+
+    className?: string;
+}
+
+declare const Line: ((props: DiffLineProps & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare function GraphDiff({ title, rows: rowsProp, footer: footerProp, children, palette, corner, className }: GraphDiffProps): react.JSX.Element;
+
+interface SlopeItem {
+
+    label?: string;
+    from: number | string;
+    to: number | string;
+}
+interface GraphSlopeProps {
+
+    title: string;
+
+    fromLabel: string;
+
+    toLabel: string;
+
+    items?: SlopeItem[];
+
+    children?: ReactNode;
+
+    palette?: GraphPalette;
+
+    corner?: string;
+
+    className?: string;
+}
+
+declare const Slope: ((props: SlopeItem & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare function GraphSlope({ title, fromLabel, toLabel, items: itemsProp, children, palette, corner, className }: GraphSlopeProps): react.JSX.Element;
+
+type UptimeStatus = 'ok' | 'degraded' | 'down' | 'empty';
+interface GraphUptimeProps {
+
+    title: string;
+
+    days: UptimeStatus[] | string;
+
+    from?: string;
+
+    to?: string;
+
+    columns?: number;
+
+    glyphs?: Glyphs;
+
+    palette?: GraphPalette;
+
+    corner?: string;
+
+    className?: string;
+}
+
+declare function GraphUptime({ title, days: daysProp, from, to, columns, glyphs, palette, corner, className }: GraphUptimeProps): react.JSX.Element;
+
+interface TreeNode {
+    label: string;
+    meta?: string;
+    accent?: boolean;
+    children?: TreeNode[];
+}
+interface NodeProps {
+
+    label?: string;
+    meta?: string;
+    accent?: boolean;
+    children?: ReactNode;
+}
+interface GraphTreeProps {
+
+    title: string;
+
+    nodes?: TreeNode[];
+
+    children?: ReactNode;
+
+    corner?: string;
+
+    className?: string;
+}
+
+declare const Node: ((props: NodeProps & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare function GraphTree({ title, nodes, children, corner, className }: GraphTreeProps): react.JSX.Element;
+
+interface TerminalProps {
+
+    title?: string;
+
+    prompt?: string;
+
+    children?: ReactNode;
+
+    corner?: string;
+
+    className?: string;
+}
+
+declare function Terminal({ title, prompt, children, corner, className }: TerminalProps): react.JSX.Element;
+
+type StepState = 'done' | 'now' | 'next';
+interface StepProps {
+
+    title?: string;
+
+    state?: StepState;
+
+    children?: ReactNode;
+}
+interface StepsProps {
+
+    title?: string;
+
+    children?: ReactNode;
+
+    corner?: string;
+
+    className?: string;
+}
+
+declare const Step: ((props: StepProps & {
+    children?: ReactNode;
+}) => null) & {
+    graphItem: string;
+    displayName?: string;
+};
+
+declare function Steps({ title, children, corner, className }: StepsProps): react.JSX.Element;
+
 declare function MdxPre({ children, ...rest }: HTMLAttributes<HTMLPreElement>): react.JSX.Element;
 declare function MdxAnchor({ href, children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>): react.JSX.Element;
 
@@ -2227,6 +2547,51 @@ declare const mdxComponents: {
     CodeBlock: typeof CodeBlock;
     CodeTabs: typeof CodeTabs;
     CodeTab: typeof CodeTab;
+    Graph: typeof Graph;
+    GraphDiff: typeof GraphDiff;
+    GraphFlow: typeof GraphFlow;
+    GraphSlope: typeof GraphSlope;
+    GraphTimeline: typeof GraphTimeline;
+    GraphTree: typeof GraphTree;
+    GraphUptime: typeof GraphUptime;
+    Terminal: typeof Terminal;
+    Steps: typeof Steps;
+    Path: ((props: PathProps & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Event: ((props: TimelineEvent & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Line: ((props: DiffLineProps & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Slope: ((props: SlopeItem & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Node: ((props: NodeProps & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
+    Step: ((props: StepProps & {
+        children?: ReactNode;
+    }) => null) & {
+        graphItem: string;
+        displayName?: string;
+    };
 };
 type MdxComponents = typeof mdxComponents;
 
@@ -2312,11 +2677,15 @@ export {
   DEFAULT_EXPERIMENTS,
   DEFAULT_LEVEL,
   DEFAULT_PRICING_TIERS,
+  DIM_OPACITY,
   DIVIDER_PATTERNS,
   DataTable,
   type DataTableProps,
   type DataTableVirtualization,
   DesignSandbox,
+  type DiffLineProps,
+  type DiffRow,
+  type DiffSign,
   Divider,
   type DividerProps,
   type DividerVariant,
@@ -2344,6 +2713,7 @@ export {
   ErrorSummary,
   type ErrorSummaryError,
   type ErrorSummaryProps,
+  Event,
   type ExperimentItem,
   ExperimentsView,
   type ExperimentsViewProps,
@@ -2356,9 +2726,38 @@ export {
   type FieldsetProps,
   type Finding,
   type FixedColour,
+  type FlowNode,
+  type FlowRow,
+  type FlowTone,
+  GLYPH_SETS,
   GitHubIcon,
   Glyph,
   type GlyphProps,
+  type GlyphSetName,
+  type Glyphs,
+  Graph,
+  GraphArrow,
+  GraphBody,
+  GraphDiff,
+  type GraphDiffProps,
+  GraphFlow,
+  type GraphFlowProps,
+  type GraphPalette,
+  type GraphProps,
+  GraphProse,
+  GraphRule,
+  GraphRuleY,
+  GraphSlope,
+  type GraphSlopeProps,
+  GraphTick,
+  GraphTimeline,
+  type GraphTimelineProps,
+  type GraphTone,
+  GraphTrack,
+  GraphTree,
+  type GraphTreeProps,
+  GraphUptime,
+  type GraphUptimeProps,
   HEADING_EMPHASIS,
   type HeadingLevel,
   Hero,
@@ -2373,6 +2772,7 @@ export {
   Legend,
   type LegendProps,
   type LevelDefinition,
+  Line,
   type LinkComponentProps,
   LinkProvider,
   type LinkProviderProps,
@@ -2406,6 +2806,8 @@ export {
   type NerdIconAccent,
   type NerdIconName,
   type NerdIconProps,
+  Node,
+  type NodeProps,
   NoteBlock,
   type NoteBlockProps,
   type OverlayAlign,
@@ -2417,6 +2819,8 @@ export {
   type PageTitleProps,
   Pagination,
   type PaginationProps,
+  Path,
+  type PathProps,
   type Polarity,
   Popover,
   type PopoverProps,
@@ -2486,6 +2890,8 @@ export {
   type SlideDeckHotkey,
   type SlideDeckProps,
   type SlideProps,
+  Slope,
+  type SlopeItem,
   Slugger,
   SocialIcon,
   type SocialIconName,
@@ -2497,6 +2903,11 @@ export {
   StatCard,
   type StatCardAccent,
   type StatCardProps,
+  Step,
+  type StepProps,
+  type StepState,
+  Steps,
+  type StepsProps,
   type Surface,
   Swatch,
   SwatchGroup,
@@ -2532,6 +2943,8 @@ export {
   type TabsVariant,
   Tag,
   type TagProps,
+  Terminal,
+  type TerminalProps,
   TextArea,
   type TextAreaProps,
   type TextTone,
@@ -2539,6 +2952,8 @@ export {
   type ThemeLevel,
   ThemeProvider,
   type ThemeProviderProps,
+  type TimelineEvent,
+  type TimelineState,
   type ToastActionOptions,
   type ToastApi,
   type ToastIntent,
@@ -2549,8 +2964,10 @@ export {
   type TokenRule,
   Tooltip,
   type TooltipProps,
+  type TreeNode,
   type TypeStep,
   type TypeStepName,
+  type UptimeStatus,
   type UseActiveHeadingOptions,
   type UseCopyToClipboardResult,
   WEB_FLOOR,
@@ -2562,29 +2979,47 @@ export {
   auditHueAgreement,
   auditSelectionDevices,
   borderVar,
+  childItems,
   childrenToText,
   cn,
   collectHeadings,
   composite,
   contrastRatio,
   createAnchorHeading,
+  defineItem,
+  elementsOf,
   fontVar,
   getRecommendedColours,
   getThemeInitScript,
+  hasHost,
+  intensityClass,
+  intensityGlyph,
+  intensityLevel,
   isExternalHref,
+  isHost,
   isMedium,
   isRecommendedColourClass,
   isThemeLevel,
+  itemText,
+  listItems,
   mdxComponents,
+  nestedList,
   nextLevel,
+  numberOf,
+  paragraphsOf,
   parseColor,
   relativeLuminance,
+  resolveGlyphs,
   scanRules,
   scanTokenRules,
   semanticTokens,
   slugify,
+  splitDash,
+  splitLabel,
   surfaceVar,
+  textOf,
   textVar,
+  toneClass,
   useActiveHeading,
   useCopyToClipboard,
   useDocsLinkComponent,
@@ -2594,4 +3029,5 @@ export {
   useOptionalToast,
   useTheme,
   useToast,
+  words,
 };

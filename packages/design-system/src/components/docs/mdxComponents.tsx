@@ -10,6 +10,23 @@ import { Badge } from '../Badge';
 import { Card } from '../Card';
 import { Tag } from '../Tag';
 import { AsciiDivider } from '../AsciiDivider';
+import {
+  Event,
+  Graph,
+  GraphDiff,
+  GraphFlow,
+  GraphSlope,
+  GraphTimeline,
+  GraphTree,
+  GraphUptime,
+  Line,
+  Node,
+  Path,
+  Slope,
+  Step,
+  Steps,
+  Terminal,
+} from './graphs';
 
 /**
  * Pull `language-ts` off the `<code>` child that MDX nests inside every `<pre>`,
@@ -78,6 +95,21 @@ export const mdxComponents = {
   CodeBlock,
   CodeTabs,
   CodeTab,
+  Graph,
+  GraphDiff,
+  GraphFlow,
+  GraphSlope,
+  GraphTimeline,
+  GraphTree,
+  GraphUptime,
+  Terminal,
+  Steps,
+  Path,
+  Event,
+  Line,
+  Slope,
+  Node,
+  Step,
 };
 
 export type MdxComponents = typeof mdxComponents;
