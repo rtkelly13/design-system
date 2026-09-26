@@ -718,7 +718,7 @@ const images = new Map();
 for (const job of ALL_JOBS) {
   const at = `${job.file}:${job.line}`;
   const texts = job.body.map(({ text }) => text);
-  if (texts.some((text) => /install-playwright|playwright\s+install/.test(text))) {
+  if (texts.some((text) => /^\s*(?:-\s+)?(?:uses:.*install-playwright|run:.*playwright\s+install)/.test(text))) {
     problems.push(
       `${at}: job \`${job.id}\` installs a browser. Rule 9: jobs that render run in the ` +
         `pinned Playwright image, which carries Chromium; a second install is a second Chromium.`,
@@ -789,7 +789,10 @@ for (const job of jobsOf('.github/workflows/ci.yml')) {
   }
   if (job.id !== 'visual') continue;
   const lookup = /- name: Previous Verdict\n\s+id: verdict\n\s+if: github\.event_name == 'pull_request'\n/.test(body);
-  const key = /key=visual-verdict-\$\{ImageOS\}-\$\{ImageVersion\}-\$\(node scripts\/render-inputs\.mjs\)/.test(body);
+  // The image is the render environment; its digest is the part of the key
+  // no tracked file can supply. The render-environment check above already
+  // holds that digest to the job's own container.
+  const key = /key=visual-verdict-[0-9a-f]{64}-\$\(node scripts\/render-inputs\.mjs\)/.test(body);
   if (readsVerdict && !lookup) {
     problems.push(
       'ci.yml `visual`: the `Previous Verdict` lookup must be `if: github.event_name == ' +
@@ -798,8 +801,8 @@ for (const job of jobsOf('.github/workflows/ci.yml')) {
   }
   if (readsVerdict && !key) {
     problems.push(
-      'ci.yml `visual`: the verdict key must be `visual-verdict-${ImageOS}-${ImageVersion}-` ' +
-        'plus `node scripts/render-inputs.mjs`. Without the image, a new runner reuses an old verdict.',
+      'ci.yml `visual`: the verdict key must be `visual-verdict-<image digest>-` plus ' +
+        '`node scripts/render-inputs.mjs`. Without the image, a new render environment reuses an old verdict.',
     );
   }
   note('verdict', !readsVerdict || (lookup && key), `ci.yml visual — ${readsVerdict ? 'reuses a verdict; PR-only lookup, keyed on inputs and image' : 'no verdict reuse'}`);
