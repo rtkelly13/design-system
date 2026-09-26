@@ -116,6 +116,16 @@ measurements rather than a guess:
   already did. The group includes the event name so rule 8's manual
   `workflow_dispatch` re-run is never cancelled by a push or queued behind one.
 
+Not done, and the largest lever left: **re-run only the stories a change can
+reach.** The verdict cache above is all-or-nothing. Replaying the last 100 merged
+PRs against the story import graph, 80 touched a rendering input; 27 of those
+touched something every story depends on (the lockfile, the theme ladder, the
+Storybook preview, a stylesheet), and the other 53 reached a median of **5 of
+119** asserted stories (p90 37). Scanning only those would be ~40% of today's
+visual and a11y work on rendering PRs, ~32% across all PRs. It needs a per-story
+key rather than a per-tree one, with snapshot files and `CASES` rows mapped to
+their story, and `main` still running everything as the check on the graph.
+
 Not done, and the next lever if the story count doubles again: sharding the
 walkthrough across runners with `--shard` and `merge-reports`. Worth roughly
 another 30s, at the cost of a merge job and three times the runner minutes.
