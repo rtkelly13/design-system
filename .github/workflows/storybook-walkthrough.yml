@@ -48,7 +48,7 @@ jobs:
       # what most pull requests restore from.
       - name: Rendering Inputs
         id: inputs
-        run: echo "key=walkthrough-report-${{ runner.os }}-$(node scripts/render-inputs.mjs)" >> "$GITHUB_OUTPUT"
+        run: echo "key=walkthrough-report-${ImageOS}-${ImageVersion}-$(node scripts/render-inputs.mjs)" >> "$GITHUB_OUTPUT"
 
       - name: Previous Report
         id: report
