@@ -38,20 +38,52 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # The report is a function of its inputs, the same ones the `visual` job's
+      # verdict is keyed on (`scripts/render-inputs.mjs` — this workflow and the
+      # walkthrough config are tracked files, so they count). When a run with
+      # identical inputs already produced a report, a pull request restores it
+      # and attaches it again rather than re-rendering every story on every
+      # Level: ~3 minutes, and the report a reviewer downloads is byte-for-byte
+      # the one those inputs produce. `main` always renders and saves, which is
+      # what most pull requests restore from.
+      - name: Rendering Inputs
+        id: inputs
+        run: echo "key=walkthrough-report-${ImageOS}-${ImageVersion}-$(node scripts/render-inputs.mjs)" >> "$GITHUB_OUTPUT"
+
+      - name: Previous Report
+        id: report
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: packages/design-system/walkthrough-report
+          key: ${{ steps.inputs.outputs.key }}
+
       - name: Setup
+        if: steps.report.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup
 
       - name: Build Storybook
+        if: steps.report.outputs.cache-hit != 'true'
         run: pnpm build-storybook
 
       - name: Install Playwright Browsers
+        if: steps.report.outputs.cache-hit != 'true'
         uses: ./.github/actions/install-playwright
 
       # The long pole of the whole PR, and the one that grows with the system:
       # every story adds four captures. `playwright.walkthrough.config.ts` runs
       # it at six workers for that reason — measured, see the note there.
       - name: Capture Walkthrough
+        if: steps.report.outputs.cache-hit != 'true'
         run: pnpm walkthrough
+
+      # Only a complete report is worth reusing, so only on success.
+      - name: Save Report
+        if: steps.report.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: packages/design-system/walkthrough-report
+          key: ${{ steps.inputs.outputs.key }}
 
       - name: Upload Walkthrough Report
         id: upload
@@ -78,6 +110,11 @@ jobs:
           {
             echo "## Storybook Walkthrough"
             echo
+            if [ "${{ steps.report.outputs.cache-hit }}" = "true" ]; then
+              echo "Restored, not re-rendered: these rendering inputs already produced this report"
+              echo "(key \`${{ steps.inputs.outputs.key }}\`)."
+              echo
+            fi
             if [ -d walkthrough-report/data ]; then
               total=$(find walkthrough-report/data -type f -name '*.png' | wc -l)
               echo "Attached **${total}** screenshots (identical captures are deduplicated)."
