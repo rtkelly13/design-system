@@ -72,6 +72,47 @@ const KNOWN: Record<string, number> = {
 const LEVELS = ['midnight', 'sketch'] as const;
 
 /**
+ * The components the visual suite asserts at a narrow viewport, read from its
+ * `MOBILE_CASES` the same way `assertedStoryIds` reads the rest.
+ */
+function narrowViewportComponents(): Set<string> {
+  const spec = readFileSync(path.join(ROOT, 'tests/visual.spec.ts'), 'utf8');
+  const start = spec.indexOf('const MOBILE_CASES');
+  const block = spec.slice(start, spec.indexOf('];', start));
+  return new Set([...block.matchAll(/id: '([a-z0-9-]+)--/g)].map((m) => m[1]));
+}
+
+/**
+ * Whether this story is scanned in this project.
+ *
+ * `chromium` scans everything. `mobile` scans only the components that have a
+ * narrow-viewport case in the visual suite — every story of them, so a sibling
+ * story like `--sketch-mode` stays in scope beside the `--dark-mode` one that
+ * the visual suite names. It used to scan every story, which doubled the
+ * slowest step in CI for answers that were already known.
+ *
+ * Measured, not assumed. The full matrix was run once with every violation
+ * recorded (all impacts, every node target): 114 stories, both Levels, both
+ * viewports. At the serious-and-critical bar this suite gates on, exactly one
+ * result differed between the viewports — the `KNOWN` contrast node on
+ * `saas-admindashboardlayout--sketch-mode` — and it is a component this scope
+ * keeps. The rest are the same DOM laid out wider. Mobile went from 233 scans
+ * to 58.
+ *
+ * The claim is kept honest rather than trusted: `A11Y_FULL_MATRIX=1` restores
+ * every story in both projects, and `ci.yml` sets it on every push to `main`.
+ * A story that starts differing at the narrow viewport fails there, the run
+ * after it merges, and the fix is adding its component to `MOBILE_CASES` —
+ * which it then needs anyway, since a layout that breaks narrow wants a
+ * narrow baseline.
+ */
+const FULL_MATRIX = process.env.A11Y_FULL_MATRIX === '1';
+const NARROW = narrowViewportComponents();
+function scannedIn(project: string, id: string): boolean {
+  return FULL_MATRIX || project !== 'mobile' || NARROW.has(id.split('--')[0]);
+}
+
+/**
  * Stories that pin their own Level, and must not be forced onto the other one.
  *
  * A story named `--dark-mode` or `--sketch-mode` wraps itself in a provider for
@@ -138,7 +179,11 @@ async function markScope(page: Page) {
 test.describe('Accessibility', () => {
   for (const level of LEVELS) {
     for (const id of assertedStoryIds()) {
-      test(`${id} — ${level}`, async ({ page }) => {
+      test(`${id} — ${level}`, async ({ page }, testInfo) => {
+        test.skip(
+          !scannedIn(testInfo.project.name, id),
+          'No narrow-viewport case for this component; see `scannedIn`',
+        );
         test.skip(
           pinsItsOwnLevel(id) && level !== LEVELS[0],
           'Story pins its own Level; forcing the other one mixes two palettes',
@@ -212,7 +257,8 @@ const DATATABLE_CASES = [
 test.describe('DataTable semantics', () => {
   for (const level of LEVELS) {
     for (const { id, rowcount } of DATATABLE_CASES) {
-      test(`${id} — keyboard sort — ${level}`, async ({ page }) => {
+      test(`${id} — keyboard sort — ${level}`, async ({ page }, testInfo) => {
+        test.skip(!scannedIn(testInfo.project.name, id), 'No narrow-viewport case for this component; see `scannedIn`');
         await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=level:${level}`);
         await waitForStoryRendered(page, id);
         await page.evaluate(() => document.fonts.ready);
@@ -327,7 +373,8 @@ const OPEN_POPUPS = [
 test.describe('Accessibility — open popups', () => {
   for (const level of LEVELS) {
     for (const { id, trigger, popup } of OPEN_POPUPS) {
-      test(`${id} open — ${level}`, async ({ page }) => {
+      test(`${id} open — ${level}`, async ({ page }, testInfo) => {
+        test.skip(!scannedIn(testInfo.project.name, id), 'No narrow-viewport case for this component; see `scannedIn`');
         await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=level:${level}`);
         await waitForStoryRendered(page, id);
         await page.evaluate(() => document.fonts.ready);
