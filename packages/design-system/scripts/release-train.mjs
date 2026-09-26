@@ -6,6 +6,11 @@ import {
   selectGatingChecks,
   summariseChecks,
 } from './release-train-checks.mjs';
+import {
+  PRODUCTION_ENVIRONMENT,
+  assessProductionDeployment,
+  selectProductionDeployment,
+} from './release-train-deployment.mjs';
 
 function run(command) {
   try {
@@ -56,38 +61,26 @@ if (targetRefLine) {
   targetSha = targetRefLine.split(/\s+/)[0];
 }
 
-// 4. Query GitHub Deployments API for latest Production deployments
-let prodDeployments = [];
+// 4. Query the site's production deployment — one environment, by exact name.
+//    See release-train-deployment.mjs for why not "anything named production".
+let prodDeployment = null;
 try {
-  const deploymentsJson = run(`gh api "repos/${repo}/deployments?per_page=15"`);
+  const deploymentsJson = run(
+    `gh api "repos/${repo}/deployments?environment=${encodeURIComponent(PRODUCTION_ENVIRONMENT)}&per_page=5"`,
+  );
   if (deploymentsJson) {
-    const allDeployments = JSON.parse(deploymentsJson);
-    // Find deployments belonging to production environments
-    const matched = allDeployments.filter((d) => {
-      const env = (d.environment || d.original_environment || '').toLowerCase();
-      return env.includes('production') || env === 'prod';
-    });
-
-    // Group by environment name so we have the latest deployment for each project surface
-    const latestByEnv = new Map();
-    for (const d of matched) {
-      const envKey = d.environment || d.original_environment;
-      if (!latestByEnv.has(envKey)) {
-        latestByEnv.set(envKey, d);
-      }
-    }
-
-    prodDeployments = Array.from(latestByEnv.values());
-
-    // Fetch status for each deployment
-    for (const deploy of prodDeployments) {
-      const statusesJson = run(
-        `gh api "repos/${repo}/deployments/${deploy.id}/statuses?per_page=1"`,
-      );
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        deploy.latestStatus = statuses[0] || null;
-      }
+    prodDeployment = selectProductionDeployment(JSON.parse(deploymentsJson));
+  } else {
+    console.warn(
+      `⚠️ Warning: Could not fetch deployments for ${PRODUCTION_ENVIRONMENT}.`,
+    );
+  }
+  if (prodDeployment) {
+    const statusesJson = run(
+      `gh api "repos/${repo}/deployments/${prodDeployment.id}/statuses?per_page=1"`,
+    );
+    if (statusesJson) {
+      prodDeployment.latestStatus = JSON.parse(statusesJson)[0] || null;
     }
   }
 } catch (e) {
@@ -128,32 +121,11 @@ try {
 // 6. Assess deployment requirement
 const isTargetDrift = !targetSha || targetSha !== sourceSha;
 
-let anyDeployFailed = false;
-let anyDeployPending = false;
-let anyDeployOutdated = false;
-const deployDetails = [];
-
-if (prodDeployments.length > 0) {
-  for (const dep of prodDeployments) {
-    const state = dep.latestStatus?.state || 'unknown';
-    const sha = dep.sha || 'unknown';
-    const env = dep.environment || 'production';
-    deployDetails.push(`${env}: [${sha.slice(0, 7)}] ${state}`);
-
-    if (['failure', 'error'].includes(state)) {
-      anyDeployFailed = true;
-    }
-    if (['pending', 'in_progress', 'queued'].includes(state)) {
-      anyDeployPending = true;
-    }
-    if (sha !== sourceSha) {
-      anyDeployOutdated = true;
-    }
-  }
-} else {
-  // No previous deployments found
-  anyDeployOutdated = true;
-}
+const deployment = assessProductionDeployment(prodDeployment, sourceSha);
+const anyDeployFailed = deployment.failed;
+const anyDeployPending = deployment.pending;
+const anyDeployOutdated = deployment.outdated;
+const deployDetails = [deployment.detail];
 
 let shouldDeploy = false;
 let actionReason = '';
@@ -179,6 +151,8 @@ if (anyDeployPending && !force) {
     actionReason = `Pointer ${targetBranch} (${targetSha.slice(0, 7)}) is behind ${sourceBranch} (${sourceSha.slice(0, 7)}).`;
   } else if (!targetSha) {
     actionReason = `Initial release: initializing ${targetBranch} pointer to ${sourceSha.slice(0, 7)}.`;
+  } else if (deployment.missing) {
+    actionReason = `No ${PRODUCTION_ENVIRONMENT} deployment found; ${targetBranch} needs deploying.`;
   } else {
     actionReason = `Deployed code is behind ${sourceBranch} (${sourceSha.slice(0, 7)}).`;
   }
