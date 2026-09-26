@@ -67,6 +67,11 @@ measurements rather than a guess:
   `--runs`, `--branch`, `--json`). The "Roughly" column above is its p50 over
   20 runs in September 2026. It had said `visual` took 60s when its median was
   over five minutes, because nothing read those timings.
+- **The a11y suite's narrow viewport is scoped on pull requests.** `mobile` scans
+  only components with a narrow-viewport case in `visual.spec.ts` (58 scans, not
+  233); every push to `main` runs the full matrix with `A11Y_FULL_MATRIX=1`, so the
+  claim that the rest agree with desktop is re-checked after every merge rather
+  than trusted. The evidence and the rule are in `scannedIn`, `tests/a11y.spec.ts`.
 - **Below the step, the `Telemetry` step.** `test` and `visual` end with
   `scripts/ci-telemetry.mjs tests`, which reads the JSON reports Vitest and
   Playwright write under `CI`. It puts the slowest tests, retries, worker
