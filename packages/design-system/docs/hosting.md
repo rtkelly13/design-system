@@ -137,10 +137,17 @@ past that, so both projects failed on every commit — previews of `main` includ
 "Deployment failed". The branch list is now one anchored regex, and
 `scripts/vercel-config.test.mjs` pins the length and which refs build.
 
-The train's own health check did not notice either. It reads the latest deployment of every
-environment whose name contains `production` among the last 15, and the storybook project's had
+The train's own health check did not notice either. It read the latest deployment of every
+environment whose name contained `production` among the last 15, and the storybook project's had
 long fallen out of that window behind previews — so it saw `Production – design-system`, a
 different project that deploys `main`, report success, and read that as this site being healthy.
+
+It now reads one environment, `Production – design-system-storybook`, matched exactly and asked
+for with the deployments API's `?environment=` filter, so no number of previews can push it out of
+view. Finding no deployment for that environment is a reason to deploy, not a quiet `SKIP`. The
+selection is a pure function in `scripts/release-train-deployment.mjs`, tested beside
+`scripts/release-train-checks.mjs`: another project's deployment is ignored, a missing one departs,
+a failed one redeploys.
 
 ### Reading a train
 
