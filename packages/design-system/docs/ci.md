@@ -72,6 +72,15 @@ measurements rather than a guess:
   233); every push to `main` runs the full matrix with `A11Y_FULL_MATRIX=1`, so the
   claim that the rest agree with desktop is re-checked after every merge rather
   than trusted. The evidence and the rule are in `scannedIn`, `tests/a11y.spec.ts`.
+- **`visual` reuses a verdict its inputs already earned.** Its first step hashes
+  every tracked file that can reach the job's result (`scripts/render-inputs.mjs`,
+  default-deny; `--list` prints what it leaves out and why) and, on a pull request,
+  looks that hash up as a cache key. A hit skips everything after checkout, which is
+  the whole ~5 minutes; a full pass records one. `main` never looks up and always
+  records, so it is both the source most PRs hit and the run where a wrong
+  exclusion would show. The key is inputs rather than `storybook-static/` because
+  the build is not reproducible: `react-docgen-typescript` reorders props between
+  runs of one tree, moving 79 of 313 files.
 - **Below the step, the `Telemetry` step.** `test` and `visual` end with
   `scripts/ci-telemetry.mjs tests`, which reads the JSON reports Vitest and
   Playwright write under `CI`. It puts the slowest tests, retries, worker
