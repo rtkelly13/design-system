@@ -693,6 +693,89 @@ for (const file of PROSE) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Rules 5 and 9 — the render environment is one pinned image.
+ *
+ * A baseline is a claim about pixels in one environment, so every job that
+ * renders — the gated suites, the snapshot writer, the walkthrough — runs in
+ * the same official Playwright image, named by digest, at the version the
+ * lockfile pins. Nothing installs a browser at run time: the image carries it.
+ * Each of those is checked, because each has been wrong somewhere before — a
+ * `playwright install` outside the image is a second Chromium, a tag without
+ * a digest is a render environment someone else can move, and an image a
+ * version behind the lockfile fails every test with a missing executable.
+ *
+ * A cache key built from `render-inputs.mjs` must name the digest too: that
+ * hash covers every tracked file, and the image is the one input none records.
+ * ------------------------------------------------------------------ */
+
+const RENDER_IMAGE = /^mcr\.microsoft\.com\/playwright:v(\d+\.\d+\.\d+)-noble@sha256:([0-9a-f]{64})$/;
+const RENDERS = /^\s*(?:-\s+)?run:.*(?:pnpm\s+(?:test:visual|test:a11y|walkthrough)\b|playwright\s+test)/;
+const lockedPlaywright = /^ {2}'@playwright\/test@(\d+\.\d+\.\d+)':/m.exec(
+  readFileSync(path.join(GITHUB_ROOT, 'pnpm-lock.yaml'), 'utf8'),
+)?.[1];
+const images = new Map();
+
+for (const job of ALL_JOBS) {
+  const at = `${job.file}:${job.line}`;
+  const texts = job.body.map(({ text }) => text);
+  if (texts.some((text) => /^\s*(?:-\s+)?(?:uses:.*install-playwright|run:.*playwright\s+install)/.test(text))) {
+    problems.push(
+      `${at}: job \`${job.id}\` installs a browser. Rule 9: jobs that render run in the ` +
+        `pinned Playwright image, which carries Chromium; a second install is a second Chromium.`,
+    );
+  }
+  if (!texts.some((text) => RENDERS.test(text))) continue;
+
+  const c = texts.findIndex((text) => /^ {4}container:\s*$/.test(text));
+  const image = c < 0 ? null : /^ {6}image:\s*(\S+)\s*$/.exec(texts[c + 1] ?? '')?.[1];
+  const options = c < 0 ? '' : /^ {6}options:\s*(.+)$/.exec(texts[c + 2] ?? '')?.[1] ?? '';
+  const parsed = image && RENDER_IMAGE.exec(image);
+  if (!parsed) {
+    problems.push(
+      `${at}: job \`${job.id}\` renders but does not run in the pinned image. Declare ` +
+        `\`container: image: mcr.microsoft.com/playwright:v<version>-noble@sha256:<digest>\` — ` +
+        `rule 5: a baseline is only comparable with one written in the same environment.`,
+    );
+    note('render', false, `${at} — ${job.id}: ${image ?? 'no container'}`);
+    continue;
+  }
+  if (parsed[1] !== lockedPlaywright) {
+    problems.push(
+      `${at}: job \`${job.id}\` runs Playwright image v${parsed[1]}, and the lockfile pins ` +
+        `@playwright/test ${lockedPlaywright}. The image's Chromium is the lockfile's only at ` +
+        `the same version — bump both together.`,
+    );
+  }
+  if (!texts.some((text) => /^\s*run:\s*git config --global --add safe\.directory "\$GITHUB_WORKSPACE"\s*$/.test(text))) {
+    problems.push(
+      `${at}: job \`${job.id}\` runs in a container without marking the workspace a safe ` +
+        `directory. The container is root over a runner-owned checkout, so git refuses it and ` +
+        `every script that asks git for the repository root fails or falls back.`,
+    );
+  }
+  if (!/--ipc=host/.test(options)) {
+    problems.push(`${at}: job \`${job.id}\` needs \`options: --ipc=host\` — Chromium renders into /dev/shm, 64MB by default.`);
+  }
+  images.set(image, [...(images.get(image) ?? []), `${job.file} ${job.id}`]);
+  for (const text of texts) {
+    if (/key=/.test(text) && /render-inputs\.mjs|\$hash/.test(text) && !text.includes(parsed[2])) {
+      problems.push(
+        `${at}: job \`${job.id}\` builds a cache key from render-inputs.mjs without the image ` +
+          `digest. The hash covers tracked files; the image is the one input none records.`,
+      );
+    }
+  }
+  note('render', true, `${at} — ${job.id}: v${parsed[1]} @ ${parsed[2].slice(0, 12)}`);
+}
+if (images.size > 1) {
+  problems.push(
+    `Jobs render in ${images.size} different images: ` +
+      [...images].map(([image, jobs]) => `${image} (${jobs.join(', ')})`).join('; ') +
+      `. One image, or baselines written by one job are checked in another environment.`,
+  );
+}
+
+/* ------------------------------------------------------------------ *
  * Rule 6's one exception — a reused `visual` verdict — held to its shape.
  *
  * A gate that can be skipped is a gate that can be skipped by accident, and
@@ -713,7 +796,17 @@ for (const job of jobsOf('.github/workflows/ci.yml')) {
   }
   if (job.id !== 'visual') continue;
   const lookup = /- name: Previous Verdict\n\s+id: verdict\n\s+if: github\.event_name == 'pull_request'\n/.test(body);
-  const key = /key=visual-verdict-\$\{ImageOS\}-\$\{ImageVersion\}-\$\(node scripts\/render-inputs\.mjs\)/.test(body);
+  // The image is the render environment; its digest is the part of the key
+  // no tracked file can supply. The render-environment check above already
+  // holds that digest to the job's own container.
+  // The hash is assigned before it is used, and checked non-empty. Written as
+  // `echo "key=...-$(node ...)"`, a crash in the script left the step green and
+  // the key ending in `-` — one constant that every pull request would match.
+  const key =
+    /^\s+hash=\$\(node scripts\/render-inputs\.mjs\)\s*$/m.test(body) &&
+    /^\s+\[ -n "\$hash" \] \|\|/m.test(body) &&
+    /key=visual-verdict-[0-9a-f]{64}-\$hash"/.test(body) &&
+    !/\$\(node scripts\/render-inputs\.mjs\)"/.test(body);
   if (readsVerdict && !lookup) {
     problems.push(
       'ci.yml `visual`: the `Previous Verdict` lookup must be `if: github.event_name == ' +
@@ -722,8 +815,9 @@ for (const job of jobsOf('.github/workflows/ci.yml')) {
   }
   if (readsVerdict && !key) {
     problems.push(
-      'ci.yml `visual`: the verdict key must be `visual-verdict-${ImageOS}-${ImageVersion}-` ' +
-        'plus `node scripts/render-inputs.mjs`. Without the image, a new runner reuses an old verdict.',
+      'ci.yml `visual`: the verdict key must be `visual-verdict-<image digest>-$hash`, with ' +
+        '`hash=$(node scripts/render-inputs.mjs)` assigned first and checked non-empty. Without the ' +
+        'image a new render environment reuses an old verdict; inlined, a crashed hash becomes a constant key.',
     );
   }
   note('verdict', !readsVerdict || (lookup && key), `ci.yml visual — ${readsVerdict ? 'reuses a verdict; PR-only lookup, keyed on inputs and image' : 'no verdict reuse'}`);
@@ -776,7 +870,7 @@ for (const job of jobsOf('.github/workflows/ci.yml')) {
 /* ------------------------------------------------------------------ */
 
 if (listing) {
-  const sections = ['pins', 'ceilings', 'uploads', 'roster', 'names', 'scripts', 'rules', 'citations', 'verdict'];
+  const sections = ['pins', 'ceilings', 'uploads', 'roster', 'names', 'scripts', 'rules', 'citations', 'render', 'verdict'];
   for (const section of sections) {
     const rows = census.filter((row) => row.section === section);
     if (!rows.length) continue;
