@@ -9,9 +9,15 @@
  * without notice.
  *
  * This checks the uncompressed (raw) and gzipped sizes of:
- *   - dist/index.mjs  (ESM bundle)
- *   - dist/index.js   (CommonJS bundle)
+ *   - every `.mjs` file under dist/  (ESM output, one file per module)
+ *   - every `.js` file under dist/   (CommonJS output, one file per module)
  *   - src/theme.css   (Generated design token & theme ladder CSS)
+ *
+ * Since #301 `dist/` is one file per source module, so each format is weighed
+ * as all of its files concatenated in path order — the same bytes the single
+ * `dist/index.mjs` used to hold, plus the per-file import lines. This gate
+ * weighs what the package *ships*; what a consumer pays for the parts it
+ * imports is `check:import-cost`.
  *
  * ## A ratchet, not an arbitrary guess
  *
@@ -24,7 +30,7 @@
  *   node scripts/check-bundle-size.mjs --list    print current sizes and ceilings
  */
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -231,17 +237,29 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * runtime dependency was added. Re-measured against the 0.11.0 base: ESM
  * 362,938 B raw / 84,112 B gzip, CommonJS 397,911 B raw / 86,900 B gzip
  * locally; the ceilings allow a small Linux gzip variance.
+ *
+ * Re-keyed for the per-module output (#301). The flat `dist/index.mjs` is now
+ * a 4 KB barrel, so a ceiling on that file alone would have stopped weighing
+ * anything. Measured on the new layout, locally on macOS: ESM 387,723 B raw
+ * / 89,050 B gzip across 117 files, CommonJS 565,563 B / 98,414 B. The ESM
+ * rise over the flat file (362,938 B → 387,723 B) is the import and export
+ * lines each module now carries for its neighbours, and the barrels' export
+ * lists written out by name (`scripts/expand-star-exports.mjs`). The CommonJS rise is
+ * larger because esbuild writes its interop preamble (`__defProp`,
+ * `__export`, `__toCommonJS`, `__toESM`) into every file rather than once —
+ * about 1.5 KB a file, boilerplate rather than behaviour, and most of it
+ * absorbed by gzip. The ceilings carry about 2% for the Linux gzip spread.
  */
 const BUDGETS = {
-  'dist/index.mjs': {
-    maxRaw: 365_000,
-    maxGzip: 85_000,
-    desc: 'ESM bundle',
+  'dist/**/*.mjs': {
+    maxRaw: 395_000,
+    maxGzip: 91_000,
+    desc: 'ESM output, every module',
   },
-  'dist/index.js': {
-    maxRaw: 400_000,
-    maxGzip: 88_000,
-    desc: 'CommonJS bundle',
+  'dist/**/*.js': {
+    maxRaw: 577_000,
+    maxGzip: 100_500,
+    desc: 'CommonJS output, every module',
   },
   'src/theme.css': {
     maxRaw: 27_000,
@@ -254,17 +272,38 @@ function formatBytes(bytes) {
   return `${(bytes / 1024).toFixed(2).padStart(6)} KB (${bytes.toLocaleString('en-US')} B)`;
 }
 
+/** Every emitted file under `dist/` ending in `ext`, in path order. */
+function outputFiles(ext) {
+  const walk = (dir) =>
+    readdirSync(dir).flatMap((entry) => {
+      const full = path.join(dir, entry);
+      return statSync(full).isDirectory() ? walk(full) : [full];
+    });
+  const dist = path.join(ROOT, 'dist');
+  return existsSync(dist) ? walk(dist).filter((file) => file.endsWith(ext)).sort() : [];
+}
+
+/** The bytes a budget key weighs: one file, or a format's whole output. */
+function contentOf(rel) {
+  const glob = rel.match(/^dist\/\*\*\/\*(\.m?js)$/);
+  if (!glob) {
+    const full = path.join(ROOT, rel);
+    return existsSync(full) ? readFileSync(full) : null;
+  }
+  const files = outputFiles(glob[1]);
+  return files.length ? Buffer.concat(files.map((file) => readFileSync(file))) : null;
+}
+
 const problems = [];
 const rows = [];
 
 for (const [rel, budget] of Object.entries(BUDGETS)) {
-  const full = path.join(ROOT, rel);
-  if (!existsSync(full)) {
+  const content = contentOf(rel);
+  if (!content) {
     problems.push(`${rel} does not exist. Run 'pnpm build' first.`);
     continue;
   }
 
-  const content = readFileSync(full);
   const rawSize = content.length;
   const gzipSize = gzipSync(content).length;
 
