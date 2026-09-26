@@ -48,10 +48,10 @@ now either — the estate audit (`repo-governance vercel-gating`, in `shared-uti
 counts what Vercel *did*: deployments created off the allowed refs, and whether the
 latest Ready production build matches `origin/main`.
 
-`pnpm check:deployed` compares the live `index.json` with this build, and
-`.github/workflows/deployment-drift.yml` runs it on pushes to `main` and daily. That
-turns silence into a red mark someone owns, and catches drift within one merge instead
-of thirty.
+`pnpm check:deployed` compares the live `index.json` with a Storybook build, and
+`.github/workflows/deployment-drift.yml` runs it against the `production` branch after every
+release train and daily. That turns silence into a red mark someone owns, and catches a stuck
+deploy within one train instead of thirty merges.
 
 ### The production domain tracks `production`, and the release train moves it
 
@@ -150,10 +150,16 @@ decision with its reason. It is the fastest answer to "why is the site not updat
 the workflow with `force` to advance the pointer when the SHAs already match, which is how to
 redeploy without a new commit.
 
-**`check:deployed` and `deployment-drift` compare the live site against `main`,** not against
-`production`. Between trains that makes them red, truthfully: there is merged work the site does
-not have yet. Read a red drift run as *a train is due*, and only investigate if one has departed
-since and the gap remains.
+**`deployment-drift` compares the live site against `production`, not `main`.** Until
+26 September it compared against `main`, which made it red after nearly every merge until the
+next train. That was truthful but useless: *a train is due* is the train's own question, and a
+check that is red by design hides the red that is a fault. A red run now means the domain is not
+serving what the pointer says: a failed or stuck Vercel build, or the account quota. It runs when
+the Release Train workflow completes (`workflow_run`, because the train pushes with
+`GITHUB_TOKEN` and GitHub starts no workflow from such a push) and daily.
+
+Run locally, `pnpm check:deployed` compares against whatever you built. On `main` that answers
+"what would the next train ship", and it is red between trains for the old reason.
 
 ### Why the Vercel check is not, and cannot be, a required check
 
