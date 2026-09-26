@@ -746,12 +746,19 @@ for (const job of ALL_JOBS) {
         `the same version — bump both together.`,
     );
   }
+  if (!texts.some((text) => /^\s*run:\s*git config --global --add safe\.directory "\$GITHUB_WORKSPACE"\s*$/.test(text))) {
+    problems.push(
+      `${at}: job \`${job.id}\` runs in a container without marking the workspace a safe ` +
+        `directory. The container is root over a runner-owned checkout, so git refuses it and ` +
+        `every script that asks git for the repository root fails or falls back.`,
+    );
+  }
   if (!/--ipc=host/.test(options)) {
     problems.push(`${at}: job \`${job.id}\` needs \`options: --ipc=host\` — Chromium renders into /dev/shm, 64MB by default.`);
   }
   images.set(image, [...(images.get(image) ?? []), `${job.file} ${job.id}`]);
   for (const text of texts) {
-    if (/render-inputs\.mjs/.test(text) && /key=/.test(text) && !text.includes(parsed[2])) {
+    if (/key=/.test(text) && /render-inputs\.mjs|\$hash/.test(text) && !text.includes(parsed[2])) {
       problems.push(
         `${at}: job \`${job.id}\` builds a cache key from render-inputs.mjs without the image ` +
           `digest. The hash covers tracked files; the image is the one input none records.`,
@@ -792,7 +799,14 @@ for (const job of jobsOf('.github/workflows/ci.yml')) {
   // The image is the render environment; its digest is the part of the key
   // no tracked file can supply. The render-environment check above already
   // holds that digest to the job's own container.
-  const key = /key=visual-verdict-[0-9a-f]{64}-\$\(node scripts\/render-inputs\.mjs\)/.test(body);
+  // The hash is assigned before it is used, and checked non-empty. Written as
+  // `echo "key=...-$(node ...)"`, a crash in the script left the step green and
+  // the key ending in `-` — one constant that every pull request would match.
+  const key =
+    /^\s+hash=\$\(node scripts\/render-inputs\.mjs\)\s*$/m.test(body) &&
+    /^\s+\[ -n "\$hash" \] \|\|/m.test(body) &&
+    /key=visual-verdict-[0-9a-f]{64}-\$hash"/.test(body) &&
+    !/\$\(node scripts\/render-inputs\.mjs\)"/.test(body);
   if (readsVerdict && !lookup) {
     problems.push(
       'ci.yml `visual`: the `Previous Verdict` lookup must be `if: github.event_name == ' +
@@ -801,8 +815,9 @@ for (const job of jobsOf('.github/workflows/ci.yml')) {
   }
   if (readsVerdict && !key) {
     problems.push(
-      'ci.yml `visual`: the verdict key must be `visual-verdict-<image digest>-` plus ' +
-        '`node scripts/render-inputs.mjs`. Without the image, a new render environment reuses an old verdict.',
+      'ci.yml `visual`: the verdict key must be `visual-verdict-<image digest>-$hash`, with ' +
+        '`hash=$(node scripts/render-inputs.mjs)` assigned first and checked non-empty. Without the ' +
+        'image a new render environment reuses an old verdict; inlined, a crashed hash becomes a constant key.',
     );
   }
   note('verdict', !readsVerdict || (lookup && key), `ci.yml visual — ${readsVerdict ? 'reuses a verdict; PR-only lookup, keyed on inputs and image' : 'no verdict reuse'}`);

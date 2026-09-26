@@ -52,6 +52,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # The container runs as root over a checkout the runner user owns, and
+      # git refuses to read a repository owned by someone else ("dubious
+      # ownership"). Every script that asks git for the repository root then
+      # fails or falls back to the package — `check-lockfile.mjs` went looking
+      # for `packages/design-system/pnpm-lock.yaml`, and `render-inputs.mjs`
+      # produced no hash at all. `actions/checkout` trusts the path only for
+      # its own git calls, so it is trusted here for everyone else's.
+      - name: Trust the Workspace
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       # The report is a function of its inputs, the same ones the `visual` job's
       # verdict is keyed on (`scripts/render-inputs.mjs` — this workflow and the
       # walkthrough config are tracked files, so they count). When a run with
@@ -64,7 +74,14 @@ jobs:
         id: inputs
         # The render environment is the container above, so the key names its
         # digest; the host runner's image no longer reaches a pixel.
-        run: echo "key=walkthrough-report-dcc5531e97840b9b5e794f2814476b21571c5124a3fca2267d73041f56e7580e-$(node scripts/render-inputs.mjs)" >> "$GITHUB_OUTPUT"
+        # Assigned first, not substituted inside the `echo`: a failing `$(…)`
+        # there leaves the step green and the key ending in `-`, one constant
+        # every later pull request would match. As an assignment it fails the
+        # step (bash -e), and the empty check covers a hash that printed nothing.
+        run: |
+          hash=$(node scripts/render-inputs.mjs)
+          [ -n "$hash" ] || { echo "::error::render-inputs.mjs printed no hash"; exit 1; }
+          echo "key=walkthrough-report-dcc5531e97840b9b5e794f2814476b21571c5124a3fca2267d73041f56e7580e-$hash" >> "$GITHUB_OUTPUT"
 
       - name: Previous Report
         id: report
