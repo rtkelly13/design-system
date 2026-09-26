@@ -278,7 +278,8 @@ const UNGATED = {
   'check:deployed':
     'Compares the live Storybook with this build, so on a pull request it can only ' +
     'be red: the deployment cannot contain the commit under review. It runs in ' +
-    'deployment-drift.yml on pushes to `main` and on a daily schedule, which is ' +
+    'deployment-drift.yml against the `production` branch after each release train and on a ' +
+    'daily schedule, which is ' +
     'where the answer exists. Making it a PR gate would make it a gate that is ' +
     'always red, and a gate that is always red gets deleted.',
 };

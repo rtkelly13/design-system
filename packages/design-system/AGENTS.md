@@ -89,8 +89,8 @@ cost real time:
 
    Two checks are deliberately excluded from the CI it consults — `deployment-drift` and
    `backup-main` — because they observe the deployment rather than judge the code. Leaving
-   `deployment-drift` in is a deadlock: it fails *because* production is stale, which is the
-   thing promoting would fix.
+   `deployment-drift` in could deadlock: it fails when the live site is behind the pointer, and
+   a redeploy is what fixes that.
 
 ## Where things are written down
 
