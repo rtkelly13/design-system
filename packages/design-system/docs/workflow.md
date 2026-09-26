@@ -24,6 +24,14 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - Note that the snapshot workflow pushes as `github-actions[bot]`, and CI runs on bot-authored commits land in **`action_required`** — they need an "Approve and run" click before the PR shows a green check.
 6. **Required Checks** — all of these run on every PR, spread across three
    parallel jobs in `ci.yml`; see § *CI Shape* for which job runs what and why.
+   One exception, and only one: the `visual` job's gates may be satisfied by a
+   **verdict those exact inputs already earned** — the same
+   `scripts/render-inputs.mjs` hash on the same runner image — and then are
+   skipped rather than re-run. Only on a pull request; a push to `main` always
+   runs them in full, which is what checks the key. `pnpm check:governance`
+   holds the exception to that shape: no other job may read the verdict, the
+   lookup is pull-request-only, and the key names both the input hash and the
+   image.
    Branch protection requires the single aggregate check named **`ci`** (the
    `verify` job), which passes only if all three jobs do. That name is
    deliberately content-free, and **must stay that way**: the string is what
