@@ -25,7 +25,7 @@ import type { SiteFixture } from '../siteChrome/fixtures';
 // `Feature`, `PricingGrid`, `PricingTier` and `CTASection` hold none of it —
 // the stories import it from here. The chrome is the site-chrome fixtures'
 // `marketing` and `projectSite` sites, so the header and footer are the ones
-// `Foundations/SiteHeader` already documents.
+// `Components/Navigation/SiteHeader` already documents.
 
 export interface FeatureFixture {
   title: string;

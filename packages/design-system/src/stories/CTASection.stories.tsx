@@ -3,7 +3,7 @@ import { CTASection } from '../components/marketing/CTASection';
 import { ctaActions, launchCta, projectCta } from './marketing/fixtures';
 
 const meta: Meta<typeof CTASection> = {
-  title: 'Foundations/CTASection',
+  title: 'Components/Marketing/CTASection',
   component: CTASection,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'padded' },

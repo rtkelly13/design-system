@@ -35,7 +35,7 @@ const rows: Deployment[] = [
 const STATE_ACCENT = { ready: 'success', building: 'info', error: 'danger' } as const;
 
 const meta: Meta<typeof DataTable<Deployment>> = {
-  title: 'Foundations/DataTable',
+  title: 'Components/Data/DataTable',
   component: DataTable,
   tags: ['autodocs', 'stable'],
 };

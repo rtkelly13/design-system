@@ -4,7 +4,7 @@ import { Progress } from '../components/Progress';
 import { Card } from '../components/Card';
 
 const meta: Meta<typeof Progress> = {
-  title: 'Foundations/Progress',
+  title: 'Components/Feedback/Progress',
   component: Progress,
   tags: ['autodocs', 'stable'],
 };

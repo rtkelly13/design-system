@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ActivityGrid, BeforeAfter, ChangeSummary, FigureFrame, FlowDiagram, GanttChart, Timeline, UptimeStrip } from '../components/docs/figures';
 
 const meta: Meta<typeof FigureFrame> = {
-  title: 'Docs/FigureCompositions',
+  title: 'Docs/Figures/FigureCompositions',
   component: FigureFrame,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'Each example gives related renderers one caption and one border. The renderers stay usable on their own.' } } },

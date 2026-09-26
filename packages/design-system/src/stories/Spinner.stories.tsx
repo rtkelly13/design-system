@@ -4,7 +4,7 @@ import { Spinner } from '../components/Spinner';
 import { Card } from '../components/Card';
 
 const meta: Meta<typeof Spinner> = {
-  title: 'Foundations/Spinner',
+  title: 'Components/Feedback/Spinner',
   component: Spinner,
   tags: ['autodocs', 'stable'],
 };

@@ -18,7 +18,7 @@ import { PageHeader } from '../components/PageHeader';
 import { StatCard } from '../components/StatCard';
 
 const meta: Meta<typeof AppShell> = {
-  title: 'Foundations/AppShell',
+  title: 'Components/Layout/AppShell',
   component: AppShell,
   subcomponents: { AppSidebar, AppSidebarNav, AppTopbar, AppMain },
   tags: ['autodocs', 'stable'],

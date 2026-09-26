@@ -366,7 +366,7 @@ choice of assertion catches the other two.
 | Size | small on purpose | every supported path | one real job |
 | Data | placeholder | fixed, by design | **computed at render** |
 | Ships | `dist/templates/` | `dist/templates/` | nowhere — repo-local |
-| Also | — | the regression: `render.test.ts` asserts it, `foundations-reportdocument--sample` screenshots it | `pnpm contrast:report:html` |
+| Also | — | the regression: `render.test.ts` asserts it, `components-reports-reportdocument--sample` screenshots it | `pnpm contrast:report:html` |
 
 `reports/contrast.tsx` is the one that answers "does this actually work". It calls
 `auditContrast(LEVELS)` during the render, so it *is* the audit rather than a

@@ -6,7 +6,7 @@ import { Button } from '../components/Button';
 import { cn } from '../lib/recipe';
 
 const meta: Meta<typeof Tooltip> = {
-  title: 'Foundations/Tooltip',
+  title: 'Components/Overlays/Tooltip',
   component: Tooltip,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },

@@ -6,7 +6,7 @@ import { Button } from '../components/Button';
 import { cn } from '../lib/recipe';
 
 const meta: Meta<typeof Popover> = {
-  title: 'Foundations/Popover',
+  title: 'Components/Overlays/Popover',
   component: Popover,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },

@@ -3,7 +3,7 @@ import { Input, TextArea } from '../components/Input';
 import { Select } from '../components/Select';
 
 const meta: Meta<typeof Input> = {
-  title: 'Foundations/Input',
+  title: 'Components/Actions & Forms/Input',
   component: Input,
   tags: ['autodocs', 'stable'],
 };

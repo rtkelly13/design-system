@@ -193,12 +193,28 @@ const preview: Preview = {
      * lorem-ipsum blog post, and two mockups at ~20-25% readiness sat at the
      * same visual weight as `Docs/*` at ~90% (`docs/surface-readiness.md`).
      *
-     * `check:story-conventions` holds the same vocabulary closed, so a group
-     * cannot arrive here without a decision about what this system claims to be.
+     * The vocabulary lives in `sidebar.ts`, which `check:story-conventions`
+     * also reads, so a group or category cannot arrive here without a decision
+     * about what this system claims to be.
      */
     options: {
       storySort: {
-        order: ['Manifesto', 'Guides', 'Foundations', 'Docs', 'Blog', 'Presentation', 'SaaS', 'Showcase', '*'],
+        // A literal because Storybook reads `storySort` statically; it must equal
+        // `storySortOrder()` in `sidebar.ts`, and `check:story-conventions` fails if not.
+        order: [
+          'Manifesto',
+          'Guides',
+          'Foundations',
+          'Components',
+          ['Actions & Forms', 'Content', 'Feedback', 'Overlays', 'Navigation', 'Layout', 'Icons', 'Data', 'Marketing', 'Reports', '*'],
+          'Docs',
+          ['Layout', 'Content', 'Figures', '*'],
+          'Blog',
+          'Presentation',
+          'SaaS',
+          'Showcase',
+          '*',
+        ],
       },
     },
 

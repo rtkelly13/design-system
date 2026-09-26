@@ -205,8 +205,8 @@ test.describe('Accessibility', () => {
  * that renders every row and on one that windows ten thousand.
  */
 const DATATABLE_CASES = [
-  { id: 'foundations-datatable--default', rowcount: null },
-  { id: 'foundations-datatable--virtualized', rowcount: '10001' },
+  { id: 'components-data-datatable--default', rowcount: null },
+  { id: 'components-data-datatable--virtualized', rowcount: '10001' },
 ] as const;
 
 test.describe('DataTable semantics', () => {
@@ -279,7 +279,7 @@ test.describe('DataTable semantics', () => {
  */
 test('the focus-guard exclusion still reports a real aria-hidden-focus', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'One project is enough to prove the scope');
-  const id = 'foundations-menu--actions';
+  const id = 'components-overlays-menu--actions';
   await page.goto(`/iframe.html?id=${id}&viewMode=story`);
   await waitForStoryRendered(page, id);
   await expect(page.locator('[data-slot="menu"]')).toBeVisible();
@@ -321,7 +321,7 @@ test('the focus-guard exclusion still reports a real aria-hidden-focus', async (
  * budget: this is new, and starts at zero.
  */
 const OPEN_POPUPS = [
-  { id: 'foundations-select--disabled-option', trigger: '#storybook-root [role="combobox"]', popup: 'listbox' },
+  { id: 'components-actions-forms-select--disabled-option', trigger: '#storybook-root [role="combobox"]', popup: 'listbox' },
 ] as const;
 
 test.describe('Accessibility — open popups', () => {

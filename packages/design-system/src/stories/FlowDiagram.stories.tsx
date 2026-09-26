@@ -3,7 +3,7 @@ import { FlowDiagram } from '../components/docs/figures/FlowDiagram';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof FlowDiagram> = {
-  title: 'Docs/FlowDiagram',
+  title: 'Docs/Figures/FlowDiagram',
   component: FlowDiagram,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'Unframed process paths. Compose inside FigureFrame alongside other documentation visuals. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn/blob/2928126ba146ebbae9c2351deca27d27bb40e744/registry/default/graph-flow/graph-flow.tsx).' } } },

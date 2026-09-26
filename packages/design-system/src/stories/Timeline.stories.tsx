@@ -3,7 +3,7 @@ import { Timeline } from '../components/docs/figures/Timeline';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof Timeline> = {
-  title: 'Docs/Timeline',
+  title: 'Docs/Figures/Timeline',
   component: Timeline,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'A compact dated sequence with done, current, and upcoming states. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn), `registry/default/graph-timeline/graph-timeline.tsx`.' } } },

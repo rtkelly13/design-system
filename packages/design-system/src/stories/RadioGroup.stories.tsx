@@ -15,7 +15,7 @@ function DeploymentOptions() {
 }
 
 const meta: Meta<typeof RadioGroup> = {
-  title: 'Foundations/RadioGroup',
+  title: 'Components/Actions & Forms/RadioGroup',
   component: RadioGroup,
   subcomponents: { Radio },
   tags: ['autodocs', 'stable'],

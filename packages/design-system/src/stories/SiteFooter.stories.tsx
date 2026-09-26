@@ -3,7 +3,7 @@ import { SiteFooter } from '../components/SiteFooter';
 import { footerNav, marketing, portfolio } from './siteChrome/fixtures';
 
 const meta: Meta<typeof SiteFooter> = {
-  title: 'Foundations/SiteFooter',
+  title: 'Components/Navigation/SiteFooter',
   component: SiteFooter,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },

@@ -3,7 +3,7 @@ import { BeforeAfter } from '../components/docs/figures/BeforeAfter';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof BeforeAfter> = {
-  title: 'Docs/BeforeAfter',
+  title: 'Docs/Figures/BeforeAfter',
   component: BeforeAfter,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'Before/after comparisons with directional change. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn), `registry/default/graph-slope/graph-slope.tsx`.' } } },

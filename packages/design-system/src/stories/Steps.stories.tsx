@@ -3,7 +3,7 @@ import { Step, Steps } from '../components/docs/figures/Steps';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof Steps> = {
-  title: 'Docs/Steps',
+  title: 'Docs/Content/Steps',
   component: Steps,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'A numbered MDX procedure with current and upcoming states. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn), `registry/default/steps/steps.tsx`.' } } },

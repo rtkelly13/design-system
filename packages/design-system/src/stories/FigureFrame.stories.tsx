@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FigureFrame, AsciiFrameRule } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof FigureFrame> = {
-  title: 'Docs/FigureFrame',
+  title: 'Docs/Figures/FigureFrame',
   component: FigureFrame,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'The optional shared border and caption for one or more documentation visuals. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn/blob/2928126ba146ebbae9c2351deca27d27bb40e744/registry/default/graph-frame/graph-frame.tsx).' } } },
