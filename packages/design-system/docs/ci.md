@@ -81,6 +81,8 @@ measurements rather than a guess:
   exclusion would show. The key is inputs rather than `storybook-static/` because
   the build is not reproducible: `react-docgen-typescript` reorders props between
   runs of one tree, moving 79 of 313 files.
+  A reused run is visible: the job's summary opens with *Visual verdict reused*
+  and names the key, and every step after the lookup reports skipped.
 - **The walkthrough reuses a report the same way.** Same hash, keyed
   `walkthrough-report-*`: on a pull request whose inputs already rendered one, the
   ~9 MB report is restored from cache and attached again instead of re-captured.
