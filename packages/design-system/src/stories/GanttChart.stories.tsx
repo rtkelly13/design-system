@@ -3,7 +3,7 @@ import { FigureFrame } from '../components/docs/figures/FigureFrame';
 import { GanttChart } from '../components/docs/figures/GanttChart';
 
 const meta: Meta<typeof GanttChart> = {
-  title: 'Docs/GanttChart',
+  title: 'Docs/Figures/GanttChart',
   component: GanttChart,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'A dated schedule with calendar-based bars. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn/blob/2928126ba146ebbae9c2351deca27d27bb40e744/registry/default/graph-gantt/graph-gantt.tsx).' } } },

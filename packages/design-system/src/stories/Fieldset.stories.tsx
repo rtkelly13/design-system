@@ -15,7 +15,7 @@ function RegionOptions() {
 }
 
 const meta: Meta<typeof Fieldset> = {
-  title: 'Foundations/Fieldset',
+  title: 'Components/Actions & Forms/Fieldset',
   component: Fieldset,
   subcomponents: { Legend },
   tags: ['autodocs', 'stable'],

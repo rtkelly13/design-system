@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from '../components/Tabs';
  * way to show it is general is to document it somewhere else entirely.
  */
 const meta: Meta<typeof Tabs> = {
-  title: 'Foundations/Tabs',
+  title: 'Components/Navigation/Tabs',
   component: Tabs,
   tags: ['autodocs', 'stable'],
   argTypes: {

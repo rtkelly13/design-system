@@ -3,7 +3,7 @@ import { Feature, FeatureGrid } from '../components/marketing/FeatureGrid';
 import { features, launchFeatures, projectContents, projectPrinciples } from './marketing/fixtures';
 
 const meta: Meta<typeof FeatureGrid> = {
-  title: 'Foundations/FeatureGrid',
+  title: 'Components/Marketing/FeatureGrid',
   component: FeatureGrid,
   subcomponents: { Feature },
   tags: ['autodocs', 'stable'],

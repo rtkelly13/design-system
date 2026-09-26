@@ -42,7 +42,7 @@ function SampleFields() {
 }
 
 const meta: Meta<typeof ErrorSummary> = {
-  title: 'Foundations/ErrorSummary',
+  title: 'Components/Actions & Forms/ErrorSummary',
   component: ErrorSummary,
   tags: ['autodocs', 'stable'],
   args: {

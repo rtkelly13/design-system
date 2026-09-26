@@ -4,7 +4,7 @@ import { SiteNavItem } from '../components/SiteNav';
 import { SitePage, marketing, portfolio } from './siteChrome/fixtures';
 
 const meta: Meta<typeof MobileNav> = {
-  title: 'Foundations/MobileNav',
+  title: 'Components/Navigation/MobileNav',
   component: MobileNav,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },

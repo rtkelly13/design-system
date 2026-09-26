@@ -4,7 +4,7 @@ import { PricingGrid, PricingTier } from '../components/marketing/PricingGrid';
 import { launchTiers, tiers } from './marketing/fixtures';
 
 const meta: Meta<typeof PricingGrid> = {
-  title: 'Foundations/PricingGrid',
+  title: 'Components/Marketing/PricingGrid',
   component: PricingGrid,
   subcomponents: { PricingTier },
   tags: ['autodocs', 'stable'],

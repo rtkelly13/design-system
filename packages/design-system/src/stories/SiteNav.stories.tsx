@@ -5,7 +5,7 @@ import { SiteNav, SiteNavItem } from '../components/SiteNav';
 import { marketing, navItems, portfolio } from './siteChrome/fixtures';
 
 const meta: Meta<typeof SiteNav> = {
-  title: 'Foundations/SiteNav',
+  title: 'Components/Navigation/SiteNav',
   component: SiteNav,
   subcomponents: { SiteNavItem },
   tags: ['autodocs', 'stable'],

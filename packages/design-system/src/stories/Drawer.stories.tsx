@@ -5,7 +5,7 @@ import { Modal } from '../components/Modal';
 import { Button } from '../components/Button';
 
 const meta: Meta<typeof Drawer> = {
-  title: 'Foundations/Drawer',
+  title: 'Components/Overlays/Drawer',
   component: Drawer,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },

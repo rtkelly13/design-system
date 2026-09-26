@@ -3,7 +3,7 @@ import { UptimeStrip } from '../components/docs/figures/UptimeStrip';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof UptimeStrip> = {
-  title: 'Docs/UptimeStrip',
+  title: 'Docs/Figures/UptimeStrip',
   component: UptimeStrip,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'A compact uptime strip with a percentage and screen-reader summary. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn), `registry/default/graph-uptime/graph-uptime.tsx`.' } } },

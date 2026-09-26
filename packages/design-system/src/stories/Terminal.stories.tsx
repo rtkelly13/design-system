@@ -3,7 +3,7 @@ import { Terminal } from '../components/docs/figures/Terminal';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof Terminal> = {
-  title: 'Docs/Terminal',
+  title: 'Docs/Content/Terminal',
   component: Terminal,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'A keyboard-focusable terminal transcript for technical documentation. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn), `registry/default/terminal/terminal.tsx`.' } } },

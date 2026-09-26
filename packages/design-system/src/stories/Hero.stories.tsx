@@ -6,7 +6,7 @@ import { Hero } from '../components/marketing/Hero';
 import { installSnippet } from './marketing/fixtures';
 
 const meta: Meta<typeof Hero> = {
-  title: 'Foundations/Hero',
+  title: 'Components/Marketing/Hero',
   component: Hero,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'padded' },

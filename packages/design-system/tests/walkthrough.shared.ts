@@ -7,7 +7,7 @@ import { THEME_LEVELS } from '../src/theme/levels';
 
 export interface StoryEntry {
   id: string;
-  /** Storybook group, e.g. `Foundations/Card`. */
+  /** Storybook group, e.g. `Components/Content/Card`. */
   title: string;
   /** Story name within the group, e.g. `Default`. */
   name: string;

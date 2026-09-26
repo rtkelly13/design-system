@@ -3,7 +3,7 @@ import { SiteHeader } from '../components/SiteHeader';
 import { SitePage, blog, marketing, portfolio, projectSite } from './siteChrome/fixtures';
 
 const meta: Meta<typeof SiteHeader> = {
-  title: 'Foundations/SiteHeader',
+  title: 'Components/Navigation/SiteHeader',
   component: SiteHeader,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },

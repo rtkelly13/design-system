@@ -3,7 +3,7 @@ import { ChangeSummary } from '../components/docs/figures/ChangeSummary';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof ChangeSummary> = {
-  title: 'Docs/ChangeSummary',
+  title: 'Docs/Figures/ChangeSummary',
   component: ChangeSummary,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'A readable additions/removals summary for technical writing. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn), `registry/default/graph-diff/graph-diff.tsx`.' } } },

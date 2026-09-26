@@ -13,7 +13,7 @@ const REGIONS: SelectOption[] = [
 ];
 
 const meta: Meta<typeof Select> = {
-  title: 'Foundations/Select',
+  title: 'Components/Actions & Forms/Select',
   component: Select,
   tags: ['autodocs', 'stable'],
   args: {

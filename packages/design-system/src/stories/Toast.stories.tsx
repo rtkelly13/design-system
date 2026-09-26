@@ -5,7 +5,7 @@ import type { ToastOptions } from '../components/Toast';
 import { Button } from '../components/Button';
 
 const meta: Meta<typeof ToastProvider> = {
-  title: 'Foundations/Toast',
+  title: 'Components/Feedback/Toast',
   component: ToastProvider,
   tags: ['autodocs', 'stable'],
   parameters: { layout: 'fullscreen' },

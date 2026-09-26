@@ -5,7 +5,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 
 const meta: Meta<typeof EmptyState> = {
-  title: 'Foundations/EmptyState',
+  title: 'Components/Feedback/EmptyState',
   component: EmptyState,
   tags: ['autodocs', 'stable'],
 };

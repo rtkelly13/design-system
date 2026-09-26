@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { cn } from '../lib/recipe';
 
 const meta: Meta<typeof Menu> = {
-  title: 'Foundations/Menu',
+  title: 'Components/Overlays/Menu',
   component: Menu,
   subcomponents: { MenuItem, MenuRadioGroup, MenuRadioItem, MenuSeparator },
   tags: ['autodocs', 'stable'],

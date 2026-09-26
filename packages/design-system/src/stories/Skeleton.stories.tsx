@@ -4,7 +4,7 @@ import { Skeleton } from '../components/Skeleton';
 import { Card } from '../components/Card';
 
 const meta: Meta<typeof Skeleton> = {
-  title: 'Foundations/Skeleton',
+  title: 'Components/Feedback/Skeleton',
   component: Skeleton,
   tags: ['autodocs', 'stable'],
 };

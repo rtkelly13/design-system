@@ -3,7 +3,7 @@ import { TreeDiagram } from '../components/docs/figures/TreeDiagram';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof TreeDiagram> = {
-  title: 'Docs/TreeDiagram',
+  title: 'Docs/Figures/TreeDiagram',
   component: TreeDiagram,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'A compact nested tree for files, modules, and systems. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn), `registry/default/graph-tree/graph-tree.tsx`.' } } },

@@ -3,7 +3,7 @@ import { ActivityGrid } from '../components/docs/figures/ActivityGrid';
 import { FigureFrame } from '../components/docs/figures/FigureFrame';
 
 const meta: Meta<typeof ActivityGrid> = {
-  title: 'Docs/ActivityGrid',
+  title: 'Docs/Figures/ActivityGrid',
   component: ActivityGrid,
   tags: ['autodocs', 'stable'],
   parameters: { docs: { description: { component: 'A calendar grid for dated counts. Adapted from [mdxcn](https://github.com/keshav-exe/mdxcn/blob/2928126ba146ebbae9c2351deca27d27bb40e744/registry/default/graph-activity/graph-activity.tsx).' } } },

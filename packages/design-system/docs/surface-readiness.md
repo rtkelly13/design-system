@@ -36,14 +36,15 @@ consumer sees it without reading this file.
 | Sidebar group | Tag | From the table below |
 |---|---|---|
 | `Guides/*` | `stable` | prose about decisions already made and shipped |
-| `Foundations/*` | `stable` | the published primitives, gated end to end |
-| `Docs/*` | `stable` | ~90%, "nothing structural" blocking |
+| `Foundations/*` | `stable` | the token specimens — roles, the ladder, swatches |
+| `Components/*/*` | `stable` | the published primitives, gated end to end, filed by category |
+| `Docs/*/*` | `stable` | ~90%, "nothing structural" blocking |
 | `Blog/*` | `stable` | ~70%, real primitives really adopted by the blog |
 | `Presentation/*` | `experimental` | `SlideDeck` is, per #70, "the one component no other consumer can use" |
 | `SaaS/*` | `experimental` | ~20–25%, "screenshots of one specific product" |
 | `Showcase/*` | `experimental` | a sandbox, not a component |
 
-One entry departs from its group. `Foundations/ReportDocument` is tagged `preview`, not
+One entry departs from its group. `Components/Reports/ReportDocument` is tagged `preview`, not
 `stable`: it is gated end to end like everything else in the group, but its only intended
 consumer — the report generator — does not exist in this repository yet, so its API has not
 met a caller. `stable` claims a shape has survived use, and this one has survived a story.
