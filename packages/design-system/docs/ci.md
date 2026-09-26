@@ -8,7 +8,7 @@ Which job runs what and why, and how to review what a change looks like.
 
 ## ⚙️ CI Shape
 
-`ci.yml` runs **three jobs in parallel**, then a fourth that reports their
+`ci.yml` runs **four jobs in parallel**, then a fifth that reports their
 combined verdict.
 
 **It runs on every pull request, whatever the base branch.** `pull_request` used
@@ -23,12 +23,13 @@ trigger is the post-merge signal for the default branch specifically.
 | `gates` | `tokens:check`, `tokens:design:check`, `check:contrast`, `check:docs`, `check:doc-snippets`, `check:skills`, `check:component-docs`, `check:story-docs`, `check:component-contract`, `check:licences`, `check:reference-material`, `check:lint-budget`, `lint`, `check:css`, `check:tokens`, `ansi:check`, `check:fonts`, `check:deps`, `check:governance` | 30s | 10m |
 | `unit` | `typecheck`, `test:coverage`, `build`, `check:bundle-size`, `check:dep-cost`, `check:api` | 40s | 10m |
 | `visual` | `build-storybook`, `check:visual-coverage`, `check:docgen-props`, `check:story-conventions`, `test:visual`, `test:a11y` | 60s | 25m |
-| `verify` | nothing — fails unless the three above succeeded | 10s | 5m |
+| `site` | builds this package, then the applied site in `apps/site` against its `dist/`: docgen, lint and the published colour scanner at zero, a typecheck and the static Next.js export | 90s | 15m |
+| `verify` | nothing — fails unless the four above succeeded | 10s | 5m |
 
 **Check names are lowercase, snake_case, and at most two words**, taken from the
 shared lexicon in `shared-utilities` (`ci`, `build`, `test`, `lint`, `visual`,
-`publish`, `format`, ...) — so the four jobs report as `lint`, `test`, `visual`
-and `ci`. Names that describe their contents cannot also be stable contracts:
+`publish`, `format`, ...) — so the five jobs report as `lint`, `test`, `visual`,
+`build` and `ci`. Names that describe their contents cannot also be stable contracts:
 the required check used to be `Build, Typecheck, Storybook & Visual Regression`,
 splitting the job silently made it `Build, Typecheck, Unit Tests, Storybook &
 Visual Regression`, and the governance map went on requiring the old string.

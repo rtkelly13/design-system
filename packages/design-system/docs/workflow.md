@@ -22,16 +22,16 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - Run manual snapshot updates via GitHub Actions `Update Visual Regression Snapshots` workflow (dispatch it on your branch; it commits regenerated baselines back to that branch — this repo blocks Actions from creating PRs).
    - **The update runs in `missing` mode by default**, writing only baselines that do not exist. That matters: a bare `--update-snapshots` presets to `changed`, so a run intended to add one new story would also re-record every baseline whose render had drifted — which is exactly how a regression becomes the expectation. Say **`/update-snapshots all`** (or `changed`) when a change is *meant* to alter rendering; the mode is echoed back in the PR comment so a reviewer can tell "two added" from "everything re-recorded".
    - Note that the snapshot workflow pushes as `github-actions[bot]`, and CI runs on bot-authored commits land in **`action_required`** — they need an "Approve and run" click before the PR shows a green check.
-6. **Required Checks** — all of these run on every PR, spread across three
+6. **Required Checks** — all of these run on every PR, spread across four
    parallel jobs in `ci.yml`; see § *CI Shape* for which job runs what and why.
    Branch protection requires the single aggregate check named **`ci`** (the
-   `verify` job), which passes only if all three jobs do. That name is
+   `verify` job), which passes only if all four jobs do. That name is
    deliberately content-free, and **must stay that way**: the string is what
    branch protection and `shared-utilities`' governance map match on. It used to
    list what CI did, and splitting the single job into three silently rewrote it
    — the map went on requiring a job that no longer reported, so every PR failed
    `repo-governance verify-pr-checks` with all seven checks green. Rename the
-   three jobs below freely; never rename `ci`:
+   four jobs below freely; never rename `ci`:
    - `pnpm tokens:check` (theme.css matches `src/theme/levels.ts`)
    - `pnpm tokens:design:check` (the DTCG export in `tokens/` is neither stale nor orphaned)
    - `pnpm check:contrast` (every role pair, every level)
@@ -65,6 +65,9 @@ The rules in `AGENTS.md` § *Conventions*, with the reasoning and the incidents 
    - `pnpm check:api` (the published type surface matches `api/index.d.ts`)
    - `pnpm build-storybook`
    - `pnpm test:visual` (Linux CI)
+   - the applied site in `apps/site` (the `site` job): this package built, then
+     the site's docgen, lint, colour scan, typecheck and static export against
+     that `dist/` — the one Next.js App Router consumer the repo builds
 
    This list is a copy of what `ci.yml` runs, introduced with the words "all of
    these run on every PR", and four of thirteen entries were missing when
