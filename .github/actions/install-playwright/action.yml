@@ -59,6 +59,11 @@ inputs:
     required: false
     default: packages/design-system
 
+outputs:
+  cache-hit:
+    description: Whether the browser download was restored from cache, for CI telemetry.
+    value: ${{ steps.cache.outputs.cache-hit }}
+
 runs:
   using: composite
   steps:

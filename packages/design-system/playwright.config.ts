@@ -37,7 +37,13 @@ export default defineConfig({
   // in `docs/visual-regression.md` — a real non-determinism found here is worth
   // more than the 24 seconds.
   workers: process.env.CI ? 4 : undefined,
-  reporter: process.env.CI ? 'html' : [['list'], ['html', { open: 'never' }]],
+  // On CI, a JSON report beside the HTML one, for `scripts/ci-telemetry.mjs`:
+  // GitHub times steps, not tests, and one step here is hundreds of tests. The
+  // file comes from `PLAYWRIGHT_JSON_OUTPUT_FILE`, set per step in `ci.yml`,
+  // because `test:visual` and `test:a11y` share this config and one fixed path
+  // would be overwritten by whichever ran second. It lives in `telemetry/`,
+  // not `test-results/`, which Playwright empties at the start of every run.
+  reporter: process.env.CI ? [['html'], ['json']] : [['list'], ['html', { open: 'never' }]],
   expect: {
     toHaveScreenshot: {
       // No pixel allowance.

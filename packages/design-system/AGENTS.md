@@ -31,6 +31,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm check:story-conventions` | story title vocabulary, and an autodocs decision per component |
 | `pnpm check:story-docs` | what a component page actually tells a reader — docs page, description, three samples, story captions, prop docs. A ratchet, ceiling **41** |
 | `pnpm check:deployed` | the live Storybook against this build — deliberately **not** a PR gate |
+| `pnpm ci:history` | where CI's minutes go: p50/p90 per job and step over recent runs, from GitHub's own timings — not a gate |
 | `pnpm release:train --dry-run` | why the last train did or did not depart — assessment only, moves nothing |
 | `pnpm check:tokens` | hue-named call sites, budget **0** — a colour is addressed by its job |
 | `pnpm ansi:check` | terminal slot coverage **and** the committed fixture diff |
