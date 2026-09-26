@@ -9,6 +9,27 @@ Proper release notes start at 1.0. Until then this file records only what a
 consumer has to *do*, newest first. The reasoning lives in the pull requests and
 in [`docs/adr/`](./docs/adr/).
 
+## Unreleased
+
+**ESM only.** The package is `"type": "module"` and ships one build: `dist/index.js` and one
+`.js` file per module. The CommonJS build, `main` and `module` are gone, and `exports["."]` is
+`{ types, default }`. No export was added or removed, and the CSS, token and terminal subpaths are
+unchanged.
+
+### You have to do something only if
+
+- **You `require()` the package on Node older than 22.12.** That already failed on 0.12.0: the
+  CommonJS build `require()`d `@microcharts/react`, which is ESM only, and Node before 22.12 throws
+  `ERR_REQUIRE_ESM` on it. 22.12 is the first release that loads an ES module from `require()`.
+  Upgrade Node, or use `import`. On 22.12+ `require('@rtkelly13/design-system')` returns the same
+  module `import` does.
+- **A tool of yours needs the package to be CommonJS** — Jest without ESM support, say. Run it in
+  ESM mode, or move it to Vitest.
+- **You deep-imported a file under `dist/`.** Nothing documented one, but `dist/index.mjs` and
+  every `dist/**/*.mjs` are now `.js`. Import from the package root.
+
+Bundlers (Vite, Next, webpack, esbuild) resolved the `import` condition already and see no change.
+
 ## 0.12.0
 
 New documentation visuals adapted from mdxcn: `ActivityGrid`, `GanttChart`,
