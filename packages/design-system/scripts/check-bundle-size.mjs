@@ -231,16 +231,25 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
  * runtime dependency was added. Re-measured against the 0.11.0 base: ESM
  * 362,938 B raw / 84,112 B gzip, CommonJS 397,911 B raw / 86,900 B gzip
  * locally; the ceilings allow a small Linux gzip variance.
+ *
+ * Raised for `Button`'s `pending` state: +1,842 B raw, +533 B gzip on the
+ * ESM bundle over #303's branch (363,764 B / 84,379 B → 365,606 B /
+ * 84,912 B; CommonJS 398,737 B / 87,147 B → 400,706 B / 87,658 B, +1,969 B /
+ * +511 B), measured locally. That is the pending recipe variant, the press
+ * classes re-gated on `not-aria-disabled`, the cancelled-click handler, the
+ * spinner overlay and the status region beside the button. No dependency
+ * moves: the activation guard is hand-rolled rather than `@base-ui/react/button`,
+ * and the spinner is this package's own `Spinner`.
  */
 const BUDGETS = {
   'dist/index.mjs': {
-    maxRaw: 365_000,
-    maxGzip: 85_000,
+    maxRaw: 367_000,
+    maxGzip: 85_600,
     desc: 'ESM bundle',
   },
   'dist/index.js': {
-    maxRaw: 400_000,
-    maxGzip: 88_000,
+    maxRaw: 402_000,
+    maxGzip: 88_600,
     desc: 'CommonJS bundle',
   },
   'src/theme.css': {
