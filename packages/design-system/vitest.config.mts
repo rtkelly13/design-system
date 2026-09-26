@@ -22,6 +22,10 @@ export default defineConfig({
     // Testing Library only registers its own `afterEach(cleanup)` under
     // `globals: true`, which this project does not use. See src/test-setup.ts.
     setupFiles: ['src/test-setup.ts'],
+    // A JSON report on CI for `scripts/ci-telemetry.mjs` — which files are
+    // slow to run. The default reporter stays, so the log reads as before.
+    reporters: process.env.CI ? ['default', 'json'] : ['default'],
+    outputFile: { json: 'telemetry/vitest.json' },
     coverage: {
       provider: 'v8',
       /*

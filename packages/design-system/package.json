@@ -74,6 +74,7 @@
     "check:component-contract:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-component-contract.mjs --list",
     "check:deployed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-deployed.mjs",
     "release:train": "node scripts/release-train.mjs",
+    "ci:history": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ci-telemetry.mjs history",
     "check:story-conventions": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-conventions.mjs",
     "check:story-docs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-docs.mjs",
     "check:story-docs:list": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-story-docs.mjs --list",

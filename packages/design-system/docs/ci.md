@@ -20,9 +20,9 @@ trigger is the post-merge signal for the default branch specifically.
 
 | Job | What it runs | Roughly | Ceiling |
 | --- | --- | --- | --- |
-| `gates` | `tokens:check`, `tokens:design:check`, `check:contrast`, `check:docs`, `check:doc-snippets`, `check:skills`, `check:component-docs`, `check:story-docs`, `check:component-contract`, `check:licences`, `check:reference-material`, `check:lint-budget`, `lint`, `check:css`, `check:tokens`, `ansi:check`, `check:fonts`, `check:deps`, `check:governance` | 30s | 10m |
-| `unit` | `typecheck`, `test:coverage`, `build`, `check:bundle-size`, `check:dep-cost`, `check:api` | 40s | 10m |
-| `visual` | `build-storybook`, `check:visual-coverage`, `check:docgen-props`, `check:story-conventions`, `test:visual`, `test:a11y` | 60s | 25m |
+| `gates` | `tokens:check`, `tokens:design:check`, `check:contrast`, `check:docs`, `check:doc-snippets`, `check:skills`, `check:component-docs`, `check:story-docs`, `check:component-contract`, `check:licences`, `check:reference-material`, `check:lint-budget`, `lint`, `check:css`, `check:tokens`, `ansi:check`, `check:fonts`, `check:deps`, `check:governance` | 80s | 10m |
+| `unit` | `typecheck`, `test:coverage`, `build`, `check:bundle-size`, `check:dep-cost`, `check:api` | 170s | 10m |
+| `visual` | `build-storybook`, `check:visual-coverage`, `check:docgen-props`, `check:story-conventions`, `test:visual`, `test:a11y` | 430s | 25m |
 | `verify` | nothing — fails unless the three above succeeded | 10s | 5m |
 
 **Check names are lowercase, snake_case, and at most two words**, taken from the
@@ -60,6 +60,18 @@ everything else had also run.
 
 **Where the time actually goes**, so the next person optimising this starts from
 measurements rather than a guess:
+
+- **Measure first: `pnpm ci:history`.** It reads the job and step timings GitHub
+  already keeps for every run and prints p50/p90 per job and step, queue time,
+  runner minutes, the critical path and a per-step trend (`--workflow`,
+  `--runs`, `--branch`, `--json`). The "Roughly" column above is its p50 over
+  20 runs in September 2026. It had said `visual` took 60s when its median was
+  over five minutes, because nothing read those timings.
+- **Below the step, the `Telemetry` step.** `test` and `visual` end with
+  `scripts/ci-telemetry.mjs tests`, which reads the JSON reports Vitest and
+  Playwright write under `CI`. It puts the slowest tests, retries, worker
+  utilisation and cache hits in the job summary, and uploads them as
+  `ci-telemetry-<job>`. It is not a gate and cannot fail one.
 
 - **The walkthrough is the long pole of the whole PR**, not `ci.yml` — one test
   per story, four captures each, and it grows by four screenshots per component.
