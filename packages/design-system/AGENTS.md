@@ -39,7 +39,7 @@ Everything is a `pnpm` script; these are the ones whose names do not give them a
 | `pnpm test:a11y` | axe over every asserted story, on both Levels |
 | `pnpm walkthrough` | screenshot every story on every level, for review rather than assertion |
 
-`pnpm lint` reports colour literals at the site that wrote them. `pnpm check:deps`,
+`pnpm lint` reports colour literals at the site that wrote them; in CI its errors are read out of `check:lint-budget`'s pass rather than a second one. `pnpm check:deps`,
 `pnpm check:css` and `pnpm check:fonts` are ratchets with stated budgets.
 
 ## The five rules that are not discoverable
