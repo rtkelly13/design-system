@@ -38,13 +38,30 @@ import { recipe } from '../lib/recipe';
 // popup shrinks to fit rather than running off-screen once the engine has
 // flipped and shifted it as far as it can.
 //
+// ## No compositor layer: `will-change` is forced back to `auto`
+//
+// Floating UI writes `will-change: transform` onto the positioner's inline
+// style, but only when `devicePixelRatio >= 1.5` — so on a phone and never on
+// a desktop at 1x. That promotes the popup to its own compositor layer, which
+// Chromium rasterises on its own schedule and may then draw resampled at a
+// sub-pixel offset rather than painted on the pixel grid with the page. Which
+// of the two you get depends on timing, not on the markup: #293 was the
+// mobile tooltip failing its baseline with the whole popup smeared
+// horizontally by a fraction of a pixel, box and text alike, then matching on
+// retry. The desktop rows of the same components, with no layer, never have.
+//
+// The hint buys smoother repositioning while a scroll moves the anchor, which
+// a label-sized popup does not need, and costs soft text on exactly the
+// high-density screens it is added for. `!` because the value is inline, and
+// an inline declaration beats every non-important class.
+//
 // Each component extends this recipe in its own file — `recipe({ extend:
 // floatingSurface, … })` — with the box that is its own: a tooltip's label
 // size, a popover's width, a menu's list padding. The shared half stays here,
 // so the three cannot disagree about layer, edge, fill or motion.
 export const floatingSurface = recipe({
   slots: {
-    positioner: 'z-top',
+    positioner: 'z-top will-change-auto!',
     popup:
       'max-w-(--available-width) border-2 border-edge-strong bg-surface-raised font-mono text-content-primary '
       + 'shadow-hard-md transition-opacity duration-quick ease-brutalist '

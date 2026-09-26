@@ -450,6 +450,19 @@ test.describe('Design System Visual Regression - Narrow viewport', () => {
           expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
         }
       }
+      // The precondition #293 broke. This project renders at a device pixel
+      // ratio of 2.625, where Floating UI puts `will-change: transform` on
+      // every positioner, and a compositor layer is drawn on the browser's
+      // schedule — resampled at a sub-pixel offset on some runs and not on
+      // others. `floatingSurface.ts` forces it off; this names the element if
+      // anything puts one back, instead of leaving a 215-pixel diff that
+      // passes on retry.
+      const layered = await page.evaluate(() =>
+        Array.from(document.body.querySelectorAll('*'))
+          .filter((el) => getComputedStyle(el).willChange !== 'auto')
+          .map((el) => `<${el.tagName.toLowerCase()} data-slot="${el.getAttribute('data-slot') ?? ''}">`),
+      );
+      expect(layered, 'elements promoted to their own compositor layer').toEqual([]);
       await expect(page).toHaveScreenshot(snapshot, fullPage ? { fullPage: true } : undefined);
     });
   }

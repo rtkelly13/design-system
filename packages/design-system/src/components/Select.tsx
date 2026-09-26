@@ -80,7 +80,8 @@ const list = recipe({
       + 'data-[disabled]:border-edge-subtle data-[disabled]:bg-surface-sunken data-[disabled]:text-content-muted',
     value: 'truncate data-[placeholder]:text-content-muted',
     icon: 'flex shrink-0 text-content-secondary',
-    positioner: 'z-top',
+    // No compositor layer at high pixel density — `floatingSurface.ts` has why.
+    positioner: 'z-top will-change-auto!',
     popup:
       'min-w-[var(--anchor-width)] border-2 border-edge-strong bg-surface-raised font-mono text-sm '
       + 'text-content-primary shadow-hard-md',

@@ -94,6 +94,19 @@ and is noted below.
   that `position: fixed` resolves against the viewport rather than the nearest
   transformed ancestor, which leaves its root legitimately empty; `Drawer`,
   `Toast` and `Tooltip` will all do the same.
+- **Nothing on the mobile project is its own compositor layer.** The `mobile`
+  project renders at a device pixel ratio of 2.625, and at any ratio of 1.5 or
+  more Floating UI writes `will-change: transform` onto every positioner. The
+  layer that creates is drawn on Chromium's schedule: on some runs it was drawn
+  resampled at a sub-pixel offset, smearing the whole popup horizontally, and
+  on others it was not. That was
+  [#293](https://github.com/rtkelly13/design-system/issues/293): the mobile
+  tooltip at the viewport edge failed by the same 215 pixels in two CI runs out
+  of 69, then matched on retry, while the desktop rows of the same components,
+  at 1x with no layer, never failed. `floatingSurface.ts` and `Select` force
+  `will-change: auto`, and every mobile case asserts that no element on the page
+  computes anything else, so a regression names the element rather than showing
+  up as a diff that passes on retry.
 - **Clean URLs must stay off.** `serve` rewrites `/iframe.html` to `/iframe` by
   default and **drops the query string**, so Storybook gets no story to select
   and renders its placeholder. Both Playwright configs therefore pass
