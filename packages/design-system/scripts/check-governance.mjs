@@ -692,10 +692,47 @@ for (const file of PROSE) {
   });
 }
 
+/* ------------------------------------------------------------------ *
+ * Rule 6's one exception — a reused `visual` verdict — held to its shape.
+ *
+ * A gate that can be skipped is a gate that can be skipped by accident, and
+ * the roster above only checks that a command is *written* in a job. So the
+ * exception is pinned here instead: only `visual` reads the verdict, only a
+ * pull request looks it up (so `main` always runs in full), and the key is the
+ * input hash plus the runner image — the one input no tracked file records.
+ * ------------------------------------------------------------------ */
+
+for (const job of jobsOf('.github/workflows/ci.yml')) {
+  const body = job.body.map(({ text }) => text).join('\n');
+  const readsVerdict = /steps\.verdict\./.test(body);
+  if (readsVerdict && job.id !== 'visual') {
+    problems.push(
+      `ci.yml job \`${job.id}\` reads \`steps.verdict\`. Rule 6 allows a reused ` +
+        `verdict for the \`visual\` job only; every other gate runs on every PR.`,
+    );
+  }
+  if (job.id !== 'visual') continue;
+  const lookup = /- name: Previous Verdict\n\s+id: verdict\n\s+if: github\.event_name == 'pull_request'\n/.test(body);
+  const key = /key=visual-verdict-\$\{ImageOS\}-\$\{ImageVersion\}-\$\(node scripts\/render-inputs\.mjs\)/.test(body);
+  if (readsVerdict && !lookup) {
+    problems.push(
+      'ci.yml `visual`: the `Previous Verdict` lookup must be `if: github.event_name == ' +
+        "'pull_request'`. A push to `main` has to run in full — it is what checks the key.",
+    );
+  }
+  if (readsVerdict && !key) {
+    problems.push(
+      'ci.yml `visual`: the verdict key must be `visual-verdict-${ImageOS}-${ImageVersion}-` ' +
+        'plus `node scripts/render-inputs.mjs`. Without the image, a new runner reuses an old verdict.',
+    );
+  }
+  note('verdict', !readsVerdict || (lookup && key), `ci.yml visual — ${readsVerdict ? 'reuses a verdict; PR-only lookup, keyed on inputs and image' : 'no verdict reuse'}`);
+}
+
 /* ------------------------------------------------------------------ */
 
 if (listing) {
-  const sections = ['pins', 'ceilings', 'uploads', 'roster', 'names', 'scripts', 'rules', 'citations'];
+  const sections = ['pins', 'ceilings', 'uploads', 'roster', 'names', 'scripts', 'rules', 'citations', 'verdict'];
   for (const section of sections) {
     const rows = census.filter((row) => row.section === section);
     if (!rows.length) continue;

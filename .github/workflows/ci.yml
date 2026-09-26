@@ -350,7 +350,11 @@ jobs:
       # Node is on the runner before `setup`, and this needs nothing else.
       - name: Rendering Inputs
         id: inputs
-        run: echo "key=visual-verdict-${{ runner.os }}-$(node scripts/render-inputs.mjs)" >> "$GITHUB_OUTPUT"
+        # The runner image is an input no tracked file records: a new
+        # `ubuntu-latest` can change fonts or rendering libraries, and under
+        # `maxDiffPixels: 0` that is a different verdict. `ImageOS` and
+        # `ImageVersion` are set on every hosted runner.
+        run: echo "key=visual-verdict-${ImageOS}-${ImageVersion}-$(node scripts/render-inputs.mjs)" >> "$GITHUB_OUTPUT"
 
       - name: Previous Verdict
         id: verdict
