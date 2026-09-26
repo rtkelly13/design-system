@@ -15,7 +15,7 @@ bundled by esbuild with `react` and `react-dom` external. See the header of
 
 | | gzip |
 |---|---|
-| Authored code — every `.mjs` in `dist/` | 87.0 KB |
+| Authored code — every `.js` in `dist/` | 87.0 KB |
 | Dependencies, all together | 160.5 KB |
 | A consumer importing everything | 247.4 KB |
 
