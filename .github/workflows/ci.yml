@@ -177,14 +177,14 @@ jobs:
       - name: Reference Material
         run: pnpm check:reference-material
 
-      # Ratchet, per rule: the general-purpose ruleset reports as warnings, and
-      # this fails if any rule's count rises. See #58 for why it is not errors.
-      - name: Lint budget
+      # The one ESLint pass. Errors — a colour literal, a class that names
+      # nothing — fail it outright, which is `pnpm lint`'s verdict; warnings
+      # fail it per rule when a count rises (see #58 for why they are not
+      # errors). `pnpm lint` used to be a second step, and a second full pass
+      # over `src/` with the same config: ~25s spent reading the other severity
+      # out of an identical run.
+      - name: Lint
         run: pnpm check:lint-budget
-
-      # Ratchet: fails if the count of colour-instead-of-role call sites rises.
-      - name: Lint — colour literals and unknown classnames
-        run: pnpm lint
 
       # Ratchet: fails if styling moves back into a stylesheet.
       - name: CSS Surface
