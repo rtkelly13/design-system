@@ -133,12 +133,17 @@ function tests(opts) {
     combined.vitest[name] = summary;
     sections.push(renderVitest(name, summary));
   }
-  // Cache results arrive as `--cache name=true|false|''`; '' is a miss with no
-  // restore-key match, which `actions/cache` reports as an empty output.
-  const caches = (opts.cache ?? []).map((pair) => String(pair).split('='));
+  // Cache results arrive as `--cache name=<cache-hit output>`. `actions/cache`
+  // has three answers, not two: 'true' is an exact key match, 'false' is a
+  // partial restore through `restore-keys`, and '' is nothing restored at all.
+  const CACHE = { true: 'hit', false: 'partial' };
+  const caches = (opts.cache ?? []).map((pair) => {
+    const [name, output = ''] = String(pair).split('=');
+    return [name, CACHE[output] ?? 'miss'];
+  });
   if (caches.length) {
-    combined.caches = Object.fromEntries(caches.map(([name, hit]) => [name, hit === 'true']));
-    sections.push(`### Caches\n\n${caches.map(([name, hit]) => `- \`${name}\`: ${hit === 'true' ? 'hit' : 'miss'}`).join('\n')}`);
+    combined.caches = Object.fromEntries(caches);
+    sections.push(`### Caches\n\n${caches.map(([name, state]) => `- \`${name}\`: ${state}`).join('\n')}`);
   }
 
   if (!sections.length) return;
